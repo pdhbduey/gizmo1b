@@ -76,3 +76,7 @@ int LibMotor::setHoldCurrent(float holdCurrent)
     return OKAY;
 }
 
+int LibMotor::getMotorStatus()
+{
+    return ERROR_TIME_OUT;
+}

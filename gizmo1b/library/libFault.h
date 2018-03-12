@@ -4,17 +4,17 @@
 class LibFault
 {
 public:
-    enum LibFaultState {
+    enum State {
         TEC_OCD_POS,
         TEC_OCD_NEG,
         OVERTEMP1, // only valid if NTC1 present
         OVERTEMP2, // only valid if NTC2 present
     };
-    enum LibFaultNtc {
+    enum Ntc {
         NTC1,
         NTC2,
     };
-    enum LibFaultStatus {
+    enum Status {
         OKAY,
         INVALID_STATE,
         INVALID_NTC,
@@ -28,4 +28,4 @@ private:
     static bool s_isInitialized;
 };
 
-#endif /* _LIB_FAULT_H_ */
+#endif // _LIB_FAULT_H_

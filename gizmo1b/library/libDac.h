@@ -4,7 +4,7 @@
 class LibDac
 {
 public:
-    enum LibDacStatus {
+    enum Status {
         OKAY,
         ERROR_SET_VALUE_OUT_OF_RANGE,
     };
@@ -15,4 +15,4 @@ private:
     static bool s_isInitialized;
 };
 
-#endif /* _LIB_DAC_H_ */
+#endif // _LIB_DAC_H_

@@ -4,12 +4,12 @@
 class LibGpio {
 public:
     enum LibGpioInputPin {
-        /* launchxl2-tms570ls1224 */
+        // launchxl2-tms570ls1224
         USER_LED_AIN,
         USER_LED_BIN,
         USER_SWITCH_A,
         USER_SWITCH_B,
-        /* gizmo 1b */
+        // gizmo1b
         DIN_0,
         DIN_1,
         DIN_2,
@@ -18,10 +18,10 @@ public:
         DIN_5,
     };
     enum LibGpioOutputPin {
-        /* launchxl2-tms570ls1224 */
+        // launchxl2-tms570ls1224
         USER_LED_AOUT,
         USER_LED_BOUT,
-        /* gizmo 1b */
+        // gizmo1b
         DOUT_0,
         DOUT_1,
         DOUT_2,
@@ -45,4 +45,4 @@ private:
     static bool s_isInitialized;
 };
 
-#endif /* _LIB_GPIO_H_ */
+#endif // _LIB_GPIO_H_

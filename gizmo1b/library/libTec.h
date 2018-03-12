@@ -17,8 +17,11 @@ public:
     // Linear Interpolation over time between set points,
     // Repeat output LOOPCOUNT times, Time (us)
     void setCurrent(int loopCount, std::vector<TimeCurrent>& setPoints);
+    void stopCurrent();
+    int getLoopValue();
+    int getCountValue();
 private:
     static bool s_isInitialized;
 };
 
-#endif /* _LIB_TEC_H_ */
+#endif // _LIB_TEC_H_

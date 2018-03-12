@@ -4,11 +4,11 @@
 class LibMotor
 {
 public:
-    enum LibMotorDirection {
+    enum Direction {
         POSITIVE,
         NEGATIVE,
     };
-    enum LibMotorMicrosteps {
+    enum Microsteps {
         MICROSTEPS_0,
         MICROSTEPS_1,
         MICROSTEPS_2,
@@ -18,11 +18,16 @@ public:
         MICROSTEPS_6,
         MICROSTEPS_7,
     };
-    enum LibMotorStatus {
+    enum Status {
         OKAY,
         ERROR_INVALID_DIRECTION,
         ERROR_STEPS_COUNT,
         ERROR_INVALID_MICROSTEPS,
+    };
+    enum MotorStatus {
+        READY,
+        BUSY,
+        ERROR_TIME_OUT,
     };
     LibMotor();
     virtual ~LibMotor();
@@ -34,8 +39,9 @@ public:
     int setAcceleration(float acceleration);
     int setDeceleration(float deceleration);
     int setHoldCurrent(float holdCurrent);
+    int getMotorStatus();
 private:
     static bool s_isInitialized;
 };
 
-#endif /* _LIB_MOTOR_H_ */
+#endif // _LIB_MOTOR_H_

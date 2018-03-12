@@ -4,7 +4,7 @@
 class LibFan
 {
 public:
-    enum LibFanStatus {
+    enum Status {
         OKAY,
         ERROR_SET_VALUE_OUT_OF_RANGE,
     };
@@ -16,4 +16,4 @@ private:
     static bool s_isInitialized;
 };
 
-#endif /* _LIB_FAN_H_ */
+#endif // _LIB_FAN_H_
