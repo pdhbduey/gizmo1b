@@ -14,12 +14,23 @@ public:
         OKAY,
         ERROR_INVALID_TEMP_CHANNEL,
     };
+    enum ConversionStatus {
+        IDLE,
+        BUSY,
+        DONE,
+        ERROR_TIMEOUT,
+    };
     LibThermistor();
     virtual ~LibThermistor();
     // Calculated Temp Based on Thermistor resistance table
     int readTemp(int channel, float& value);
+    int startReading(int channel);
+    int getStatus();
+    float getResult();
 private:
     static bool s_isInitialized;
+    float m_result;
+    int m_status;
 };
 
-#endif /* _LIB_THERMISTOR_H_ */
+#endif // _LIB_THERMISTOR_H_

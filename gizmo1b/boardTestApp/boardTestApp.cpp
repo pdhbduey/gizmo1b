@@ -2,15 +2,58 @@
 #include "libSci2.h"
 #include "boardTestUserLed.h"
 #include "boardTestUserSwitch.h"
+#include "boardTestAdc.h"
+#include "boardTestDac.h"
+#include "boardTestFan.h"
+#include "boardTestFault.h"
+#include "boardTestGpio.h"
+#include "boardTestMotor.h"
+#include "boardTestTec.h"
+#include "boardTestThermistor.h"
 
 BoardTestApp::BoardTestApp(const char* name) :
     LibTask(name),
     m_libSci(*new LibSci2(32, 32))
 {
     // launchxl2-tms570ls1224 tests
-    m_boardTestMap[USER_LED]    = new BoardTestUserLed;
-    m_boardTestMap[USER_SWITCH] = new BoardTestUserSwitch;
-    // gizmo 1b tests
+    m_boardTestMap[BoardTest::USER_LED]    = new BoardTestUserLed;
+    m_boardTestMap[BoardTest::USER_SWITCH] = new BoardTestUserSwitch;
+    // gizmo1b tests
+    BoardTest* boardTest = new BoardTestAdc;
+    m_boardTestMap[BoardTest::ADC_CONTROL] = boardTest;
+    m_boardTestMap[BoardTest::ADC_STATUS]  = boardTest;
+    m_boardTestMap[BoardTest::ADC_RESULT]  = boardTest;
+    m_boardTestMap[BoardTest::DAC_VALUE] = new BoardTestDac;
+    m_boardTestMap[BoardTest::FAN_VALUE] = new BoardTestFan;
+    boardTest = new BoardTestFault;
+    m_boardTestMap[BoardTest::FAULT_RESET] = boardTest;
+    m_boardTestMap[BoardTest::FAULT_STATE] = boardTest;
+    boardTest = new BoardTestGpio;
+    m_boardTestMap[BoardTest::GPIO_IN]  = boardTest;
+    m_boardTestMap[BoardTest::GPIO_OUT] = boardTest;
+    boardTest = new BoardTestMotor;
+    m_boardTestMap[BoardTest::MOTOR_CONTROL]           = boardTest;
+    m_boardTestMap[BoardTest::MOTOR_STATUS]            = boardTest;
+    m_boardTestMap[BoardTest::MOTOR_RELATIVE_POSITION] = boardTest;
+    m_boardTestMap[BoardTest::MOTOR_ABSOLUTE_POSITION] = boardTest;
+    m_boardTestMap[BoardTest::MOTOR_SPEED]             = boardTest;
+    m_boardTestMap[BoardTest::MOTOR_ACCELERATION]      = boardTest;
+    m_boardTestMap[BoardTest::MOTOR_DECELERATION]      = boardTest;
+    m_boardTestMap[BoardTest::MOTOR_HOLD_CURRENT]      = boardTest;
+    boardTest = new BoardTestTec;
+    m_boardTestMap[BoardTest::TEC_CONTROL]            = boardTest;
+    m_boardTestMap[BoardTest::TEC_TIME_VALUE]         = boardTest;
+    m_boardTestMap[BoardTest::TEC_CURRENT_VALUE]      = boardTest;
+    m_boardTestMap[BoardTest::TEC_CURRENT_COUNT]      = boardTest;
+    m_boardTestMap[BoardTest::TEC_CURRENT_LOOP_COUNT] = boardTest;
+    m_boardTestMap[BoardTest::TEC_ISENSE_VALUE]       = boardTest;
+    m_boardTestMap[BoardTest::TEC_VSENSE_VALUE]       = boardTest;
+    m_boardTestMap[BoardTest::TEC_LOOP_VALUE]         = boardTest;
+    m_boardTestMap[BoardTest::TEC_COUNT_VALUE]        = boardTest;
+    boardTest = new BoardTestThermistor;
+    m_boardTestMap[BoardTest::THERMISTOR_CONTROL] = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_STATUS]  = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_RESULT]  = boardTest;
 }
 
 BoardTestApp::~BoardTestApp()
@@ -103,7 +146,8 @@ void BoardTestApp::decodeMessage(std::vector<uint8>& message,
 
 bool BoardTestApp::isAddressValid(uint32 address)
 {
-    return address < REG_MEMORY_MAP_MAX && m_boardTestMap[address];
+    return m_boardTestMap.find(address) != m_boardTestMap.end()
+        && m_boardTestMap[address];
 }
 
 int BoardTestApp::regRead(uint32 address, uint32& value)

@@ -35,3 +35,16 @@ void LibTec::setCurrent(int loopCount, std::vector<TimeCurrent>& setPoints)
 {
 }
 
+void LibTec::stopCurrent()
+{
+}
+
+int LibTec::getLoopValue()
+{
+    return 0;
+}
+
+int LibTec::getCountValue()
+{
+    return 0;
+}

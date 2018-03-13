@@ -2,6 +2,7 @@
 #define _BOARD_TEST_APP_H_
 
 #include <vector>
+#include <map>
 #include "sys_common.h"
 #include "libSci.h"
 #include "libTask.h"
@@ -52,14 +53,6 @@ public:
         uint8 buffer[sizeof(struct msgSlaveToMaster)];
     };
 
-    // Register memory map
-    enum RegMemoryMap {
-        // launchxl2-tms570ls1224
-        USER_LED,     // USER_LED register
-        USER_SWITCH,  // USER_SWITCH register
-        // gizmo 1b
-        REG_MEMORY_MAP_MAX
-    };
 public:
     BoardTestApp(const char* name);
     virtual ~BoardTestApp();
@@ -74,7 +67,7 @@ private:
     LibSci& m_libSci;
     union MasterToSlaveMsg m_masterToSlave;
     union SlaveToMasterMsg m_slaveToMaster;
-    BoardTest* m_boardTestMap[REG_MEMORY_MAP_MAX];
+    std::map<int, BoardTest*> m_boardTestMap;
 };
 
 #endif // _BOARD_TEST_APP_H_

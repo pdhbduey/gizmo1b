@@ -12,13 +12,60 @@ public:
         REG_WRITE = 2, // register write
     };
 
-    // Command status
+    // Status
     enum Status {
         OKAY,       // Okay
         ERROR_CMD,  // Error unknown command
         ERROR_ADDR, // Error unknown register address
         ERROR_RO,   // Error read-only register
         ERROR_WO,   // Error write-only register
+    };
+
+    // Register memory map
+    enum RegMemoryMap {
+        // launchxl2-tms570ls1224
+        USER_BASE = 0x00000000,
+        USER_LED = USER_BASE,
+        USER_SWITCH,
+        // gizmo1b
+        ADC_BASE    = 0x00000100,
+        ADC_CONTROL = ADC_BASE,
+        ADC_STATUS,
+        ADC_RESULT,
+        DAC_BASE  = 0x00000200,
+        DAC_VALUE = DAC_BASE,
+        FAN_BASE  = 0x00000300,
+        FAN_VALUE = FAN_BASE,
+        FAULT_BASE  = 0x00000400,
+        FAULT_RESET = FAULT_BASE,
+        FAULT_STATE,
+        GPIO_BASE = 0x00000500,
+        GPIO_IN   = GPIO_BASE,
+        GPIO_OUT,
+        MOTOR_BASE    = 0x00000600,
+        MOTOR_CONTROL = MOTOR_BASE,
+        MOTOR_STATUS,
+        MOTOR_RELATIVE_POSITION,
+        MOTOR_ABSOLUTE_POSITION,
+        MOTOR_SPEED,
+        MOTOR_ACCELERATION,
+        MOTOR_DECELERATION,
+        MOTOR_HOLD_CURRENT,
+        TEC_BASE    = 0x00000700,
+        TEC_CONTROL = TEC_BASE,
+        TEC_TIME_VALUE,
+        TEC_CURRENT_VALUE,
+        TEC_CURRENT_COUNT,
+        TEC_CURRENT_LOOP_COUNT,
+        TEC_ISENSE_VALUE,
+        TEC_VSENSE_VALUE,
+        TEC_LOOP_VALUE,
+        TEC_COUNT_VALUE,
+        THERMISTOR_BASE = 0x00000800,
+        THERMISTOR_CONTROL = THERMISTOR_BASE,
+        THERMISTOR_STATUS,
+        THERMISTOR_RESULT,
+
     };
     BoardTest();
     virtual ~BoardTest();
