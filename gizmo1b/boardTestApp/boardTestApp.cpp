@@ -1,7 +1,5 @@
 #include "boardTestApp.h"
 #include "libSci2.h"
-#include "boardTestUserLed.h"
-#include "boardTestUserSwitch.h"
 #include "boardTestAdc.h"
 #include "boardTestDac.h"
 #include "boardTestFan.h"
@@ -15,10 +13,6 @@ BoardTestApp::BoardTestApp(const char* name) :
     LibTask(name),
     m_libSci(*new LibSci2(32, 32))
 {
-    // launchxl2-tms570ls1224 tests
-    m_boardTestMap[BoardTest::USER_LED]    = new BoardTestUserLed;
-    m_boardTestMap[BoardTest::USER_SWITCH] = new BoardTestUserSwitch;
-    // gizmo1b tests
     BoardTest* boardTest = new BoardTestAdc;
     m_boardTestMap[BoardTest::ADC_CONTROL] = boardTest;
     m_boardTestMap[BoardTest::ADC_STATUS]  = boardTest;
