@@ -12,8 +12,6 @@ public:
     virtual ~LibFan();
     int set(int value); // 0-100
     int read(); // 0-100
-private:
-    static bool s_isInitialized;
 };
 
 #endif // _LIB_FAN_H_

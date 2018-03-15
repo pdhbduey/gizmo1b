@@ -11,8 +11,6 @@ public:
     LibDac();
     virtual ~LibDac();
     int set(float value); // 0-5V
-private:
-    static bool s_isInitialized;
 };
 
 #endif // _LIB_DAC_H_

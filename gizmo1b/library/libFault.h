@@ -1,7 +1,8 @@
 #ifndef _LIB_FAULT_H_
 #define _LIB_FAULT_H_
 
-#include "libCommon.h"
+#include <map>
+#include "libWrapGioPort.h"
 
 class LibFault
 {
@@ -11,16 +12,13 @@ public:
         TEC_OCD_NEG,
         OVERTEMP1, // only valid if NTC1 present
         OVERTEMP2, // only valid if NTC2 present
-        STATE_MAX
     };
     enum Ntc {
         NTC1,
         NTC2,
-        NTC_MAX
     };
     enum Reset {
         RESET_FAULT,
-        RESET_FAULT_MAX
     };
     enum Status {
         OKAY,
@@ -34,10 +32,9 @@ public:
     int readState(int state, bool& isFault); // monitor every 1s
     int readNtcPresent(int ntc, bool& isNtcPresent);
 private:
-    static bool s_isInitialized;
-    static struct LibCommon::Port s_statePort[STATE_MAX];
-    static struct LibCommon::Port s_ntcPort[NTC_MAX];
-    static struct LibCommon::Port s_resetPort[RESET_FAULT_MAX];
+    std::map<int, LibWrapGioPort::Port*> m_stateMap;
+    std::map<int, LibWrapGioPort::Port*> m_ntcMap;
+    std::map<int, LibWrapGioPort::Port*> m_resetMap;
 };
 
 #endif // _LIB_FAULT_H_

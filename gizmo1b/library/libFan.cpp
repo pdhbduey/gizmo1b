@@ -1,12 +1,7 @@
 #include "libFan.h"
 
-bool LibFan::s_isInitialized = false;
-
 LibFan::LibFan()
 {
-    if (!s_isInitialized) {
-        s_isInitialized = true;
-    }
 }
 
 LibFan::~LibFan()

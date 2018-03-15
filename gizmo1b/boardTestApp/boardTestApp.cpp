@@ -1,10 +1,10 @@
+#include "boardTestDio.h"
 #include "boardTestApp.h"
 #include "libSci2.h"
 #include "boardTestAdc.h"
 #include "boardTestDac.h"
 #include "boardTestFan.h"
 #include "boardTestFault.h"
-#include "boardTestGpio.h"
 #include "boardTestMotor.h"
 #include "boardTestTec.h"
 #include "boardTestThermistor.h"
@@ -23,7 +23,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     boardTest = new BoardTestFault;
     m_boardTestMap[BoardTest::FAULT_RESET] = boardTest;
     m_boardTestMap[BoardTest::FAULT_STATE] = boardTest;
-    boardTest = new BoardTestGpio;
+    boardTest = new BoardTestDio;
     m_boardTestMap[BoardTest::GPIO_IN]  = boardTest;
     m_boardTestMap[BoardTest::GPIO_OUT] = boardTest;
     boardTest = new BoardTestMotor;

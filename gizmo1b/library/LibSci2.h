@@ -33,7 +33,6 @@ private:
     static SemaphoreHandle_t sGetSem();
 private:
     static sciBASE_t* s_sci;
-    static bool s_isInitialized;
     static QueueHandle_t s_rxQueue;
     static QueueHandle_t s_txQueue;
     static SemaphoreHandle_t s_sem;

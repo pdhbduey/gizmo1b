@@ -1,6 +1,5 @@
 #include "LibSci2.h"
 
-bool LibSci2::s_isInitialized;
 SemaphoreHandle_t LibSci2::s_sem;
 QueueHandle_t LibSci2::s_rxQueue;
 QueueHandle_t LibSci2::s_txQueue;
@@ -8,13 +7,10 @@ sciBASE_t* LibSci2::s_sci;
 
 LibSci2::LibSci2(UBaseType_t rxQueueLength, UBaseType_t txQueueLength)
 {
-    if (!s_isInitialized) {
-        s_sci = scilinREG;
-        s_sem = xSemaphoreCreateBinary();
-        s_rxQueue = xQueueCreate(rxQueueLength, sizeof(uint8));
-        s_txQueue = xQueueCreate(txQueueLength, sizeof(uint8));
-        s_isInitialized = true;
-    }
+    s_sci = scilinREG;
+    s_sem = xSemaphoreCreateBinary();
+    s_rxQueue = xQueueCreate(rxQueueLength, sizeof(uint8));
+    s_txQueue = xQueueCreate(txQueueLength, sizeof(uint8));
 }
 
 LibSci2::~LibSci2()
