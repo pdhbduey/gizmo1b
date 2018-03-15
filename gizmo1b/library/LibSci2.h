@@ -39,4 +39,4 @@ private:
     static SemaphoreHandle_t s_sem;
 };
 
-#endif /* _LIB_SCI2_H_ */
+#endif // _LIB_SCI2_H_
