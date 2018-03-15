@@ -23,10 +23,6 @@ public:
 
     // Register memory map
     enum RegMemoryMap {
-        // launchxl2-tms570ls1224
-        USER_BASE = 0x00000000,
-        USER_LED = USER_BASE,
-        USER_SWITCH,
         // gizmo1b
         ADC_BASE    = 0x00000100,
         ADC_CONTROL = ADC_BASE,
