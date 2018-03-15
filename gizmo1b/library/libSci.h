@@ -62,4 +62,4 @@ protected:
     int m_stopBits;
 };
 
-#endif /* _LIB_COMM_H_ */
+#endif // _LIB_COMM_H_

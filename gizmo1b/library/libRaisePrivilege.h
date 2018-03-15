@@ -12,4 +12,4 @@ private:
     BaseType_t m_runningPrivileged;
 };
 
-#endif /* _LIB_RAISE_PRIVILEGE_H_ */
+#endif // _LIB_RAISE_PRIVILEGE_H_

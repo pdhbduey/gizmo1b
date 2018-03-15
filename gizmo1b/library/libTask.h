@@ -24,4 +24,4 @@ private:
     bool m_isPrivileged;
 };
 
-#endif /* _LIB_TASK_H_ */
+#endif // _LIB_TASK_H_
