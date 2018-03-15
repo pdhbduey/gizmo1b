@@ -548,6 +548,499 @@ uint32 i ;
 
 
 
+    /** @b initialize @b MIBSPI5 */
+
+    /** bring MIBSPI out of reset */
+    mibspiREG5->GCR0 = 0U;
+    mibspiREG5->GCR0 = 1U;
+
+    /** enable MIBSPI5 multibuffered mode and enable buffer RAM */
+    mibspiREG5->MIBSPIE = (mibspiREG5->MIBSPIE & 0xFFFFFFFEU) | 1U;
+
+    /** MIBSPI5 master mode and clock configuration */
+    mibspiREG5->GCR1 = (mibspiREG5->GCR1 & 0xFFFFFFFCU) | ((uint32)((uint32)1U << 1U)  /* CLOKMOD */
+                  | 1U);  /* MASTER */
+
+    /** MIBSPI5 enable pin configuration */
+    mibspiREG5->INT0 = (mibspiREG5->INT0 & 0xFEFFFFFFU) | (uint32)((uint32)0U << 24U);  /* ENABLE HIGHZ */
+
+    /** - Delays */
+    mibspiREG5->DELAY = (uint32)((uint32)0U << 24U)  /* C2TDELAY */
+                      | (uint32)((uint32)0U << 16U)  /* T2CDELAY */
+                      | (uint32)((uint32)0U << 8U)   /* T2EDELAY */
+                      | (uint32)((uint32)0U << 0U);  /* C2EDELAY */
+
+    /** - Data Format 0 */
+    mibspiREG5->FMT0 = (uint32)((uint32)0U << 24U)  /* wdelay */
+                     | (uint32)((uint32)0U << 23U)  /* parity Polarity */
+                     | (uint32)((uint32)0U << 22U)  /* parity enable */
+                     | (uint32)((uint32)0U << 21U)  /* wait on enable */
+                     | (uint32)((uint32)0U << 20U)  /* shift direction */
+                     | (uint32)((uint32)0U << 17U)  /* clock polarity */
+                     | (uint32)((uint32)0U << 16U)  /* clock phase */
+                     | (uint32)((uint32)79U << 8U)  /* baudrate prescale */
+                     | (uint32)((uint32)16U << 0U); /* data word length */
+
+    /** - Data Format 1 */
+    mibspiREG5->FMT1 = (uint32)((uint32)0U << 24U)  /* wdelay */
+                     | (uint32)((uint32)0U << 23U)  /* parity Polarity */
+                     | (uint32)((uint32)0U << 22U)  /* parity enable */
+                     | (uint32)((uint32)0U << 21U)  /* wait on enable */
+                     | (uint32)((uint32)0U << 20U)  /* shift direction */
+                     | (uint32)((uint32)0U << 17U)  /* clock polarity */
+                     | (uint32)((uint32)0U << 16U)  /* clock phase */
+                     | (uint32)((uint32)79U << 8U)  /* baudrate prescale */
+                     | (uint32)((uint32)16U << 0U); /* data word length */
+
+    /** - Data Format 2 */
+    mibspiREG5->FMT2 = (uint32)((uint32)0U << 24U)  /* wdelay */
+                     | (uint32)((uint32)0U << 23U)  /* parity Polarity */
+                     | (uint32)((uint32)0U << 22U)  /* parity enable */
+                     | (uint32)((uint32)0U << 21U)  /* wait on enable */
+                     | (uint32)((uint32)0U << 20U)  /* shift direction */
+                     | (uint32)((uint32)0U << 17U)  /* clock polarity */
+                     | (uint32)((uint32)0U << 16U)  /* clock phase */
+                     | (uint32)((uint32)79U << 8U)  /* baudrate prescale */
+                     | (uint32)((uint32)16U << 0U); /* data word length */
+
+    /** - Data Format 3 */
+    mibspiREG5->FMT3 = (uint32)((uint32)0U << 24U)  /* wdelay */
+                     | (uint32)((uint32)0U << 23U)  /* parity Polarity */
+                     | (uint32)((uint32)0U << 22U)  /* parity enable */
+                     | (uint32)((uint32)0U << 21U)  /* wait on enable */
+                     | (uint32)((uint32)0U << 20U)  /* shift direction */
+                     | (uint32)((uint32)0U << 17U)  /* clock polarity */
+                     | (uint32)((uint32)0U << 16U)  /* clock phase */
+                     | (uint32)((uint32)79U << 8U)  /* baudrate prescale */
+                     | (uint32)((uint32)16U << 0U); /* data word length */
+
+    /** - Default Chip Select */
+    mibspiREG5->DEF = (uint32)(0xFFU);
+
+    /** - wait for buffer initialization complete before accessing MibSPI registers */
+    /*SAFETYMCUSW 28 D MR:NA <APPROVED> "Hardware status bit read check" */
+    while ((mibspiREG5->FLG & 0x01000000U) != 0U)
+    {
+    } /* Wait */
+
+    /** enable MIBSPI RAM Parity */
+    mibspiREG5->UERRCTRL = (mibspiREG5->UERRCTRL & 0xFFFFFFF0U) | (0x00000005U);
+
+    /** - initialize transfer groups */
+    mibspiREG5->TGCTRL[0U] = (uint32)((uint32)1U << 30U)  /* oneshot */
+                           | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
+                           | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
+                           | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
+                           | (uint32)((uint32)0U << 8U);  /* start buffer */
+
+    mibspiREG5->TGCTRL[1U] = (uint32)((uint32)1U << 30U)  /* oneshot */
+                           | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
+                           | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
+                           | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
+                           | (uint32)((uint32)8U << 8U);  /* start buffer */
+
+    mibspiREG5->TGCTRL[2U] = (uint32)((uint32)1U << 30U)  /* oneshot */
+                           | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
+                           | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
+                           | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
+                           | (uint32)((uint32)(8U+0U) << 8U);  /* start buffer */
+
+    mibspiREG5->TGCTRL[3U] = (uint32)((uint32)1U << 30U)  /* oneshot */
+                           | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
+                           | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
+                           | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
+                           | (uint32)((uint32)(8U+0U+0U) << 8U);  /* start buffer */
+
+    mibspiREG5->TGCTRL[4U] = (uint32)((uint32)1U << 30U)  /* oneshot */
+                           | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
+                           | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
+                           | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
+                           | (uint32)((uint32)(8U+0U+0U+0U) << 8U);  /* start buffer */
+
+    mibspiREG5->TGCTRL[5U] = (uint32)((uint32)1U << 30U)  /* oneshot */
+                           | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
+                           | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
+                           | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
+                           | (uint32)((uint32)(8U+0U+0U+0U+0U) << 8U);  /* start buffer */
+
+    mibspiREG5->TGCTRL[6U] = (uint32)((uint32)1U << 30U)  /* oneshot */
+                           | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
+                           | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
+                           | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
+                           | (uint32)((uint32)(8U+0U+0U+0U+0U+0U) << 8U);  /* start buffer */
+
+    mibspiREG5->TGCTRL[7U] = (uint32)((uint32)1U << 30U)  /* oneshot */
+                           | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
+                           | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
+                           | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
+                           | (uint32)((uint32)(8U+0U+0U+0U+0U+0U+0U) << 8U);  /* start buffer */
+
+
+    mibspiREG5->TGCTRL[8U] = (uint32)(8U+0U+0U+0U+0U+0U+0U+0U) << 8U;
+
+    mibspiREG5->LTGPEND = (mibspiREG5->LTGPEND & 0xFFFF00FFU) | (uint32)(((uint32)(8U+0U+0U+0U+0U+0U+0U+0U)-1U) << 8U);
+
+    /** - initialize buffer ram */
+    {
+        i = 0U;
+
+#if (8U > 0U)
+        {
+
+#if (8U > 1U)
+
+            while (i < (8U-1U))
+            {
+                mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                          | (uint16)((uint16)0U << 12U)  /* chip select hold */
+                                          | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                          | (uint16)((uint16)0U << 11U)  /* lock transmission */
+                                          | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_0)) & (uint16)0x00FFU);  /* chip select */
+                i++;
+            }
+#endif
+            mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                      | (uint16)((uint16)0U << 12U) /* chip select hold */
+                                      | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                      | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_0)) & (uint16)0x00FFU);  /* chip select */
+
+
+            i++;
+        }
+#endif
+
+#if (0U > 0U)
+        {
+
+#if (0U > 1U)
+
+            while (i < ((8U+0U)-1U))
+            {
+                mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                          | (uint16)((uint16)0U << 12U)  /* chip select hold */
+                                          | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                          | (uint16)((uint16)0U << 11U)  /* lock transmission */
+                                          | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_1)) & (uint16)0x00FFU);  /* chip select */
+
+                i++;
+            }
+#endif
+            mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                      | (uint16)((uint16)0U << 12U) /* chip select hold */
+                                      | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                      | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_1)) & (uint16)0x00FFU);  /* chip select */
+
+            i++;
+        }
+#endif
+
+#if (0U > 0U)
+        {
+
+#if (0U > 1U)
+
+            while (i < ((8U+0U+0U)-1U))
+            {
+                mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                          | (uint16)((uint16)0U << 12U)  /* chip select hold */
+                                          | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                          | (uint16)((uint16)0U << 11U)  /* lock transmission */
+                                          | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_2)) & (uint16)0x00FFU);  /* chip select */
+
+                i++;
+            }
+#endif
+            mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                      | (uint16)((uint16)0U << 12U) /* chip select hold */
+                                      | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                      | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_2)) & (uint16)0x00FFU);  /* chip select */
+
+            i++;
+        }
+#endif
+
+#if (0U > 0U)
+        {
+
+#if (0U > 1U)
+
+            while (i < ((8U+0U+0U+0U)-1U))
+            {
+                mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                          | (uint16)((uint16)0U << 12U)  /* chip select hold */
+                                          | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                          | (uint16)((uint16)0U << 11U)  /* lock transmission */
+                                          | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_3)) & (uint16)0x00FFU);  /* chip select */
+
+                i++;
+            }
+#endif
+            mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                      | (uint16)((uint16)0U << 12U) /* chip select hold */
+                                      | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                      | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_3)) & (uint16)0x00FFU);  /* chip select */
+
+            i++;
+        }
+#endif
+
+#if (0U > 0U)
+        {
+
+#if (0U > 1U)
+
+            while (i < ((8U+0U+0U+0U+0U)-1U))
+            {
+                mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                          | (uint16)((uint16)0U << 12U)  /* chip select hold */
+                                          | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                          | (uint16)((uint16)0U << 11U)  /* lock transmission */
+                                          | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_4)) & (uint16)0x00FFU);  /* chip select */
+
+                i++;
+            }
+#endif
+            mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                      | (uint16)((uint16)0U << 12U) /* chip select hold */
+                                      | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                      | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_4)) & (uint16)0x00FFU);  /* chip select */
+
+            i++;
+        }
+#endif
+
+#if (0U > 0U)
+        {
+
+#if (0U > 1U)
+
+            while (i < ((8U+0U+0U+0U+0U+0U)-1U))
+            {
+                mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                          | (uint16)((uint16)0U << 12U)  /* chip select hold */
+                                          | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                          | (uint16)((uint16)0U << 11U)  /* lock transmission */
+                                          | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_5)) & (uint16)0x00FFU);  /* chip select */
+
+                i++;
+            }
+#endif
+            mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                      | (uint16)((uint16)0U << 12U) /* chip select hold */
+                                      | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                      | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_5)) & (uint16)0x00FFU);  /* chip select */
+
+            i++;
+        }
+#endif
+
+#if (0U > 0U)
+        {
+
+#if (0U > 1U)
+
+            while (i < ((8U+0U+0U+0U+0U+0U+0U)-1U))
+            {
+                mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                          | (uint16)((uint16)0U << 12U)  /* chip select hold */
+                                          | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                          | (uint16)((uint16)0U << 11U)  /* lock transmission */
+                                          | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_6)) & (uint16)0x00FFU);  /* chip select */
+
+                i++;
+            }
+#endif
+            mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                      | (uint16)((uint16)0U << 12U) /* chip select hold */
+                                      | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                      | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_6)) & (uint16)0x00FFU);  /* chip select */
+
+            i++;
+        }
+#endif
+
+#if (0U > 0U)
+        {
+
+#if (0U > 1U)
+
+            while (i < ((8U+0U+0U+0U+0U+0U+0U+0U)-1U))
+            {
+                mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                          | (uint16)((uint16)0U << 12U)  /* chip select hold */
+                                          | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                          | (uint16)((uint16)0U << 11U)  /* lock transmission */
+                                          | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_7)) & (uint16)0x00FFU);  /* chip select */
+
+                i++;
+            }
+#endif
+            mibspiRAM5->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
+                                      | (uint16)((uint16)0U << 12U) /* chip select hold */
+                                      | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
+                                      | (uint16)((uint16)0U << 8U)  /* data format */
+										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_7)) & (uint16)0x00FFU);  /* chip select */
+            i++;
+        }
+#endif
+    }
+
+    /** - set interrupt levels */
+    mibspiREG5->LVL = (uint32)((uint32)0U << 9U)  /* TXINT */
+                    | (uint32)((uint32)0U << 8U)  /* RXINT */
+                    | (uint32)((uint32)0U << 6U)  /* OVRNINT */
+                    | (uint32)((uint32)0U << 4U)  /* BITERR */
+                    | (uint32)((uint32)0U << 3U)  /* DESYNC */
+                    | (uint32)((uint32)0U << 2U)  /* PARERR */
+                    | (uint32)((uint32)0U << 1U)  /* TIMEOUT */
+                    | (uint32)((uint32)0U << 0U); /* DLENERR */
+
+    /** - clear any pending interrupts */
+    mibspiREG5->FLG |= 0xFFFFU;
+
+    /** - enable interrupts */
+    mibspiREG5->INT0 = (mibspiREG5->INT0 & 0xFFFF0000U)
+                     | (uint32)((uint32)0U << 9U)  /* TXINT */
+                     | (uint32)((uint32)0U << 8U)  /* RXINT */
+                     | (uint32)((uint32)0U << 6U)  /* OVRNINT */
+                     | (uint32)((uint32)0U << 4U)  /* BITERR */
+                     | (uint32)((uint32)0U << 3U)  /* DESYNC */
+                     | (uint32)((uint32)0U << 2U)  /* PARERR */
+                     | (uint32)((uint32)0U << 1U)  /* TIMEOUT */
+                     | (uint32)((uint32)0U << 0U); /* DLENERR */
+
+    /** @b initialize @b MIBSPI5 @b Port */
+
+    /** - MIBSPI5 Port output values */
+    mibspiREG5->PC3 = (uint32)((uint32)1U << 0U)  /* SCS[0] */
+                    | (uint32)((uint32)1U << 1U)  /* SCS[1] */
+                    | (uint32)((uint32)1U << 2U)  /* SCS[2] */
+                    | (uint32)((uint32)1U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)0U << 8U)  /* ENA */
+                    | (uint32)((uint32)0U << 9U)  /* CLK */
+                    | (uint32)((uint32)0U << 10U)  /* SIMO[0] */
+                    | (uint32)((uint32)0U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)0U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)0U << 18U)  /* SIMO[2] */
+                    | (uint32)((uint32)0U << 19U)  /* SIMO[3] */
+                    | (uint32)((uint32)0U << 25U)  /* SOMI[1] */
+                    | (uint32)((uint32)0U << 26U)  /* SOMI[2] */
+                    | (uint32)((uint32)0U << 27U); /* SOMI[3] */
+
+    /** - MIBSPI5 Port direction */
+    mibspiREG5->PC1 = (uint32)((uint32)0U << 0U)  /* SCS[0] */
+                    | (uint32)((uint32)1U << 1U)  /* SCS[1] */
+                    | (uint32)((uint32)1U << 2U)  /* SCS[2] */
+                    | (uint32)((uint32)1U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)1U << 8U)  /* ENA */
+                    | (uint32)((uint32)1U << 9U)  /* CLK */
+                    | (uint32)((uint32)1U << 10U)  /* SIMO[0] */
+                    | (uint32)((uint32)0U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)0U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)0U << 18U)  /* SIMO[2] */
+                    | (uint32)((uint32)0U << 19U)  /* SIMO[3] */
+                    | (uint32)((uint32)0U << 25U)  /* SOMI[1] */
+                    | (uint32)((uint32)0U << 26U)  /* SOMI[2] */
+                    | (uint32)((uint32)0U << 27U); /* SOMI[3] */
+
+    /** - MIBSPI5 Port open drain enable */
+    mibspiREG5->PC6 = (uint32)((uint32)0U << 0U)  /* SCS[0] */
+                    | (uint32)((uint32)0U << 1U)  /* SCS[1] */
+                    | (uint32)((uint32)0U << 2U)  /* SCS[2] */
+                    | (uint32)((uint32)0U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)0U << 8U)  /* ENA */
+                    | (uint32)((uint32)0U << 9U)  /* CLK */
+                    | (uint32)((uint32)0U << 10U)  /* SIMO[0] */
+                    | (uint32)((uint32)0U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)0U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)0U << 18U)  /* SIMO[2] */
+                    | (uint32)((uint32)0U << 19U)  /* SIMO[3] */
+                    | (uint32)((uint32)0U << 25U)  /* SOMI[1] */
+                    | (uint32)((uint32)0U << 26U)  /* SOMI[2] */
+                    | (uint32)((uint32)0U << 27U); /* SOMI[3] */
+
+    /** - MIBSPI5 Port pullup / pulldown selection */
+    mibspiREG5->PC8 = (uint32)((uint32)1U << 0U)  /* SCS[0] */
+                    | (uint32)((uint32)1U << 1U)  /* SCS[1] */
+                    | (uint32)((uint32)1U << 2U)  /* SCS[2] */
+                    | (uint32)((uint32)1U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)1U << 8U)  /* ENA */
+                    | (uint32)((uint32)1U << 9U)  /* CLK */
+                    | (uint32)((uint32)1U << 10U)  /* SIMO[0] */
+                    | (uint32)((uint32)1U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)1U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)1U << 18U)  /* SIMO[2] */
+                    | (uint32)((uint32)1U << 19U)  /* SIMO[3] */
+                    | (uint32)((uint32)1U << 25U)  /* SOMI[1] */
+                    | (uint32)((uint32)1U << 26U)  /* SOMI[2] */
+                    | (uint32)((uint32)1U << 27U); /* SOMI[3] */
+
+    /** - MIBSPI5 Port pullup / pulldown enable*/
+    mibspiREG5->PC7 = (uint32)((uint32)1U << 0U)  /* SCS[0] */
+                    | (uint32)((uint32)0U << 1U)  /* SCS[1] */
+                    | (uint32)((uint32)0U << 2U)  /* SCS[2] */
+                    | (uint32)((uint32)0U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)1U << 8U)  /* ENA */
+                    | (uint32)((uint32)0U << 9U)  /* CLK */
+                    | (uint32)((uint32)0U << 10U)  /* SIMO[0] */
+                    | (uint32)((uint32)0U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)0U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)0U << 18U)  /* SIMO[2] */
+                    | (uint32)((uint32)0U << 19U)  /* SIMO[3] */
+                    | (uint32)((uint32)0U << 25U)  /* SOMI[1] */
+                    | (uint32)((uint32)0U << 26U)  /* SOMI[2] */
+                    | (uint32)((uint32)0U << 27U); /* SOMI[3] */
+
+    /* MIBSPI5 set all pins to functional */
+    mibspiREG5->PC0 = (uint32)((uint32)0U << 0U)  /* SCS[0] */
+                    | (uint32)((uint32)0U << 1U)  /* SCS[1] */
+                    | (uint32)((uint32)0U << 2U)  /* SCS[2] */
+                    | (uint32)((uint32)0U << 3U)  /* SCS[3] */
+                    | (uint32)((uint32)0U << 8U)  /* ENA */
+                    | (uint32)((uint32)1U << 9U)  /* CLK */
+                    | (uint32)((uint32)1U << 10U)  /* SIMO[0] */
+                    | (uint32)((uint32)1U << 11U)  /* SOMI[0] */
+                    | (uint32)((uint32)1U << 17U)  /* SIMO[1] */
+                    | (uint32)((uint32)1U << 18U)  /* SIMO[2] */
+                    | (uint32)((uint32)1U << 19U)  /* SIMO[3] */
+                    | (uint32)((uint32)1U << 25U)  /* SOMI[1] */
+                    | (uint32)((uint32)1U << 26U)  /* SOMI[2] */
+                    | (uint32)((uint32)1U << 27U); /* SOMI[3] */
+
+  /** - Finally start MIBSPI5 */
+    mibspiREG5->GCR1 = (mibspiREG5->GCR1 & 0xFEFFFFFFU) | 0x01000000U;
+
 /* USER CODE BEGIN (3) */
 /* USER CODE END */
 
@@ -923,6 +1416,83 @@ void mibspi1GetConfigValue(mibspi_config_reg_t *config_reg, config_value_type_t 
     }
 }
 
+
+/** @fn void mibspi5GetConfigValue(mibspi_config_reg_t *config_reg, config_value_type_t type)
+*   @brief Get the initial or current values of the configuration registers
+*
+*    @param[in] *config_reg: pointer to the struct to which the initial or current
+*                           value of the configuration registers need to be stored
+*    @param[in] type:     whether initial or current value of the configuration registers need to be stored
+*                        - InitialValue: initial value of the configuration registers will be stored
+*                                       in the struct pointed by config_reg
+*                        - CurrentValue: initial value of the configuration registers will be stored
+*                                       in the struct pointed by config_reg
+*
+*   This function will copy the initial or current value (depending on the parameter 'type')
+*   of the configuration registers to the struct pointed by config_reg
+*
+*/
+/* SourceId : MIBSPI_SourceId_014 */
+/* DesignId : MIBSPI_DesignId_012 */
+/* Requirements : HL_SR166 */
+void mibspi5GetConfigValue(mibspi_config_reg_t *config_reg, config_value_type_t type)
+{
+    if (type == InitialValue)
+    {
+        config_reg->CONFIG_GCR1       = MIBSPI5_GCR1_CONFIGVALUE;
+        config_reg->CONFIG_INT0       = MIBSPI5_INT0_CONFIGVALUE;
+        config_reg->CONFIG_LVL        = MIBSPI5_LVL_CONFIGVALUE;
+        config_reg->CONFIG_PCFUN      = MIBSPI5_PCFUN_CONFIGVALUE;
+        config_reg->CONFIG_PCDIR      = MIBSPI5_PCDIR_CONFIGVALUE;
+        config_reg->CONFIG_PCPDR      = MIBSPI5_PCPDR_CONFIGVALUE;
+        config_reg->CONFIG_PCDIS      = MIBSPI5_PCDIS_CONFIGVALUE;
+        config_reg->CONFIG_PCPSL      = MIBSPI5_PCPSL_CONFIGVALUE;
+        config_reg->CONFIG_DELAY      = MIBSPI5_DELAY_CONFIGVALUE;
+        config_reg->CONFIG_FMT0       = MIBSPI5_FMT0_CONFIGVALUE;
+        config_reg->CONFIG_FMT1       = MIBSPI5_FMT1_CONFIGVALUE;
+        config_reg->CONFIG_FMT2       = MIBSPI5_FMT2_CONFIGVALUE;
+        config_reg->CONFIG_FMT3       = MIBSPI5_FMT3_CONFIGVALUE;
+        config_reg->CONFIG_MIBSPIE    = MIBSPI5_MIBSPIE_CONFIGVALUE;
+        config_reg->CONFIG_LTGPEND    = MIBSPI5_LTGPEND_CONFIGVALUE;
+        config_reg->CONFIG_TGCTRL[0U] = MIBSPI5_TGCTRL0_CONFIGVALUE;
+        config_reg->CONFIG_TGCTRL[1U] = MIBSPI5_TGCTRL1_CONFIGVALUE;
+        config_reg->CONFIG_TGCTRL[2U] = MIBSPI5_TGCTRL2_CONFIGVALUE;
+        config_reg->CONFIG_TGCTRL[3U] = MIBSPI5_TGCTRL3_CONFIGVALUE;
+        config_reg->CONFIG_TGCTRL[4U] = MIBSPI5_TGCTRL4_CONFIGVALUE;
+        config_reg->CONFIG_TGCTRL[5U] = MIBSPI5_TGCTRL5_CONFIGVALUE;
+        config_reg->CONFIG_TGCTRL[6U] = MIBSPI5_TGCTRL6_CONFIGVALUE;
+        config_reg->CONFIG_TGCTRL[7U] = MIBSPI5_TGCTRL7_CONFIGVALUE;
+        config_reg->CONFIG_UERRCTRL   = MIBSPI5_UERRCTRL_CONFIGVALUE;
+    }
+    else
+    {
+    /*SAFETYMCUSW 134 S MR:12.2 <APPROVED> "LDRA Tool issue" */
+        config_reg->CONFIG_GCR1       = mibspiREG5->GCR1;
+        config_reg->CONFIG_INT0       = mibspiREG5->INT0;
+        config_reg->CONFIG_LVL        = mibspiREG5->LVL;
+        config_reg->CONFIG_PCFUN      = mibspiREG5->PC0;
+        config_reg->CONFIG_PCDIR      = mibspiREG5->PC1;
+        config_reg->CONFIG_PCPDR      = mibspiREG5->PC6;
+        config_reg->CONFIG_PCDIS      = mibspiREG5->PC7;
+        config_reg->CONFIG_PCPSL      = mibspiREG5->PC8;
+        config_reg->CONFIG_DELAY      = mibspiREG5->DELAY;
+        config_reg->CONFIG_FMT0       = mibspiREG5->FMT0;
+        config_reg->CONFIG_FMT1       = mibspiREG5->FMT1;
+        config_reg->CONFIG_FMT2       = mibspiREG5->FMT2;
+        config_reg->CONFIG_FMT3       = mibspiREG5->FMT3;
+        config_reg->CONFIG_MIBSPIE    = mibspiREG5->MIBSPIE;
+        config_reg->CONFIG_LTGPEND    = mibspiREG5->LTGPEND;
+        config_reg->CONFIG_TGCTRL[0U] = mibspiREG5->TGCTRL[0U];
+        config_reg->CONFIG_TGCTRL[1U] = mibspiREG5->TGCTRL[1U];
+        config_reg->CONFIG_TGCTRL[2U] = mibspiREG5->TGCTRL[2U];
+        config_reg->CONFIG_TGCTRL[3U] = mibspiREG5->TGCTRL[3U];
+        config_reg->CONFIG_TGCTRL[4U] = mibspiREG5->TGCTRL[4U];
+        config_reg->CONFIG_TGCTRL[5U] = mibspiREG5->TGCTRL[5U];
+        config_reg->CONFIG_TGCTRL[6U] = mibspiREG5->TGCTRL[6U];
+        config_reg->CONFIG_TGCTRL[7U] = mibspiREG5->TGCTRL[7U];
+        config_reg->CONFIG_UERRCTRL   = mibspiREG5->UERRCTRL;
+    }
+}
 
 
 
