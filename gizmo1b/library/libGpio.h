@@ -5,7 +5,7 @@
 
 class LibGpio {
 public:
-    enum InputPin {
+    enum Input {
         // Mapped A[0-5], B[0-3] --> [0-9]
         DIN_0 = (uint32)((uint32)1U <<  6U), //  38:HET1_06:DIG_IN_A0
         DIN_1 = (uint32)((uint32)1U <<  7U), //  33:HET1_07:DIG_IN_A1
@@ -19,7 +19,7 @@ public:
         DIN_9 = (uint32)((uint32)1U << 22U), //  15:HET1_22:DIG_IN_B3
 
     };
-    enum OutputPin {
+    enum Output {
         // Mapped A[0-3], B[0-3] --> [0-7]
         DOUT_0 = (uint32)((uint32)1U << 12U), // 124:HET1_12:DIG_OUT_A0
         DOUT_1 = (uint32)((uint32)1U << 13U), //  39:HET1_13:DIG_OUT_A1
@@ -30,7 +30,7 @@ public:
         DOUT_6 = (uint32)((uint32)1U << 28U), // 107:HET1_28:DIG_OUT_B2
         DOUT_7 = (uint32)((uint32)1U << 30U), // 127:HET1_30:DIG_OUT_B3
     };
-    enum LibGpioStatus {
+    enum Status {
         OKAY,
         INVALID_INPUT_PIN,
         INVALID_OUTPUT_PIN,
@@ -40,18 +40,6 @@ public:
     int setPin(int pin, bool set);
     int getPin(int pin, bool& isSet);
 private:
-    enum RegMap{
-        DIN_0_REG,
-        DIN_1_REG,
-        DIN_2_REG,
-        DIN_3_REG,
-        DIN_4_REG,
-        DIN_5_REG,
-        DIN_6_REG,
-        DIN_7_REG,
-        DIN_8_REG,
-        DIN_9_REG,
-    };
     static bool s_isInitialized;
 };
 

@@ -14,8 +14,6 @@ int BoardTestGpio::get(uint32 address, uint32& value)
     switch (address) {
     default:
         return ERROR_ADDR;
-    case FAULT_RESET:
-        return ERROR_WO;
     case GPIO_IN:
         value = 0;
         m_libGpio.getPin(LibGpio::DIN_0, isSet);

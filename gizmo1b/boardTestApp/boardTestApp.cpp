@@ -8,6 +8,7 @@
 #include "boardTestMotor.h"
 #include "boardTestTec.h"
 #include "boardTestThermistor.h"
+#include "boardTestLed.h"
 
 BoardTestApp::BoardTestApp(const char* name) :
     LibTask(name),
@@ -48,6 +49,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::THERMISTOR_CONTROL] = boardTest;
     m_boardTestMap[BoardTest::THERMISTOR_STATUS]  = boardTest;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT]  = boardTest;
+    m_boardTestMap[BoardTest::LED_CONTROL] = new BoardTestLed;
 }
 
 BoardTestApp::~BoardTestApp()
