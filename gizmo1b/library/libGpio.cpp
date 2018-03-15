@@ -7,7 +7,6 @@ bool LibGpio::s_isInitialized = false;
 LibGpio::LibGpio()
 {
     if (!s_isInitialized) {
-        gioInit();
         hetInit();
         s_isInitialized = true;
     }

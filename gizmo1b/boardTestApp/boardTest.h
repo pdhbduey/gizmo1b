@@ -57,10 +57,12 @@ public:
         TEC_VSENSE_VALUE,
         TEC_LOOP_VALUE,
         TEC_COUNT_VALUE,
-        THERMISTOR_BASE = 0x00000800,
+        THERMISTOR_BASE    = 0x00000800,
         THERMISTOR_CONTROL = THERMISTOR_BASE,
         THERMISTOR_STATUS,
         THERMISTOR_RESULT,
+        LED_BASE    = 0x00000900,
+        LED_CONTROL = LED_BASE,
 
     };
     BoardTest();

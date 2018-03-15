@@ -7,11 +7,6 @@
 class BoardTestGpio: public BoardTest
 {
 public:
-    BoardTestGpio();
-    virtual ~BoardTestGpio();
-    virtual int get(uint32 address, uint32& value);
-    virtual int set(uint32 address, uint32 value);
-private:
     enum InBits {
         DIN_0_STATE = (uint32)((uint32)1U << 0U),
         DIN_1_STATE = (uint32)((uint32)1U << 1U),
@@ -38,6 +33,11 @@ private:
         DOUT_7_ON  = (uint32)((uint32)1U << 14U),
         DOUT_7_OFF = (uint32)((uint32)1U << 15U),
     };
+    BoardTestGpio();
+    virtual ~BoardTestGpio();
+    virtual int get(uint32 address, uint32& value);
+    virtual int set(uint32 address, uint32 value);
+private:
     LibGpio m_libGpio;
 };
 
