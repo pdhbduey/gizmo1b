@@ -1,31 +1,33 @@
 #ifndef _LIB_COMM_H_
 #define _LIB_COMM_H_
 
+#include <vector>
+#include <map>
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "os_queue.h"
 #include "sys_common.h"
-#include <vector>
+#include "sci.h"
 
 class LibSci {
 public:
-    enum LibSciBaudRate {
+    enum BaudRate {
         BAUD_9600,
         BAUD_19200,
         BAUD_38400,
         BAUD_57600,
         BAUD_115200,
     };
-    enum LibSciParity {
-        NO_PARITY,
-        EVEN_PARITY,
-        ODD_PARITY,
+    enum Parity {
+        NONE,
+        EVEN,
+        ODD,
     };
-    enum LibSciStopBits {
-        ONE_STOP,
-        TWO_STOP,
+    enum StopBits {
+        ONE,
+        TWO,
     };
-    enum LibSciStatus {
+    enum Status {
         OKAY,
         ERROR_BAUD_RATE,
         ERROR_PARITY,
@@ -44,6 +46,7 @@ public:
     int write(const std::vector<uint8>& data);
     bool waitForBytesWritten(int msTimeout = 1000);
     bool waitForReadyRead(int msTimeout = 1000);
+    friend void sciNotification(sciBASE_t* sci, uint32 flags);
 protected:
     virtual void openLowLevel() = 0;
     virtual void closeLowLevel() = 0;
@@ -54,10 +57,15 @@ protected:
     virtual QueueHandle_t getRxQueue() = 0;
     virtual QueueHandle_t getTxQueue() = 0;
     virtual SemaphoreHandle_t getSem() = 0;
+    void addNotification(sciBASE_t* sciReg, void (*notification)(uint32));
 protected:
     int m_baudRate;
     int m_parity;
     int m_stopBits;
+private:
+    static bool s_isInitialized;
+    std::map<sciBASE_t*, void (*)(uint32)> m_notificationMap;
+    static std::map<sciBASE_t*, void (*)(uint32)>* s_notificationMap;
 };
 
 #endif // _LIB_COMM_H_

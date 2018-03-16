@@ -1,5 +1,10 @@
 #include "libAdc.h"
 
+//AD7689ACPZ
+//8CH 16BIT ADC
+// 98:MIBSPI5SOMI[0]:ADC_CNV
+
+
 LibAdc::LibAdc()
 {
 }

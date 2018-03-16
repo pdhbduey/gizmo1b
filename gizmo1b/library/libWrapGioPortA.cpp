@@ -11,7 +11,6 @@ LibWrapGioPortA::LibWrapGioPortA() :
 {
     if (!s_mutex) {
         s_mutex = xSemaphoreCreateMutex();
-        gioInit();
     }
 }
 

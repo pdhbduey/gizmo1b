@@ -17,6 +17,8 @@ public:
     virtual ~LibWrapGioPort();
     virtual void setBit(uint32 bit, uint32 value) = 0;
     virtual uint32 getBit(uint32 bit) = 0;
+private:
+    static bool s_isInitialized;
 };
 
 #endif // _LIB_WRAP_GIO_PORTA_H_

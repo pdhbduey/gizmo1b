@@ -67,8 +67,8 @@ void BoardTestApp::run()
         if (resetSci) {
             m_libSci.close();
             m_libSci.setBaudRate(LibSci::BAUD_115200);
-            m_libSci.setParity(LibSci::NO_PARITY);
-            m_libSci.setStopBits(LibSci::TWO_STOP);
+            m_libSci.setParity(LibSci::NONE);
+            m_libSci.setStopBits(LibSci::TWO);
             m_libSci.open();
             resetSci = false;
         }

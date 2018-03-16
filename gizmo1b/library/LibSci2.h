@@ -23,19 +23,17 @@ protected:
     virtual QueueHandle_t getRxQueue();
     virtual QueueHandle_t getTxQueue();
     virtual SemaphoreHandle_t getSem();
-    friend void libSci2Notification(sciBASE_t* sci, uint32 flags);
 private:
     void setBaudRateLowLevel();
     void setParityLowLevel();
     void setStopBitsLowLevel();
-    static QueueHandle_t sGetRxQueue();
-    static QueueHandle_t sGetTxQueue();
-    static SemaphoreHandle_t sGetSem();
+    static void notification(uint32 flags);
 private:
     static sciBASE_t* s_sci;
     static QueueHandle_t s_rxQueue;
     static QueueHandle_t s_txQueue;
     static SemaphoreHandle_t s_sem;
+    static bool s_isInitialized;
 };
 
 #endif // _LIB_SCI2_H_
