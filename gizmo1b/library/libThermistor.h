@@ -28,7 +28,6 @@ public:
     int getStatus();
     float getResult();
 private:
-    static bool s_isInitialized;
     float m_result;
     int m_status;
 };

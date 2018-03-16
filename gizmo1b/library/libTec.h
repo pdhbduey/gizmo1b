@@ -20,8 +20,6 @@ public:
     void stopCurrent();
     int getLoopValue();
     int getCountValue();
-private:
-    static bool s_isInitialized;
 };
 
 #endif // _LIB_TEC_H_

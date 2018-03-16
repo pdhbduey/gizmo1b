@@ -1,12 +1,7 @@
 #include "libTec.h"
 
-bool LibTec::s_isInitialized = false;
-
 LibTec::LibTec()
 {
-    if (!s_isInitialized) {
-        s_isInitialized = true;
-    }
 }
 
 LibTec::~LibTec()

@@ -1,12 +1,7 @@
 #include "libDac.h"
 
-bool LibDac::s_isInitialized = false;
-
 LibDac::LibDac()
 {
-    if (!s_isInitialized) {
-        s_isInitialized = true;
-    }
 }
 
 LibDac::~LibDac()

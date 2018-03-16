@@ -1,12 +1,7 @@
 #include "libThermistor.h"
 
-bool LibThermistor::s_isInitialized = false;
-
 LibThermistor::LibThermistor()
 {
-    if (!s_isInitialized) {
-        s_isInitialized = true;
-    }
 }
 
 LibThermistor::~LibThermistor()

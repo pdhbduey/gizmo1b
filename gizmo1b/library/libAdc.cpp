@@ -1,13 +1,7 @@
 #include "libAdc.h"
 
-bool LibAdc::s_isInitialized = false;
-
-LibAdc::LibAdc() :
-    m_status(IDLE)
+LibAdc::LibAdc()
 {
-    if (!s_isInitialized) {
-        s_isInitialized = true;
-    }
 }
 
 LibAdc::~LibAdc()

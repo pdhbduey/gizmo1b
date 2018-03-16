@@ -1,0 +1,21 @@
+#ifndef _LIB_WRAP_MIB_SPI1_H_
+#define _LIB_WRAP_MIB_SPI1_H_
+
+#include "FreeRTOS.h"
+#include "os_semphr.h"
+#include "reg_gio.h"
+#include "libWrapMibSpi.h"
+
+class LibWrapMibSpi1 : public LibWrapMibSpi
+{
+public:
+    LibWrapMibSpi1();
+    virtual ~LibWrapMibSpi1();
+    virtual void setBit(uint32 bit, uint32 value);
+    virtual uint32 getBit(uint32 bit);
+private:
+    static SemaphoreHandle_t s_mutex;
+    gioPORT_t* m_port;
+};
+
+#endif // _LIB_WRAP_MIB_SPI1_H_

@@ -40,8 +40,6 @@ public:
     int setDeceleration(float deceleration);
     int setHoldCurrent(float holdCurrent);
     int getMotorStatus();
-private:
-    static bool s_isInitialized;
 };
 
 #endif // _LIB_MOTOR_H_

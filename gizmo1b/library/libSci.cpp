@@ -1,14 +1,9 @@
 #include "sci.h"
 #include "libSci.h"
 
-bool LibSci::s_isInitialized;
-
 LibSci::LibSci()
 {
-    if (!s_isInitialized) {
-        sciInit();
-        s_isInitialized = true;
-    }
+    sciInit();
 }
 
 LibSci::~LibSci()

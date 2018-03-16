@@ -54,8 +54,6 @@ protected:
     virtual QueueHandle_t getRxQueue() = 0;
     virtual QueueHandle_t getTxQueue() = 0;
     virtual SemaphoreHandle_t getSem() = 0;
-private:
-    static bool s_isInitialized;
 protected:
     int m_baudRate;
     int m_parity;

@@ -1,12 +1,7 @@
 #include "libMotor.h"
 
-bool LibMotor::s_isInitialized = false;
-
 LibMotor::LibMotor()
 {
-    if (!s_isInitialized) {
-        s_isInitialized = true;
-    }
 }
 
 LibMotor::~LibMotor()

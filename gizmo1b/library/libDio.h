@@ -1,9 +1,10 @@
 #ifndef _LIB_GPIO_H_
 #define _LIB_GPIO_H_
 
-#include "libCommon.h"
+#include <map>
+#include "libWrapGioPort.h"
 
-class LibGpio {
+class LibDio {
 public:
     enum Input {
         // Mapped A[0-5], B[0-3] --> [0-9]
@@ -17,7 +18,6 @@ public:
         DIN_7,
         DIN_8,
         DIN_9,
-        INPUT_MAX
 
     };
     enum Output {
@@ -30,7 +30,6 @@ public:
         DOUT_5,
         DOUT_6,
         DOUT_7,
-        OUTPUT_MAX
     };
     enum Status {
         OKAY,
@@ -38,14 +37,13 @@ public:
         INVALID_OUTPUT_PIN,
     };
 public:
-    LibGpio();
-    virtual ~LibGpio();
+    LibDio();
+    virtual ~LibDio();
     int setPin(int pin, bool set);
     int getPin(int pin, bool& isSet);
 private:
-    static bool s_isInitialized;
-    static struct LibCommon::Port s_inputPort[INPUT_MAX];
-    static struct LibCommon::Port s_outputPort[OUTPUT_MAX];
+    std::map<int, LibWrapGioPort::Port*> m_inMap;
+    std::map<int, LibWrapGioPort::Port*> m_outMap;
 };
 
 #endif // _LIB_GPIO_H_
