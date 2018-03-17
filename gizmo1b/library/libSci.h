@@ -1,11 +1,13 @@
 #ifndef _LIB_COMM_H_
 #define _LIB_COMM_H_
 
+#include <vector>
+#include <map>
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "os_queue.h"
 #include "sys_common.h"
-#include <vector>
+#include "reg_sci.h"
 
 class LibSci {
 public:
@@ -44,6 +46,7 @@ public:
     int write(const std::vector<uint8>& data);
     bool waitForBytesWritten(int msTimeout = 1000);
     bool waitForReadyRead(int msTimeout = 1000);
+    static std::map<sciBASE_t*, void (*)(uint32)>* s_notificationMap;
 protected:
     virtual void openLowLevel() = 0;
     virtual void closeLowLevel() = 0;
@@ -60,6 +63,7 @@ protected:
     int m_baudRate;
     int m_parity;
     int m_stopBits;
+    std::map<sciBASE_t*, void (*)(uint32)> m_notificationMap;
 };
 
 #endif /* _LIB_COMM_H_ */

@@ -2,11 +2,13 @@
 #include "libSci.h"
 
 bool LibSci::s_isInitialized;
+std::map<sciBASE_t*, void (*)(uint32)>* LibSci::s_notificationMap;
 
 LibSci::LibSci()
 {
     if (!s_isInitialized) {
         sciInit();
+        s_notificationMap = &m_notificationMap;
         s_isInitialized = true;
     }
 }
@@ -119,11 +121,10 @@ bool LibSci::waitForReadyRead(int msTimeout)
     return true;
 }
 
-extern void libSci2Notification(sciBASE_t* sci, uint32 flags);
-
 extern "C" void sciNotification(sciBASE_t* sci, uint32 flags)
 {
-    if (sci == scilinREG) {
-        libSci2Notification(sci, flags);
+    if (LibSci::s_notificationMap->find(sci) != LibSci::s_notificationMap->end()
+     && (*LibSci::s_notificationMap)[sci]) {
+        (*LibSci::s_notificationMap)[sci](flags);
     }
 }
