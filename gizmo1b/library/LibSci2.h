@@ -31,6 +31,7 @@ private:
     static QueueHandle_t sGetRxQueue();
     static QueueHandle_t sGetTxQueue();
     static SemaphoreHandle_t sGetSem();
+    static void notification(uint32 flags);
 private:
     static sciBASE_t* s_sci;
     static bool s_isInitialized;

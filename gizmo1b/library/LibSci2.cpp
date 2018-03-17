@@ -13,6 +13,7 @@ LibSci2::LibSci2(UBaseType_t rxQueueLength, UBaseType_t txQueueLength)
         s_sem = xSemaphoreCreateBinary();
         s_rxQueue = xQueueCreate(rxQueueLength, sizeof(uint8));
         s_txQueue = xQueueCreate(txQueueLength, sizeof(uint8));
+        m_notificationMap[scilinREG] = notification;
         s_isInitialized = true;
     }
 }
@@ -117,11 +118,11 @@ SemaphoreHandle_t LibSci2::sGetSem()
     return s_sem;
 }
 
-void libSci2Notification(sciBASE_t* sci, uint32 flags)
+void LibSci2::notification(uint32 flags)
 {
     uint8 byte;
     if (flags & SCI_RX_INT) {
-        byte = (uint8)(sci->RD & 0x000000FFU);
+        byte = (uint8)(s_sci->RD & 0x000000FFU);
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         xQueueSendFromISR(LibSci2::sGetRxQueue(), &byte,
                                                      &xHigherPriorityTaskWoken);
@@ -131,10 +132,10 @@ void libSci2Notification(sciBASE_t* sci, uint32 flags)
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         if (xQueueReceiveFromISR(LibSci2::sGetTxQueue(), &byte,
                                  &xHigherPriorityTaskWoken) != errQUEUE_EMPTY) {
-            sci->TD = (uint32)byte;
+            s_sci->TD = (uint32)byte;
         }
         else {
-            sci->CLEARINT = (uint32)SCI_TX_INT;
+            s_sci->CLEARINT = (uint32)SCI_TX_INT;
             xHigherPriorityTaskWoken = pdFALSE;
             xSemaphoreGiveFromISR(LibSci2::sGetSem(), &xHigherPriorityTaskWoken);
         }
