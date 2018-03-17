@@ -121,6 +121,11 @@ bool LibSci::waitForReadyRead(int msTimeout)
     return true;
 }
 
+void LibSci::addNotification(sciBASE_t* sciReg, void (*notification)(uint32))
+{
+    m_notificationMap[sciReg] = notification;
+}
+
 extern "C" void sciNotification(sciBASE_t* sci, uint32 flags)
 {
     if (LibSci::s_notificationMap->find(sci) != LibSci::s_notificationMap->end()
