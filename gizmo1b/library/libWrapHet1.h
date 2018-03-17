@@ -11,6 +11,7 @@ class LibWrapHet1 : public LibWrapGioPort
 public:
     LibWrapHet1();
     virtual ~LibWrapHet1();
+    // LibWrapGioPort interface
     virtual void setBit(uint32 bit, uint32 value);
     virtual uint32 getBit(uint32 bit);
 private:

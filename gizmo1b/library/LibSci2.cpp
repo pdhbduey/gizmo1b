@@ -1,5 +1,6 @@
 #include "LibSci2.h"
 
+bool LibSci2::s_isInitialized;
 SemaphoreHandle_t LibSci2::s_sem;
 QueueHandle_t LibSci2::s_rxQueue;
 QueueHandle_t LibSci2::s_txQueue;
@@ -7,10 +8,14 @@ sciBASE_t* LibSci2::s_sci;
 
 LibSci2::LibSci2(UBaseType_t rxQueueLength, UBaseType_t txQueueLength)
 {
-    s_sci = scilinREG;
-    s_sem = xSemaphoreCreateBinary();
-    s_rxQueue = xQueueCreate(rxQueueLength, sizeof(uint8));
-    s_txQueue = xQueueCreate(txQueueLength, sizeof(uint8));
+    if (!s_isInitialized) {
+        s_sci = scilinREG;
+        s_sem = xSemaphoreCreateBinary();
+        s_rxQueue = xQueueCreate(rxQueueLength, sizeof(uint8));
+        s_txQueue = xQueueCreate(txQueueLength, sizeof(uint8));
+        addNotification(scilinREG, notification);
+        s_isInitialized = true;
+    }
 }
 
 LibSci2::~LibSci2()
@@ -65,9 +70,9 @@ void LibSci2::setBaudRateLowLevel()
 void LibSci2::setParityLowLevel()
 {
     uint32 parity[] = {
-        [NO_PARITY]   = (uint32)((uint32)0U << 3U),
-        [EVEN_PARITY] = (uint32)((uint32)3U << 3U),
-        [ODD_PARITY]  = (uint32)((uint32)1U << 3U),
+        [NONE]   = (uint32)((uint32)0U << 3U),
+        [EVEN] = (uint32)((uint32)3U << 3U),
+        [ODD]  = (uint32)((uint32)1U << 3U),
     };
     s_sci->GCR1 &= ~(uint32)((uint32)3U << 3U);
     s_sci->GCR1 |= parity[m_parity];
@@ -77,8 +82,8 @@ void LibSci2::setStopBitsLowLevel()
 {
     s_sci->GCR1 &= ~(uint32)((uint32)1U << 4U);
     uint32 stopBits[] = {
-        [ONE_STOP] = (uint32)((uint32)0U << 4U),
-        [TWO_STOP] = (uint32)((uint32)1U << 4U),
+        [ONE] = (uint32)((uint32)0U << 4U),
+        [TWO] = (uint32)((uint32)1U << 4U),
     };
     s_sci->GCR1 |= stopBits[m_stopBits];
 }
@@ -98,41 +103,26 @@ SemaphoreHandle_t LibSci2::getSem()
     return s_sem;
 }
 
-QueueHandle_t LibSci2::sGetRxQueue()
-{
-    return s_rxQueue;
-}
-
-QueueHandle_t LibSci2::sGetTxQueue()
-{
-    return s_txQueue;
-}
-
-SemaphoreHandle_t LibSci2::sGetSem()
-{
-    return s_sem;
-}
-
-void libSci2Notification(sciBASE_t* sci, uint32 flags)
+void LibSci2::notification(uint32 flags)
 {
     uint8 byte;
     if (flags & SCI_RX_INT) {
-        byte = (uint8)(sci->RD & 0x000000FFU);
+        byte = (uint8)(s_sci->RD & 0x000000FFU);
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        xQueueSendFromISR(LibSci2::sGetRxQueue(), &byte,
+        xQueueSendFromISR(LibSci2::s_rxQueue, &byte,
                                                      &xHigherPriorityTaskWoken);
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
     if  (flags & SCI_TX_INT) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        if (xQueueReceiveFromISR(LibSci2::sGetTxQueue(), &byte,
+        if (xQueueReceiveFromISR(LibSci2::s_txQueue, &byte,
                                  &xHigherPriorityTaskWoken) != errQUEUE_EMPTY) {
-            sci->TD = (uint32)byte;
+            s_sci->TD = (uint32)byte;
         }
         else {
-            sci->CLEARINT = (uint32)SCI_TX_INT;
+            s_sci->CLEARINT = (uint32)SCI_TX_INT;
             xHigherPriorityTaskWoken = pdFALSE;
-            xSemaphoreGiveFromISR(LibSci2::sGetSem(), &xHigherPriorityTaskWoken);
+            xSemaphoreGiveFromISR(LibSci2::s_sem, &xHigherPriorityTaskWoken);
         }
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }

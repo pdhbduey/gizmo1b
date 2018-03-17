@@ -4,13 +4,14 @@
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "reg_gio.h"
-#include "libWrapMibSpi.h"
+#include "libWrapGioPort.h"
 
-class LibWrapMibSpi5 : public LibWrapMibSpi
+class LibWrapMibSpi5 : public LibWrapGioPort
 {
 public:
     LibWrapMibSpi5();
     virtual ~LibWrapMibSpi5();
+    // LibWrapGioPort interface
     virtual void setBit(uint32 bit, uint32 value);
     virtual uint32 getBit(uint32 bit);
 private:
