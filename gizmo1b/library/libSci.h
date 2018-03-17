@@ -7,7 +7,7 @@
 #include "os_semphr.h"
 #include "os_queue.h"
 #include "sys_common.h"
-#include "reg_sci.h"
+#include "sci.h"
 
 class LibSci {
 public:
@@ -46,7 +46,7 @@ public:
     int write(const std::vector<uint8>& data);
     bool waitForBytesWritten(int msTimeout = 1000);
     bool waitForReadyRead(int msTimeout = 1000);
-    static std::map<sciBASE_t*, void (*)(uint32)>* s_notificationMap;
+    friend void sciNotification(sciBASE_t* sci, uint32 flags);
 protected:
     virtual void openLowLevel() = 0;
     virtual void closeLowLevel() = 0;
@@ -57,13 +57,15 @@ protected:
     virtual QueueHandle_t getRxQueue() = 0;
     virtual QueueHandle_t getTxQueue() = 0;
     virtual SemaphoreHandle_t getSem() = 0;
-private:
-    static bool s_isInitialized;
+    void addNotification(sciBASE_t* sciReg, void (*notification)(uint32));
 protected:
     int m_baudRate;
     int m_parity;
     int m_stopBits;
+private:
+    static bool s_isInitialized;
     std::map<sciBASE_t*, void (*)(uint32)> m_notificationMap;
+    static std::map<sciBASE_t*, void (*)(uint32)>* s_notificationMap;
 };
 
 #endif /* _LIB_COMM_H_ */
