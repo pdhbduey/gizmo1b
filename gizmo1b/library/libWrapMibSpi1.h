@@ -23,22 +23,20 @@ public:
     LibWrapMibSpi1(bool isLoopBack = false);
     virtual ~LibWrapMibSpi1();
     void somiSelect(int somi);
-    // LibWrapGioPort interface
-    virtual void setBit(uint32 bit, uint32 value);
-    virtual uint32 getBit(uint32 bit);
-    // LibWrapMibSpi interface
-    virtual void setData(uint32 group, uint16* data);
-    virtual void getData(uint32 group, uint16* data);
-    virtual void transfer(uint32 group);
-    virtual bool waitForTransferComplete(uint32 group, int msTimeout);
     static bool test();
+private:
+    virtual gioPORT_t* getPort();
+    virtual SemaphoreHandle_t& getMutex();
+    virtual mibspiBASE_t* getMibSpiBase();
+    virtual bool isLoopBack();
+    virtual SemaphoreHandle_t& getSem();
 private:
     static void notification(uint32 flags);
 private:
     static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
     gioPORT_t* m_port;
-    mibspiBASE_t* m_base;
+    mibspiBASE_t* m_mibSpiBase;
     static SemaphoreHandle_t s_spi1SomiSwMutex;
     std::map<int, LibWrapGioPort::Port*> m_somiSwMap;
     static SemaphoreHandle_t s_sem;

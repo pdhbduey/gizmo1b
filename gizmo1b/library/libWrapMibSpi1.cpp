@@ -18,7 +18,7 @@ bool LibWrapMibSpi1::s_isInitialized;
 
 LibWrapMibSpi1::LibWrapMibSpi1(bool isLoopBack) :
     m_port(mibspiPORT1),
-    m_base(mibspiREG1),
+    m_mibSpiBase(mibspiREG1),
     m_isLoopBack(isLoopBack)
 {
     if (!s_isInitialized) {
@@ -37,51 +37,32 @@ LibWrapMibSpi1::~LibWrapMibSpi1()
 
 void LibWrapMibSpi1::somiSelect(int somi)
 {
-    m_somiSwMap[SOMI_SW]->m_libWrapGioPort->setBit(m_somiSwMap[SOMI_SW]->m_pin, somi);
+    m_somiSwMap[SOMI_SW]->m_libWrapGioPort->setPin(m_somiSwMap[SOMI_SW]->m_pin, somi);
 }
 
-void LibWrapMibSpi1::setBit(uint32 bit, uint32 value)
+gioPORT_t* LibWrapMibSpi1::getPort()
 {
-    LibMutex libMutex(s_mutex);
-    gioSetBit(m_port, bit, value);
+    return m_port;
 }
 
-uint32 LibWrapMibSpi1::getBit(uint32 bit)
+SemaphoreHandle_t& LibWrapMibSpi1::getMutex()
 {
-    LibMutex libMutex(s_mutex);
-    return gioGetBit(m_port, bit);
+    return s_mutex;
 }
 
-void LibWrapMibSpi1::setData(uint32 group, uint16* data)
+mibspiBASE_t* LibWrapMibSpi1::getMibSpiBase()
 {
-    LibMutex libMutex(s_mutex);
-    mibspiSetData(m_base, group, data);
+    return m_mibSpiBase;
 }
 
-void LibWrapMibSpi1::getData(uint32 group, uint16* data)
+bool LibWrapMibSpi1::isLoopBack()
 {
-    LibMutex libMutex(s_mutex);
-    mibspiGetData(m_base, group, data);
+    return m_isLoopBack;
 }
 
-void LibWrapMibSpi1::transfer(uint32 group)
+SemaphoreHandle_t& LibWrapMibSpi1::getSem()
 {
-    LibMutex libMutex(s_mutex);
-    if (m_isLoopBack) {
-        mibspiEnableLoopback(m_base, Digital_Lbk);
-    }
-    mibspiEnableGroupNotification(m_base, group, 0);
-    mibspiTransfer(m_base, group);
-}
-
-bool LibWrapMibSpi1::waitForTransferComplete(uint32 group, int msTimeout)
-{
-    if (xSemaphoreTake(s_sem, pdMS_TO_TICKS(msTimeout)) == pdFALSE) {
-        LibMutex libMutex(s_mutex);
-        mibspiDisableLoopback(m_base);
-        return false;
-    }
-    return true;
+    return s_sem;
 }
 
 void LibWrapMibSpi1::notification(uint32 group)

@@ -6,12 +6,14 @@
 #include "libWrapMibSpi5.h"
 
 SemaphoreHandle_t LibWrapMibSpi5::s_mutex;
+bool LibWrapMibSpi5::s_isInitialized;
 
 LibWrapMibSpi5::LibWrapMibSpi5() :
     m_port(mibspiPORT5)
 {
-    if (!s_mutex) {
+    if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
+        s_isInitialized = true;
     }
 }
 
@@ -19,14 +21,12 @@ LibWrapMibSpi5::~LibWrapMibSpi5()
 {
 }
 
-void LibWrapMibSpi5::setBit(uint32 bit, uint32 value)
+gioPORT_t* LibWrapMibSpi5::getPort()
 {
-    LibMutex libMutex(s_mutex);
-    gioSetBit(m_port, bit, value);
+    return m_port;
 }
 
-uint32 LibWrapMibSpi5::getBit(uint32 bit)
+SemaphoreHandle_t& LibWrapMibSpi5::getMutex()
 {
-    LibMutex libMutex(s_mutex);
-    return gioGetBit(m_port, bit);
+    return s_mutex;
 }
