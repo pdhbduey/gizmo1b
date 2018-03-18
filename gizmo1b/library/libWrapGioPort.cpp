@@ -24,12 +24,12 @@ LibWrapGioPort::Port::Port(LibWrapGioPort* libWrapGioPort, int pin) :
 
 void LibWrapGioPort::setPin(uint32 pin, uint32 value)
 {
-    LibMutex libMutex(getMutex());
+    LibMutex libMutex(getPortMutex());
     gioSetBit(getPort(), pin, value);
 }
 
 uint32 LibWrapGioPort::getPin(uint32 pin)
 {
-    LibMutex libMutex(getMutex());
+    LibMutex libMutex(getPortMutex());
     return gioGetBit(getPort(), pin);
 }
