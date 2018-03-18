@@ -4,7 +4,6 @@
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "reg_gio.h"
-#include "reg_mibspi.h"
 #include "libWrapGioPort.h"
 
 class LibWrapMibSpi3 : public LibWrapGioPort
@@ -12,10 +11,11 @@ class LibWrapMibSpi3 : public LibWrapGioPort
 public:
     LibWrapMibSpi3();
     virtual ~LibWrapMibSpi3();
-    // LibWrapGioPort interface
-    virtual void setBit(uint32 bit, uint32 value);
-    virtual uint32 getBit(uint32 bit);
 private:
+    virtual gioPORT_t* getPort();
+    virtual SemaphoreHandle_t& getMutex();
+private:
+    static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
     gioPORT_t* m_port;
 };
