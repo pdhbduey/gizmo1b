@@ -1,6 +1,8 @@
 #ifndef _LIB_WRAP_GIO_PORT_H_
 #define _LIB_WRAP_GIO_PORT_H_
 
+#include "FreeRTOS.h"
+#include "os_semphr.h"
 #include "sys_common.h"
 
 class LibWrapGioPort
@@ -15,8 +17,11 @@ public:
 public:
     LibWrapGioPort();
     virtual ~LibWrapGioPort();
-    virtual void setBit(uint32 bit, uint32 value) = 0;
-    virtual uint32 getBit(uint32 bit) = 0;
+    void setBit(uint32 bit, uint32 value);
+    uint32 getBit(uint32 bit);
+protected:
+    virtual SemaphoreHandle_t& getMutex() = 0;
+    virtual gioPORT_t* getPort() = 0;
 private:
     static bool s_isInitialized;
 };
