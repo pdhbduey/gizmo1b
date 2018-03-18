@@ -1,6 +1,5 @@
 #include "mibspi.h"
 #include "libWrapMibSpi.h"
-#include "libMutex.h"
 
 bool LibWrapMibSpi::s_isInitialized;
 std::map<mibspiBASE_t*, void (*)(uint32)>* LibWrapMibSpi::s_notificationMap;
@@ -25,20 +24,17 @@ void LibWrapMibSpi::addNotification(mibspiBASE_t* mibspiReg, void (*notification
 
 void LibWrapMibSpi::setData(uint32 group, uint16* data)
 {
-    LibMutex libMutex(getMutex());
     mibspiSetData(getMibSpiBase(), group, data);
 }
 
 void LibWrapMibSpi::getData(uint32 group, uint16* data)
 {
-    LibMutex libMutex(getMutex());
     mibspiDisableLoopback(getMibSpiBase());
     mibspiGetData(getMibSpiBase(), group, data);
 }
 
 void LibWrapMibSpi::transfer(uint32 group)
 {
-    LibMutex libMutex(getMutex());
     if (isLoopBack()) {
         mibspiEnableLoopback(getMibSpiBase(), Digital_Lbk);
     }
@@ -49,10 +45,19 @@ void LibWrapMibSpi::transfer(uint32 group)
 bool LibWrapMibSpi::waitForTransferComplete(uint32 group, int msTimeout)
 {
     if (xSemaphoreTake(getSem(), pdMS_TO_TICKS(msTimeout)) == pdFALSE) {
-        LibMutex libMutex(getMutex());
         return false;
     }
     return true;
+}
+
+void LibWrapMibSpi::lock(int msTimeout)
+{
+    xSemaphoreTake(getMutex(), pdMS_TO_TICKS(msTimeout));
+}
+
+void LibWrapMibSpi::unlock()
+{
+    xSemaphoreGive(getMutex());
 }
 
 extern "C" void mibspiGroupNotification(mibspiBASE_t* mibspiReg, uint32 group)

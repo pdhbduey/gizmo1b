@@ -13,6 +13,8 @@ class LibWrapMibSpi
 public:
     LibWrapMibSpi();
     virtual ~LibWrapMibSpi();
+    virtual void lock(int msTimeout = 1000);
+    virtual void unlock();
     void setData(uint32 group, uint16* data);
     void getData(uint32 group, uint16* data);
     void transfer(uint32 group);
