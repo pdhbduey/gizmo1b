@@ -153,59 +153,59 @@ uint32 i ;
                            | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
                            | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
                            | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
-                           | (uint32)((uint32)8U << 8U);  /* start buffer */
+                           | (uint32)((uint32)10U << 8U);  /* start buffer */
 
     mibspiREG1->TGCTRL[2U] = (uint32)((uint32)1U << 30U)  /* oneshot */
                            | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
                            | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
                            | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
-                           | (uint32)((uint32)(8U+0U) << 8U);  /* start buffer */
+                           | (uint32)((uint32)(10U+0U) << 8U);  /* start buffer */
 
     mibspiREG1->TGCTRL[3U] = (uint32)((uint32)1U << 30U)  /* oneshot */
                            | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
                            | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
                            | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
-                           | (uint32)((uint32)(8U+0U+0U) << 8U);  /* start buffer */
+                           | (uint32)((uint32)(10U+0U+0U) << 8U);  /* start buffer */
 
     mibspiREG1->TGCTRL[4U] = (uint32)((uint32)1U << 30U)  /* oneshot */
                            | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
                            | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
                            | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
-                           | (uint32)((uint32)(8U+0U+0U+0U) << 8U);  /* start buffer */
+                           | (uint32)((uint32)(10U+0U+0U+0U) << 8U);  /* start buffer */
 
     mibspiREG1->TGCTRL[5U] = (uint32)((uint32)1U << 30U)  /* oneshot */
                            | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
                            | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
                            | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
-                           | (uint32)((uint32)(8U+0U+0U+0U+0U) << 8U);  /* start buffer */
+                           | (uint32)((uint32)(10U+0U+0U+0U+0U) << 8U);  /* start buffer */
 
     mibspiREG1->TGCTRL[6U] = (uint32)((uint32)1U << 30U)  /* oneshot */
                            | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
                            | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
                            | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
-                           | (uint32)((uint32)(8U+0U+0U+0U+0U+0U) << 8U);  /* start buffer */
+                           | (uint32)((uint32)(10U+0U+0U+0U+0U+0U) << 8U);  /* start buffer */
 
     mibspiREG1->TGCTRL[7U] = (uint32)((uint32)1U << 30U)  /* oneshot */
                            | (uint32)((uint32)0U << 29U)  /* pcurrent reset */
                            | (uint32)((uint32)TRG_ALWAYS << 20U)  /* trigger event */
                            | (uint32)((uint32)TRG_DISABLED << 16U)  /* trigger source */
-                           | (uint32)((uint32)(8U+0U+0U+0U+0U+0U+0U) << 8U);  /* start buffer */
+                           | (uint32)((uint32)(10U+0U+0U+0U+0U+0U+0U) << 8U);  /* start buffer */
 
 
-    mibspiREG1->TGCTRL[8U] = (uint32)(8U+0U+0U+0U+0U+0U+0U+0U) << 8U;
+    mibspiREG1->TGCTRL[8U] = (uint32)(10U+0U+0U+0U+0U+0U+0U+0U) << 8U;
 
-    mibspiREG1->LTGPEND = (mibspiREG1->LTGPEND & 0xFFFF00FFU) | (uint32)((uint32)((8U+0U+0U+0U+0U+0U+0U+0U)-1U) << 8U);
+    mibspiREG1->LTGPEND = (mibspiREG1->LTGPEND & 0xFFFF00FFU) | (uint32)((uint32)((10U+0U+0U+0U+0U+0U+0U+0U)-1U) << 8U);
 
     /** - initialize buffer ram */
     {
         i = 0U;
 
-#if (8U > 0U)
+#if (10U > 0U)
         {
 
-#if (8U > 1U)
+#if (10U > 1U)
 
-            while (i < (8U-1U))
+            while (i < (10U-1U))
             {
                 mibspiRAM1->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
                                           | (uint16)((uint16)0U << 12U)  /* chip select hold */
@@ -234,7 +234,7 @@ uint32 i ;
 
 #if (0U > 1U)
 
-            while (i < ((8U+0U)-1U))
+            while (i < ((10U+0U)-1U))
             {
                 mibspiRAM1->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
                                           | (uint16)((uint16)0U << 12U)  /* chip select hold */
@@ -263,7 +263,7 @@ uint32 i ;
 
 #if (0U > 1U)
 
-            while (i < ((8U+0U+0U)-1U))
+            while (i < ((10U+0U+0U)-1U))
             {
                 mibspiRAM1->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
                                           | (uint16)((uint16)0U << 12U)  /* chip select hold */
@@ -292,7 +292,7 @@ uint32 i ;
 
 #if (0U > 1U)
 
-            while (i < ((8U+0U+0U+0U)-1U))
+            while (i < ((10U+0U+0U+0U)-1U))
             {
                 mibspiRAM1->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
                                           | (uint16)((uint16)0U << 12U)  /* chip select hold */
@@ -321,7 +321,7 @@ uint32 i ;
 
 #if (0U > 1U)
 
-            while (i < ((8U+0U+0U+0U+0U)-1U))
+            while (i < ((10U+0U+0U+0U+0U)-1U))
             {
                 mibspiRAM1->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
                                           | (uint16)((uint16)0U << 12U)  /* chip select hold */
@@ -350,7 +350,7 @@ uint32 i ;
 
 #if (0U > 1U)
 
-            while (i < ((8U+0U+0U+0U+0U+0U)-1U))
+            while (i < ((10U+0U+0U+0U+0U+0U)-1U))
             {
                 mibspiRAM1->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
                                           | (uint16)((uint16)0U << 12U)  /* chip select hold */
@@ -379,7 +379,7 @@ uint32 i ;
 
 #if (0U > 1U)
 
-            while (i < ((8U+0U+0U+0U+0U+0U+0U)-1U))
+            while (i < ((10U+0U+0U+0U+0U+0U+0U)-1U))
             {
                 mibspiRAM1->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
                                           | (uint16)((uint16)0U << 12U)  /* chip select hold */
@@ -408,7 +408,7 @@ uint32 i ;
 
 #if (0U > 1U)
 
-            while (i < ((8U+0U+0U+0U+0U+0U+0U+0U)-1U))
+            while (i < ((10U+0U+0U+0U+0U+0U+0U+0U)-1U))
             {
                 mibspiRAM1->tx[i].control = (uint16)((uint16)4U << 13U)  /* buffer mode */
                                           | (uint16)((uint16)0U << 12U)  /* chip select hold */
@@ -1474,6 +1474,38 @@ void mibspi3GetConfigValue(mibspi_config_reg_t *config_reg, config_value_type_t 
 }
 
 
+/* USER CODE BEGIN (22) */
+/* USER CODE END */
+
+/** @fn void mibspi1HighLevelInterrupt(void)
+*   @brief Level 0 Interrupt for MIBSPI1
+*/
+#pragma CODE_STATE(mibspi1HighLevelInterrupt, 32)
+#pragma INTERRUPT(mibspi1HighLevelInterrupt, IRQ)
+
+/* SourceId : MIBSPI_SourceId_015 */
+/* DesignId : MIBSPI_DesignId_013 */
+/* Requirements : HL_SR163, HL_SR164, HL_SR165 */
+void mibspi1HighLevelInterrupt(void)
+{
+    uint32 mibspiFlags = (mibspiREG1->FLG & 0x0000FFFFU) & (~mibspiREG1->LVL & 0x035FU);
+    uint32 vec = mibspiREG1->INTVECT0;
+
+/* USER CODE BEGIN (23) */
+/* USER CODE END */
+
+    if (vec > 0x21U)
+    {
+        mibspiREG1->FLG = (mibspiREG1->FLG & 0xFFFF0000U) | mibspiFlags;
+        mibspiNotification(mibspiREG1, mibspiFlags & 0xFFU);
+    }
+    else
+    {
+        mibspiGroupNotification(mibspiREG1, ((vec & 0x3FU) >> 1U) - 1U);
+    }
+/* USER CODE BEGIN (24) */
+/* USER CODE END */
+}
 
 
 
