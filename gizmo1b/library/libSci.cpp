@@ -129,7 +129,7 @@ void LibSci::addNotification(sciBASE_t* sciReg, void (*notification)(uint32))
 extern "C" void sciNotification(sciBASE_t* sci, uint32 flags)
 {
     if (LibSci::s_notificationMap->find(sci) != LibSci::s_notificationMap->end()
-     && (*LibSci::s_notificationMap)[sci]) {
+   && (*LibSci::s_notificationMap)[sci]) {
         (*LibSci::s_notificationMap)[sci](flags);
     }
 }
