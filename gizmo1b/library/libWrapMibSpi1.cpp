@@ -77,24 +77,26 @@ bool LibWrapMibSpi1::test()
     LibWrapMibSpi& libWrapMibSpi = *new LibWrapMibSpi1(true);
     uint16 txBuffer[10];
     uint16 rxBuffer[10];
-
+    bool isPass = true;
     for (int i = 0; i < 10; i++) {
         txBuffer[i] = i;
         rxBuffer[i] = 0;
     }
-
+    libWrapMibSpi.lock();
     libWrapMibSpi.setData(0, txBuffer);
     libWrapMibSpi.transfer(0);
     if (libWrapMibSpi.waitForTransferComplete(0)) {
         libWrapMibSpi.getData(0, rxBuffer);
     }
     else {
-        return false;
+        isPass = false;
     }
     for (int i = 0; i < 10; i++) {
         if (rxBuffer[i] != txBuffer[i]) {
-            return false;
+            isPass = false;
+            break;
         }
     }
-    return true;
+    libWrapMibSpi.unlock();
+    return isPass;
 }

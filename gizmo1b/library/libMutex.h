@@ -7,11 +7,11 @@
 class LibMutex
 {
 public:
-    LibMutex(SemaphoreHandle_t& mutex, TickType_t delay = portMAX_DELAY);
+    LibMutex(SemaphoreHandle_t& mutex, int msTimeout = 1000);
     virtual ~LibMutex();
 private:
     SemaphoreHandle_t& m_mutex;
-    TickType_t m_delay;
+    int m_msTimeout;
 };
 
 #endif // _LIB_MUTEX_H_
