@@ -20,7 +20,7 @@ public:
     enum SomiSw{
         SOMI_SW
     };
-    LibWrapMibSpi1();
+    LibWrapMibSpi1(bool isLoopBack = false);
     virtual ~LibWrapMibSpi1();
     void somiSelect(int somi);
     // LibWrapGioPort interface
@@ -30,13 +30,19 @@ public:
     virtual void setData(uint32 group, uint16* data);
     virtual void getData(uint32 group, uint16* data);
     virtual void transfer(uint32 group);
-    virtual bool isTransferComplete(uint32 group);
+    virtual bool waitForTransferComplete(uint32 group, int msTimeout);
+    static bool test();
 private:
+    static void notification(uint32 flags);
+private:
+    static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
     gioPORT_t* m_port;
     mibspiBASE_t* m_base;
     static SemaphoreHandle_t s_spi1SomiSwMutex;
     std::map<int, LibWrapGioPort::Port*> m_somiSwMap;
+    static SemaphoreHandle_t s_sem;
+    bool m_isLoopBack;
 };
 
 #endif // _LIB_WRAP_MIB_SPI1_H_
