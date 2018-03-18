@@ -14,7 +14,7 @@ int BoardTestDio::get(uint32 address, uint32& value)
     switch (address) {
     default:
         return ERROR_ADDR;
-    case GPIO_IN:
+    case DIO_IN:
         value = 0;
         m_libDio.getPin(LibDio::DIN_0, isSet);
         value |= isSet ? DIN_0_STATE : 0;
@@ -29,7 +29,7 @@ int BoardTestDio::get(uint32 address, uint32& value)
         m_libDio.getPin(LibDio::DIN_5, isSet);
         value |= isSet ? DIN_5_STATE : 0;
         break;
-    case GPIO_OUT:
+    case DIO_OUT:
         value = 0;
         m_libDio.getPin(LibDio::DOUT_0, isSet);
         value |= (isSet ? DOUT_0_ON : DOUT_0_OFF);
@@ -57,9 +57,9 @@ int BoardTestDio::set(uint32 address, uint32 value)
     switch (address) {
     default:
         return ERROR_ADDR;
-    case GPIO_IN:
+    case DIO_IN:
         return ERROR_RO;
-    case GPIO_OUT:
+    case DIO_OUT:
         if (value & DOUT_0_ON) {
             m_libDio.setPin(LibDio::DOUT_0, true);
         }
