@@ -17,7 +17,7 @@ public:
         SPI_A,
         SPI_B,
     };
-    enum SomiSw{
+    enum SomiSw {
         SOMI_SW
     };
     LibWrapMibSpi1(bool isLoopBack = false);
@@ -43,6 +43,7 @@ private:
     std::map<int, LibWrapGioPort::Port*> m_somiSwMap;
     static SemaphoreHandle_t s_sem;
     bool m_isLoopBack;
+    uint32 m_group;
 };
 
 #endif // _LIB_WRAP_MIB_SPI1_H_

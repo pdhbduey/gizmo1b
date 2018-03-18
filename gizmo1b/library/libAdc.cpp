@@ -3,7 +3,11 @@
 //AD7689ACPZ
 //8CH 16BIT ADC
 // 98:MIBSPI5SOMI[0]:ADC_CNV
-
+// MIBSPI1 group 0 (use HALCOGEN to configure):
+// CLK frequency:
+// word size:
+// number of words:
+// CLK polarity and phase:
 
 LibAdc::LibAdc()
 {

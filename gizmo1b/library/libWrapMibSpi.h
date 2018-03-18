@@ -9,6 +9,17 @@
 class LibWrapMibSpi
 {
 public:
+    enum Group {
+        GROUP_0,
+        GROUP_1,
+        GROUP_2,
+        GROUP_3,
+        GROUP_4,
+        GROUP_5,
+        GROUP_6,
+        GROUP_7,
+    };
+public:
     LibWrapMibSpi();
     virtual ~LibWrapMibSpi();
     virtual void setData(uint32 group, uint16* data) = 0;
