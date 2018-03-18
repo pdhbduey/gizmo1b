@@ -5,13 +5,11 @@
 #include "libWrapGioPortA.h"
 #include "libWrapMibSpi5.h"
 
-LibFault::LibFault()
+LibFault::LibFault() :
+    m_drvErrClr(new LibWrapMibSpi5, PIN_ENA) // 97:MIBSPI5NENA:DRV_ERR_CLR
 {
-    LibWrapGioPort* libWrapMibSpi5 = new LibWrapMibSpi5;
-    LibWrapGioPort* libWrapGioPortA = new LibWrapGioPortA;
-    m_ntcMap[NTC1] = new LibWrapGioPort::Port(libWrapMibSpi5, PIN_CS0);  // 32:MIBSPI5NCS[0]:NTC_PRESENT1
-    m_ntcMap[NTC2] = new LibWrapGioPort::Port(libWrapGioPortA, 2);       //  9:GIOA[2]:NTC_PRESENT2
-    m_resetMap[RESET_FAULT] = new LibWrapGioPort::Port(libWrapMibSpi5, PIN_ENA);  // 97:MIBSPI5NENA:DRV_ERR_CLR
+    m_ntcMap[NTC1] = new LibWrapGioPort::Port(new LibWrapMibSpi5, PIN_CS0); // 32:MIBSPI5NCS[0]:NTC_PRESENT1
+    m_ntcMap[NTC2] = new LibWrapGioPort::Port(new LibWrapGioPortA, 2);      //  9:GIOA[2]:NTC_PRESENT2
 }
 
 LibFault::~LibFault()
@@ -20,12 +18,9 @@ LibFault::~LibFault()
 
 void LibFault::reset()
 {
-    if (m_resetMap.find(RESET_FAULT) != m_resetMap.end()
-     && m_resetMap[RESET_FAULT]) {
-        m_resetMap[RESET_FAULT]->m_libWrapGioPort->setPin(m_resetMap[RESET_FAULT]->m_pin, true);
-        vTaskDelay(pdMS_TO_TICKS(1)); // >1us
-        m_resetMap[RESET_FAULT]->m_libWrapGioPort->setPin(m_resetMap[RESET_FAULT]->m_pin, false);
-    }
+    m_drvErrClr.m_libWrapGioPort->setPin(m_drvErrClr.m_pin, true);
+    vTaskDelay(pdMS_TO_TICKS(1)); // >1us
+    m_drvErrClr.m_libWrapGioPort->setPin(m_drvErrClr.m_pin, false);
 }
 
 int LibFault::readState(int state, bool& isFault)

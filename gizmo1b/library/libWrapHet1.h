@@ -12,11 +12,11 @@ public:
     LibWrapHet1();
     virtual ~LibWrapHet1();
 protected:
-    virtual SemaphoreHandle_t& getMutex();
+    virtual SemaphoreHandle_t& getPortMutex();
     virtual gioPORT_t* getPort();
 private:
     static bool s_isInitialized;
-    static SemaphoreHandle_t s_mutex;
+    static SemaphoreHandle_t s_portMutex;
     gioPORT_t* m_port;
 };
 
