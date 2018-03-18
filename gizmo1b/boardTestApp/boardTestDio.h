@@ -1,17 +1,12 @@
 #ifndef _BOARD_TEST_GPIO_H_
 #define _BOARD_TEST_GPIO_H_
 
+#include "libDio.h"
 #include "boardTest.h"
-#include "libGpio.h"
 
-class BoardTestGpio: public BoardTest
+class BoardTestDio: public BoardTest
 {
 public:
-    BoardTestGpio();
-    virtual ~BoardTestGpio();
-    virtual int get(uint32 address, uint32& value);
-    virtual int set(uint32 address, uint32 value);
-private:
     enum InBits {
         DIN_0_STATE = (uint32)((uint32)1U << 0U),
         DIN_1_STATE = (uint32)((uint32)1U << 1U),
@@ -38,7 +33,12 @@ private:
         DOUT_7_ON  = (uint32)((uint32)1U << 14U),
         DOUT_7_OFF = (uint32)((uint32)1U << 15U),
     };
-    LibGpio m_libGpio;
+    BoardTestDio();
+    virtual ~BoardTestDio();
+    virtual int get(uint32 address, uint32& value);
+    virtual int set(uint32 address, uint32 value);
+private:
+    LibDio m_libDio;
 };
 
 #endif // _BOARD_TEST_GPIO_H_

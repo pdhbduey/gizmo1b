@@ -2,11 +2,11 @@
 #include "libSci2.h"
 #include "boardTestUserLed.h"
 #include "boardTestUserSwitch.h"
+#include "boardTestDio.h"
 #include "boardTestAdc.h"
 #include "boardTestDac.h"
 #include "boardTestFan.h"
 #include "boardTestFault.h"
-#include "boardTestGpio.h"
 #include "boardTestMotor.h"
 #include "boardTestTec.h"
 #include "boardTestThermistor.h"
@@ -28,9 +28,9 @@ BoardTestApp::BoardTestApp(const char* name) :
     boardTest = new BoardTestFault;
     m_boardTestMap[BoardTest::FAULT_RESET] = boardTest;
     m_boardTestMap[BoardTest::FAULT_STATE] = boardTest;
-    boardTest = new BoardTestGpio;
-    m_boardTestMap[BoardTest::GPIO_IN]  = boardTest;
-    m_boardTestMap[BoardTest::GPIO_OUT] = boardTest;
+    boardTest = new BoardTestDio;
+    m_boardTestMap[BoardTest::DIO_IN]  = boardTest;
+    m_boardTestMap[BoardTest::DIO_OUT] = boardTest;
     boardTest = new BoardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_CONTROL]           = boardTest;
     m_boardTestMap[BoardTest::MOTOR_STATUS]            = boardTest;

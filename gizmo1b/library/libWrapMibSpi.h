@@ -5,7 +5,7 @@
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "sys_common.h"
-#include "reg_mibspi.h"
+#include "mibspi.h"
 
 
 class LibWrapMibSpi

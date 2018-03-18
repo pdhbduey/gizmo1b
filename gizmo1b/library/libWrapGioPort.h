@@ -4,6 +4,7 @@
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "sys_common.h"
+#include "reg_gio.h"
 
 class LibWrapGioPort
 {
@@ -17,8 +18,8 @@ public:
 public:
     LibWrapGioPort();
     virtual ~LibWrapGioPort();
-    void setBit(uint32 bit, uint32 value);
-    uint32 getBit(uint32 bit);
+    void setPin(uint32 pin, uint32 value);
+    uint32 getPin(uint32 pin);
 protected:
     virtual SemaphoreHandle_t& getMutex() = 0;
     virtual gioPORT_t* getPort() = 0;

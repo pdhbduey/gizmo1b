@@ -3,7 +3,7 @@
 #define _BOARD_TEST_USER_SWITCH_H_
 
 #include "boardTest.h"
-#include "libGpio.h"
+#include "libUserSwitch.h"
 
 class BoardTestUserSwitch : public BoardTest
 {
@@ -16,7 +16,7 @@ private:
         SWITCH_A = (uint32)((uint32)1U << 0U),
         SWITCH_B = (uint32)((uint32)1U << 1U),
     };
-    LibGpio m_libGpio;
+    LibUserSwitch m_libUserSwitch;
 };
 
 #endif // _BOARD_TEST_USER_SWITCH_H_

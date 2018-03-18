@@ -1,27 +1,27 @@
 #ifndef _LIB_GPIO_H_
 #define _LIB_GPIO_H_
 
-class LibGpio {
+#include <map>
+#include "libWrapGioPort.h"
+
+class LibDio {
 public:
-    enum LibGpioInputPin {
-        // launchxl2-tms570ls1224
-        USER_LED_AIN,
-        USER_LED_BIN,
-        USER_SWITCH_A,
-        USER_SWITCH_B,
-        // gizmo1b
+    enum Input {
+        // Mapped A[0-5], B[0-3] --> [0-9]
         DIN_0,
         DIN_1,
         DIN_2,
         DIN_3,
         DIN_4,
         DIN_5,
+        DIN_6,
+        DIN_7,
+        DIN_8,
+        DIN_9,
+
     };
-    enum LibGpioOutputPin {
-        // launchxl2-tms570ls1224
-        USER_LED_AOUT,
-        USER_LED_BOUT,
-        // gizmo1b
+    enum Output {
+        // Mapped A[0-3], B[0-3] --> [0-7]
         DOUT_0,
         DOUT_1,
         DOUT_2,
@@ -31,18 +31,19 @@ public:
         DOUT_6,
         DOUT_7,
     };
-    enum LibGpioStatus {
+    enum Status {
         OKAY,
         INVALID_INPUT_PIN,
         INVALID_OUTPUT_PIN,
     };
 public:
-    LibGpio();
-    virtual ~LibGpio();
+    LibDio();
+    virtual ~LibDio();
     int setPin(int pin, bool set);
     int getPin(int pin, bool& isSet);
 private:
-    static bool s_isInitialized;
+    std::map<int, LibWrapGioPort::Port*> m_inMap;
+    std::map<int, LibWrapGioPort::Port*> m_outMap;
 };
 
 #endif // _LIB_GPIO_H_

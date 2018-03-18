@@ -37,7 +37,7 @@ LibWrapMibSpi1::~LibWrapMibSpi1()
 
 void LibWrapMibSpi1::somiSelect(int somi)
 {
-    m_somiSwMap[SOMI_SW]->m_libWrapGioPort->setBit(m_somiSwMap[SOMI_SW]->m_pin, somi);
+    m_somiSwMap[SOMI_SW]->m_libWrapGioPort->setPin(m_somiSwMap[SOMI_SW]->m_pin, somi);
 }
 
 gioPORT_t* LibWrapMibSpi1::getPort()
