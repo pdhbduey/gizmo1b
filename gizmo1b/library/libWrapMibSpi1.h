@@ -26,15 +26,17 @@ public:
     static bool test();
 private:
     virtual gioPORT_t* getPort();
-    virtual SemaphoreHandle_t& getMutex();
+    virtual SemaphoreHandle_t& getPortMutex();
     virtual mibspiBASE_t* getMibSpiBase();
+    virtual SemaphoreHandle_t& getMibSpiMutex();
     virtual bool isLoopBack();
     virtual SemaphoreHandle_t& getSem();
 private:
     static void notification(uint32 flags);
 private:
     static bool s_isInitialized;
-    static SemaphoreHandle_t s_mutex;
+    static SemaphoreHandle_t s_portMutex;
+    static SemaphoreHandle_t s_mibSpiMutex;
     gioPORT_t* m_port;
     mibspiBASE_t* m_mibSpiBase;
     static SemaphoreHandle_t s_spi1SomiSwMutex;

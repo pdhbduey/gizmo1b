@@ -21,7 +21,7 @@ public:
     void setPin(uint32 pin, uint32 value);
     uint32 getPin(uint32 pin);
 protected:
-    virtual SemaphoreHandle_t& getMutex() = 0;
+    virtual SemaphoreHandle_t& getPortMutex() = 0;
     virtual gioPORT_t* getPort() = 0;
 private:
     static bool s_isInitialized;

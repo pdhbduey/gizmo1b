@@ -52,12 +52,12 @@ bool LibWrapMibSpi::waitForTransferComplete(uint32 group, int msTimeout)
 
 void LibWrapMibSpi::lock(int msTimeout)
 {
-    xSemaphoreTake(getMutex(), pdMS_TO_TICKS(msTimeout));
+    xSemaphoreTake(getMibSpiMutex(), pdMS_TO_TICKS(msTimeout));
 }
 
 void LibWrapMibSpi::unlock()
 {
-    xSemaphoreGive(getMutex());
+    xSemaphoreGive(getMibSpiMutex());
 }
 
 extern "C" void mibspiGroupNotification(mibspiBASE_t* mibspiReg, uint32 group)

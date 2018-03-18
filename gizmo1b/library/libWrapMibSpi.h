@@ -21,7 +21,7 @@ public:
     bool waitForTransferComplete(uint32 group, int msTimeout = 1000);
     friend void mibspiGroupNotification(mibspiBASE_t* mibspiReg, uint32 group);
 protected:
-    virtual SemaphoreHandle_t& getMutex() = 0;
+    virtual SemaphoreHandle_t& getMibSpiMutex() = 0;
     virtual mibspiBASE_t* getMibSpiBase() = 0;
     virtual bool isLoopBack() = 0;
     virtual SemaphoreHandle_t& getSem() = 0;

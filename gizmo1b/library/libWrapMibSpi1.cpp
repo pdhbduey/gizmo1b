@@ -12,7 +12,8 @@
 // 93:MIBSPI1SIMO[0]:MCU_SPI1_SIMO
 
 SemaphoreHandle_t LibWrapMibSpi1::s_sem;
-SemaphoreHandle_t LibWrapMibSpi1::s_mutex;
+SemaphoreHandle_t LibWrapMibSpi1::s_portMutex;
+SemaphoreHandle_t LibWrapMibSpi1::s_mibSpiMutex;
 SemaphoreHandle_t LibWrapMibSpi1::s_spi1SomiSwMutex;
 bool LibWrapMibSpi1::s_isInitialized;
 
@@ -22,7 +23,8 @@ LibWrapMibSpi1::LibWrapMibSpi1(bool isLoopBack) :
     m_isLoopBack(isLoopBack)
 {
     if (!s_isInitialized) {
-        s_mutex = xSemaphoreCreateMutex();
+        s_portMutex = xSemaphoreCreateMutex();
+        s_mibSpiMutex = xSemaphoreCreateMutex();
         s_spi1SomiSwMutex = xSemaphoreCreateMutex();
         addNotification(mibspiREG1, notification);
         s_sem = xSemaphoreCreateBinary();
@@ -45,14 +47,19 @@ gioPORT_t* LibWrapMibSpi1::getPort()
     return m_port;
 }
 
-SemaphoreHandle_t& LibWrapMibSpi1::getMutex()
+SemaphoreHandle_t& LibWrapMibSpi1::getPortMutex()
 {
-    return s_mutex;
+    return s_portMutex;
 }
 
 mibspiBASE_t* LibWrapMibSpi1::getMibSpiBase()
 {
     return m_mibSpiBase;
+}
+
+SemaphoreHandle_t& LibWrapMibSpi1::getMibSpiMutex()
+{
+    return s_mibSpiMutex;
 }
 
 bool LibWrapMibSpi1::isLoopBack()
