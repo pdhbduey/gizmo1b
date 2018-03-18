@@ -10,12 +10,14 @@
 // 93:MIBSPI3SIMO:MCU_SPI3_SIMO
 
 SemaphoreHandle_t LibWrapMibSpi3::s_mutex;
+bool LibWrapMibSpi3::s_isInitialized;
 
 LibWrapMibSpi3::LibWrapMibSpi3() :
     m_port(mibspiPORT3)
 {
-    if (!s_mutex) {
+    if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
+        s_isInitialized = true;
     }
 }
 
@@ -23,14 +25,12 @@ LibWrapMibSpi3::~LibWrapMibSpi3()
 {
 }
 
-void LibWrapMibSpi3::setBit(uint32 bit, uint32 value)
+gioPORT_t* LibWrapMibSpi3::getPort()
 {
-    LibMutex libMutex(s_mutex);
-    gioSetBit(m_port, bit, value);
+    return m_port;
 }
 
-uint32 LibWrapMibSpi3::getBit(uint32 bit)
+SemaphoreHandle_t& LibWrapMibSpi3::getMutex()
 {
-    LibMutex libMutex(s_mutex);
-    return gioGetBit(m_port, bit);
+    return s_mutex;
 }

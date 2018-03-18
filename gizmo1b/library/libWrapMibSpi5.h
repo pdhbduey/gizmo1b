@@ -11,10 +11,11 @@ class LibWrapMibSpi5 : public LibWrapGioPort
 public:
     LibWrapMibSpi5();
     virtual ~LibWrapMibSpi5();
-    // LibWrapGioPort interface
-    virtual void setBit(uint32 bit, uint32 value);
-    virtual uint32 getBit(uint32 bit);
 private:
+    virtual gioPORT_t* getPort();
+    virtual SemaphoreHandle_t& getMutex();
+private:
+    static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
     gioPORT_t* m_port;
 };

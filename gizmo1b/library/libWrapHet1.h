@@ -11,10 +11,11 @@ class LibWrapHet1 : public LibWrapGioPort
 public:
     LibWrapHet1();
     virtual ~LibWrapHet1();
-    // LibWrapGioPort interface
-    virtual void setBit(uint32 bit, uint32 value);
-    virtual uint32 getBit(uint32 bit);
+protected:
+    virtual SemaphoreHandle_t& getMutex();
+    virtual gioPORT_t* getPort();
 private:
+    static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
     gioPORT_t* m_port;
 };

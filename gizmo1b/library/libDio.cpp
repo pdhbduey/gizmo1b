@@ -34,7 +34,7 @@ int LibDio::setPin(int pin, bool set)
     if (m_outMap.find(pin) == m_outMap.end() || !m_outMap[pin]) {
         return INVALID_OUTPUT_PIN;
     }
-    m_outMap[pin]->m_libWrapGioPort->setBit(m_outMap[pin]->m_pin, set);
+    m_outMap[pin]->m_libWrapGioPort->setPin(m_outMap[pin]->m_pin, set);
     return OKAY;
 }
 
@@ -43,6 +43,6 @@ int LibDio::getPin(int pin, bool& isSet)
     if (m_inMap.find(pin) == m_inMap.end() || !m_inMap[pin]) {
         return INVALID_INPUT_PIN;
     }
-    isSet = m_inMap[pin]->m_libWrapGioPort->getBit(m_inMap[pin]->m_pin);
+    isSet = m_inMap[pin]->m_libWrapGioPort->getPin(m_inMap[pin]->m_pin);
     return OKAY;
 }

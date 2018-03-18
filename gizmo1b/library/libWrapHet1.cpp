@@ -2,17 +2,18 @@
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "het.h"
-#include "gio.h"
 #include "libMutex.h"
 
 SemaphoreHandle_t LibWrapHet1::s_mutex;
+bool LibWrapHet1::s_isInitialized;
 
 LibWrapHet1::LibWrapHet1() :
     m_port(hetPORT1)
 {
-    if (!s_mutex) {
+    if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
         hetInit();
+        s_isInitialized = true;
     }
 }
 
@@ -20,14 +21,12 @@ LibWrapHet1::~LibWrapHet1()
 {
 }
 
-void LibWrapHet1::setBit(uint32 bit, uint32 value)
+gioPORT_t* LibWrapHet1::getPort()
 {
-    LibMutex libMutex(s_mutex);
-    gioSetBit(m_port, bit, value);
+    return m_port;
 }
 
-uint32 LibWrapHet1::getBit(uint32 bit)
+SemaphoreHandle_t& LibWrapHet1::getMutex()
 {
-    LibMutex libMutex(s_mutex);
-    return gioGetBit(m_port, bit);
+    return s_mutex;
 }

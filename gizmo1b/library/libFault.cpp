@@ -22,9 +22,9 @@ void LibFault::reset()
 {
     if (m_resetMap.find(RESET_FAULT) != m_resetMap.end()
      && m_resetMap[RESET_FAULT]) {
-        m_resetMap[RESET_FAULT]->m_libWrapGioPort->setBit(m_resetMap[RESET_FAULT]->m_pin, true);
+        m_resetMap[RESET_FAULT]->m_libWrapGioPort->setPin(m_resetMap[RESET_FAULT]->m_pin, true);
         vTaskDelay(pdMS_TO_TICKS(1)); // >1us
-        m_resetMap[RESET_FAULT]->m_libWrapGioPort->setBit(m_resetMap[RESET_FAULT]->m_pin, false);
+        m_resetMap[RESET_FAULT]->m_libWrapGioPort->setPin(m_resetMap[RESET_FAULT]->m_pin, false);
     }
 }
 
@@ -33,7 +33,7 @@ int LibFault::readState(int state, bool& isFault)
     if (m_stateMap.find(state) == m_stateMap.end() || !m_stateMap[state]) {
         return INVALID_STATE;
     }
-    isFault = m_stateMap[state]->m_libWrapGioPort->getBit(m_stateMap[state]->m_pin);
+    isFault = m_stateMap[state]->m_libWrapGioPort->getPin(m_stateMap[state]->m_pin);
     return OKAY;
 }
 
@@ -42,6 +42,6 @@ int LibFault::readNtcPresent(int ntc, bool& isNtcPresent)
     if (m_ntcMap.find(ntc) == m_ntcMap.end() || !m_ntcMap[ntc]) {
         return INVALID_NTC;
     }
-    isNtcPresent = m_ntcMap[ntc]->m_libWrapGioPort->getBit(m_ntcMap[ntc]->m_pin);
+    isNtcPresent = m_ntcMap[ntc]->m_libWrapGioPort->getPin(m_ntcMap[ntc]->m_pin);
     return OKAY;
 }

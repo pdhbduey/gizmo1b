@@ -2,6 +2,8 @@
 #define _LIB_WRAP_MIB_SPI_H_
 
 #include <map>
+#include "FreeRTOS.h"
+#include "os_semphr.h"
 #include "sys_common.h"
 #include "reg_mibspi.h"
 
@@ -22,12 +24,16 @@ public:
 public:
     LibWrapMibSpi();
     virtual ~LibWrapMibSpi();
-    virtual void setData(uint32 group, uint16* data) = 0;
-    virtual void getData(uint32 group, uint16* data) = 0;
-    virtual void transfer(uint32 group) = 0;
-    virtual bool waitForTransferComplete(uint32 group, int msTimeout = 1000) = 0;
+    void setData(uint32 group, uint16* data);
+    void getData(uint32 group, uint16* data);
+    void transfer(uint32 group);
+    bool waitForTransferComplete(uint32 group, int msTimeout = 1000);
     friend void mibspiGroupNotification(mibspiBASE_t* mibspiReg, uint32 group);
 protected:
+    virtual SemaphoreHandle_t& getMutex() = 0;
+    virtual mibspiBASE_t* getMibSpiBase() = 0;
+    virtual bool isLoopBack() = 0;
+    virtual SemaphoreHandle_t& getSem() = 0;
     void addNotification(mibspiBASE_t* mibspiReg, void (*notification)(uint32));
 private:
     static bool s_isInitialized;
