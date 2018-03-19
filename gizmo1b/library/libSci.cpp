@@ -2,7 +2,7 @@
 #include "libSci.h"
 
 bool LibSci::s_isInitialized;
-std::map<sciBASE_t*, void (*)(uint32)>* LibSci::s_notificationMap;
+std::map<sciBASE_t*, LibSci*>* LibSci::s_notificationMap;
 
 LibSci::LibSci()
 {
@@ -121,15 +121,39 @@ bool LibSci::waitForReadyRead(int msTimeout)
     return true;
 }
 
-void LibSci::addNotification(sciBASE_t* sciReg, void (*notification)(uint32))
+void LibSci::addNotification(LibSci* libSci)
 {
-    m_notificationMap[sciReg] = notification;
+    m_notificationMap[getSciBaseReg()] = libSci;
+}
+
+void LibSci::notification(uint32 flags)
+{
+    uint8 byte;
+    if (flags & SCI_RX_INT) {
+        byte = (uint8)(getSciBaseReg()->RD & 0x000000FFU);
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xQueueSendFromISR(getRxQueue(), &byte, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
+    if  (flags & SCI_TX_INT) {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        if (xQueueReceiveFromISR(getTxQueue(), &byte,
+                                 &xHigherPriorityTaskWoken) != errQUEUE_EMPTY) {
+            getSciBaseReg()->TD = (uint32)byte;
+        }
+        else {
+            getSciBaseReg()->CLEARINT = (uint32)SCI_TX_INT;
+            xHigherPriorityTaskWoken = pdFALSE;
+            xSemaphoreGiveFromISR(getSem(), &xHigherPriorityTaskWoken);
+        }
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
 }
 
 extern "C" void sciNotification(sciBASE_t* sci, uint32 flags)
 {
     if (LibSci::s_notificationMap->find(sci) != LibSci::s_notificationMap->end()
    && (*LibSci::s_notificationMap)[sci]) {
-        (*LibSci::s_notificationMap)[sci](flags);
+        (*LibSci::s_notificationMap)[sci]->notification(flags);
     }
 }
