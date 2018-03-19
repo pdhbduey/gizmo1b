@@ -4,14 +4,14 @@
 #include "het.h"
 #include "libMutex.h"
 
-SemaphoreHandle_t LibWrapHet1::s_mutex;
+SemaphoreHandle_t LibWrapHet1::s_portMutex;
 bool LibWrapHet1::s_isInitialized;
 
 LibWrapHet1::LibWrapHet1() :
     m_port(hetPORT1)
 {
     if (!s_isInitialized) {
-        s_mutex = xSemaphoreCreateMutex();
+        s_portMutex = xSemaphoreCreateMutex();
         hetInit();
         s_isInitialized = true;
     }
@@ -26,7 +26,7 @@ gioPORT_t* LibWrapHet1::getPort()
     return m_port;
 }
 
-SemaphoreHandle_t& LibWrapHet1::getMutex()
+SemaphoreHandle_t& LibWrapHet1::getPortMutex()
 {
-    return s_mutex;
+    return s_portMutex;
 }

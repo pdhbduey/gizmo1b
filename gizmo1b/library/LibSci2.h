@@ -23,11 +23,11 @@ protected:
     virtual QueueHandle_t getRxQueue();
     virtual QueueHandle_t getTxQueue();
     virtual SemaphoreHandle_t getSem();
+    virtual sciBASE_t* getSciBaseReg();
 private:
     void setBaudRateLowLevel();
     void setParityLowLevel();
     void setStopBitsLowLevel();
-    static void notification(uint32 flags);
 private:
     static sciBASE_t* s_sci;
     static QueueHandle_t s_rxQueue;

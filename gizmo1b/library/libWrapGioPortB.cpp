@@ -4,14 +4,14 @@
 #include "gio.h"
 #include "libMutex.h"
 
-SemaphoreHandle_t LibWrapGioPortB::s_mutex;
+SemaphoreHandle_t LibWrapGioPortB::s_portMutex;
 bool LibWrapGioPortB::s_isInitialized;
 
 LibWrapGioPortB::LibWrapGioPortB() :
     m_port(gioPORTB)
 {
     if (!s_isInitialized) {
-        s_mutex = xSemaphoreCreateMutex();
+        s_portMutex = xSemaphoreCreateMutex();
         s_isInitialized = true;
     }
 }
@@ -25,8 +25,8 @@ gioPORT_t* LibWrapGioPortB::getPort()
     return m_port;
 }
 
-SemaphoreHandle_t& LibWrapGioPortB::getMutex()
+SemaphoreHandle_t& LibWrapGioPortB::getPortMutex()
 {
-    return s_mutex;
+    return s_portMutex;
 }
 

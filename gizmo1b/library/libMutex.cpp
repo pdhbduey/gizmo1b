@@ -1,10 +1,10 @@
 #include "libMutex.h"
 
-LibMutex::LibMutex(SemaphoreHandle_t& mutex, TickType_t delay) :
+LibMutex::LibMutex(SemaphoreHandle_t& mutex, int msTimeout) :
     m_mutex(mutex),
-    m_delay(delay)
+    m_msTimeout(msTimeout)
 {
-    xSemaphoreTake(m_mutex, m_delay);
+    xSemaphoreTake(m_mutex, pdMS_TO_TICKS(m_msTimeout));
 }
 
 LibMutex::~LibMutex()

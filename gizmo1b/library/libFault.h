@@ -34,7 +34,7 @@ public:
 private:
     std::map<int, LibWrapGioPort::Port*> m_stateMap;
     std::map<int, LibWrapGioPort::Port*> m_ntcMap;
-    std::map<int, LibWrapGioPort::Port*> m_resetMap;
+    LibWrapGioPort::Port m_drvErrClr;
 };
 
 #endif // _LIB_FAULT_H_
