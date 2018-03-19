@@ -26,8 +26,8 @@ LibWrapMibSpi1::LibWrapMibSpi1(bool isLoopBack) :
         s_portMutex = xSemaphoreCreateMutex();
         s_mibSpiMutex = xSemaphoreCreateMutex();
         s_spi1SomiSwMutex = xSemaphoreCreateMutex();
-        addNotification(mibspiREG1, notification);
         s_sem = xSemaphoreCreateBinary();
+        addNotification(this);
         s_isInitialized = true;
     }
     m_somiSwMap[SOMI_SW] = new LibWrapGioPort::Port(new LibWrapMibSpi3, PIN_ENA); // 54:MIBSPI3NENA:MCU_SPI1_SOMI_SW
@@ -70,13 +70,6 @@ bool LibWrapMibSpi1::isLoopBack()
 SemaphoreHandle_t& LibWrapMibSpi1::getSem()
 {
     return s_sem;
-}
-
-void LibWrapMibSpi1::notification(uint32 group)
-{
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(s_sem, &xHigherPriorityTaskWoken);
 }
 
 bool LibWrapMibSpi1::test()

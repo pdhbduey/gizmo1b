@@ -32,8 +32,6 @@ private:
     virtual bool isLoopBack();
     virtual SemaphoreHandle_t& getSem();
 private:
-    static void notification(uint32 flags);
-private:
     static bool s_isInitialized;
     static SemaphoreHandle_t s_portMutex;
     static SemaphoreHandle_t s_mibSpiMutex;

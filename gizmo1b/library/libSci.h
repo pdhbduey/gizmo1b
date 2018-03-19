@@ -57,15 +57,18 @@ protected:
     virtual QueueHandle_t getRxQueue() = 0;
     virtual QueueHandle_t getTxQueue() = 0;
     virtual SemaphoreHandle_t getSem() = 0;
-    void addNotification(sciBASE_t* sciReg, void (*notification)(uint32));
+    virtual sciBASE_t* getSciBaseReg() = 0;
+    void addNotification(LibSci* libSci);
+private:
+    void notification(uint32 flags);
 protected:
     int m_baudRate;
     int m_parity;
     int m_stopBits;
 private:
     static bool s_isInitialized;
-    std::map<sciBASE_t*, void (*)(uint32)> m_notificationMap;
-    static std::map<sciBASE_t*, void (*)(uint32)>* s_notificationMap;
+    std::map<sciBASE_t*, LibSci*> m_notificationMap;
+    static std::map<sciBASE_t*, LibSci*>* s_notificationMap;
 };
 
 #endif /* _LIB_COMM_H_ */
