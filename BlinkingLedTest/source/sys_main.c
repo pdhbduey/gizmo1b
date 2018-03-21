@@ -52,6 +52,7 @@
 /* USER CODE BEGIN (1) */
 #include "mibspi.h"
 #include "gio.h"
+#include "sys_pmu.h"
 /* USER CODE END */
 
 /** @fn void main(void)
@@ -63,23 +64,30 @@
 */
 
 /* USER CODE BEGIN (2) */
-#define DELAY_VALUE 2000000
+#define US_TO_CYCLES(us) (us * 160)
+
+void delay_cycles (const uint32 delay)
+{
+    const uint32 start = _pmuGetCycleCount_ ();
+    while ((_pmuGetCycleCount_ () - start) < delay)
+    {
+    }
+}
 /* USER CODE END */
 
 int main(void)
 {
 /* USER CODE BEGIN (3) */
-    int i;
-
     mibspiInit();
     gioInit();
+    _pmuEnableCountersGlobal_ ();
+    _pmuStartCounters_(pmuCYCLE_COUNTER);
     gioSetBit(mibspiPORT1, PIN_ENA, 1);
     gioSetBit(mibspiPORT1, PIN_CS0, 0);
     while (1) {
         gioToggleBit(mibspiPORT1, PIN_ENA);
         gioToggleBit(mibspiPORT1, PIN_CS0);
-        for (i = 0; i < DELAY_VALUE; i++) {
-        }
+        delay_cycles(US_TO_CYCLES(500000));
     }
 /* USER CODE END */
 
