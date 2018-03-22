@@ -64,7 +64,6 @@ private:
     bool isAddressValid(uint32 address);
 private:
     virtual void run();
-    LibSci& m_libSci;
     union MasterToSlaveMsg m_masterToSlave;
     union SlaveToMasterMsg m_slaveToMaster;
     std::map<int, BoardTest*> m_boardTestMap;
