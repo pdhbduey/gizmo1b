@@ -1,6 +1,5 @@
-#include "FreeRTOS.h"
-#include "os_task.h"
 #include "boardTestLed.h"
+#include "libDelay.h"
 
 BoardTestLed::BoardTestLed()
 {
@@ -54,12 +53,11 @@ void BoardTestLed::test()
 {
     BoardTestLed boardTestLed;
     boardTestLed.set(LED_CONTROL, RED_OFF | GREEN_ON);
-    TickType_t xNextWakeTime = xTaskGetTickCount();
     for (int i = 0; i < 10; i++) {
         uint32 value;
         boardTestLed.get(LED_CONTROL, value);
         boardTestLed.set(LED_CONTROL, ~value);
-        vTaskDelayUntil(&xNextWakeTime, pdMS_TO_TICKS(500));
+        LibDelay::us(500000);
     }
     boardTestLed.set(LED_CONTROL, RED_OFF | GREEN_OFF);
 }
