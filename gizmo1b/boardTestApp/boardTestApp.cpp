@@ -10,10 +10,19 @@
 #include "boardTestThermistor.h"
 #include "boardTestLed.h"
 
+#define portRESET_PRIVILEGE(xRunningPrivileged) \
+                         if( xRunningPrivileged == 0 ) portSWITCH_TO_USER_MODE()
+#ifdef __cplusplus
+#pragma SWI_ALIAS(1)
+#else
+#pragma SWI_ALIAS(prvRaisePrivilege, 1)
+#endif
+extern "C" BaseType_t prvRaisePrivilege(void);
+
 BoardTestApp::BoardTestApp(const char* name) :
-    LibTask(name),
-    m_libSci(*new LibSci2(32, 32))
+    LibTask(name)
 {
+    //m_libSci = new LibSci2(32, 32);
     BoardTest* boardTest = new BoardTestAdc;
     m_boardTestMap[BoardTest::ADC_CONTROL] = boardTest;
     m_boardTestMap[BoardTest::ADC_STATUS]  = boardTest;
@@ -58,6 +67,7 @@ BoardTestApp::~BoardTestApp()
 
 void BoardTestApp::run()
 {
+    LibSci2 libSci(32, 32);
     bool resetSci = true;
     std::vector<uint8> message;
     message.reserve(32);
@@ -65,30 +75,30 @@ void BoardTestApp::run()
     response.reserve(32);
     while (true) {
         if (resetSci) {
-            m_libSci.close();
-            m_libSci.setBaudRate(LibSci::BAUD_115200);
-            m_libSci.setParity(LibSci::NONE);
-            m_libSci.setStopBits(LibSci::TWO);
-            m_libSci.open();
+            libSci.close();
+            libSci.setBaudRate(LibSci::BAUD_115200);
+            libSci.setParity(LibSci::NONE);
+            libSci.setStopBits(LibSci::TWO);
+            libSci.open();
             resetSci = false;
         }
-        while (!m_libSci.waitForReadyRead(1000)) {
+        if (!libSci.waitForReadyRead(1000)) {
             continue;
         }
         message.clear();
-        m_libSci.read(message);
+        libSci.read(message);
         while (message.size() < sizeof(m_masterToSlave)) {
-            if (!m_libSci.waitForReadyRead(10)) {
+            if (!libSci.waitForReadyRead(10)) {
                 resetSci = true;
                 break;
             }
-            m_libSci.read(message);
+            libSci.read(message);
         }
         if (!resetSci) {
             decodeMessage(message, response);
-            if (m_libSci.write(response) == BoardTest::OKAY) {
-                while (!m_libSci.waitForBytesWritten(1000)) {
-                    continue;
+            if (libSci.write(response) == BoardTest::OKAY) {
+                if (!libSci.waitForBytesWritten(1000)) {
+                    resetSci = true;
                 }
             }
             else {
