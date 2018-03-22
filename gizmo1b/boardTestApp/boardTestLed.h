@@ -11,12 +11,14 @@ public:
         RED_ON     = (uint32)((uint32)1U << 0U),
         RED_OFF    = (uint32)((uint32)1U << 1U),
         GREEN_ON   = (uint32)((uint32)1U << 2U),
-        GREEN__OFF = (uint32)((uint32)1U << 3U),
+        GREEN_OFF  = (uint32)((uint32)1U << 3U),
     };
+public:
     BoardTestLed();
     virtual ~BoardTestLed();
     virtual int get(uint32 address, uint32& value);
     virtual int set(uint32 address, uint32 value);
+    static void test();
 private:
     LibLed m_libLed;
 };
