@@ -71,6 +71,13 @@ class SettingsDialog : public QDialog
 
 public:
     struct Settings {
+        int numberOfPorts;
+        QString description;
+        QString manufacturer;
+        QString serialNumber;
+        QString systemLocation;
+        QString vendorIdentifier;
+        QString productIdentifier;
         QString name;
         qint32 baudRate;
         QString stringBaudRate;
@@ -89,6 +96,7 @@ public:
     ~SettingsDialog();
 
     Settings settings() const;
+    bool isSettingsChanged() const;
 
 private slots:
     void showPortInfo(int idx);
