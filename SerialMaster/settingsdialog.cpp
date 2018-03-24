@@ -92,6 +92,33 @@ SettingsDialog::Settings SettingsDialog::settings() const
     return m_currentSettings;
 }
 
+bool SettingsDialog::isSettingsChanged() const
+{
+    const auto infos = QSerialPortInfo::availablePorts();
+    if (infos.size() != m_currentSettings.numberOfPorts) {
+        return true;
+    }
+    for (const QSerialPortInfo &info : infos) {
+        if (info.portName() == m_currentSettings.name) {
+            QString description = tr("Description: %1").arg(!info.description().isEmpty() ? info.description() : blankString);
+            QString manufacturer = tr("Manufacturer: %1").arg(!info.manufacturer().isEmpty() ? info.manufacturer() : blankString);
+            QString serialNumber = tr("Serial number: %1").arg(!info.serialNumber().isEmpty() ? info.serialNumber() : blankString);
+            QString systemLocation = tr("Location: %1").arg(info.systemLocation());
+            QString vendorIdentifier = tr("Vendor Identifier: %1").arg(info.vendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : blankString);
+            QString productIdentifier = tr("Product Identifier: %1").arg(info.productIdentifier() ? QString::number(info.productIdentifier(), 16) : blankString);
+            if (description == m_currentSettings.description
+             || manufacturer == m_currentSettings.manufacturer
+             || serialNumber == m_currentSettings.serialNumber
+             || systemLocation == m_currentSettings.systemLocation
+             || vendorIdentifier == m_currentSettings.vendorIdentifier
+             || productIdentifier == m_currentSettings.productIdentifier) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 void SettingsDialog::showPortInfo(int idx)
 {
     if (idx == -1)
@@ -185,11 +212,20 @@ void SettingsDialog::fillPortsInfo()
         m_ui->serialPortInfoListBox->addItem(list.first(), list);
     }
 
-    m_ui->serialPortInfoListBox->addItem(tr("Custom"));
+    if (infos.isEmpty()) {
+        m_ui->serialPortInfoListBox->addItem(tr("Custom"));
+    }
+    m_currentSettings.numberOfPorts = infos.size();
 }
 
 void SettingsDialog::updateSettings()
 {
+    m_currentSettings.description = m_ui->descriptionLabel->text();
+    m_currentSettings.manufacturer = m_ui->manufacturerLabel->text();
+    m_currentSettings.serialNumber = m_ui->serialNumberLabel->text();
+    m_currentSettings.systemLocation = m_ui->locationLabel->text();
+    m_currentSettings.vendorIdentifier = m_ui->vidLabel->text();
+    m_currentSettings.productIdentifier = m_ui->pidLabel->text();
     m_currentSettings.name = m_ui->serialPortInfoListBox->currentText();
 
     if (m_ui->baudRateBox->currentIndex() == 4) {
@@ -219,7 +255,14 @@ void SettingsDialog::updateSettings()
 
 bool SettingsDialog::Settings::operator!=(const SettingsDialog::Settings& settings) const
 {
-    return this->name != settings.name
+    return this->numberOfPorts != settings.numberOfPorts
+        || this->description != settings.description
+        || this->manufacturer != settings.manufacturer
+        || this->serialNumber != settings.serialNumber
+        || this->systemLocation != settings.systemLocation
+        || this->vendorIdentifier != settings.vendorIdentifier
+        || this->productIdentifier != settings.productIdentifier
+        || this->name != settings.name
         || this->baudRate != settings.baudRate
         || this->stringBaudRate != settings.stringBaudRate
         || this->dataBits != settings.dataBits
