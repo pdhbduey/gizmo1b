@@ -10,19 +10,9 @@
 #include "boardTestThermistor.h"
 #include "boardTestLed.h"
 
-#define portRESET_PRIVILEGE(xRunningPrivileged) \
-                         if( xRunningPrivileged == 0 ) portSWITCH_TO_USER_MODE()
-#ifdef __cplusplus
-#pragma SWI_ALIAS(1)
-#else
-#pragma SWI_ALIAS(prvRaisePrivilege, 1)
-#endif
-extern "C" BaseType_t prvRaisePrivilege(void);
-
 BoardTestApp::BoardTestApp(const char* name) :
     LibTask(name)
 {
-    //m_libSci = new LibSci2(32, 32);
     BoardTest* boardTest = new BoardTestAdc;
     m_boardTestMap[BoardTest::ADC_CONTROL] = boardTest;
     m_boardTestMap[BoardTest::ADC_STATUS]  = boardTest;
