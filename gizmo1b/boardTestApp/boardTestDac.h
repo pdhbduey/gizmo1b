@@ -13,7 +13,7 @@ public:
     virtual int set(uint32 address, uint32 value);
 private:
     LibDac m_libDac;
-    int m_channel;
+    int m_status;
     float m_value;
 };
 

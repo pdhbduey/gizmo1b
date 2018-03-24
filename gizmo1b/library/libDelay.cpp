@@ -2,7 +2,7 @@
 #include "system.h"
 #include "libDelay.h"
 
-#define US_TO_CYCLES(us) (us * GCLK_FREQ)
+#define US_TO_CYCLES(us) (us * VCLK1_FREQ)
 
 void LibDelay::us(uint32 usDelay)
 {
