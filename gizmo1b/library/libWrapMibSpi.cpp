@@ -29,15 +29,13 @@ void LibWrapMibSpi::setData(uint32 group, uint16* data)
 
 void LibWrapMibSpi::getData(uint32 group, uint16* data)
 {
-    if (isLoopBack()) {
-        mibspiDisableLoopback(getMibSpiBase());
-    }
+    mibspiDisableLoopback(getMibSpiBase());
     mibspiGetData(getMibSpiBase(), group, data);
 }
 
 void LibWrapMibSpi::transfer(uint32 group)
 {
-    if (isLoopBack()) {
+    if (group == LibWrapMibSpi::LOOP_BACK_TEST) {
         mibspiEnableLoopback(getMibSpiBase(), Digital_Lbk);
     }
     mibspiEnableGroupNotification(getMibSpiBase(), group, 0);

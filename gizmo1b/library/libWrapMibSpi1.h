@@ -16,7 +16,8 @@ public:
         SPI_A,
         SPI_B,
     };
-    LibWrapMibSpi1(bool isLoopBack = false);
+public:
+    LibWrapMibSpi1();
     virtual ~LibWrapMibSpi1();
     void somiSelect(int somi);
     static bool test();
@@ -25,7 +26,6 @@ private:
     virtual SemaphoreHandle_t& getPortMutex();
     virtual mibspiBASE_t* getMibSpiBase();
     virtual SemaphoreHandle_t& getMibSpiMutex();
-    virtual bool isLoopBack();
     virtual SemaphoreHandle_t& getSem();
 private:
     static bool s_isInitialized;
@@ -36,7 +36,6 @@ private:
     static SemaphoreHandle_t s_spi1SomiSwMutex;
     LibWrapGioPort::Port m_somiSw;
     static SemaphoreHandle_t s_sem;
-    bool m_isLoopBack;
     uint32 m_group;
 };
 

@@ -17,10 +17,9 @@ SemaphoreHandle_t LibWrapMibSpi1::s_mibSpiMutex;
 SemaphoreHandle_t LibWrapMibSpi1::s_spi1SomiSwMutex;
 bool LibWrapMibSpi1::s_isInitialized;
 
-LibWrapMibSpi1::LibWrapMibSpi1(bool isLoopBack) :
+LibWrapMibSpi1::LibWrapMibSpi1() :
     m_port(mibspiPORT1),
     m_mibSpiBase(mibspiREG1),
-    m_isLoopBack(isLoopBack),
     m_somiSw(new LibWrapMibSpi3, PIN_ENA) // 54:MIBSPI3NENA:MCU_SPI1_SOMI_SW
 {
     if (!s_isInitialized) {
@@ -62,11 +61,6 @@ SemaphoreHandle_t& LibWrapMibSpi1::getMibSpiMutex()
     return s_mibSpiMutex;
 }
 
-bool LibWrapMibSpi1::isLoopBack()
-{
-    return m_isLoopBack;
-}
-
 SemaphoreHandle_t& LibWrapMibSpi1::getSem()
 {
     return s_sem;
@@ -74,7 +68,7 @@ SemaphoreHandle_t& LibWrapMibSpi1::getSem()
 
 bool LibWrapMibSpi1::test()
 {
-    LibWrapMibSpi& libWrapMibSpi = *new LibWrapMibSpi1(true);
+    LibWrapMibSpi& libWrapMibSpi = *new LibWrapMibSpi1;
     uint16 txBuffer[10];
     uint16 rxBuffer[10];
     bool isPass = true;
@@ -83,9 +77,9 @@ bool LibWrapMibSpi1::test()
         rxBuffer[i] = 0;
     }
     libWrapMibSpi.lock();
-    libWrapMibSpi.setData(0, txBuffer);
-    libWrapMibSpi.transfer(0);
-    if (libWrapMibSpi.waitForTransferComplete(0)) {
+    libWrapMibSpi.setData(LibWrapMibSpi::LOOP_BACK_TEST, txBuffer);
+    libWrapMibSpi.transfer(LibWrapMibSpi::LOOP_BACK_TEST);
+    if (libWrapMibSpi.waitForTransferComplete(LibWrapMibSpi::LOOP_BACK_TEST)) {
         libWrapMibSpi.getData(0, rxBuffer);
     }
     else {
