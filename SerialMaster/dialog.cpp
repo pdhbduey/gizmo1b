@@ -62,7 +62,8 @@ Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     m_serialPortLabel(new QLabel(tr("Serial port:"))),
     m_serialPortCfgPushButton(new QPushButton(tr("Configure"))),
-    m_settingsDialog(new SettingsDialog()),
+    //m_settingsDialog(new SettingsDialog()),
+    m_settingsDialog(nullptr),
     m_waitResponseLabel(new QLabel(tr("Wait response, msec:"))),
     m_waitResponseSpinBox(new QSpinBox),
     m_requestLabel(new QLabel(tr("Request:"))),
@@ -99,6 +100,10 @@ Dialog::Dialog(QWidget *parent) :
 
 void Dialog::configure()
 {
+    if (m_settingsDialog)  {
+        delete m_settingsDialog;
+    }
+    m_settingsDialog = new SettingsDialog();
     m_settingsDialog->show();
 }
 
