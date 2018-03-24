@@ -109,6 +109,10 @@ void Dialog::configure()
 
 void Dialog::transaction()
 {
+    if (!m_settingsDialog) {
+        configure();
+        return;
+    }
     setControlsEnabled(false);
     m_statusLabel->setText(tr("Status: Running, connected to port %1.")
                            .arg(m_settingsDialog->settings().name));
