@@ -20,6 +20,8 @@ public:
         GROUP_5,
         GROUP_6,
         GROUP_7,
+
+        LOOP_BACK_TEST = GROUP_0,
     };
 public:
     LibWrapMibSpi();
@@ -34,7 +36,6 @@ public:
 protected:
     virtual SemaphoreHandle_t& getMibSpiMutex() = 0;
     virtual mibspiBASE_t* getMibSpiBase() = 0;
-    virtual bool isLoopBack() = 0;
     virtual SemaphoreHandle_t& getSem() = 0;
 protected:
     void addNotification(LibWrapMibSpi* libWrapMibSpi);
