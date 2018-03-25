@@ -1486,7 +1486,7 @@ uint32 i ;
                     | (uint32)((uint32)0U << 3U)  /* SCS[3] */
                     | (uint32)((uint32)1U << 8U)  /* ENA */
                     | (uint32)((uint32)0U << 9U)  /* CLK */
-                    | (uint32)((uint32)0U << 10U)  /* SIMO[0] */
+                    | (uint32)((uint32)1U << 10U)  /* SIMO[0] */
                     | (uint32)((uint32)1U << 11U)  /* SOMI[0] */
                     | (uint32)((uint32)0U << 17U)  /* SIMO[1] */
                     | (uint32)((uint32)0U << 18U)  /* SIMO[2] */
@@ -1502,7 +1502,7 @@ uint32 i ;
                     | (uint32)((uint32)0U << 3U)  /* SCS[3] */
                     | (uint32)((uint32)0U << 8U)  /* ENA */
                     | (uint32)((uint32)1U << 9U)  /* CLK */
-                    | (uint32)((uint32)1U << 10U)  /* SIMO[0] */
+                    | (uint32)((uint32)0U << 10U)  /* SIMO[0] */
                     | (uint32)((uint32)0U << 11U)  /* SOMI[0] */
                     | (uint32)((uint32)1U << 17U)  /* SIMO[1] */
                     | (uint32)((uint32)1U << 18U)  /* SIMO[2] */

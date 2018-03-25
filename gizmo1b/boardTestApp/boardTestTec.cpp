@@ -1,7 +1,9 @@
 #include "boardTestTec.h"
 
-BoardTestTec::BoardTestTec()
+BoardTestTec::BoardTestTec() :
+    m_isEnabled(false)
 {
+    m_libTec.enable(m_isEnabled);
 }
 
 BoardTestTec::~BoardTestTec()
