@@ -3,12 +3,14 @@
 
 bool LibWrapMibSpi::s_isInitialized;
 std::map<mibspiBASE_t*, LibWrapMibSpi*>* LibWrapMibSpi::s_notificationMap;
+SemaphoreHandle_t LibWrapMibSpi::s_mibSpiMutex;
 
 LibWrapMibSpi::LibWrapMibSpi()
 {
     if (!s_isInitialized) {
         mibspiInit();
-        s_notificationMap = &m_notificationMap;
+        s_notificationMap = new std::map<mibspiBASE_t*, LibWrapMibSpi*>;
+        s_mibSpiMutex =  xSemaphoreCreateMutex();
         s_isInitialized = true;
     }
 }
@@ -19,7 +21,9 @@ LibWrapMibSpi::~LibWrapMibSpi()
 
 void LibWrapMibSpi::addNotification(LibWrapMibSpi* libWrapMibSpi)
 {
-    m_notificationMap[libWrapMibSpi->getMibSpiBase()] = libWrapMibSpi;
+    xSemaphoreTake(s_mibSpiMutex, portMAX_DELAY);
+    (*s_notificationMap)[libWrapMibSpi->getMibSpiBase()] = libWrapMibSpi;
+    xSemaphoreGive(s_mibSpiMutex);
 }
 
 void LibWrapMibSpi::setData(uint32 group, uint16* data)
@@ -69,9 +73,9 @@ void LibWrapMibSpi::notification(uint32 group)
 
 extern "C" void mibspiGroupNotification(mibspiBASE_t* mibspiReg, uint32 group)
 {
-    if (LibWrapMibSpi::s_notificationMap->find(mibspiReg)
-                                      != LibWrapMibSpi::s_notificationMap->end()
-   && (*LibWrapMibSpi::s_notificationMap)[mibspiReg]) {
+    if (*LibWrapMibSpi::s_notificationMap->find(mibspiReg)
+                                     != *LibWrapMibSpi::s_notificationMap->end()
+     && (*LibWrapMibSpi::s_notificationMap)[mibspiReg]) {
         mibspiDisableGroupNotification(mibspiReg, group);
         (*LibWrapMibSpi::s_notificationMap)[mibspiReg]->notification(group);
     }

@@ -79,8 +79,8 @@ bool LibWrapMibSpi1::test()
     libWrapMibSpi.lock();
     libWrapMibSpi.setData(LibWrapMibSpi::LOOP_BACK_TEST, txBuffer);
     libWrapMibSpi.transfer(LibWrapMibSpi::LOOP_BACK_TEST);
-    if (libWrapMibSpi.waitForTransferComplete(LibWrapMibSpi::LOOP_BACK_TEST)) {
-        libWrapMibSpi.getData(0, rxBuffer);
+    if (libWrapMibSpi.waitForTransferComplete(LibWrapMibSpi::LOOP_BACK_TEST, 1)) {
+        libWrapMibSpi.getData(LibWrapMibSpi::LOOP_BACK_TEST, rxBuffer);
     }
     else {
         isPass = false;

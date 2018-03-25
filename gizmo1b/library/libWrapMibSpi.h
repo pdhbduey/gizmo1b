@@ -43,8 +43,8 @@ private:
     void notification(uint32 group);
 private:
     static bool s_isInitialized;
-    std::map<mibspiBASE_t*, LibWrapMibSpi*> m_notificationMap;
     static std::map<mibspiBASE_t*, LibWrapMibSpi*>* s_notificationMap;
+    static SemaphoreHandle_t s_mibSpiMutex;
 };
 
 #endif // _LIB_WRAP_MIB_SPI_H_
