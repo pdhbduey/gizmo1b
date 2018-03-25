@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <utility>
+#include "libWrapGioPort.h"
 
 class LibTec
 {
@@ -20,6 +21,8 @@ public:
     void stopCurrent();
     int getLoopValue();
     int getCountValue();
+private:
+    LibWrapGioPort::Port m_tecEnable;
 };
 
 #endif // _LIB_TEC_H_

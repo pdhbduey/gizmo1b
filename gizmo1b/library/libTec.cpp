@@ -1,7 +1,11 @@
+#include "mibspi.h"
+#include "libWrapMibSpi5.h"
 #include "libTec.h"
 
-LibTec::LibTec()
+LibTec::LibTec() :
+    m_tecEnable(new LibWrapMibSpi5, PIN_SIMO) // 99:MIBSPI5SIMO[0]:TEC_EN
 {
+    enable(false);
 }
 
 LibTec::~LibTec()
@@ -10,6 +14,7 @@ LibTec::~LibTec()
 
 void LibTec::enable(bool en)
 {
+    m_tecEnable.m_libWrapGioPort->setPin(m_tecEnable.m_pin, en);
 }
 
 float LibTec::getISense()

@@ -1,7 +1,6 @@
-#include "FreeRTOS.h"
-#include "os_task.h"
-#include "libFault.h"
 #include "mibspi.h"
+#include "libFault.h"
+#include "libDelay.h"
 #include "libWrapGioPortA.h"
 #include "libWrapMibSpi5.h"
 
@@ -19,7 +18,7 @@ LibFault::~LibFault()
 void LibFault::reset()
 {
     m_drvErrClr.m_libWrapGioPort->setPin(m_drvErrClr.m_pin, true);
-    vTaskDelay(pdMS_TO_TICKS(1)); // >1us
+    LibDelay::us(100); // >1us
     m_drvErrClr.m_libWrapGioPort->setPin(m_drvErrClr.m_pin, false);
 }
 
