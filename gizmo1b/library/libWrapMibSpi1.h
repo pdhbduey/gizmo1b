@@ -16,6 +16,11 @@ public:
         SPI_A,
         SPI_B,
     };
+    enum Group {
+        DAC8563SDGST_16_BIT_DAC       = GROUP_1,
+        AD7689ACPZ_8CH_16BIT_ADC      = GROUP_2,
+        L6470HTR_STEPPER_MOTOR_DRIVER = GROUP_3,
+    };
 public:
     LibWrapMibSpi1();
     virtual ~LibWrapMibSpi1();
