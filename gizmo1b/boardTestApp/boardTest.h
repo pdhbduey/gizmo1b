@@ -30,6 +30,7 @@ public:
         ADC_RESULT,
         DAC_BASE  = 0x00000200,
         DAC_VALUE = DAC_BASE,
+        DAC_STATUS,
         FAN_BASE  = 0x00000300,
         FAN_VALUE = FAN_BASE,
         FAULT_BASE  = 0x00000400,

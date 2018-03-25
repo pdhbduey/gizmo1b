@@ -17,7 +17,9 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::ADC_CONTROL] = boardTest;
     m_boardTestMap[BoardTest::ADC_STATUS]  = boardTest;
     m_boardTestMap[BoardTest::ADC_RESULT]  = boardTest;
-    m_boardTestMap[BoardTest::DAC_VALUE] = new BoardTestDac;
+    boardTest = new BoardTestDac;
+    m_boardTestMap[BoardTest::DAC_VALUE] = boardTest;
+    m_boardTestMap[BoardTest::DAC_STATUS] = boardTest;
     m_boardTestMap[BoardTest::FAN_VALUE] = new BoardTestFan;
     boardTest = new BoardTestFault;
     m_boardTestMap[BoardTest::FAULT_RESET] = boardTest;

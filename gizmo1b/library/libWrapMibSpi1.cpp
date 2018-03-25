@@ -66,7 +66,7 @@ SemaphoreHandle_t& LibWrapMibSpi1::getSem()
     return s_sem;
 }
 
-bool LibWrapMibSpi1::test()
+void LibWrapMibSpi1::test()
 {
     LibWrapMibSpi& libWrapMibSpi = *new LibWrapMibSpi1;
     uint16 txBuffer[10];
@@ -92,5 +92,4 @@ bool LibWrapMibSpi1::test()
         }
     }
     libWrapMibSpi.unlock();
-    return isPass;
 }

@@ -25,7 +25,7 @@ public:
     LibWrapMibSpi1();
     virtual ~LibWrapMibSpi1();
     void somiSelect(int somi);
-    static bool test();
+    static void test();
 private:
     virtual gioPORT_t* getPort();
     virtual SemaphoreHandle_t& getPortMutex();
