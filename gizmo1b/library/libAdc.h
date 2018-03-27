@@ -70,7 +70,8 @@ private:
         READ_BACK_DISABLE,
     };
 private:
-    int read(uint16* cfg, uint16* value);
+    bool isChannelCorrect(int channel);
+    bool readDataDuringConversion(uint16 cfg, uint16& data);
 private:
     LibWrapMibSpi1 m_libWrapMibSpi1;
     LibWrapGioPort::Port m_adcCnv;
