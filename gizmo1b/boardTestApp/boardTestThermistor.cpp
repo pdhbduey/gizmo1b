@@ -13,41 +13,43 @@ int BoardTestThermistor::get(uint32 address, uint32& value)
     switch (address) {
     default:
         return ERROR_ADDR;
-    case THERMISTOR_CONTROL:
-        value = ((m_channel + 1) << THERMISTOR_CHANNEL_SELECT_SHIFT)
-                                               & THERMISTOR_CHANNEL_SELECT_MASK;
-        break;
     case THERMISTOR_STATUS:
-        value = (m_libThermistor.getStatus() << THERMISTOR_STATUS_SHIFT)
-                                                      &  THERMISTOR_STATUS_MASK;
+        value = m_status;
         break;
-    case THERMISTOR_RESULT:
+    case THERMISTOR_RESULT_AIN_A:
         {
-            float result = m_libThermistor.getResult();
-            value = *reinterpret_cast<uint32*>(&result); // NOTE: PC side may be LE
+            float ain;
+            m_status = m_libThermistor.readTemp(LibThermistor::AIN_A, ain);
+            if (m_status == LibThermistor::OKAY) {
+                value = *reinterpret_cast<uint32*>(&ain);
+            }
         }
         break;
-    }
-    return OKAY;
-}
-
-int BoardTestThermistor::set(uint32 address, uint32 value)
-{
-    int channel;
-    switch (address) {
-    default:
-        return ERROR_ADDR;
-    case THERMISTOR_STATUS:
-    case THERMISTOR_RESULT:
-        return ERROR_RO;
-    case THERMISTOR_CONTROL:
-        channel = (value & THERMISTOR_CHANNEL_SELECT_MASK)
-                                             >> THERMISTOR_CHANNEL_SELECT_SHIFT;
-        if (channel) {
-            m_channel = channel;
+    case THERMISTOR_RESULT_AIN_B:
+        {
+            float ain;
+            m_status = m_libThermistor.readTemp(LibThermistor::AIN_B, ain);
+            if (m_status == LibThermistor::OKAY) {
+                value = *reinterpret_cast<uint32*>(&ain);
+            }
         }
-        if (value & START_READING_MASK) {
-            m_libThermistor.startReading(m_channel);
+        break;
+    case THERMISTOR_RESULT_AIN_C:
+        {
+            float ain;
+            m_status = m_libThermistor.readTemp(LibThermistor::AIN_C, ain);
+            if (m_status == LibThermistor::OKAY) {
+                value = *reinterpret_cast<uint32*>(&ain);
+            }
+        }
+        break;
+    case THERMISTOR_RESULT_AIN_D:
+        {
+            float ain;
+            m_status = m_libThermistor.readTemp(LibThermistor::AIN_D, ain);
+            if (m_status == LibThermistor::OKAY) {
+                value = *reinterpret_cast<uint32*>(&ain);
+            }
         }
         break;
     }

@@ -38,14 +38,20 @@ int BoardTestTec::get(uint32 address, uint32& value)
         break;
     case TEC_ISENSE_VALUE:
         {
-            float iSense = m_libTec.getISense();
-            value = *reinterpret_cast<uint32*>(&iSense);
+            float iSense;
+            m_status = m_libTec.getISense(iSense);
+            if (m_status == LibTec::OKAY) {
+                value = *reinterpret_cast<uint32*>(&iSense);
+            }
         }
         break;
     case TEC_VSENSE_VALUE:
         {
-            float vSense = m_libTec.getVSense();
-            value = *reinterpret_cast<uint32*>(&vSense);
+            float vSense;
+            m_status = m_libTec.getVSense(vSense);
+            if (m_status == LibTec::OKAY) {
+                value = *reinterpret_cast<uint32*>(&vSense);
+            }
         }
         break;
     case TEC_LOOP_VALUE:
@@ -53,6 +59,9 @@ int BoardTestTec::get(uint32 address, uint32& value)
         break;
     case TEC_COUNT_VALUE:
         value = m_libTec.getCountValue();
+        break;
+    case TEC_STATUS:
+        value = m_status;
         break;
     }
     return OKAY;
@@ -68,6 +77,7 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TEC_CURRENT_COUNT:
     case TEC_LOOP_VALUE:
     case TEC_COUNT_VALUE:
+    case TEC_STATUS:
         return ERROR_RO;
     case TEC_CONTROL:
         if (value & DISABLE) {

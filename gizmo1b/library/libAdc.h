@@ -1,6 +1,8 @@
 #ifndef _LIB_ADC_H_
 #define _LIB_ADC_H_
 
+#include "FreeRTOS.h"
+#include "os_semphr.h"
 #include "libWrapMibSpi1.h"
 #include "libWrapGioPort.h"
 
@@ -75,6 +77,8 @@ private:
 private:
     LibWrapMibSpi1 m_libWrapMibSpi1;
     LibWrapGioPort::Port m_adcCnv;
+    static bool s_isInitialized;
+    static SemaphoreHandle_t s_mutex;
 };
 
 #endif // _LIB_ADC_H_

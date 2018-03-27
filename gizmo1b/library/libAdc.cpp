@@ -1,13 +1,21 @@
 #include "libDelay.h"
 #include "libWrapMibSpi5.h"
+#include "libMutex.h"
 #include "libAdc.h"
+
+SemaphoreHandle_t LibAdc::s_mutex;
+bool LibAdc::s_isInitialized;
 
 LibAdc::LibAdc() :
     m_adcCnv(new LibWrapMibSpi5, PIN_SOMI) // 98:MIBSPI5SOMI[0]:ADC_CNV
 {
-    // set ADC into the known state
-    float dummy;
-    read(CHANNEL_0, dummy);
+    if (!s_isInitialized) {
+        s_mutex = xSemaphoreCreateMutex();
+        // set ADC into the known state
+        float dummy;
+        read(CHANNEL_0, dummy);
+        s_isInitialized = true;
+    }
 }
 
 LibAdc::~LibAdc()
@@ -62,6 +70,7 @@ bool LibAdc::readDataDuringConversion(uint16 cfg, uint16& data)
 
 int LibAdc::read(int channel, float& value)
 {
+    LibMutex libMutex(s_mutex);
     int result = isChannelCorrect(channel);
     if (result != OKAY) {
         return result;

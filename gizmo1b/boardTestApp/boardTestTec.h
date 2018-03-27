@@ -27,6 +27,7 @@ private:
     int m_timeValue;
     float m_currentValue;
     int m_loopCount;
+    int m_status;
 };
 
 #endif // _BOARD_TEST_TEC_H_

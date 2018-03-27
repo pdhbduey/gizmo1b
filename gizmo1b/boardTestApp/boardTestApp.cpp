@@ -46,10 +46,13 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::TEC_VSENSE_VALUE]       = boardTest;
     m_boardTestMap[BoardTest::TEC_LOOP_VALUE]         = boardTest;
     m_boardTestMap[BoardTest::TEC_COUNT_VALUE]        = boardTest;
+    m_boardTestMap[BoardTest::TEC_STATUS]             = boardTest;
     boardTest = new BoardTestThermistor;
-    m_boardTestMap[BoardTest::THERMISTOR_CONTROL] = boardTest;
-    m_boardTestMap[BoardTest::THERMISTOR_STATUS]  = boardTest;
-    m_boardTestMap[BoardTest::THERMISTOR_RESULT]  = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_STATUS]        = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A]  = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_B]  = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_C]  = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_D]  = boardTest;
     m_boardTestMap[BoardTest::LED_CONTROL] = new BoardTestLed;
 }
 

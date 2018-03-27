@@ -4,6 +4,7 @@
 #include "libDac.h"
 #include "BoardTestTec.h"
 #include "libAdc.h"
+#include "libThermistor.h"
 
 UnitTestApp::UnitTestApp(const char* name) :
     LibTask(name)
@@ -21,6 +22,7 @@ void UnitTestApp::run()
 //    LibDac::test();
 //    BoardTestTec::test();
 //    LibAdc::test();
+    LibThermistor::test();
 
     while (true) {
     }
