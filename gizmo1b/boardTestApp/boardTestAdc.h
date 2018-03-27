@@ -7,26 +7,23 @@
 class BoardTestAdc: public BoardTest
 {
 public:
+    enum ControlMask {
+        ADC_CHANNEL_MASK = 7,
+        ADC_START_MASK   = 1,
+    };
+    enum ControlShift {
+        ADC_CHANNEL_SHIFT      = 0,
+        ADC_START_MASK_SHIFT   = 8,
+    };
+    enum StatusShift {
+        ADC_STATUS_SHIFT = 0,
+    };
+public:
     BoardTestAdc();
     virtual ~BoardTestAdc();
     virtual int get(uint32 address, uint32& value);
     virtual int set(uint32 address, uint32 value);
 private:
-    enum Control {
-        ADC_CHANNEL = 7,
-        ADC_START   = 1,
-    };
-    enum ControlShift {
-        ADC_CHANNEL_SHIFT = 0,
-        ADC_START_SHIFT   = 8,
-    };
-
-    enum Status {
-        ADC_STATUS = 1,
-    };
-    enum StatusShift {
-        ADC_STATUS_SHIFT = 0,
-    };
     LibAdc m_libAdc;
     int m_channel;
     float m_result;

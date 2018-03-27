@@ -5,14 +5,33 @@
 LibAdc::LibAdc() :
     m_adcCnv(new LibWrapMibSpi5, PIN_SOMI) // 98:MIBSPI5SOMI[0]:ADC_CNV
 {
-    // Initialize ADC
+    float dummy;
+    read(CHANNEL_0, dummy);
 }
 
 LibAdc::~LibAdc()
 {
 }
 
-int LibAdc::setChannel(int channel)
+int LibAdc::read(uint16* cfg, uint16* value)
+{
+    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
+    LibDelay::us(3); // max conv time 2.2us
+    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, false);
+    LibDelay::us(2); // min acq time 1.8us
+    m_libWrapMibSpi1.setData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, cfg);
+    m_libWrapMibSpi1.transfer(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC);
+    int result = OKAY;
+    if (!m_libWrapMibSpi1.waitForTransferComplete(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, 1)) {
+        result = ERROR_TIME_OUT;
+    }
+    else if (value) {
+        m_libWrapMibSpi1.getData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, value);
+    }
+    return result;
+}
+
+int LibAdc::read(int channel, float& value)
 {
     switch (channel) {
     case CHANNEL_0:
@@ -25,51 +44,47 @@ int LibAdc::setChannel(int channel)
     default:
         return ERROR_INVALID_CHANNEL;
     }
+    uint16 cfg =  OVERWRITE_CFG << CFG_SHIFT
+               |  UNIPOLAR_REF_TO_GND << IN_CH_CFG_SHIFT
+               |  channel << IN_CH_SEL_SHIFT
+               |  FULL_BW << FULL_BW_SEL_SHIFT
+               |  EXT_REF << REF_SEL_SHIFT
+               |  DISABLE_SEQ << SEQ_EN_SHIFT
+               |  READ_BACK_DISABLE << READ_BACK_SHIFT;
+    cfg <<= 2;
     m_libWrapMibSpi1.lock();
     m_libWrapMibSpi1.somiSelect(LibWrapMibSpi1::SPI_A);
-    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
-    LibDelay::us(10);
-    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, false);
-    uint16 cfg = 0;
-    cfg |= OVERWRITE_CFG << CFG_SHIFT
-        |  UNIPOLAR_REF_TO_GND << IN_CH_CFG_SHIFT
-        |  channel << IN_CH_SEL_SHIFT
-        |  FULL_BW << FULL_BW_SEL_SHIFT
-        |  EXT_REF << REF_SEL_SHIFT
-        |  DISABLE_SEQ << SEQ_EN_SHIFT
-        |  READ_BACK_DISABLE << READ_BACK_SHIFT;
-    int result = OKAY;
-    m_libWrapMibSpi1.lock();
-    m_libWrapMibSpi1.setData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, &cfg);
-    m_libWrapMibSpi1.transfer(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC);
-    if (m_libWrapMibSpi1.waitForTransferComplete(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, 1)) {
-        result = ERROR_TIME_OUT;
+    int result = read(&cfg, (uint16*)NULL);
+    if (result != OKAY) {
+        m_libWrapMibSpi1.unlock();
+        return result;
     }
+    cfg = KEEP_CFG << CFG_SHIFT;
+    cfg <<= 2;
+    result = read(&cfg, (uint16*)NULL);
+    if (result != OKAY) {
+        m_libWrapMibSpi1.unlock();
+        return result;
+    }
+    cfg = KEEP_CFG << CFG_SHIFT;
+    cfg <<= 2;
+    uint16 v;
+    result = read(&cfg, &v);
     m_libWrapMibSpi1.unlock();
+    if (result == OKAY) {
+        value = v * (5.0 / 65535);
+    }
     return result;
 }
 
-int LibAdc::read(float& value)
+void LibAdc::test()
 {
-    m_libWrapMibSpi1.lock();
-    m_libWrapMibSpi1.somiSelect(LibWrapMibSpi1::SPI_A);
-    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
-    LibDelay::us(10);
-    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, false);
-    uint16 cfg = 0;
-    cfg = KEEP_CFG << CFG_SHIFT;
-    int result = OKAY;
-    m_libWrapMibSpi1.lock();
-    m_libWrapMibSpi1.setData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, &cfg);
-    m_libWrapMibSpi1.transfer(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC);
-    if (m_libWrapMibSpi1.waitForTransferComplete(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, 1)) {
-        result = ERROR_TIME_OUT;
-    }
-    else {
-        uint16 v;
-        m_libWrapMibSpi1.getData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, &v);
-        value = v * (5.0 / 65536);
-    }
-    m_libWrapMibSpi1.unlock();
-    return result;
+    LibAdc libAdc;
+    float dummy;
+    libAdc.read(CHANNEL_0, dummy);
+    libAdc.read(CHANNEL_0, dummy);
+    float vSense;
+    int result = libAdc.read(CHANNEL_0, vSense);
+    float iSense;
+    result = libAdc.read(CHANNEL_1, iSense);
 }
