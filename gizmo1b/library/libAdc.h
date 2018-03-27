@@ -23,17 +23,17 @@ public:
 public:
     LibAdc();
     virtual ~LibAdc();
-    int setChannel(int channel);
-    int read(float& value); // 0-5V
+    int read(int channel, float& value); // 0-5V
+    static void test();
 private:
     enum CtrlRegisterShifts {
-        CFG_SHIFT         = 15,
-        IN_CH_CFG_SHIFT   = 12,
-        IN_CH_SEL_SHIFT   =  9,
-        FULL_BW_SEL_SHIFT =  8,
-        REF_SEL_SHIFT     =  5,
-        SEQ_EN_SHIFT      =  3,
-        READ_BACK_SHIFT   =  2,
+        CFG_SHIFT         = 13,
+        IN_CH_CFG_SHIFT   = 10,
+        IN_CH_SEL_SHIFT   =  7,
+        FULL_BW_SEL_SHIFT =  6,
+        REF_SEL_SHIFT     =  3,
+        SEQ_EN_SHIFT      =  1,
+        READ_BACK_SHIFT   =  0,
     };
     enum CfgBit {
         KEEP_CFG,
@@ -45,7 +45,7 @@ private:
         TEMP_SENSOR         = 3, // Temperature sensor
         UNIPOLAR_DIFF_PAIRS = 4, // INx− referenced to GND ± 0.1 V.
         UNIPOLAR_REF_TO_COM = 6, // INx referenced to COM = GND ± 0.1 V.
-        UNIPOLAR_REF_TO_GND = 7, //  INx referenced to GND
+        UNIPOLAR_REF_TO_GND = 7, // INx referenced to GND
     };
     enum BwSelectBit {
         QUARTER_BW,
@@ -69,6 +69,8 @@ private:
         READ_BACK_EN,
         READ_BACK_DISABLE,
     };
+private:
+    int read(uint16* cfg, uint16* value);
 private:
     LibWrapMibSpi1 m_libWrapMibSpi1;
     LibWrapGioPort::Port m_adcCnv;

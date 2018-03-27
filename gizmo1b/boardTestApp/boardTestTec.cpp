@@ -1,3 +1,4 @@
+#include <math.h>
 #include "libTec.h"
 #include "libFault.h"
 #include "libDac.h"
@@ -117,9 +118,16 @@ void BoardTestTec::test()
     libDac.set(2.5);
     libTec.enable(true);
     while (true) {
-        libDac.set(5.0);
-        LibDelay::us(1000);
-        libDac.set(2.5);
-        LibDelay::us(1000);
+        // Square wave
+//        libDac.set(5.0);
+//        LibDelay::us(1000);
+//        libDac.set(2.5);
+//        LibDelay::us(1000);
+        // Sine wave
+        for (int i = 0; i < 360; i++) {
+            float v = 2.5 + 1.5 * sin(i * 2 * 3.141 / 360);
+            libDac.set(v);
+            LibDelay::us(5400);
+        }
     }
 }
