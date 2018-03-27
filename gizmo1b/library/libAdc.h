@@ -18,13 +18,14 @@ public:
     enum Status {
         OKAY,
         ERROR_INVALID_CHANNEL,
+        ERROR_TIME_OUT,
     };
-    enum ConversionStatus {
-        IDLE,
-        BUSY,
-        DONE,
-        ERROR_TIMEOUT,
-    };
+public:
+    LibAdc();
+    virtual ~LibAdc();
+    int setChannel(int channel);
+    int read(float& value); // 0-5V
+private:
     enum CtrlRegisterShifts {
         CFG_SHIFT         = 15,
         IN_CH_CFG_SHIFT   = 12,
@@ -68,19 +69,8 @@ public:
         READ_BACK_EN,
         READ_BACK_DISABLE,
     };
-public:
-    LibAdc();
-    virtual ~LibAdc();
-    int read(int channel, float& value); // 0-5V
-    int startConversion(int channel);
-    int getStatus();
-    float getResult();
 private:
-    void doConversion();
-private:
-    float m_result;
     LibWrapMibSpi1 m_libWrapMibSpi1;
-    int m_status;
     LibWrapGioPort::Port m_adcCnv;
 };
 

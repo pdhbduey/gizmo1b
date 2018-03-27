@@ -12,23 +12,25 @@ public:
     virtual int get(uint32 address, uint32& value);
     virtual int set(uint32 address, uint32 value);
 private:
-    enum BitsAdcControlMask {
-        ADC_CHANNEL_SELECT_MASK = (uint32)((uint32)7U << 0U),
-        START_ADC_MASK          = (uint32)((uint32)1U << 8U),
+    enum Control {
+        ADC_CHANNEL = 7,
+        ADC_START   = 1,
     };
-    enum BitsAdcControlShift {
-        ADC_CHANNEL_SELECT_SHIFT = 0,
-        START_ADC_SHIFT          = 8,
+    enum ControlShift {
+        ADC_CHANNEL_SHIFT = 0,
+        ADC_START_SHIFT   = 8,
     };
-    enum BitsAdcStatusMask {
-        ADC_STATUS_MASK = (uint32)((uint32)3U << 0U),
+
+    enum Status {
+        ADC_STATUS = 1,
     };
-    enum BitsAdcStatusShift {
+    enum StatusShift {
         ADC_STATUS_SHIFT = 0,
     };
     LibAdc m_libAdc;
     int m_channel;
-
+    float m_result;
+    int m_status;
 };
 
 #endif // _BOARD_TEST_ADC_H_

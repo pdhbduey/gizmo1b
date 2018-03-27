@@ -1,45 +1,18 @@
-#include <string.h>
-#include "FreeRTOS.h"
-#include "os_task.h"
-#include "libAdc.h"
-#include "mibspi.h"
-#include "libWrapGioPort.h"
+#include "libDelay.h"
 #include "libWrapMibSpi5.h"
+#include "libAdc.h"
 
 LibAdc::LibAdc() :
     m_adcCnv(new LibWrapMibSpi5, PIN_SOMI) // 98:MIBSPI5SOMI[0]:ADC_CNV
 {
+    // Initialize ADC
 }
 
 LibAdc::~LibAdc()
 {
 }
 
-int LibAdc::read(int channel, float& value)
-{
-    int result = startConversion(channel);
-    if (result != OKAY) {
-        return result;
-    }
-    value = getResult();
-    return OKAY;
-}
-
-void LibAdc::doConversion()
-{
-    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
-    vTaskDelay(pdMS_TO_TICKS(1)); // >1us
-    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, false);
-}
-
-// RAC without BUSY indicator:
-// Conversion time is max 3.2us so if we keep CNV signal high for
-// more than that we disabled BUSY indicator.
-// When we return CNV to low we can configure the next conv and
-// read the previous  conv result. We need to repeat the conversion
-// to get the up to date result
-// see AD7689 Data sheet GENERAL TIMING WITHOUT A BUSY INDICATOR
-int LibAdc::startConversion(int channel)
+int LibAdc::setChannel(int channel)
 {
     switch (channel) {
     case CHANNEL_0:
@@ -54,7 +27,9 @@ int LibAdc::startConversion(int channel)
     }
     m_libWrapMibSpi1.lock();
     m_libWrapMibSpi1.somiSelect(LibWrapMibSpi1::SPI_A);
-    doConversion();
+    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
+    LibDelay::us(10);
+    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, false);
     uint16 cfg = 0;
     cfg |= OVERWRITE_CFG << CFG_SHIFT
         |  UNIPOLAR_REF_TO_GND << IN_CH_CFG_SHIFT
@@ -63,45 +38,38 @@ int LibAdc::startConversion(int channel)
         |  EXT_REF << REF_SEL_SHIFT
         |  DISABLE_SEQ << SEQ_EN_SHIFT
         |  READ_BACK_DISABLE << READ_BACK_SHIFT;
-    m_libWrapMibSpi1.setData(LibWrapMibSpi::GROUP_0, &cfg);
-    m_libWrapMibSpi1.transfer(LibWrapMibSpi::GROUP_0);
-    m_status = BUSY;
-    if (!m_libWrapMibSpi1.waitForTransferComplete(LibWrapMibSpi1::GROUP_0, 1)) {
-        m_libWrapMibSpi1.unlock();
-        m_status = ERROR_TIMEOUT;
-        return OKAY;
+    int result = OKAY;
+    m_libWrapMibSpi1.lock();
+    m_libWrapMibSpi1.setData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, &cfg);
+    m_libWrapMibSpi1.transfer(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC);
+    if (m_libWrapMibSpi1.waitForTransferComplete(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, 1)) {
+        result = ERROR_TIME_OUT;
     }
-    doConversion();
-    m_libWrapMibSpi1.setData(LibWrapMibSpi::GROUP_0, &cfg);
-    m_libWrapMibSpi1.transfer(LibWrapMibSpi::GROUP_0);
-    if (!m_libWrapMibSpi1.waitForTransferComplete(LibWrapMibSpi1::GROUP_0, 1)) {
-        m_libWrapMibSpi1.unlock();
-        m_status = ERROR_TIMEOUT;
-        return OKAY;
-    }
-    uint16 result;
-    m_libWrapMibSpi1.getData(LibWrapMibSpi::GROUP_0, &result);
     m_libWrapMibSpi1.unlock();
-    m_status = DONE;
-    m_result = result * (5.0 / 65536);
-    return OKAY;
+    return result;
 }
 
-int LibAdc::getStatus()
+int LibAdc::read(float& value)
 {
-    switch (m_status) {
-    default:
-    case DONE:
-    case ERROR_TIMEOUT:
-        m_status = IDLE;
-        break;
-    case BUSY:
-        break;
+    m_libWrapMibSpi1.lock();
+    m_libWrapMibSpi1.somiSelect(LibWrapMibSpi1::SPI_A);
+    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
+    LibDelay::us(10);
+    m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, false);
+    uint16 cfg = 0;
+    cfg = KEEP_CFG << CFG_SHIFT;
+    int result = OKAY;
+    m_libWrapMibSpi1.lock();
+    m_libWrapMibSpi1.setData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, &cfg);
+    m_libWrapMibSpi1.transfer(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC);
+    if (m_libWrapMibSpi1.waitForTransferComplete(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, 1)) {
+        result = ERROR_TIME_OUT;
     }
-    return m_status;
-}
-
-float LibAdc::getResult()
-{
-    return m_result;
+    else {
+        uint16 v;
+        m_libWrapMibSpi1.getData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, &v);
+        value = v * (5.0 / 65536);
+    }
+    m_libWrapMibSpi1.unlock();
+    return result;
 }
