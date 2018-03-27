@@ -7,10 +7,6 @@
 class BoardTestTec: public BoardTest
 {
 public:
-    BoardTestTec();
-    virtual ~BoardTestTec();
-    virtual int get(uint32 address, uint32& value);
-    virtual int set(uint32 address, uint32 value);
     enum Control {
         DISABLE                = (uint32)((uint32) 1U << 0U),
         ENABLE                 = (uint32)((uint32) 1U << 1U),
@@ -18,6 +14,12 @@ public:
         START_CURRENT_WAVEFORM = (uint32)((uint32) 1U << 3U),
         STOP_CURRENT_WAVEFORM  = (uint32)((uint32) 1U << 4U),
     };
+public:
+    BoardTestTec();
+    virtual ~BoardTestTec();
+    virtual int get(uint32 address, uint32& value);
+    virtual int set(uint32 address, uint32 value);
+    static void test();
 private:
     LibTec m_libTec;
     std::vector<LibTec::TimeCurrent> m_setPoints;

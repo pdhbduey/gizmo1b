@@ -1,7 +1,10 @@
 #include "boardTestDac.h"
 
-BoardTestDac::BoardTestDac()
+BoardTestDac::BoardTestDac() :
+    m_value(2.5),
+    m_status(m_libDac.set(2.5))
 {
+
 }
 
 BoardTestDac::~BoardTestDac()

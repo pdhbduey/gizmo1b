@@ -1,9 +1,13 @@
+#include "libTec.h"
+#include "libFault.h"
+#include "libDac.h"
+#include "LibDelay.h"
 #include "boardTestTec.h"
 
 BoardTestTec::BoardTestTec() :
     m_isEnabled(false)
 {
-    m_libTec.enable(m_isEnabled);
+    m_libTec.enable(false);
 }
 
 BoardTestTec::~BoardTestTec()
@@ -101,4 +105,21 @@ int BoardTestTec::set(uint32 address, uint32 value)
         break;
     }
     return OKAY;
+}
+
+void BoardTestTec::test()
+{
+    LibTec libTec;
+    LibFault libFault;
+    LibDac libDac;
+    libTec.enable(false);
+    libFault.reset();
+    libDac.set(2.5);
+    libTec.enable(true);
+    while (true) {
+        libDac.set(5.0);
+        LibDelay::us(1000);
+        libDac.set(2.5);
+        LibDelay::us(1000);
+    }
 }

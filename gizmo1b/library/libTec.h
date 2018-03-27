@@ -9,6 +9,7 @@ class LibTec
 {
 public:
     typedef std::pair<int, float> TimeCurrent;
+public:
     LibTec();
     virtual ~LibTec();
     void enable(bool en);

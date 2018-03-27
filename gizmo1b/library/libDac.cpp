@@ -29,12 +29,8 @@ LibDac::LibDac()
     txBuffer[1] = 0;
     txBuffer[2] = POWER_DOWN_DAC_B_HI_Z;
     writeDac(txBuffer);
-    // Clear output
-    txBuffer[0] = CMD_WR_ONE_REG_AND_UPDATE_ONE_DAC << CMD_SHIFT
-                | ADDR_DAC_A << ADDR_SHIFT;
-    txBuffer[1] = 0;
-    txBuffer[2] = 0;
-    int result = writeDac(txBuffer);
+    // Set output to 2.5V
+    set(2.5);
 }
 
 LibDac::~LibDac()
