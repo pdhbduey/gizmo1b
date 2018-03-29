@@ -1,4 +1,3 @@
-#include "boardTestApp.h"
 #include "libSci2.h"
 #include "boardTestDio.h"
 #include "boardTestAdc.h"
@@ -9,6 +8,7 @@
 #include "boardTestTec.h"
 #include "boardTestThermistor.h"
 #include "boardTestLed.h"
+#include "boardTestApp.h"
 
 BoardTestApp::BoardTestApp(const char* name) :
     LibTask(name)
@@ -18,7 +18,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::ADC_STATUS]  = boardTest;
     m_boardTestMap[BoardTest::ADC_RESULT]  = boardTest;
     boardTest = new BoardTestDac;
-    m_boardTestMap[BoardTest::DAC_VALUE] = boardTest;
+    m_boardTestMap[BoardTest::DAC_VALUE]  = boardTest;
     m_boardTestMap[BoardTest::DAC_STATUS] = boardTest;
     m_boardTestMap[BoardTest::FAN_VALUE] = new BoardTestFan;
     boardTest = new BoardTestFault;
@@ -37,22 +37,19 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::MOTOR_DECELERATION]      = boardTest;
     m_boardTestMap[BoardTest::MOTOR_HOLD_CURRENT]      = boardTest;
     boardTest = new BoardTestTec;
-    m_boardTestMap[BoardTest::TEC_CONTROL]            = boardTest;
-    m_boardTestMap[BoardTest::TEC_TIME_VALUE]         = boardTest;
-    m_boardTestMap[BoardTest::TEC_CURRENT_VALUE]      = boardTest;
-    m_boardTestMap[BoardTest::TEC_CURRENT_COUNT]      = boardTest;
-    m_boardTestMap[BoardTest::TEC_CURRENT_LOOP_COUNT] = boardTest;
-    m_boardTestMap[BoardTest::TEC_ISENSE_VALUE]       = boardTest;
-    m_boardTestMap[BoardTest::TEC_VSENSE_VALUE]       = boardTest;
-    m_boardTestMap[BoardTest::TEC_LOOP_VALUE]         = boardTest;
-    m_boardTestMap[BoardTest::TEC_COUNT_VALUE]        = boardTest;
-    m_boardTestMap[BoardTest::TEC_STATUS]             = boardTest;
+    m_boardTestMap[BoardTest::TEC_CONTROL]         = boardTest;
+    m_boardTestMap[BoardTest::TEC_IREF_VALUE]      = boardTest;
+    m_boardTestMap[BoardTest::TEC_ISENSE_VALUE]    = boardTest;
+    m_boardTestMap[BoardTest::TEC_VSENSE_VALUE]    = boardTest;
+    m_boardTestMap[BoardTest::TEC_STATUS]          = boardTest;
+    m_boardTestMap[BoardTest::TEC_WAVEFORM_TYPE]   = boardTest;
+    m_boardTestMap[BoardTest::TEC_WAVEFORM_PERIOD] = boardTest;
     boardTest = new BoardTestThermistor;
-    m_boardTestMap[BoardTest::THERMISTOR_STATUS]        = boardTest;
-    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A]  = boardTest;
-    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_B]  = boardTest;
-    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_C]  = boardTest;
-    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_D]  = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_STATUS]       = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A] = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_B] = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_C] = boardTest;
+    m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_D] = boardTest;
     m_boardTestMap[BoardTest::LED_CONTROL] = new BoardTestLed;
 }
 
@@ -77,13 +74,13 @@ void BoardTestApp::run()
             libSci.open();
             resetSci = false;
         }
-        if (!libSci.waitForReadyRead(1000)) {
+        if (!libSci.isDataAvailable(1000)) {
             continue;
         }
         message.clear();
         libSci.read(message);
         while (message.size() < sizeof(m_masterToSlave)) {
-            if (!libSci.waitForReadyRead(10)) {
+            if (!libSci.isDataAvailable(10)) {
                 resetSci = true;
                 break;
             }
@@ -91,8 +88,8 @@ void BoardTestApp::run()
         }
         if (!resetSci) {
             decodeMessage(message, response);
-            if (libSci.write(response) == BoardTest::OKAY) {
-                if (!libSci.waitForBytesWritten(1000)) {
+            if (libSci.write(response) == LibSci::OKAY) {
+                if (!libSci.isDataWritten(1000)) {
                     resetSci = true;
                 }
             }

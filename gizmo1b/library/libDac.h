@@ -17,6 +17,7 @@ public:
     LibDac();
     virtual ~LibDac();
     int set(float value); // 0-5V
+    float get();
     static void test();
 private:
     enum DacCtrl {
@@ -85,6 +86,9 @@ private:
 private:
     LibWrapMibSpi1 m_libWrapMibSpi1;
     std::map<int, LibWrapGioPort::Port*> m_dacCtrlMap;
+    static float s_value;
+    static bool s_isInitialized;
+    static SemaphoreHandle_t s_mutex;
 };
 
 #endif // _LIB_DAC_H_

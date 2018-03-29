@@ -1,7 +1,6 @@
 #include "boardTestDac.h"
 
 BoardTestDac::BoardTestDac() :
-    m_value(2.5),
     m_status(m_libDac.set(2.5))
 {
 
@@ -13,11 +12,13 @@ BoardTestDac::~BoardTestDac()
 
 int BoardTestDac::get(uint32 address, uint32& value)
 {
+    float v;
     switch (address) {
     default:
         return ERROR_ADDR;
     case DAC_VALUE:
-        value = *reinterpret_cast<uint32*>(&m_value); // NOTE: PC side may be LE
+        v = m_libDac.get();
+        value = *reinterpret_cast<uint32*>(&v); // NOTE: PC side may be LE
         break;
     case DAC_STATUS:
         value = m_status;
@@ -28,17 +29,15 @@ int BoardTestDac::get(uint32 address, uint32& value)
 
 int BoardTestDac::set(uint32 address, uint32 value)
 {
+    float v;
     switch (address) {
     default:
         return ERROR_ADDR;
     case DAC_STATUS:
         return ERROR_RO;
     case DAC_VALUE:
-        float v = *reinterpret_cast<float*>(&value);
+        v = *reinterpret_cast<float*>(&value);
         m_status = m_libDac.set(v);
-        if (m_status == LibDac::OKAY) {
-            m_value = v;
-        }
         break;
     }
     return OKAY;

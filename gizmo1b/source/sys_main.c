@@ -52,6 +52,7 @@
 /* USER CODE BEGIN (1) */
 #include "boardTestAppStart.h"
 #include "unitTestAppStart.h"
+#include "boardTestConsoleAppStart.h"
 /* USER CODE END */
 
 /** @fn void main(void)
@@ -70,6 +71,7 @@ int main(void)
 /* USER CODE BEGIN (3) */
     boardTestAppStart();
     //unitTestAppStart();
+    //boardTestConsoleAppStart();
 /* USER CODE END */
 
     return 0;

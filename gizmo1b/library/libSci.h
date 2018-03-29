@@ -44,8 +44,8 @@ public:
     int setStopBits(int stopBits);
     int read(std::vector<uint8>& data);
     int write(const std::vector<uint8>& data);
-    bool waitForBytesWritten(int msTimeout = 1000);
-    bool waitForReadyRead(int msTimeout = 1000);
+    bool isDataWritten(int msTimeout = 1000);
+    bool isDataAvailable(int msTimeout = 1000);
     friend void sciNotification(sciBASE_t* sci, uint32 flags);
 protected:
     virtual void openLowLevel() = 0;

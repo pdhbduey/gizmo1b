@@ -1,14 +1,14 @@
 #include "FreeRTOS.h"
 #include "os_task.h"
 #include "libRaisePrivilege.h"
-#include "boardTestAppStart.h"
-#include "boardTestApp.h"
+#include "boardTestConsoleApp.h"
+#include "boardTestConsoleAppStart.h"
 
 static void launcherTask(void* parameter)
 {
     LibRaisePrivilege libRaisePrivilege;
-    BoardTestApp boardTestApp("BoardTestApp");
-    boardTestApp.start();
+    BoardTestConsoleApp demoTestConsoleApp("DemoTestConsoleApp");
+    demoTestConsoleApp.start();
     while (true) {
     }
 }
@@ -16,7 +16,7 @@ static void launcherTask(void* parameter)
 // Interrupts are enabled in the scheduler so application must be started
 // AFTER the scheduler because we need interrupts enabled when we run the
 // application
-void boardTestAppStart()
+void boardTestConsoleAppStart()
 {
     TaskHandle_t taskHandle;
     xTaskCreate(launcherTask, "Launcher", configMINIMAL_STACK_SIZE, NULL,

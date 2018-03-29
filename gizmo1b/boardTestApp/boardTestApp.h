@@ -56,17 +56,19 @@ public:
 public:
     BoardTestApp(const char* name);
     virtual ~BoardTestApp();
-private:
-    void decodeMessage(std::vector<uint8>& message,
-                                                  std::vector<uint8>& response);
+protected:
     int regRead(uint32 address, uint32& value);
     int regWrite(uint32 address, uint32 value);
-    bool isAddressValid(uint32 address);
 private:
     virtual void run();
+    void decodeMessage(std::vector<uint8>& message,
+                                                  std::vector<uint8>& response);
+    bool isAddressValid(uint32 address);
+protected:
+    std::map<int, BoardTest*> m_boardTestMap;
+private:
     union MasterToSlaveMsg m_masterToSlave;
     union SlaveToMasterMsg m_slaveToMaster;
-    std::map<int, BoardTest*> m_boardTestMap;
 };
 
 #endif // _BOARD_TEST_APP_H_

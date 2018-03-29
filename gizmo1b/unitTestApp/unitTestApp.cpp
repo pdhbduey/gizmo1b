@@ -22,7 +22,7 @@ void UnitTestApp::run()
 //    LibDac::test();
 //    BoardTestTec::test();
 //    LibAdc::test();
-    LibThermistor::test();
+//    LibThermistor::test();
 
     while (true) {
     }

@@ -23,7 +23,6 @@ public:
 
     // Register memory map
     enum RegMemoryMap {
-        // gizmo1b
         ADC_BASE    = 0x00000100,
         ADC_CONTROL = ADC_BASE,
         ADC_STATUS,
@@ -50,15 +49,12 @@ public:
         MOTOR_HOLD_CURRENT,
         TEC_BASE    = 0x00000700,
         TEC_CONTROL = TEC_BASE,
-        TEC_TIME_VALUE,
-        TEC_CURRENT_VALUE,
-        TEC_CURRENT_COUNT,
-        TEC_CURRENT_LOOP_COUNT,
+        TEC_IREF_VALUE,
         TEC_ISENSE_VALUE,
         TEC_VSENSE_VALUE,
-        TEC_LOOP_VALUE,
-        TEC_COUNT_VALUE,
         TEC_STATUS,
+        TEC_WAVEFORM_TYPE,
+        TEC_WAVEFORM_PERIOD,
         THERMISTOR_BASE    = 0x00000800,
         THERMISTOR_STATUS = THERMISTOR_BASE,
         THERMISTOR_RESULT_AIN_A,
