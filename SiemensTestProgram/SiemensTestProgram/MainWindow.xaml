@@ -14,7 +14,7 @@
         MaxWidth="650"
         Height="400" 
         Width="525"
-        Background="#E4FDE1">
+        Background="WhiteSmoke">
 
     <Window.Resources>
         <DataTemplate x:Name="LedViewName" DataType="{x:Type viewmodels:LedViewModel}">
