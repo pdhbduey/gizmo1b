@@ -35,6 +35,7 @@ namespace DeviceManager.ViewModel
         private const string StopCaptureText = "Stop Capture";
         private const string EnableText = "Enable";
         private const string DisableText = "Disable";
+        private const int updateDelay = 400;
         private bool saving;
         private bool updating;
 
@@ -430,7 +431,6 @@ namespace DeviceManager.ViewModel
                 if (token.IsCancellationRequested == true)
                 {
                     updating = false;
-                    //token.ThrowIfCancellationRequested();
                     break;
                 }
 
@@ -438,23 +438,23 @@ namespace DeviceManager.ViewModel
                 {
                     var iRefData = await tecModel.ReadIref();
                     IRef = Helper.GetFloatFromBigEndian(iRefData);
+                    Thread.Sleep(updateDelay);
                     var iSenseData = await tecModel.ReadIsense();
                     ISense = Helper.GetFloatFromBigEndian(iSenseData);
+                    Thread.Sleep(updateDelay);
                     var vSenseData = await tecModel.ReadVsense();
                     VSense = Helper.GetFloatFromBigEndian(vSenseData);
+                    Thread.Sleep(updateDelay);
                     var status = await tecModel.ReadStatus();
                     ProcessStatus(status);
-                    //UpdateIref();
-                    //UpdateISense();
-                    //UpdateVSense();
-                    //UpdateStatus();
+                    Thread.Sleep(updateDelay);
                 }
                 catch (Exception e)
                 {
                     StatusMessage = e.Message;
                 }
                 
-                Thread.Sleep(1000);
+                
             }
         }
 

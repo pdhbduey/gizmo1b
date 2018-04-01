@@ -65,16 +65,23 @@ namespace DeviceManager.DeviceCommunication
                 var data = new byte[5];
                 lock (mutex)
                 {
-                    if (serialPort.IsOpen)
+                    try
                     {
-                        do
+                        if (serialPort.IsOpen)
                         {
-                            time += 10;
-                            if (time > timeout) return data;
-                            Thread.Sleep(10);
-                        } while (serialPort.BytesToRead < 5);
+                            do
+                            {
+                                time += 10;
+                                if (time > timeout) return data;
+                                Thread.Sleep(10);
+                            } while (serialPort.BytesToRead < 5);
 
-                        serialPort.Read(data, 0, data.Length);
+                            serialPort.Read(data, 0, data.Length);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        return new byte[0];
                     }
 
                     return data;
