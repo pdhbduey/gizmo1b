@@ -8,10 +8,26 @@ namespace DeviceManager.Model
     public class TecModel : ITecModel
     {
         private IComCommunication communication;
+        private object mutex = new object();
 
         public TecModel(IComCommunication communication)
         {
             this.communication = communication;
+        }
+
+        public Task<byte[]> SetIRef(byte[] data)
+        {
+            var requestArray = TecDefaults.GetSetIrefCommand(data);
+            communication.WriteData(requestArray);
+            return ReadStatus();
+        }
+
+        public Task<byte[]> Reset()
+        {
+            var requestArray = TecDefaults.GetResetCommand();
+            communication.WriteData(requestArray);
+            var data = communication.ReadData();
+            return data;
         }
 
         public Task<byte[]> ReadIsense()
@@ -50,21 +66,21 @@ namespace DeviceManager.Model
         {
             var requestArray = TecDefaults.GetControlCommand(request);
             communication.WriteData(requestArray);
-            return ReadStatus();
+            return communication.ReadData();
         }
 
         public Task<byte[]> SetWaveformCommand(string waveform)
         {
             var requestArray = TecDefaults.GetWaveformTypeCommand(waveform);
             communication.WriteData(requestArray);
-            return ReadStatus();
+            return communication.ReadData();
         }
 
         public Task<byte[]> SetPeriodCommand(int period)
         {
             var requestArray = TecDefaults.GetWaveformPeriodCommand(period);
             communication.WriteData(requestArray);
-            return ReadStatus();
+            return communication.ReadData();
         }
     }
 }

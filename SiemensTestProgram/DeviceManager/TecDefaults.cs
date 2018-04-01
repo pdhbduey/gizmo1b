@@ -57,6 +57,27 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] GetSetIrefCommand(byte[] data)
+        {
+            if (data.Length != 4)
+            {
+                return null;
+            }
+
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x01,
+                data[0],
+                data[1],
+                data[2],
+                data[3]
+            };
+        }
+
         public static byte[] GetIsenseCommand()
         {
             return new byte[]
@@ -105,6 +126,22 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] GetResetCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x04,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x01
+            };
+        }
+
         public static byte[] GetWaveformTypeCommand(string waveform)
         {
             var waveformType = WaveFormByteValues[waveform];
@@ -142,10 +179,12 @@ namespace DeviceManager
         public static Dictionary<byte, string> Errors = new Dictionary<byte, string>()
         {
             { 0x00, "Okay"},
-            { 0x01, "ISense Error"},
-            { 0x02, "Error ref current out of range"},
-            { 0x03, "Error set ref current"},
-            { 0x04, "Error waveform type out of range"}
+            { 0x01, "Error ISense"},
+            { 0x02, "Error VSense" },
+            { 0x03, "Error ref current out of range"},
+            { 0x04, "Error set ref current"},
+            { 0x05, "Error waveform type out of range"},
+            { 0x06, "Error waveform period out of range"}
         };
 
         public static Dictionary<string, byte> WaveFormByteValues = new Dictionary<string, byte>()

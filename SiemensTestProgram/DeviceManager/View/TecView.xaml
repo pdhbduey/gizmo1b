@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DeviceManager.View"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300"
+             Background="WhiteSmoke">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -36,23 +37,24 @@
                 <TextBox Width="100" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=TecPeriod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
 
                 <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
-                    <Slider 
-                    Width="250" 
-                    Margin="20"
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Left" 
-                    Minimum="0" 
-                    Maximum="500" 
-                    Value="{Binding SliderVoltageValue}">
+                    <Slider
+                        IsEnabled="{Binding IsIRefEditable}"
+                        Width="250" 
+                        Margin="20"
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Left" 
+                        Minimum="-1500" 
+                        Maximum="1500" 
+                        Value="{Binding SliderIrefValue}">
                     </Slider>
-                    <Label VerticalAlignment="Center" Content="{Binding VoltageValueText}"></Label>
+                    <Label VerticalAlignment="Center" Content="{Binding IrefCurrentValueText}"></Label>
                 </StackPanel>
 
                 <!-- TEC Commands -->
                 <StackPanel Grid.Row="0" Grid.RowSpan="3" Grid.Column="2" Orientation="Vertical">
                     <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
                     <Button Margin="2" Width="100" Height="25" Content="Reset" Command="{Binding ResetTecCommand}"></Button>
-                    <!--<ToggleButton Margin="2" Width="100" Height="25" Content="{Binding CaptureButtonState}" Command="{Binding CaptureStartStopCommand}"></ToggleButton>-->
+                    <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>
                 </StackPanel>
             </Grid>
         </StackPanel>
@@ -75,7 +77,7 @@
                 <ProgressBar Margin="2" Grid.Column="0" HorizontalAlignment="Stretch" Minimum="0" Maximum="{Binding ProgressMaximum}" Value="{Binding SaveProgressValue}" ></ProgressBar>
                 <TextBlock Text="{Binding SaveProgress}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
-            <Button Grid.Column="1" Margin="2" Width="100" Height="25" Content="Save" Command="{Binding SaveDataCommand}"></Button>
+            <Button Grid.Column="1" Margin="2" Width="100" Height="25" Content="Save" IsEnabled="False" Command="{Binding SaveDataCommand}"></Button>
         </Grid>
     </Grid>
 </UserControl>

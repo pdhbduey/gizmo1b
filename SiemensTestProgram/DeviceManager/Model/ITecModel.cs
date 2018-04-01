@@ -19,5 +19,7 @@ namespace DeviceManager.Model
         Task<byte[]> SetWaveformCommand(string waveform);
 
         Task<byte[]> SetPeriodCommand(int period);
+
+        Task<byte[]> Reset();
     }
 }

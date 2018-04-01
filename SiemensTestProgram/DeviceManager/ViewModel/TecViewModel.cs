@@ -12,6 +12,7 @@ namespace DeviceManager.ViewModel
 
     public class TecViewModel : BindableBase
     {
+        private object mutex = new object();
         private Task updateTask;
         private ITecModel tecModel;
         private int progressMaximum;
@@ -19,10 +20,11 @@ namespace DeviceManager.ViewModel
         private string saveProgress;
         private string enableButtonState;
         private string captureButtonState;
+        private string waveformButtonState;
         private int saveProgressValue;
         private int numberOfSamples;
-        private float voltageValue;
-        private int sliderVoltageValue;
+        private float irefCurrentValue;
+        private int sliderIrefValue;
         private int tecPeriod;
 
         private float vSense;
@@ -34,6 +36,9 @@ namespace DeviceManager.ViewModel
         private const string StopCaptureText = "Stop Capture";
         private const string EnableText = "Enable";
         private const string DisableText = "Disable";
+        private const string StartWaveformText = "Start Waveform";
+        private const string StopWaveformText = "Stop Waveform";
+        private const int updateDelay = 300;
         private bool saving;
         private bool updating;
 
@@ -52,14 +57,16 @@ namespace DeviceManager.ViewModel
             saveProgressValue = 0;
             saveProgress = string.Empty;
             captureButtonState = StartCaptureText;
+            waveformButtonState = StartWaveformText;
             enableButtonState = EnableText;
             numberOfSamples = 0;
-            SliderVoltageValue = 250;
+            SliderIrefValue = 0;
 
             // Set commands
             SaveDataCommand = new RelayCommand(param => SaveData());
             EnableCommand = new RelayCommand(param => EnableToggle());
             CaptureStartStopCommand = new RelayCommand(param => CaptureToggle());
+            StartStopWaveformCommand = new RelayCommand(param => WaveformToggle());
             ResetTecCommand = new RelayCommand(param => ResetTec());
 
             StartUpdateTask();
@@ -72,6 +79,8 @@ namespace DeviceManager.ViewModel
         public RelayCommand ResetTecCommand { get; set; }
 
         public RelayCommand CaptureStartStopCommand { get; set; }
+
+        public RelayCommand StartStopWaveformCommand { get; set; }
 
         public List<string> Waveforms { get; set; }
 
@@ -89,6 +98,14 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        public bool IsIRefEditable
+        {
+            get
+            {
+                return (waveformButtonState == StartWaveformText);
+            }
+        }
+
         public string CaptureButtonState
         {
             get
@@ -100,6 +117,21 @@ namespace DeviceManager.ViewModel
             {
                 captureButtonState = value;
                 OnPropertyChanged(nameof(CaptureButtonState));
+            }
+        }
+
+        public string WaveformButtonState
+        {
+            get
+            {
+                return waveformButtonState;
+            }
+
+            set
+            {
+                waveformButtonState = value;
+                OnPropertyChanged(nameof(WaveformButtonState));
+                OnPropertyChanged(nameof(IsIRefEditable));
             }
         }
 
@@ -211,26 +243,26 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public float VoltageValue
+        public float IrefCurrentValue
         {
             get
             {
-                return voltageValue;
+                return irefCurrentValue;
             }
 
             set
             {
-                voltageValue = value;
-                OnPropertyChanged(nameof(VoltageValue));
-                OnPropertyChanged(nameof(VoltageValueText));
+                irefCurrentValue = value;
+                OnPropertyChanged(nameof(IrefCurrentValue));
+                OnPropertyChanged(nameof(IrefCurrentValueText));
             }
         }
 
-        public string VoltageValueText
+        public string IrefCurrentValueText
         {
             get
             {
-                return $"{VoltageValue} V";
+                return $"{IrefCurrentValue} A";
             }
         }
 
@@ -238,7 +270,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"IRef: {iRef}";
+                return $"IRef: {iRef} A";
             }
         }
 
@@ -261,7 +293,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"VSense: {vSense}";
+                return $"VSense: {vSense} V";
             }
         }
 
@@ -284,7 +316,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"ISense: {iSense}";
+                return $"ISense: {iSense} A";
             }
         }
 
@@ -317,17 +349,17 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public int SliderVoltageValue
+        public int SliderIrefValue
         {
             get
             {
-                return sliderVoltageValue;
+                return sliderIrefValue;
             }
             set
             {
-                sliderVoltageValue = value;
-                VoltageValue = (float)sliderVoltageValue / 100;
-                OnPropertyChanged(nameof(SliderVoltageValue));
+                sliderIrefValue = value;
+                IrefCurrentValue = (float)sliderIrefValue / 100;
+                OnPropertyChanged(nameof(SliderIrefValue));
             }
         }
 
@@ -350,7 +382,6 @@ namespace DeviceManager.ViewModel
         {
             EnableButtonState = enableButtonState == EnableText ? DisableText : EnableText;
             var status = await tecModel.ControlCommand(enableButtonState);
-            ProcessStatus(status);
         }
 
         private async void UpdatePeriod()
@@ -369,10 +400,15 @@ namespace DeviceManager.ViewModel
         {
             CaptureButtonState = captureButtonState == StartCaptureText ? StopCaptureText : StartCaptureText;
         }
-        
-        private void ResetTec()
+
+        private void WaveformToggle()
         {
-            // set waveform to continuous, samples = ?, period 1000ms
+            WaveformButtonState = waveformButtonState == StartWaveformText ? StopWaveformText : StartWaveformText;
+        }
+
+        private async void ResetTec()
+        {
+            await tecModel.Reset();
         }
 
         private async void UpdateIref()
@@ -390,7 +426,7 @@ namespace DeviceManager.ViewModel
         private async void UpdateVSense()
         {
             var data = await tecModel.ReadVsense();
-            VSense = Helper.GetFloatFromBigEndian(data);
+            VSense = Helper.GetFloatFromBigEndian(data); 
         }
 
         private async void UpdateStatus()
@@ -422,30 +458,37 @@ namespace DeviceManager.ViewModel
             }, token);
         }
 
-        private void UpdateAllStatuses()
+        private async void UpdateAllStatuses()
         {
             while (true)
             {
                 if (token.IsCancellationRequested == true)
                 {
                     updating = false;
-                    //token.ThrowIfCancellationRequested();
                     break;
                 }
 
                 try
                 {
-                    UpdateIref();
-                    UpdateISense();
-                    UpdateVSense();
-                    UpdateStatus();
+                    var iRefData = await tecModel.ReadIref();
+                    IRef = Helper.GetFloatFromBigEndian(iRefData);
+                    Thread.Sleep(updateDelay);
+                    var iSenseData = await tecModel.ReadIsense();
+                    ISense = Helper.GetFloatFromBigEndian(iSenseData);
+                    Thread.Sleep(updateDelay);
+                    var vSenseData = await tecModel.ReadVsense();
+                    VSense = Helper.GetFloatFromBigEndian(vSenseData);
+                    Thread.Sleep(updateDelay);
+                    var status = await tecModel.ReadStatus();
+                    ProcessStatus(status);
+                    Thread.Sleep(updateDelay);
                 }
                 catch (Exception e)
                 {
                     StatusMessage = e.Message;
                 }
                 
-                Thread.Sleep(1000);
+                
             }
         }
 
