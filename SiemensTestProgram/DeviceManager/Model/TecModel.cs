@@ -15,10 +15,15 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        //public Task<byte[]> SetIRef()
-        //{
-
-        //}
+        public Task<byte[]> SetIRef(byte[] data)
+        {
+            //lock (mutex)
+            //{
+                var requestArray = TecDefaults.GetSetIrefCommand(data);
+                communication.WriteData(requestArray);
+                return ReadStatus();
+            //}
+        }
 
         //public Task<byte[]> Reset()
         //{
@@ -27,76 +32,79 @@ namespace DeviceManager.Model
 
         public Task<byte[]> ReadIsense()
         {
-            lock (mutex)
-            {
+            //lock (mutex)
+            //{
                 var requestArray = TecDefaults.GetIsenseCommand();
                 communication.WriteData(requestArray);
                 var data = communication.ReadData();
                 return data;
-            }
+            //}
         }
 
         public Task<byte[]> ReadVsense()
         {
-            lock (mutex)
-            {
+            //lock (mutex)
+            //{
                 var requestArray = TecDefaults.GetVsenseCommand();
                 communication.WriteData(requestArray);
                 var data = communication.ReadData();
                 return data;
-            }
+            //}
         }
 
         public Task<byte[]> ReadIref()
         {
-            lock (mutex)
-            {
+            //lock (mutex)
+            //{
                 var requestArray = TecDefaults.GetIrefCommand();
                 communication.WriteData(requestArray);
                 var data = communication.ReadData();
                 return data;
-            }
+            //}
         }
 
         public Task<byte[]> ReadStatus()
         {
-            lock (mutex)
-            {
+            //lock (mutex)
+            //{
                 var requestArray = TecDefaults.GetStatusCommand();
                 communication.WriteData(requestArray);
                 var data = communication.ReadData();
                 return data;
-            }
+            //}
         }
 
         public Task<byte[]> ControlCommand(string request)
         {
-            lock (mutex)
-            {
+            //lock (mutex)
+            //{
                 var requestArray = TecDefaults.GetControlCommand(request);
                 communication.WriteData(requestArray);
-                return ReadStatus();
-            }
+                return communication.ReadData(); // dummy read
+                //return ReadStatus();
+            //}
         }
 
         public Task<byte[]> SetWaveformCommand(string waveform)
         {
-            lock (mutex)
-            {
+            //lock (mutex)
+            //{
                 var requestArray = TecDefaults.GetWaveformTypeCommand(waveform);
                 communication.WriteData(requestArray);
-                return ReadStatus();
-            }
+                return communication.ReadData();
+            //return ReadStatus();
+            //}
         }
 
         public Task<byte[]> SetPeriodCommand(int period)
         {
-            lock (mutex)
-            {
+            //lock (mutex)
+            //{
                 var requestArray = TecDefaults.GetWaveformPeriodCommand(period);
                 communication.WriteData(requestArray);
-                return ReadStatus();
-            }
+                return communication.ReadData();
+            //return ReadStatus();
+            //}
         }
     }
 }

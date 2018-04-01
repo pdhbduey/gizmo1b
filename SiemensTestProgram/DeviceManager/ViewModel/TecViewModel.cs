@@ -352,7 +352,7 @@ namespace DeviceManager.ViewModel
         {
             EnableButtonState = enableButtonState == EnableText ? DisableText : EnableText;
             var status = await tecModel.ControlCommand(enableButtonState);
-            ProcessStatus(status);
+            //ProcessStatus(status);
         }
 
         private async void UpdatePeriod()

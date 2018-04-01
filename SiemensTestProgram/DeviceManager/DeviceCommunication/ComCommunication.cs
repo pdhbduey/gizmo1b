@@ -16,6 +16,8 @@ namespace DeviceManager.DeviceCommunication
     {
         // Default configuration
         private volatile object mutex = new object();
+        private SemaphoreSlim writeSemaphore;
+        private SemaphoreSlim readSemaphore;
         private const int timeout = 10000;
         private const int byteThreshold = 5;
         private string comPort = "COM8";
@@ -29,6 +31,8 @@ namespace DeviceManager.DeviceCommunication
         public ComCommunication() 
         {
             isConfigured = false;
+            writeSemaphore = new SemaphoreSlim(1);
+            readSemaphore = new SemaphoreSlim(1);
             CreateSerialPort();
         }
 
@@ -52,8 +56,10 @@ namespace DeviceManager.DeviceCommunication
         {
             if (serialPort.IsOpen)
             {
+                readSemaphore.Wait();
                 serialPort.DiscardOutBuffer();
                 serialPort.Write(request, 0, request.Length);
+                writeSemaphore.Release();
             }
         }
 
@@ -63,29 +69,30 @@ namespace DeviceManager.DeviceCommunication
             {
                 var time = 0;
                 var data = new byte[5];
-                lock (mutex)
+                //lock (mutex)
+                //{
+                //try
+                //{
+                writeSemaphore.Wait();
+                if (serialPort.IsOpen)
                 {
-                    try
+                    do
                     {
-                        if (serialPort.IsOpen)
-                        {
-                            do
-                            {
-                                time += 10;
-                                if (time > timeout) return data;
-                                Thread.Sleep(10);
-                            } while (serialPort.BytesToRead < 5);
+                        time += 10;
+                        if (time > timeout) return data;
+                        Thread.Sleep(10);
+                    } while (serialPort.BytesToRead < 5);
 
-                            serialPort.Read(data, 0, data.Length);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        return new byte[0];
-                    }
-
-                    return data;
+                    serialPort.Read(data, 0, data.Length);
                 }
+                //}
+                //catch (Exception e)
+                //{
+                //   return new byte[0];
+                //}
+                readSemaphore.Release();
+                    return data;
+                //}
                 
             });
             

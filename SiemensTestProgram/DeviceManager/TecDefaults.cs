@@ -57,6 +57,27 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] GetSetIrefCommand(byte[] data)
+        {
+            if (data.Length != 4)
+            {
+                return null;
+            }
+
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x01,
+                data[0],
+                data[1],
+                data[2],
+                data[3]
+            };
+        }
+
         public static byte[] GetIsenseCommand()
         {
             return new byte[]

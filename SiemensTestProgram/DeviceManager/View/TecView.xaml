@@ -43,7 +43,8 @@
                     HorizontalAlignment="Left" 
                     Minimum="-1500" 
                     Maximum="1500" 
-                    Value="{Binding SliderIrefValue}">
+                    Thumb.DragCompleted="Slider_DragCompleted"
+                    Value="{Binding SliderIrefValue, Delay=300}">
                     </Slider>
                     <Label VerticalAlignment="Center" Content="{Binding IrefCurrentValueText}"></Label>
                 </StackPanel>
