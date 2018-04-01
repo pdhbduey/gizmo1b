@@ -103,6 +103,9 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(VoltageValue));
+
+                sliderVoltageValue = (int)(voltageValue * 100);
+                OnPropertyChanged(nameof(SliderVoltageValue));
             }
         }
 
