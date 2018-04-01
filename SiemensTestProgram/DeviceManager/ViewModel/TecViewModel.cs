@@ -438,7 +438,7 @@ namespace DeviceManager.ViewModel
         {
             if (status.Length < 4)
             {
-                statusMessage = "Response length incorrect";
+                statusMessage = "Communication Error";
                 return;
             }
 

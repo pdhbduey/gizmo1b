@@ -18,7 +18,8 @@ namespace DeviceManager.Model
         {
             var requestArray = TecDefaults.GetSetIrefCommand(data);
             communication.WriteData(requestArray);
-            return ReadStatus();
+            var response = communication.ReadData();
+            return response;
         }
 
         public Task<byte[]> Reset()

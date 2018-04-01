@@ -16,15 +16,11 @@ namespace DeviceManager
         private DacView dacView;
         private TecView tecView;
         private LedView ledView;
-        private ThermistorView thermistorView;
-        private AdcView adcView;
 
         // Singleton View Models
         private DacViewModel dacViewModel;
         private TecViewModel tecViewModel;
         private LedViewModel ledViewModel;
-        private ThermistorViewModel thermistorViewModel;
-        private AdcViewModel adcViewModel;
 
         /// <summary>
         /// Creates Device Manager Factory.
@@ -124,14 +120,11 @@ namespace DeviceManager
         /// <returns> Thermistor view </returns>
         public ThermistorView GetThermistorView()
         {
-            if (thermistorViewModel == null)
+            var thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
+            var thermistorView = new ThermistorView()
             {
-                thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
-                thermistorView = new ThermistorView()
-                {
-                    DataContext = thermistorViewModel
-                };
-            }
+                DataContext = thermistorViewModel
+            };
 
             return thermistorView;
         }
@@ -142,15 +135,12 @@ namespace DeviceManager
         /// <returns> ADC view </returns>
         public AdcView GetAdcView()
         {
-            if (adcViewModel == null)
+            var adcViewModel = new AdcViewModel(GetAdcModel());
+            var adcView = new AdcView()
             {
-                adcViewModel = new AdcViewModel(GetAdcModel());
-                adcView = new AdcView()
-                {
-                    DataContext = adcViewModel
-                };
-            }
-
+                DataContext = adcViewModel
+            };
+            
             return adcView;
         }
 
