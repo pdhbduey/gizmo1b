@@ -6,8 +6,9 @@
 #include "libWrapGioPort.h"
 #include "libAdc.h"
 #include "libDac.h"
+#include "libTask.h"
 
-class LibTec
+class LibTec : public LibTask
 {
 public:
     typedef std::pair<int, float> TimeCurrent;
@@ -27,7 +28,7 @@ public:
         WAVEFORM_TYPE_SQUARE,
     };
 public:
-    LibTec();
+    LibTec(const char* name = "LibTec");
     virtual ~LibTec();
     void enable(bool en);
     int getISense(float& iSense); // Calculated Current Based on ADC voltage
@@ -47,9 +48,12 @@ private:
         VSENSE = LibAdc::CHANNEL_0,
     };
     struct WaveformSample {
-        float time;
-        float value;
+        TickType_t m_ticks;
+        float m_value;
     };
+private:
+    virtual void run();
+    int driveReference(float refCurrent);
 private:
     LibWrapGioPort::Port m_tecEnable;
     LibAdc m_libAdc;
@@ -57,8 +61,13 @@ private:
     static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
     uint32 m_waveformType;
-    struct WaveformSample m_waveform[100];
-    uint32 m_waveformPeriod; // 500ms-10,000ms
+    struct WaveformSample m_waveform[1000];
+    uint32 m_waveformPeriod; // 1s-10s
+    TickType_t m_ticks;
+    bool m_isWaveformRunning;
+    bool m_isTaskRunning;
+    static SemaphoreHandle_t s_sem;
+    float m_refCurrent;
 };
 
 #endif // _LIB_TEC_H_

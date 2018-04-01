@@ -75,7 +75,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform\n\r";
     help += "tec set iref [-15,15]\n\r";
     help += "tec set waveformtype sin|tr|sq|const\n\r";
-    help += "tec set waveformperiod 500..10,000ms\n\r";
+    help += "tec set waveformperiod 1..10s\n\r";
     help += "tec set waveform start|stop\n\r";
     help += "thermistor get a|b|c|d\n\r";
 }
@@ -227,7 +227,7 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 result = regRead(BoardTest::TEC_WAVEFORM_PERIOD, value);
                 if (result == BoardTest::OKAY) {
                     char t[16];
-                    sprintf(t, "%dms", value);
+                    sprintf(t, "%ds", value);
                     res = t;
                 }
                 isParsingError = false;
