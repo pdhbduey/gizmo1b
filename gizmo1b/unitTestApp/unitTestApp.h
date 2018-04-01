@@ -1,7 +1,6 @@
 #ifndef _UNIT_TEST_APP_H_
 #define _UNIT_TEST_APP_H_
 
-#include "sys_common.h"
 #include "libTask.h"
 
 class UnitTestApp: public LibTask {

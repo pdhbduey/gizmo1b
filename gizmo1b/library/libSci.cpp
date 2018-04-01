@@ -102,7 +102,7 @@ int LibSci::write(const std::vector<uint8>& data)
     return OKAY;
 }
 
-bool LibSci::waitForBytesWritten(int msTimeout)
+bool LibSci::isDataWritten(int msTimeout)
 {
     if (xSemaphoreTake(getSem(), pdMS_TO_TICKS(msTimeout)) == pdFALSE) {
         return false;
@@ -111,14 +111,11 @@ bool LibSci::waitForBytesWritten(int msTimeout)
     return true;
 }
 
-bool LibSci::waitForReadyRead(int msTimeout)
+bool LibSci::isDataAvailable(int msTimeout)
 {
     uint8 dat;
-    if (xQueuePeek(getRxQueue(), &dat, pdMS_TO_TICKS(msTimeout))
-                                                            == errQUEUE_EMPTY) {
-        return false;
-    }
-    return true;
+    return xQueuePeek(getRxQueue(), &dat, pdMS_TO_TICKS(msTimeout))
+                                                              != errQUEUE_EMPTY;
 }
 
 void LibSci::addNotification(LibSci* libSci)

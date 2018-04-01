@@ -14,7 +14,6 @@ public:
 private:
     LibDac m_libDac;
     int m_status;
-    float m_value;
 };
 
 #endif // _BOARD_TEST_DAC_H_

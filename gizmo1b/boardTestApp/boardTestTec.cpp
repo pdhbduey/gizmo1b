@@ -9,6 +9,7 @@ BoardTestTec::BoardTestTec() :
     m_isEnabled(false)
 {
     m_libTec.enable(false);
+    m_libTec.setRefCurrent(0);
 }
 
 BoardTestTec::~BoardTestTec()
@@ -23,18 +24,13 @@ int BoardTestTec::get(uint32 address, uint32& value)
     case TEC_CONTROL:
         value = 0;
         value |= m_isEnabled ? ENABLE : DISABLE;
+        value |= m_isWaveformStarted ? START_WAVEFORM : STOP_WAVEFORM;
         break;
-    case TEC_TIME_VALUE:
-        value = m_timeValue;
-        break;
-    case TEC_CURRENT_VALUE:
-        value = *reinterpret_cast<uint32*>(&m_currentValue);
-        break;
-    case TEC_CURRENT_COUNT:
-        value = m_setPoints.size();
-        break;
-    case TEC_CURRENT_LOOP_COUNT:
-        value = m_loopCount;
+    case TEC_IREF_VALUE:
+        {
+            float refCurrentValue = m_libTec.getRefCurrent();
+            value = *reinterpret_cast<uint32*>(&refCurrentValue);
+        }
         break;
     case TEC_ISENSE_VALUE:
         {
@@ -54,14 +50,14 @@ int BoardTestTec::get(uint32 address, uint32& value)
             }
         }
         break;
-    case TEC_LOOP_VALUE:
-        value = m_libTec.getLoopValue();
-        break;
-    case TEC_COUNT_VALUE:
-        value = m_libTec.getCountValue();
-        break;
     case TEC_STATUS:
         value = m_status;
+        break;
+    case TEC_WAVEFORM_TYPE:
+        value = m_libTec.getWaveformType();
+        break;
+    case TEC_WAVEFORM_PERIOD:
+        value = m_libTec.getWaveformPeriod();
         break;
     }
     return OKAY;
@@ -74,45 +70,37 @@ int BoardTestTec::set(uint32 address, uint32 value)
         return ERROR_ADDR;
     case TEC_ISENSE_VALUE:
     case TEC_VSENSE_VALUE:
-    case TEC_CURRENT_COUNT:
-    case TEC_LOOP_VALUE:
-    case TEC_COUNT_VALUE:
     case TEC_STATUS:
         return ERROR_RO;
     case TEC_CONTROL:
         if (value & DISABLE) {
             m_libTec.enable(false);
+            m_isEnabled = false;
         }
         if (value & ENABLE) {
             m_libTec.enable(true);
+            m_isEnabled = true;
         }
-        if (value & RESET_CURRENT_COUNTER) {
-            m_setPoints.clear();
+        if (value & START_WAVEFORM) {
+            m_libTec.waveformStart();
+            m_isWaveformStarted = true;
         }
-        if (value & START_CURRENT_WAVEFORM) {
-            if (m_setPoints.size() > 1) {
-                m_libTec.setCurrent(m_loopCount, m_setPoints);
-            }
-            else if (m_setPoints.size() == 1) {
-                m_libTec.setCurrent(m_currentValue);
-            }
-        }
-        if (value & STOP_CURRENT_WAVEFORM) {
-            m_libTec.stopCurrent();
+        if (value & STOP_WAVEFORM) {
+            m_libTec.waveformStop();
+            m_isWaveformStarted = false;
         }
         break;
-    case TEC_TIME_VALUE:
-        m_timeValue = value;
-        break;
-    case TEC_CURRENT_VALUE:
+    case TEC_IREF_VALUE:
         {
-            m_currentValue = *reinterpret_cast<float*>(&value);
-            LibTec::TimeCurrent timeCurrent(m_timeValue, m_currentValue);
-            m_setPoints.push_back(timeCurrent);
+            float refCurrentValue = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.setRefCurrent(refCurrentValue);
         }
         break;
-    case TEC_CURRENT_LOOP_COUNT:
-        m_loopCount = value;
+    case TEC_WAVEFORM_TYPE:
+        m_status = m_libTec.setWaveformType(value);
+        break;
+    case TEC_WAVEFORM_PERIOD:
+        m_status = m_libTec.setWaveformPeriod(value);
         break;
     }
     return OKAY;
