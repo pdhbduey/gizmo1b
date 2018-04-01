@@ -17,94 +17,70 @@ namespace DeviceManager.Model
 
         public Task<byte[]> SetIRef(byte[] data)
         {
-            //lock (mutex)
-            //{
-                var requestArray = TecDefaults.GetSetIrefCommand(data);
-                communication.WriteData(requestArray);
-                return ReadStatus();
-            //}
+            var requestArray = TecDefaults.GetSetIrefCommand(data);
+            communication.WriteData(requestArray);
+            return ReadStatus();
         }
 
-        //public Task<byte[]> Reset()
-        //{
-
-        //}
+        public Task<byte[]> Reset()
+        {
+            var requestArray = TecDefaults.GetResetCommand();
+            communication.WriteData(requestArray);
+            var data = communication.ReadData();
+            return data;
+        }
 
         public Task<byte[]> ReadIsense()
         {
-            //lock (mutex)
-            //{
-                var requestArray = TecDefaults.GetIsenseCommand();
-                communication.WriteData(requestArray);
-                var data = communication.ReadData();
-                return data;
-            //}
+            var requestArray = TecDefaults.GetIsenseCommand();
+            communication.WriteData(requestArray);
+            var data = communication.ReadData();
+            return data;
         }
 
         public Task<byte[]> ReadVsense()
         {
-            //lock (mutex)
-            //{
-                var requestArray = TecDefaults.GetVsenseCommand();
-                communication.WriteData(requestArray);
-                var data = communication.ReadData();
-                return data;
-            //}
+            var requestArray = TecDefaults.GetVsenseCommand();
+            communication.WriteData(requestArray);
+            var data = communication.ReadData();
+            return data;
         }
 
         public Task<byte[]> ReadIref()
         {
-            //lock (mutex)
-            //{
-                var requestArray = TecDefaults.GetIrefCommand();
-                communication.WriteData(requestArray);
-                var data = communication.ReadData();
-                return data;
-            //}
+            var requestArray = TecDefaults.GetIrefCommand();
+            communication.WriteData(requestArray);
+            var data = communication.ReadData();
+            return data;
         }
 
         public Task<byte[]> ReadStatus()
         {
-            //lock (mutex)
-            //{
-                var requestArray = TecDefaults.GetStatusCommand();
-                communication.WriteData(requestArray);
-                var data = communication.ReadData();
-                return data;
-            //}
+            var requestArray = TecDefaults.GetStatusCommand();
+            communication.WriteData(requestArray);
+            var data = communication.ReadData();
+            return data;
         }
 
         public Task<byte[]> ControlCommand(string request)
         {
-            //lock (mutex)
-            //{
-                var requestArray = TecDefaults.GetControlCommand(request);
-                communication.WriteData(requestArray);
-                return communication.ReadData(); // dummy read
-                //return ReadStatus();
-            //}
+            var requestArray = TecDefaults.GetControlCommand(request);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
         }
 
         public Task<byte[]> SetWaveformCommand(string waveform)
         {
-            //lock (mutex)
-            //{
-                var requestArray = TecDefaults.GetWaveformTypeCommand(waveform);
-                communication.WriteData(requestArray);
-                return communication.ReadData();
-            //return ReadStatus();
-            //}
+            var requestArray = TecDefaults.GetWaveformTypeCommand(waveform);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
         }
 
         public Task<byte[]> SetPeriodCommand(int period)
         {
-            //lock (mutex)
-            //{
-                var requestArray = TecDefaults.GetWaveformPeriodCommand(period);
-                communication.WriteData(requestArray);
-                return communication.ReadData();
-            //return ReadStatus();
-            //}
+            var requestArray = TecDefaults.GetWaveformPeriodCommand(period);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
         }
     }
 }

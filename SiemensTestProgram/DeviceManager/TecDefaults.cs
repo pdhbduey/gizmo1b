@@ -126,6 +126,22 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] GetResetCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x04,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x01
+            };
+        }
+
         public static byte[] GetWaveformTypeCommand(string waveform)
         {
             var waveformType = WaveFormByteValues[waveform];

@@ -382,7 +382,6 @@ namespace DeviceManager.ViewModel
         {
             EnableButtonState = enableButtonState == EnableText ? DisableText : EnableText;
             var status = await tecModel.ControlCommand(enableButtonState);
-            //ProcessStatus(status);
         }
 
         private async void UpdatePeriod()
@@ -406,10 +405,10 @@ namespace DeviceManager.ViewModel
         {
             WaveformButtonState = waveformButtonState == StartWaveformText ? StopWaveformText : StartWaveformText;
         }
-        
-        private void ResetTec()
+
+        private async void ResetTec()
         {
-            // set waveform to continuous, samples = ?, period 1000ms
+            await tecModel.Reset();
         }
 
         private async void UpdateIref()
