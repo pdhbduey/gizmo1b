@@ -8,7 +8,6 @@ namespace DeviceManager.Model
     public class TecModel : ITecModel
     {
         private IComCommunication communication;
-        private object mutex = new object();
 
         public TecModel(IComCommunication communication)
         {

@@ -1,9 +1,9 @@
 ﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
-using System.Threading.Tasks;
-
 namespace DeviceManager.Model
 {
+    using System.Threading.Tasks;
+
     public interface ITecModel
     {
         Task<byte[]> ReadIsense();

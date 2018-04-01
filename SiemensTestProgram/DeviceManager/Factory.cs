@@ -16,11 +16,13 @@ namespace DeviceManager
         private DacView dacView;
         private TecView tecView;
         private LedView ledView;
+        private ThermistorView thermistorView;
 
         // Singleton View Models
         private DacViewModel dacViewModel;
         private TecViewModel tecViewModel;
         private LedViewModel ledViewModel;
+        private ThermistorViewModel thermistorViewModel;
 
         /// <summary>
         /// Creates Device Manager Factory.
@@ -114,6 +116,24 @@ namespace DeviceManager
             return tecView;
         }
 
+        /// <summary>
+        ///  Sets the data context for thermistor view.
+        /// </summary>
+        /// <returns> Thermistor view </returns>
+        public ThermistorView GetThermistorView()
+        {
+            if (thermistorViewModel == null)
+            {
+                thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
+                thermistorView = new ThermistorView()
+                {
+                    DataContext = thermistorViewModel
+                };
+            }
+
+            return thermistorView;
+        }
+
         public CommunicationConfigurationView GetCommunicationConfigurationView()
         {
             return new CommunicationConfigurationView()
@@ -150,9 +170,14 @@ namespace DeviceManager
             return new TecModel(communication);
         }
 
+        private IThermistorModel GetThermistorModel()
+        {
+            return new ThermistorModel(serialCommunication);
+        }
+
         private IMotorModel GetMotorModel(IComCommunication communication)
         {
-            return new MotorModel(communication);
+            return new MotorModel(serialCommunication);
         }
 
         private ICommunicationConfigurationModel GetCommunicationConfigurationModel(IComCommunication communication)

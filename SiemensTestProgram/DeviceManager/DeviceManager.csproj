@@ -80,16 +80,20 @@
     <Compile Include="Model\ILedModel.cs" />
     <Compile Include="Model\IMotorModel.cs" />
     <Compile Include="Model\ITecModel.cs" />
+    <Compile Include="Model\IThermistorModel.cs" />
     <Compile Include="Model\LedModel.cs" />
     <Compile Include="Model\MotorModel.cs" />
     <Compile Include="Model\TecModel.cs" />
+    <Compile Include="Model\ThermistorModel.cs" />
     <Compile Include="TecDefaults.cs" />
+    <Compile Include="ThermistorDefaults.cs" />
     <Compile Include="ViewModel\CommunicationConfigurationViewModel.cs" />
     <Compile Include="ViewModel\DacViewModel.cs" />
     <Compile Include="ViewModel\DeviceManagerViewModel.cs" />
     <Compile Include="ViewModel\MotorViewModel.cs" />
     <Compile Include="ViewModel\LedViewModel.cs" />
     <Compile Include="ViewModel\TecViewModel.cs" />
+    <Compile Include="ViewModel\ThermistorViewModel.cs" />
     <Compile Include="View\CommunicationConfigurationView.xaml.cs">
       <DependentUpon>CommunicationConfigurationView.xaml</DependentUpon>
     </Compile>
@@ -107,6 +111,9 @@
     </Compile>
     <Compile Include="View\TecView.xaml.cs">
       <DependentUpon>TecView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ThermistorView.xaml.cs">
+      <DependentUpon>ThermistorView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -142,6 +149,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\TecView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ThermistorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
