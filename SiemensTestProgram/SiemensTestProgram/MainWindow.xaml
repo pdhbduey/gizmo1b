@@ -1,0 +1,46 @@
+﻿<Window x:Class="SiemensTestProgram.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:DeviceManager.View;assembly=DeviceManager"
+        xmlns:viewmodels="clr-namespace:DeviceManager.ViewModel;assembly=DeviceManager"
+        xmlns:local="clr-namespace:SiemensTestProgram"
+        mc:Ignorable="d"
+        Title="Gizmo1B"
+        MinHeight="400"
+        MinWidth="450"
+        MaxHeight="500"
+        MaxWidth="650"
+        Height="400" 
+        Width="525"
+        Background="#E4FDE1">
+
+    <Window.Resources>
+        <DataTemplate x:Name="LedViewName" DataType="{x:Type viewmodels:LedViewModel}">
+            <views:LedView DataContext="{Binding}"></views:LedView>
+        </DataTemplate>
+        <DataTemplate x:Name="DacViewName" DataType="{x:Type viewmodels:DacViewModel}">
+            <views:DacView DataContext="{Binding}"></views:DacView>
+        </DataTemplate>
+        <DataTemplate x:Name="TecViewName" DataType="{x:Type viewmodels:TecViewModel}">
+            <views:TecView DataContext="{Binding}"></views:TecView>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="8*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="10" Grid.Row="0" Visibility="{Binding ReturnVisibility}">
+            <Button Height="25" Width="100" HorizontalAlignment="Left" Margin="1" Content="Return" Command="{Binding ExitCommand}"></Button>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Visibility="{Binding CommunicationVisibility}" Orientation="Horizontal">
+            <ComboBox Height="25" Width="100" Margin="1" ItemsSource="{Binding TestViews}" SelectedItem="{Binding SelectedTestView}"></ComboBox>
+            <Button Height="25" Width="100" Margin="1" Content="Configure" Command="{Binding ConfigureComCommand}"></Button>
+        </StackPanel>
+        
+        <ContentControl Grid.Row="1" Content="{Binding Content}"></ContentControl>
+    </Grid>
+</Window>

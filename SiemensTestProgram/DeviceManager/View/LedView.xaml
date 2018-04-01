@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="DeviceManager.View.LedView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DeviceManager.View"
+             mc:Ignorable="d" 
+             Background="#E4FDE1">
+    <!-- Layouts Display for LED tests -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Layout for buttons -->
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+            <StackPanel Orientation="Vertical">
+                <!-- LED buttons -->
+                <GroupBox HorizontalAlignment="Left" BorderBrush="DarkGray">
+                    <GroupBox.Header>
+                        LED
+                    </GroupBox.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ToggleButton Width="100" Height="25" Margin="2" Content="Green" HorizontalAlignment="Left" Command="{Binding ToggleLedGreenCommand}"></ToggleButton>
+                        <ToggleButton Width="100" Height="25" Margin="2" Content="Red" HorizontalAlignment="Left" Command="{Binding ToggleLedRedCommand}"></ToggleButton>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </StackPanel>
+        
+        <!-- Send/Receive Data -->
+        <StackPanel Margin="0,10,0,0" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid HorizontalAlignment="Stretch">
+                <TextBox MaxLength="45" Margin="2" Text="{Binding Message}"></TextBox>
+                <Button Width="100" Height="25" Margin="2" Content="Send" Command="{Binding SendMessageCommand}" HorizontalAlignment="Right"></Button>
+            </Grid>
+            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding MessageReceived}"></Label>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

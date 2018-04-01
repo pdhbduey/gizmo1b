@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="DeviceManager.View.CommunicationConfigurationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DeviceManager.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <GroupBox HorizontalAlignment="Left" BorderBrush="DarkGray">
+                <GroupBox.Header>
+                    Configuration
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Data Bits:"></Label>
+                        <TextBox MaxLength="2" Text="{Binding DataBits}"></TextBox>
+                    </StackPanel>
+                    <ComboBox Margin="1" ItemsSource="{Binding ComPorts}" SelectedItem="{Binding SelectedComPort}"></ComboBox>
+                    <ComboBox Margin="1" ItemsSource="{Binding BaudRates}" SelectedItem="{Binding SelectedBaudRate}"></ComboBox>
+                    <ComboBox Margin="1" ItemsSource="{Binding Parities}" SelectedItem="{Binding SelectedParity}"></ComboBox>
+                    <ComboBox Margin="1" ItemsSource="{Binding StopBits}" SelectedItem="{Binding SelectedStopBits}"></ComboBox>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox HorizontalAlignment="Left" BorderBrush="DarkGray">
+                <GroupBox.Header>
+                    Serial Port Settings
+                </GroupBox.Header>
+                <StackPanel>
+                    <Label Content="{Binding Name}"></Label>
+                    <Label Content="{Binding Description}"></Label>
+                    <Label Content="{Binding Status}"></Label>
+                    <Label Content="{Binding PnpDeviceId}"></Label>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <!--<Button Margin="1" Width="100" Height="25" Command="{Binding ExitConfigurationCommand}" Content="Exit"></Button>-->
+            <Button Margin="1" Width="100" Height="25" Command="{Binding ConfigureCommunicationCommand}" Content="Update"></Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

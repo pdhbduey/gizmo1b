@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="DeviceManager.View.DacView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DeviceManager.View"
+        mc:Ignorable="d"
+        Background="#E4FDE1">
+    <Grid>
+        <StackPanel Margin="10">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Continuous:"></Label>
+                    <RadioButton VerticalAlignment="Center" IsChecked="{Binding ContinuousMode}"></RadioButton>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Step:"></Label>
+                    <RadioButton VerticalAlignment="Center" IsChecked="{Binding StepMode}"></RadioButton>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Slider
+                    Width="250" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Left" 
+                    Minimum="0" 
+                    Maximum="500" 
+                    Value="{Binding SliderVoltageValue}">
+                </Slider>
+                <TextBox Text="{Binding Path=VoltageValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2}" HorizontalAlignment="Left" MaxLength="5" Width="40"></TextBox>
+                <Button Content="Set" Command="{Binding SendDacValueCommand}"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
