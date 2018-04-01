@@ -52,7 +52,6 @@ namespace DeviceManager.DeviceCommunication
         {
             if (serialPort.IsOpen)
             {
-                serialPort.DiscardInBuffer();
                 serialPort.DiscardOutBuffer();
                 serialPort.Write(request, 0, request.Length);
             }
@@ -68,17 +67,14 @@ namespace DeviceManager.DeviceCommunication
                 {
                     if (serialPort.IsOpen)
                     {
-                        //lock (mutex)
-                        //{
                         do
                         {
-                            //time += 10;
-                            //if (time > timeout) return data;
+                            time += 10;
+                            if (time > timeout) return data;
                             Thread.Sleep(10);
                         } while (serialPort.BytesToRead < 5);
 
                         serialPort.Read(data, 0, data.Length);
-                        //}
                     }
 
                     return data;

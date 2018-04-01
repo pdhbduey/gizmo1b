@@ -21,11 +21,11 @@
             TestViews = new ObservableCollection<string>()
             {
                 "LED/Switch",
-                "ADC",
+                //"ADC",
                 "DAC",
-                "Motor",
-                "Fan",
-                "Thermistor",
+                //"Motor",
+                //"Fan",
+                //"Thermistor",
                 "TEC"
             };
 

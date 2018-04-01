@@ -10,7 +10,17 @@ namespace DeviceManager
     public sealed class Factory
     {
         private static Factory instance = null;
-        private IComCommunication serialCommunication; 
+        private IComCommunication serialCommunication;
+
+        // Singleton Views
+        private DacView dacView;
+        private TecView tecView;
+        private LedView ledView;
+
+        // Singleton View Models
+        private DacViewModel dacViewModel;
+        private TecViewModel tecViewModel;
+        private LedViewModel ledViewModel;
 
         /// <summary>
         /// Creates Device Manager Factory.
@@ -56,11 +66,16 @@ namespace DeviceManager
         /// <returns> DAC view </returns>
         public DacView GetDacView()
         {
-
-            return new DacView()
+            if (dacViewModel == null)
             {
-                DataContext = new DacViewModel(GetDacModel(serialCommunication))
-            };
+                dacViewModel = new DacViewModel(GetDacModel(serialCommunication));
+                dacView = new DacView()
+                {
+                    DataContext = dacViewModel
+                };
+            }
+
+            return dacView;
         }
 
         /// <summary>
@@ -69,10 +84,16 @@ namespace DeviceManager
         /// <returns> LED view </returns>
         public LedView GetLedView()
         {
-            return new LedView()
+            if (ledViewModel == null)
             {
-                DataContext = new LedViewModel(GetLedModel(serialCommunication))
-            };
+                ledViewModel = new LedViewModel(GetLedModel(serialCommunication));
+                ledView = new LedView()
+                {
+                    DataContext = ledViewModel
+                };
+            }
+
+            return ledView;
         }
 
         /// <summary>
@@ -81,10 +102,16 @@ namespace DeviceManager
         /// <returns> TEC view </returns>
         public TecView GetTecView()
         {
-            return new TecView()
+            if (tecViewModel == null)
             {
-                DataContext = new TecViewModel(GetTecModel(serialCommunication))
-            };
+                tecViewModel = new TecViewModel(GetTecModel(serialCommunication));
+                tecView = new TecView()
+                {
+                    DataContext = tecViewModel
+                };
+            }
+
+            return tecView;
         }
 
         public CommunicationConfigurationView GetCommunicationConfigurationView()

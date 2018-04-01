@@ -12,6 +12,7 @@ namespace DeviceManager.ViewModel
 
     public class TecViewModel : BindableBase
     {
+        private object mutex = new object();
         private Task updateTask;
         private ITecModel tecModel;
         private int progressMaximum;
@@ -390,7 +391,7 @@ namespace DeviceManager.ViewModel
         private async void UpdateVSense()
         {
             var data = await tecModel.ReadVsense();
-            VSense = Helper.GetFloatFromBigEndian(data);
+            VSense = Helper.GetFloatFromBigEndian(data); 
         }
 
         private async void UpdateStatus()
@@ -422,7 +423,7 @@ namespace DeviceManager.ViewModel
             }, token);
         }
 
-        private void UpdateAllStatuses()
+        private async void UpdateAllStatuses()
         {
             while (true)
             {
@@ -435,10 +436,18 @@ namespace DeviceManager.ViewModel
 
                 try
                 {
-                    UpdateIref();
-                    UpdateISense();
-                    UpdateVSense();
-                    UpdateStatus();
+                    var iRefData = await tecModel.ReadIref();
+                    IRef = Helper.GetFloatFromBigEndian(iRefData);
+                    var iSenseData = await tecModel.ReadIsense();
+                    ISense = Helper.GetFloatFromBigEndian(iSenseData);
+                    var vSenseData = await tecModel.ReadVsense();
+                    VSense = Helper.GetFloatFromBigEndian(vSenseData);
+                    var status = await tecModel.ReadStatus();
+                    ProcessStatus(status);
+                    //UpdateIref();
+                    //UpdateISense();
+                    //UpdateVSense();
+                    //UpdateStatus();
                 }
                 catch (Exception e)
                 {
