@@ -20,6 +20,7 @@ namespace DeviceManager.ViewModel
         private string saveProgress;
         private string enableButtonState;
         private string captureButtonState;
+        private string waveformButtonState;
         private int saveProgressValue;
         private int numberOfSamples;
         private float irefCurrentValue;
@@ -35,7 +36,9 @@ namespace DeviceManager.ViewModel
         private const string StopCaptureText = "Stop Capture";
         private const string EnableText = "Enable";
         private const string DisableText = "Disable";
-        private const int updateDelay = 400;
+        private const string StartWaveformText = "Start Waveform";
+        private const string StopWaveformText = "Stop Waveform";
+        private const int updateDelay = 300;
         private bool saving;
         private bool updating;
 
@@ -54,6 +57,7 @@ namespace DeviceManager.ViewModel
             saveProgressValue = 0;
             saveProgress = string.Empty;
             captureButtonState = StartCaptureText;
+            waveformButtonState = StartWaveformText;
             enableButtonState = EnableText;
             numberOfSamples = 0;
             SliderIrefValue = 0;
@@ -62,6 +66,7 @@ namespace DeviceManager.ViewModel
             SaveDataCommand = new RelayCommand(param => SaveData());
             EnableCommand = new RelayCommand(param => EnableToggle());
             CaptureStartStopCommand = new RelayCommand(param => CaptureToggle());
+            StartStopWaveformCommand = new RelayCommand(param => WaveformToggle());
             ResetTecCommand = new RelayCommand(param => ResetTec());
 
             StartUpdateTask();
@@ -74,6 +79,8 @@ namespace DeviceManager.ViewModel
         public RelayCommand ResetTecCommand { get; set; }
 
         public RelayCommand CaptureStartStopCommand { get; set; }
+
+        public RelayCommand StartStopWaveformCommand { get; set; }
 
         public List<string> Waveforms { get; set; }
 
@@ -91,6 +98,14 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        public bool IsIRefEditable
+        {
+            get
+            {
+                return (waveformButtonState == StartWaveformText);
+            }
+        }
+
         public string CaptureButtonState
         {
             get
@@ -102,6 +117,21 @@ namespace DeviceManager.ViewModel
             {
                 captureButtonState = value;
                 OnPropertyChanged(nameof(CaptureButtonState));
+            }
+        }
+
+        public string WaveformButtonState
+        {
+            get
+            {
+                return waveformButtonState;
+            }
+
+            set
+            {
+                waveformButtonState = value;
+                OnPropertyChanged(nameof(WaveformButtonState));
+                OnPropertyChanged(nameof(IsIRefEditable));
             }
         }
 
@@ -232,7 +262,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"{IrefCurrentValue} Amps";
+                return $"{IrefCurrentValue} A";
             }
         }
 
@@ -240,7 +270,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"IRef: {iRef}";
+                return $"IRef: {iRef} A";
             }
         }
 
@@ -263,7 +293,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"VSense: {vSense}";
+                return $"VSense: {vSense} V";
             }
         }
 
@@ -286,7 +316,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"ISense: {iSense}";
+                return $"ISense: {iSense} A";
             }
         }
 
@@ -370,6 +400,11 @@ namespace DeviceManager.ViewModel
         private void CaptureToggle()
         {
             CaptureButtonState = captureButtonState == StartCaptureText ? StopCaptureText : StartCaptureText;
+        }
+
+        private void WaveformToggle()
+        {
+            WaveformButtonState = waveformButtonState == StartWaveformText ? StopWaveformText : StartWaveformText;
         }
         
         private void ResetTec()

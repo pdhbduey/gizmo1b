@@ -25,20 +25,5 @@ namespace DeviceManager.View
         {
             InitializeComponent();
         }
-
-        private void Slider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {
-            if (sender is UserControl)
-            {
-                var userControl = (UserControl)sender;
-
-                if (userControl.DataContext is TecViewModel)
-                {
-                    var tecViewModel = (TecViewModel)userControl.DataContext;
-                    //tecViewModel.UpdateIref();
-                }
-                
-            }
-        }
     }
 }
