@@ -8,6 +8,12 @@
              d:DesignHeight="300" d:DesignWidth="300"
              Background="WhiteSmoke">
     <Grid>
-        <Label Content="{Binding TestMvvmBinding}"></Label>
+        <StackPanel Margin="2" Orientation="Vertical">
+            <Label Content="{Binding AinAText}"></Label>
+            <Label Content="{Binding AinBText}"></Label>
+            <Label Content="{Binding AinCText}"></Label>
+            <Label Content="{Binding AinDText}"></Label>
+            <Label Content="{Binding StatusMessage}"></Label>
+        </StackPanel>
     </Grid>
 </UserControl>
