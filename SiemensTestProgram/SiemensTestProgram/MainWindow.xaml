@@ -26,6 +26,9 @@
         <DataTemplate x:Name="TecViewName" DataType="{x:Type viewmodels:TecViewModel}">
             <views:TecView DataContext="{Binding}"></views:TecView>
         </DataTemplate>
+        <DataTemplate x:Name="ThermistorViewName" DataType="{x:Type viewmodels:ThermistorViewModel}">
+            <views:ThermistorView DataContext="{Binding}"></views:ThermistorView>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>

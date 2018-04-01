@@ -5,11 +5,11 @@ namespace DeviceManager.View
     using System.Windows.Controls;
 
     /// <summary>
-    /// Interaction logic for TecView.xaml
+    /// Interaction logic for ThermistorView.xaml
     /// </summary>
-    public partial class TecView : UserControl
+    public partial class ThermistorView : UserControl
     {
-        public TecView()
+        public ThermistorView()
         {
             InitializeComponent();
         }
