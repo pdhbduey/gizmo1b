@@ -41,11 +41,11 @@
                     Margin="20"
                     Orientation="Horizontal" 
                     HorizontalAlignment="Left" 
-                    Minimum="0" 
-                    Maximum="500" 
-                    Value="{Binding SliderVoltageValue}">
+                    Minimum="-1500" 
+                    Maximum="1500" 
+                    Value="{Binding SliderIrefValue}">
                     </Slider>
-                    <Label VerticalAlignment="Center" Content="{Binding VoltageValueText}"></Label>
+                    <Label VerticalAlignment="Center" Content="{Binding IrefCurrentValueText}"></Label>
                 </StackPanel>
 
                 <!-- TEC Commands -->

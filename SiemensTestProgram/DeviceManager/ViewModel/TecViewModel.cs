@@ -22,8 +22,8 @@ namespace DeviceManager.ViewModel
         private string captureButtonState;
         private int saveProgressValue;
         private int numberOfSamples;
-        private float voltageValue;
-        private int sliderVoltageValue;
+        private float irefCurrentValue;
+        private int sliderIrefValue;
         private int tecPeriod;
 
         private float vSense;
@@ -56,7 +56,7 @@ namespace DeviceManager.ViewModel
             captureButtonState = StartCaptureText;
             enableButtonState = EnableText;
             numberOfSamples = 0;
-            SliderVoltageValue = 250;
+            SliderIrefValue = 0;
 
             // Set commands
             SaveDataCommand = new RelayCommand(param => SaveData());
@@ -213,26 +213,26 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public float VoltageValue
+        public float IrefCurrentValue
         {
             get
             {
-                return voltageValue;
+                return irefCurrentValue;
             }
 
             set
             {
-                voltageValue = value;
-                OnPropertyChanged(nameof(VoltageValue));
-                OnPropertyChanged(nameof(VoltageValueText));
+                irefCurrentValue = value;
+                OnPropertyChanged(nameof(IrefCurrentValue));
+                OnPropertyChanged(nameof(IrefCurrentValueText));
             }
         }
 
-        public string VoltageValueText
+        public string IrefCurrentValueText
         {
             get
             {
-                return $"{VoltageValue} V";
+                return $"{IrefCurrentValue} Amps";
             }
         }
 
@@ -319,17 +319,17 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public int SliderVoltageValue
+        public int SliderIrefValue
         {
             get
             {
-                return sliderVoltageValue;
+                return sliderIrefValue;
             }
             set
             {
-                sliderVoltageValue = value;
-                VoltageValue = (float)sliderVoltageValue / 100;
-                OnPropertyChanged(nameof(SliderVoltageValue));
+                sliderIrefValue = value;
+                IrefCurrentValue = (float)sliderIrefValue / 100;
+                OnPropertyChanged(nameof(SliderIrefValue));
             }
         }
 
