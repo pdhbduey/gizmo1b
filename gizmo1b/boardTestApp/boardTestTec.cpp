@@ -5,11 +5,9 @@
 #include "LibDelay.h"
 #include "boardTestTec.h"
 
-BoardTestTec::BoardTestTec() :
-    m_isEnabled(false)
+BoardTestTec::BoardTestTec()
 {
-    m_libTec.enable(false);
-    m_libTec.setRefCurrent(0);
+    m_libTec.start();
 }
 
 BoardTestTec::~BoardTestTec()
@@ -23,8 +21,9 @@ int BoardTestTec::get(uint32 address, uint32& value)
         return ERROR_ADDR;
     case TEC_CONTROL:
         value = 0;
-        value |= m_isEnabled ? ENABLE : DISABLE;
-        value |= m_isWaveformStarted ? START_WAVEFORM : STOP_WAVEFORM;
+        value |= m_libTec.isEnabled() ? ENABLE : DISABLE;
+        value |= m_libTec.isWaveformStarted() ? START_WAVEFORM : STOP_WAVEFORM;
+        value |= m_libTec.isClosedLoopEnabled() ? CLOSED_LOOP_ENABLE : CLOSED_LOOP_DISABLE;
         break;
     case TEC_IREF_VALUE:
         {
@@ -59,6 +58,12 @@ int BoardTestTec::get(uint32 address, uint32& value)
     case TEC_WAVEFORM_PERIOD:
         value = m_libTec.getWaveformPeriod();
         break;
+    case TEC_IREF_GAIN:
+        {
+            float gain = m_libTec.getGain();
+            value = *reinterpret_cast<uint32*>(&gain);
+        }
+        break;
     }
     return OKAY;
 }
@@ -75,19 +80,21 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TEC_CONTROL:
         if (value & DISABLE) {
             m_libTec.enable(false);
-            m_isEnabled = false;
         }
         if (value & ENABLE) {
             m_libTec.enable(true);
-            m_isEnabled = true;
         }
         if (value & START_WAVEFORM) {
             m_libTec.waveformStart();
-            m_isWaveformStarted = true;
         }
         if (value & STOP_WAVEFORM) {
             m_libTec.waveformStop();
-            m_isWaveformStarted = false;
+        }
+        if (value & CLOSED_LOOP_DISABLE) {
+            m_libTec.closedLoopDisable();
+        }
+        if (value & CLOSED_LOOP_ENABLE) {
+            m_libTec.closedLoopEnable();
         }
         break;
     case TEC_IREF_VALUE:
@@ -101,6 +108,12 @@ int BoardTestTec::set(uint32 address, uint32 value)
         break;
     case TEC_WAVEFORM_PERIOD:
         m_status = m_libTec.setWaveformPeriod(value);
+        break;
+    case TEC_IREF_GAIN:
+        {
+            float gain = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.setGain(gain);
+        }
         break;
     }
     return OKAY;

@@ -8,10 +8,12 @@ class BoardTestTec: public BoardTest
 {
 public:
     enum Control {
-        DISABLE                = (uint32)((uint32) 1U << 0U),
-        ENABLE                 = (uint32)((uint32) 1U << 1U),
-        START_WAVEFORM = (uint32)((uint32) 1U << 2U),
-        STOP_WAVEFORM  = (uint32)((uint32) 1U << 3U),
+        DISABLE             = (uint32)((uint32) 1U << 0U),
+        ENABLE              = (uint32)((uint32) 1U << 1U),
+        START_WAVEFORM      = (uint32)((uint32) 1U << 2U),
+        STOP_WAVEFORM       = (uint32)((uint32) 1U << 3U),
+        CLOSED_LOOP_DISABLE = (uint32)((uint32) 1U << 4U),
+        CLOSED_LOOP_ENABLE  = (uint32)((uint32) 1U << 5U),
     };
 public:
     BoardTestTec();
@@ -21,9 +23,7 @@ public:
     static void test();
 private:
     LibTec m_libTec;
-    bool m_isEnabled;
     int m_status;
-    bool m_isWaveformStarted;
 };
 
 #endif // _BOARD_TEST_TEC_H_

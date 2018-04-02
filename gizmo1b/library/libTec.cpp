@@ -5,18 +5,17 @@
 #include "libTec.h"
 
 SemaphoreHandle_t LibTec::s_mutex;
-SemaphoreHandle_t LibTec::s_sem;
 bool LibTec::s_isInitialized;
 
 LibTec::LibTec(const char* name) :
     LibTask(name, configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 1),
     m_tecEnable(new LibWrapMibSpi5, PIN_SIMO), // 99:MIBSPI5SIMO[0]:TEC_EN
-    m_waveformPeriod(1000)
+    m_waveformPeriod(1),
+    m_pidGain(1)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
-        s_sem = xSemaphoreCreateBinary();
-        enable(false);
+        m_tecEnable.m_libWrapGioPort->setPin(m_tecEnable.m_pin, false);
         s_isInitialized = true;
     }
 }
@@ -29,6 +28,13 @@ void LibTec::enable(bool en)
 {
     LibMutex libMutex(s_mutex);
     m_tecEnable.m_libWrapGioPort->setPin(m_tecEnable.m_pin, en);
+    m_isEnabled = en;
+}
+
+bool LibTec::isEnabled()
+{
+    LibMutex libMutex(s_mutex);
+    return m_isEnabled;
 }
 
 // TEC_ISENSE = (ISENSE * 0.008ohm * 20V/V + 2.5V) * 6.04K/9.05K
@@ -58,9 +64,12 @@ int LibTec::getVSense(float& vSense)
     return OKAY;
 }
 
-int LibTec::driveReference(float refCurrent)
+bool LibTec::driveControl(float control)
 {
-    float ref = refCurrent / 15.0 * 2.5 + 2.5;
+    control = control >  2.5 ?     2.5:
+              control < -2.5 ?    -2.5:
+                               control;
+    float ref = control + 2.5;
     int result = m_libDac.set(ref);
     return result != LibDac::OKAY ? ERROR_SET_REF_CURRENT : OKAY;
 }
@@ -72,19 +81,12 @@ int LibTec::setRefCurrent(float refCurrent)
         return ERROR_REF_CURRENT_OUT_OF_RANGE;
     }
     m_refCurrent = refCurrent;
-    if (m_waveformType == WAVEFORM_TYPE_CONSTANT)  {
-        return driveReference(m_refCurrent);
-    }
     return OKAY;
 }
 
 float LibTec::getRefCurrent()
 {
     LibMutex libMutex(s_mutex);
-    if (m_waveformType == WAVEFORM_TYPE_CONSTANT)  {
-        float value = m_libDac.get() ;
-        m_refCurrent = (value - 2.5) / 2.5 * 15.0;
-    }
     return m_refCurrent;
 }
 
@@ -187,11 +189,6 @@ void LibTec::waveformStart()
     }
     m_ticks = 0;
     m_isWaveformRunning = true;
-    if (!m_isTaskRunning) {
-        m_isTaskRunning = true;
-        start();
-    }
-    xSemaphoreGive(s_sem);
 }
 
 void LibTec::waveformStop()
@@ -201,42 +198,80 @@ void LibTec::waveformStop()
         return;
     }
     m_isWaveformRunning = false;
-    xSemaphoreGive(s_sem);
+}
+
+bool LibTec::isWaveformStarted()
+{
+    LibMutex libMutex(s_mutex);
+    return m_isWaveformRunning;
+}
+
+void LibTec::closedLoopEnable()
+{
+    LibMutex libMutex(s_mutex);
+    m_isClosedLoopEnabled = true;
+}
+
+void LibTec::closedLoopDisable()
+{
+    LibMutex libMutex(s_mutex);
+    m_isClosedLoopEnabled = false;
+}
+
+int LibTec::setGain(float gain)
+{
+    LibMutex libMutex(s_mutex);
+    if (gain < 0.01 || gain > 100) {
+        return ERROR_GAIN_OUT_OF_RANGE;
+    }
+    m_pidGain = gain;
+    return OKAY;
+}
+
+float LibTec::getGain()
+{
+    LibMutex libMutex(s_mutex);
+    return m_pidGain;
+}
+
+bool LibTec::isClosedLoopEnabled()
+{
+    LibMutex libMutex(s_mutex);
+    return m_isClosedLoopEnabled;
 }
 
 void LibTec::run()
 {
-    TickType_t ticksToWait = portMAX_DELAY;
     while (true) {
-        xSemaphoreTake(s_sem, ticksToWait);
-        {
-            LibMutex libMutex(s_mutex);
-            if (!m_isWaveformRunning) {
-                ticksToWait = portMAX_DELAY;
-                driveReference(m_refCurrent);
-                continue;
+        vTaskDelay(1);
+        float value = 1;
+        if (m_isWaveformRunning) {
+            TickType_t ticks = xTaskGetTickCount() - m_ticks;
+            if (m_waveform[999].m_ticks < ticks) {
+                m_ticks = xTaskGetTickCount();
+                ticks   = 0;
             }
-            else {
-                ticksToWait = 1;
-            }
-        }
-        //driveReference(0); // debug
-        TickType_t ticks = xTaskGetTickCount() - m_ticks;
-        if (m_waveform[999].m_ticks < ticks) {
-            m_ticks = xTaskGetTickCount();
-            ticks   = 0;
-        }
-        for (int i = 0; i < 1000; i++) {
-            if (ticks >= m_waveform[i].m_ticks
-             && ticks <= m_waveform[i + 1].m_ticks) {
-                float value = m_waveform[i].m_value
-                            + (m_waveform[i + 1].m_value - m_waveform[i].m_value)
-                            * (ticks - m_waveform[i].m_ticks)
-                            / (m_waveform[i + 1].m_ticks - m_waveform[i].m_ticks);
-                driveReference(m_refCurrent * value);
-                break;
+            for (int i = 0; i < 1000; i++) {
+                if (ticks >= m_waveform[i].m_ticks
+                 && ticks <= m_waveform[i + 1].m_ticks) {
+                    value = m_waveform[i].m_value
+                          + (m_waveform[i + 1].m_value - m_waveform[i].m_value)
+                          * (ticks - m_waveform[i].m_ticks)
+                          / (m_waveform[i + 1].m_ticks - m_waveform[i].m_ticks);
+                    break;
+                }
             }
         }
-        //driveReference(m_refCurrent); // debug
+        float ref = value * m_refCurrent;
+        float control = ref; // open loop by default
+        if (m_isClosedLoopEnabled) {
+            float iSense;
+            if (getISense(iSense) == OKAY) {
+                control = ref - iSense;
+            }
+        }
+        control *= m_pidGain;
+        control *= 2.5 / 15;
+        driveControl(control);
     }
 }
