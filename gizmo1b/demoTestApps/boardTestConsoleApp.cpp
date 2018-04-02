@@ -72,11 +72,14 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "led get green|red\n\r";
     help += "fault reset\n\r";
     help += "tec enable|disable\n\r";
-    help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform\n\r";
+    help += "tec get enable\n\r";
+    help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform|gain|closedloop\n\r";
     help += "tec set iref [-15,15]\n\r";
     help += "tec set waveformtype sin|tr|sq|const\n\r";
     help += "tec set waveformperiod 1..10s\n\r";
     help += "tec set waveform start|stop\n\r";
+    help += "tec set closedloop enable|disable\n\r";
+    help += "tec set gain [0.01,100]\n\r";
     help += "thermistor get a|b|c|d\n\r";
 }
 
@@ -161,6 +164,7 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
     tecStatus.push_back("ERROR_SET_REF_CURRENT");
     tecStatus.push_back("ERROR_WAVE_FORM_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_WAVEFORM_PERIOD_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_GAIN_OUT_OF_RANGE");
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "enable") {
             result = regWrite(BoardTest::TEC_CONTROL, BoardTestTec::ENABLE);
@@ -195,6 +199,16 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                                       tokens[ARGUMENT] == "isense" ? "A" : "V");
                         res = t;
                     }
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "enable") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_CONTROL, value);
+                if (result == BoardTest::OKAY) {
+                    res = value & BoardTestTec::DISABLE ? "disabled" :
+                          value & BoardTestTec::ENABLE  ? "enabled"  :
+                                                          "undefined";
                 }
                 isParsingError = false;
             }
@@ -239,6 +253,27 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                     res = value & BoardTestTec::START_WAVEFORM ? "running"  :
                           value & BoardTestTec::STOP_WAVEFORM  ? "stopped"  :
                                                                  "undefined";
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "gain") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_IREF_GAIN, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2f", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "closedloop") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_CONTROL, value);
+                if (result == BoardTest::OKAY) {
+                    res = value & BoardTestTec::CLOSED_LOOP_DISABLE ? "disabled" :
+                          value & BoardTestTec::CLOSED_LOOP_ENABLE  ? "enabled"  :
+                                                                      "undefined";
                 }
                 isParsingError = false;
             }
@@ -301,6 +336,32 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                     result = regWrite(BoardTest::TEC_CONTROL,
                                                    BoardTestTec::STOP_WAVEFORM);
                     isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "closedloop" && tokens.size() > VALUE) {
+                if (tokens[VALUE] == "enable") {
+                    result = regWrite(BoardTest::TEC_CONTROL,
+                                                  BoardTestTec::CLOSED_LOOP_ENABLE);
+                    isParsingError = false;
+                }
+                else if (tokens[VALUE] == "disable") {
+                    result = regWrite(BoardTest::TEC_CONTROL,
+                                                   BoardTestTec::CLOSED_LOOP_DISABLE);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "gain" && tokens.size() > VALUE) {
+                float gain;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &gain) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&gain);
+                   result = regWrite(BoardTest::TEC_IREF_GAIN, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::TEC_STATUS, value);
+                       if (value != LibTec::OKAY) {
+                           res = "tec  status: " + tecStatus[value];
+                       }
+                   }
+                   isParsingError = false;
                 }
             }
         }

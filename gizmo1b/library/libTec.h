@@ -8,6 +8,7 @@
 #include "libDac.h"
 #include "libTask.h"
 
+// Make sure to start LibTech thread after creating LibTec object by calling LibTask::start() method.
 class LibTec : public LibTask
 {
 public:
@@ -20,6 +21,7 @@ public:
        ERROR_SET_REF_CURRENT,
        ERROR_WAVEFORM_TYPE_OUT_OF_RANGE,
        ERROR_WAVEFORM_PERIOD_OUT_OF_RANGE,
+       ERROR_GAIN_OUT_OF_RANGE,
     };
     enum WaveformType {
         WAVEFORM_TYPE_CONSTANT,
@@ -31,6 +33,7 @@ public:
     LibTec(const char* name = "LibTec");
     virtual ~LibTec();
     void enable(bool en);
+    bool isEnabled();
     int getISense(float& iSense); // Calculated Current Based on ADC voltage
     int getVSense(float& vSense); // Calculated Voltage Based on ADC voltage
     // Calculated Closed Loop Current Output (Iref)
@@ -42,6 +45,12 @@ public:
     uint32 getWaveformPeriod();
     void waveformStart();
     void waveformStop();
+    bool isWaveformStarted();
+    void closedLoopEnable();
+    void closedLoopDisable();
+    int setGain(float gain); // 0.01-100
+    float getGain();
+    bool isClosedLoopEnabled();
 private:
     enum adcChannels {
         ISENSE = LibAdc::CHANNEL_1,
@@ -53,7 +62,7 @@ private:
     };
 private:
     virtual void run();
-    int driveReference(float refCurrent);
+    bool driveControl(float control);
 private:
     LibWrapGioPort::Port m_tecEnable;
     LibAdc m_libAdc;
@@ -65,9 +74,10 @@ private:
     uint32 m_waveformPeriod; // 1s-10s
     TickType_t m_ticks;
     bool m_isWaveformRunning;
-    bool m_isTaskRunning;
-    static SemaphoreHandle_t s_sem;
     float m_refCurrent;
+    float m_pidGain;
+    bool m_isClosedLoopEnabled;
+    bool m_isEnabled;
 };
 
 #endif // _LIB_TEC_H_

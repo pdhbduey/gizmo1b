@@ -44,6 +44,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::TEC_STATUS]          = boardTest;
     m_boardTestMap[BoardTest::TEC_WAVEFORM_TYPE]   = boardTest;
     m_boardTestMap[BoardTest::TEC_WAVEFORM_PERIOD] = boardTest;
+    m_boardTestMap[BoardTest::TEC_IREF_GAIN]       = boardTest;
     boardTest = new BoardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_STATUS]       = boardTest;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A] = boardTest;
