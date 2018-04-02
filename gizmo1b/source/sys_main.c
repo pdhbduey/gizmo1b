@@ -69,9 +69,9 @@
 int main(void)
 {
 /* USER CODE BEGIN (3) */
-    //boardTestAppStart();
+    boardTestAppStart();
     //unitTestAppStart();
-    boardTestConsoleAppStart();
+    //boardTestConsoleAppStart();
 /* USER CODE END */
 
     return 0;
