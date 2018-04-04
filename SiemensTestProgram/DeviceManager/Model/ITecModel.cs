@@ -20,6 +20,8 @@ namespace DeviceManager.Model
 
         Task<byte[]> SetPeriodCommand(int period);
 
+        Task<byte[]> SetIrefGainCommand(int irefGain);
+
         Task<byte[]> Reset();
     }
 }

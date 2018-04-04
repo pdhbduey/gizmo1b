@@ -1,6 +1,4 @@
-﻿
-
-namespace Common.Bindings
+﻿namespace Common.Bindings
 {
     using System;
     using System.ComponentModel;
@@ -8,7 +6,6 @@ namespace Common.Bindings
 
     public class BindableBase : INotifyPropertyChanged
     {
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] String propertyName = null)

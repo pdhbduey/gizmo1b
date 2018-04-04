@@ -14,13 +14,13 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public Task<byte[]> SetIRef(byte[] data)
-        {
-            var requestArray = TecDefaults.GetSetIrefCommand(data);
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
-        }
+        //public Task<byte[]> SetIRef(byte[] data)
+        //{
+        //    var requestArray = TecDefaults.GetSetIrefCommand(data);
+        //    communication.WriteData(requestArray);
+        //    var response = communication.ReadData();
+        //    return response;
+        //}
 
         public Task<byte[]> Reset()
         {
@@ -79,6 +79,13 @@ namespace DeviceManager.Model
         public Task<byte[]> SetPeriodCommand(int period)
         {
             var requestArray = TecDefaults.GetWaveformPeriodCommand(period);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
+        }
+
+        public Task<byte[]> SetIrefGainCommand(int irefGain)
+        {
+            var requestArray = TecDefaults.GetIrefGainCommand(irefGain);
             communication.WriteData(requestArray);
             return communication.ReadData();
         }

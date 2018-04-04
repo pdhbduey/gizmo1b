@@ -35,8 +35,9 @@
                 <TextBox Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=NumberOfSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 <Label Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" Margin="1" Content="Period (ms):"></Label>
                 <TextBox Width="100" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=TecPeriod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-
-                <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
+                <Label Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right" Margin="1" Content="Iref Gain (ms):"></Label>
+                <TextBox Width="100" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=IRefGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <!--<StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
                     <Slider
                         IsEnabled="{Binding IsIRefEditable}"
                         Width="250" 
@@ -48,13 +49,14 @@
                         Value="{Binding SliderIrefValue}">
                     </Slider>
                     <Label VerticalAlignment="Center" Content="{Binding IrefCurrentValueText}"></Label>
-                </StackPanel>
+                </StackPanel>-->
 
                 <!-- TEC Commands -->
                 <StackPanel Grid.Row="0" Grid.RowSpan="3" Grid.Column="2" Orientation="Vertical">
                     <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
                     <Button Margin="2" Width="100" Height="25" Content="Reset" Command="{Binding ResetTecCommand}"></Button>
                     <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>
+                    <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding ClosedLoopButtonState}" Command="{Binding ClosedLoopToggleCommand}"></ToggleButton>
                 </StackPanel>
             </Grid>
         </StackPanel>
@@ -67,8 +69,8 @@
             <Label Content="{Binding StatusMessage}"></Label>
         </StackPanel>
         
-        <!--Save and Progress-->
-        <Grid Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+        <!--Save and Progress **NOT YET IMPLEMENTED*****-->
+        <!--<Grid Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -78,6 +80,6 @@
                 <TextBlock Text="{Binding SaveProgress}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <Button Grid.Column="1" Margin="2" Width="100" Height="25" Content="Save" IsEnabled="False" Command="{Binding SaveDataCommand}"></Button>
-        </Grid>
+        </Grid>-->
     </Grid>
 </UserControl>
