@@ -16,13 +16,11 @@ namespace DeviceManager
         private DacView dacView;
         private TecView tecView;
         private LedView ledView;
-        private ThermistorView thermistorView;
 
         // Singleton View Models
         private DacViewModel dacViewModel;
         private TecViewModel tecViewModel;
         private LedViewModel ledViewModel;
-        private ThermistorViewModel thermistorViewModel;
 
         /// <summary>
         /// Creates Device Manager Factory.
@@ -122,16 +120,28 @@ namespace DeviceManager
         /// <returns> Thermistor view </returns>
         public ThermistorView GetThermistorView()
         {
-            if (thermistorViewModel == null)
+            var thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
+            var thermistorView = new ThermistorView()
             {
-                thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
-                thermistorView = new ThermistorView()
-                {
-                    DataContext = thermistorViewModel
-                };
-            }
+                DataContext = thermistorViewModel
+            };
 
             return thermistorView;
+        }
+
+        /// <summary>
+        ///  Sets the data context for ADC view.
+        /// </summary>
+        /// <returns> ADC view </returns>
+        public AdcView GetAdcView()
+        {
+            var adcViewModel = new AdcViewModel(GetAdcModel());
+            var adcView = new AdcView()
+            {
+                DataContext = adcViewModel
+            };
+            
+            return adcView;
         }
 
         public CommunicationConfigurationView GetCommunicationConfigurationView()
@@ -173,6 +183,11 @@ namespace DeviceManager
         private IThermistorModel GetThermistorModel()
         {
             return new ThermistorModel(serialCommunication);
+        }
+
+        private IAdcModel GetAdcModel()
+        {
+            return new AdcModel(serialCommunication);
         }
 
         private IMotorModel GetMotorModel(IComCommunication communication)

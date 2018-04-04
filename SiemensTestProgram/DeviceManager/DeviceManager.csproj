@@ -65,15 +65,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AdcControls.cs" />
+    <Compile Include="AdcDefaults.cs" />
     <Compile Include="ComCommands.cs" />
     <Compile Include="DataHelper.cs" />
     <Compile Include="DeviceCommunication\ComCommunication.cs" />
     <Compile Include="DeviceCommunication\ComPortDefaults.cs" />
     <Compile Include="DeviceCommunication\IComCommunication.cs" />
+    <Compile Include="Model\AdcModel.cs" />
     <Compile Include="Model\CommunicationConfigurationModel.cs" />
     <Compile Include="Model\DacModel.cs" />
     <Compile Include="Model\DeviceManager.cs" />
+    <Compile Include="Model\IAdcModel.cs" />
     <Compile Include="Model\ICommunicationConfigurationModel.cs" />
     <Compile Include="Model\IDacModel.cs" />
     <Compile Include="Model\IDeviceManager.cs" />
@@ -87,6 +89,7 @@
     <Compile Include="Model\ThermistorModel.cs" />
     <Compile Include="TecDefaults.cs" />
     <Compile Include="ThermistorDefaults.cs" />
+    <Compile Include="ViewModel\AdcViewModel.cs" />
     <Compile Include="ViewModel\CommunicationConfigurationViewModel.cs" />
     <Compile Include="ViewModel\DacViewModel.cs" />
     <Compile Include="ViewModel\DeviceManagerViewModel.cs" />
@@ -94,6 +97,9 @@
     <Compile Include="ViewModel\LedViewModel.cs" />
     <Compile Include="ViewModel\TecViewModel.cs" />
     <Compile Include="ViewModel\ThermistorViewModel.cs" />
+    <Compile Include="View\AdcView.xaml.cs">
+      <DependentUpon>AdcView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CommunicationConfigurationView.xaml.cs">
       <DependentUpon>CommunicationConfigurationView.xaml</DependentUpon>
     </Compile>
@@ -128,6 +134,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\AdcView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\CommunicationConfigurationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

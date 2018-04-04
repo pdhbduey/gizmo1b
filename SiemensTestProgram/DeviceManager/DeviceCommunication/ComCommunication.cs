@@ -14,13 +14,15 @@ namespace DeviceManager.DeviceCommunication
     /// </summary>
     public class ComCommunication : IComCommunication, IDisposable
     {
-        // Default configuration
+        // Synchronization
         private volatile object mutex = new object();
-        private SemaphoreSlim writeSemaphore;
-        private SemaphoreSlim readSemaphore;
+        private SemaphoreSlim requestSemaphore;
+        //private SemaphoreSlim readSemaphore;
+
+        // Default configuration
         private const int timeout = 10000;
         private const int byteThreshold = 5;
-        private string comPort = "COM8";
+        private string comPort = "COM9";
         private int baudRate = 115200;
         private int dataBits = 8;
         private Parity parity = System.IO.Ports.Parity.None;
@@ -31,8 +33,8 @@ namespace DeviceManager.DeviceCommunication
         public ComCommunication() 
         {
             isConfigured = false;
-            writeSemaphore = new SemaphoreSlim(1);
-            readSemaphore = new SemaphoreSlim(1);
+            requestSemaphore = new SemaphoreSlim(1);
+            //readSemaphore = new SemaphoreSlim(1);
             CreateSerialPort();
         }
 
@@ -54,12 +56,19 @@ namespace DeviceManager.DeviceCommunication
         /// <param name="message"> Data to send. </param>
         public void WriteData(byte[] request)
         {
-            if (serialPort.IsOpen)
+            try
             {
-                readSemaphore.Wait();
+                if (serialPort.IsOpen)
+                {
+                    requestSemaphore.Wait(1);
+                    serialPort.DiscardOutBuffer();
+                    serialPort.Write(request, 0, request.Length);
+                }
+            }
+            catch
+            {
+                serialPort.DiscardInBuffer();
                 serialPort.DiscardOutBuffer();
-                serialPort.Write(request, 0, request.Length);
-                writeSemaphore.Release();
             }
         }
 
@@ -69,31 +78,27 @@ namespace DeviceManager.DeviceCommunication
             {
                 var time = 0;
                 var data = new byte[5];
-                //lock (mutex)
-                //{
-                //try
-                //{
-                writeSemaphore.Wait();
-                if (serialPort.IsOpen)
+                try
                 {
-                    do
+                    if (serialPort.IsOpen)
                     {
-                        time += 10;
-                        if (time > timeout) return data;
-                        Thread.Sleep(10);
-                    } while (serialPort.BytesToRead < 5);
+                        do
+                        {
+                            time += 10;
+                            if (time > timeout) return data;
+                            Thread.Sleep(10);
+                        } while (serialPort.BytesToRead < 5);
 
-                    serialPort.Read(data, 0, data.Length);
+                        serialPort.Read(data, 0, data.Length);
+                        requestSemaphore.Release(1);
+                    }
                 }
-                //}
-                //catch (Exception e)
-                //{
-                //   return new byte[0];
-                //}
-                readSemaphore.Release();
-                    return data;
-                //}
-                
+                catch (Exception e)
+                {
+                   return new byte[0];
+                }
+                    
+                return data;
             });
             
         }
@@ -125,24 +130,11 @@ namespace DeviceManager.DeviceCommunication
         public List<string> GetPorts()
         {
             var portsList = new List<string>();
-            ManagementObjectCollection mbsList = null;
-            ManagementObjectSearcher mbs = new ManagementObjectSearcher("SELECT * FROM MSSerial_PortName");
-            mbsList = mbs.Get();
             foreach (var port in SerialPort.GetPortNames())
             {
                 portsList.Add(port);
             }
 
-            //foreach (ManagementObject mo in mbsList)
-            //{
-            //    var comPort = mo["DeviceId"].ToString();
-            //    var deviceDescription = mo["Description"].ToString();
-            //    var name = mo["Name"].ToString();
-            //    var status = mo["Status"].ToString();
-            //    var h = mo["PNPDeviceID"].ToString();
-            //    portsList.Add(comPort);
-            //}
-            ////portsList.Add("COM8");
             return portsList;
         }
 
@@ -154,7 +146,7 @@ namespace DeviceManager.DeviceCommunication
             pnpDeviceId = string.Empty;
 
             ManagementObjectCollection mbsList = null;
-            ManagementObjectSearcher mbs = new ManagementObjectSearcher("Select * From Win32_SerialPort");
+            ManagementObjectSearcher mbs = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_SerialPort");
             mbsList = mbs.Get();
 
             foreach (ManagementObject mo in mbsList)
