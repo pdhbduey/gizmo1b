@@ -66,9 +66,6 @@ int LibTec::getVSense(float& vSense)
 
 bool LibTec::driveControl(float control)
 {
-    control = control >  2.5 ?     2.5:
-              control < -2.5 ?    -2.5:
-                               control;
     float ref = control + 2.5;
     int result = m_libDac.set(ref);
     return result != LibDac::OKAY ? ERROR_SET_REF_CURRENT : OKAY;
@@ -234,6 +231,22 @@ float LibTec::getGain()
     return m_pidGain;
 }
 
+int LibTec::setOffset(float offset)
+{
+    LibMutex libMutex(s_mutex);
+    if (offset < -1.0 || offset > 1.0) {
+        return ERROR_OFFSET_OUT_OF_RANGE;
+    }
+    m_offset = offset;
+    return OKAY;
+}
+
+float LibTec::getOffset()
+{
+    LibMutex libMutex(s_mutex);
+    return m_offset;
+}
+
 bool LibTec::isClosedLoopEnabled()
 {
     LibMutex libMutex(s_mutex);
@@ -272,6 +285,9 @@ void LibTec::run()
         }
         control *= m_pidGain;
         control *= 2.5 / 15;
-        driveControl(control);
+        control += m_offset;
+        if (m_isEnabled) {
+            driveControl(control);
+        }
     }
 }

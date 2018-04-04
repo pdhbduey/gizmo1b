@@ -22,6 +22,7 @@ public:
        ERROR_WAVEFORM_TYPE_OUT_OF_RANGE,
        ERROR_WAVEFORM_PERIOD_OUT_OF_RANGE,
        ERROR_GAIN_OUT_OF_RANGE,
+       ERROR_OFFSET_OUT_OF_RANGE,
     };
     enum WaveformType {
         WAVEFORM_TYPE_CONSTANT,
@@ -50,6 +51,8 @@ public:
     void closedLoopDisable();
     int setGain(float gain); // 0.01-100
     float getGain();
+    int setOffset(float offset); // -1.0-1.0
+    float getOffset();
     bool isClosedLoopEnabled();
 private:
     enum adcChannels {
@@ -76,6 +79,7 @@ private:
     bool m_isWaveformRunning;
     float m_refCurrent;
     float m_pidGain;
+    float m_offset;
     bool m_isClosedLoopEnabled;
     bool m_isEnabled;
 };

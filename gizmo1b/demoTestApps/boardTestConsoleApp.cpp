@@ -65,7 +65,7 @@ void BoardTestConsoleApp::help(std::string& help)
 {
     help  = "ERROR: Unrecognized command\n\r";
     help += "USAGE:\n\r";
-    help += "dac set [0,5]\n\r";
+    help += "dac set [0V,5V]\n\r";
     help += "dac get\n\r";
     help += "adc get 0..5\n\r";
     help += "led set green|red on|off\n\r";
@@ -73,13 +73,16 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "fault reset\n\r";
     help += "tec enable|disable\n\r";
     help += "tec get enable\n\r";
-    help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform|gain|closedloop\n\r";
-    help += "tec set iref [-15,15]\n\r";
+    help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform|closedloop\n\r";
+    help += "tec set iref [-15A,15A]\n\r";
     help += "tec set waveformtype sin|tr|sq|const\n\r";
     help += "tec set waveformperiod 1..10s\n\r";
     help += "tec set waveform start|stop\n\r";
     help += "tec set closedloop enable|disable\n\r";
     help += "tec set gain [0.01,100]\n\r";
+    help += "tec get gain\n\r";
+    help += "dac set dacoffset [-1.0V,1.0V]\n\r";
+    help += "tec get dacoffset\n\r";
     help += "thermistor get a|b|c|d\n\r";
 }
 
@@ -165,6 +168,7 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
     tecStatus.push_back("ERROR_WAVE_FORM_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_WAVEFORM_PERIOD_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_GAIN_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_OFFSET_OUT_OF_RANGE");
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "enable") {
             result = regWrite(BoardTest::TEC_CONTROL, BoardTestTec::ENABLE);
@@ -277,6 +281,17 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 }
                 isParsingError = false;
             }
+            else if (tokens[ARGUMENT] == "dacoffset") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_IREF_OFFSET, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2fV", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
         }
         else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
             if (tokens[ARGUMENT] == "iref" && tokens.size() > VALUE) {
@@ -355,6 +370,20 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 if (sscanf(tokens[VALUE].c_str(), "%f", &gain) == 1) {
                    uint32 value = *reinterpret_cast<uint32*>(&gain);
                    result = regWrite(BoardTest::TEC_IREF_GAIN, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::TEC_STATUS, value);
+                       if (value != LibTec::OKAY) {
+                           res = "tec  status: " + tecStatus[value];
+                       }
+                   }
+                   isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "dacoffset" && tokens.size() > VALUE) {
+                float offset;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &offset) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&offset);
+                   result = regWrite(BoardTest::TEC_IREF_OFFSET, value);
                    if (result == BoardTest::OKAY) {
                        result = regRead(BoardTest::TEC_STATUS, value);
                        if (value != LibTec::OKAY) {

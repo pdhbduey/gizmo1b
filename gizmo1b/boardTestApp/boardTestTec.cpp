@@ -64,6 +64,12 @@ int BoardTestTec::get(uint32 address, uint32& value)
             value = *reinterpret_cast<uint32*>(&gain);
         }
         break;
+    case TEC_IREF_OFFSET:
+        {
+            float offset = m_libTec.getOffset();
+            value = *reinterpret_cast<uint32*>(&offset);
+        }
+        break;
     }
     return OKAY;
 }
@@ -113,6 +119,12 @@ int BoardTestTec::set(uint32 address, uint32 value)
         {
             float gain = *reinterpret_cast<float*>(&value);
             m_status = m_libTec.setGain(gain);
+        }
+        break;
+    case TEC_IREF_OFFSET:
+        {
+            float offset = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.setOffset(offset);
         }
         break;
     }
