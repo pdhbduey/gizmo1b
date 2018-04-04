@@ -29,14 +29,14 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Margin="1" Content="Waveform:"></Label>
-                <ComboBox Width="100" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="1" ItemsSource="{Binding Waveforms}" SelectedItem="{Binding SelectedWaveForm}"></ComboBox>
-                <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Margin="1" Content="Samples:"></Label>
-                <TextBox Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=NumberOfSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Label Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" Margin="1" Content="Period (ms):"></Label>
-                <TextBox Width="100" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=TecPeriod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Label Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right" Margin="1" Content="Iref Gain (ms):"></Label>
-                <TextBox Width="100" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=IRefGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Waveform:"></Label>
+                <ComboBox Height="25" Width="100" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="1" ItemsSource="{Binding Waveforms}" SelectedItem="{Binding SelectedWaveForm}"></ComboBox>
+                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Samples:"></Label>
+                <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=NumberOfSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Period (ms):"></Label>
+                <TextBox Height="25" Width="100" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=TecPeriod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Iref Gain (ms):"></Label>
+                <TextBox Height="25" Width="100" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=IRefGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 <!--<StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
                     <Slider
                         IsEnabled="{Binding IsIRefEditable}"
