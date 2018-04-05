@@ -76,11 +76,15 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform|closedloop\n\r";
     help += "tec set iref [-15A,15A]\n\r";
     help += "tec set waveformtype sin|tr|sq|const\n\r";
-    help += "tec set waveformperiod 1..10s\n\r";
+    help += "tec set waveformperiod 2..10,000ms\n\r";
     help += "tec set waveform start|stop\n\r";
     help += "tec set closedloop enable|disable\n\r";
-    help += "tec set gain [0.01,100]\n\r";
-    help += "tec get gain\n\r";
+    help += "tec set propgain [0.01,100]\n\r";
+    help += "tec get propgain\n\r";
+    help += "tec set intgain [0,100]\n\r";
+    help += "tec get intgain\n\r";
+    help += "tec set dergain [0,100]\n\r";
+    help += "tec get dergain\n\r";
     help += "dac set dacoffset [-1.0V,1.0V]\n\r";
     help += "tec get dacoffset\n\r";
     help += "thermistor get a|b|c|d\n\r";
@@ -167,8 +171,11 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
     tecStatus.push_back("ERROR_SET_REF_CURRENT");
     tecStatus.push_back("ERROR_WAVE_FORM_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_WAVEFORM_PERIOD_OUT_OF_RANGE");
-    tecStatus.push_back("ERROR_GAIN_OUT_OF_RANGE");
-    tecStatus.push_back("ERROR_OFFSET_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_DAC_OFFSET_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_PROPORTIONAL_GAIN_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_INTEGRAL_GAIN_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_DERIVATIVE_GAIN_OUT_OF_RANGE");
+
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "enable") {
             result = regWrite(BoardTest::TEC_CONTROL, BoardTestTec::ENABLE);
@@ -245,7 +252,7 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 result = regRead(BoardTest::TEC_WAVEFORM_PERIOD, value);
                 if (result == BoardTest::OKAY) {
                     char t[16];
-                    sprintf(t, "%ds", value);
+                    sprintf(t, "%dms", value);
                     res = t;
                 }
                 isParsingError = false;
@@ -260,9 +267,31 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 }
                 isParsingError = false;
             }
-            else if (tokens[ARGUMENT] == "gain") {
+            else if (tokens[ARGUMENT] == "propgain") {
                 uint32 value;
-                result = regRead(BoardTest::TEC_IREF_GAIN, value);
+                result = regRead(BoardTest::TEC_PROPORTIONAL_GAIN, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2f", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "intgain") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_INTEGRAL_GAIN, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2f", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "dergain") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_DERIVATIVE_GAIN, value);
                 if (result == BoardTest::OKAY) {
                     float f = *reinterpret_cast<float*>(&value);
                     char t[16];
@@ -283,7 +312,7 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "dacoffset") {
                 uint32 value;
-                result = regRead(BoardTest::TEC_IREF_OFFSET, value);
+                result = regRead(BoardTest::TEC_DAC_OFFSET, value);
                 if (result == BoardTest::OKAY) {
                     float f = *reinterpret_cast<float*>(&value);
                     char t[16];
@@ -365,11 +394,39 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                     isParsingError = false;
                 }
             }
-            else if (tokens[ARGUMENT] == "gain" && tokens.size() > VALUE) {
+            else if (tokens[ARGUMENT] == "propgain" && tokens.size() > VALUE) {
                 float gain;
                 if (sscanf(tokens[VALUE].c_str(), "%f", &gain) == 1) {
                    uint32 value = *reinterpret_cast<uint32*>(&gain);
-                   result = regWrite(BoardTest::TEC_IREF_GAIN, value);
+                   result = regWrite(BoardTest::TEC_PROPORTIONAL_GAIN, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::TEC_STATUS, value);
+                       if (value != LibTec::OKAY) {
+                           res = "tec  status: " + tecStatus[value];
+                       }
+                   }
+                   isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "intgain" && tokens.size() > VALUE) {
+                float gain;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &gain) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&gain);
+                   result = regWrite(BoardTest::TEC_INTEGRAL_GAIN, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::TEC_STATUS, value);
+                       if (value != LibTec::OKAY) {
+                           res = "tec  status: " + tecStatus[value];
+                       }
+                   }
+                   isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "dergain" && tokens.size() > VALUE) {
+                float gain;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &gain) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&gain);
+                   result = regWrite(BoardTest::TEC_DERIVATIVE_GAIN, value);
                    if (result == BoardTest::OKAY) {
                        result = regRead(BoardTest::TEC_STATUS, value);
                        if (value != LibTec::OKAY) {
@@ -383,7 +440,7 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 float offset;
                 if (sscanf(tokens[VALUE].c_str(), "%f", &offset) == 1) {
                    uint32 value = *reinterpret_cast<uint32*>(&offset);
-                   result = regWrite(BoardTest::TEC_IREF_OFFSET, value);
+                   result = regWrite(BoardTest::TEC_DAC_OFFSET, value);
                    if (result == BoardTest::OKAY) {
                        result = regRead(BoardTest::TEC_STATUS, value);
                        if (value != LibTec::OKAY) {
