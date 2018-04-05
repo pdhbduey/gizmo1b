@@ -10,8 +10,8 @@ bool LibTec::s_isInitialized;
 LibTec::LibTec(const char* name) :
     LibTask(name, configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 1),
     m_tecEnable(new LibWrapMibSpi5, PIN_SIMO), // 99:MIBSPI5SIMO[0]:TEC_EN
-    m_waveformPeriod(1),
-    m_pidGain(1)
+    m_waveformPeriod(1000),
+    m_pidProportionalGain(1)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
@@ -117,7 +117,7 @@ int LibTec::setWaveformPeriod(uint32 waveformPeriod)
 {
     int status = OKAY;
     LibMutex libMutex(s_mutex);
-    if (waveformPeriod < 1 || waveformPeriod > 10) {
+    if (waveformPeriod < 2 || waveformPeriod > 10000) {
         status = ERROR_WAVEFORM_PERIOD_OUT_OF_RANGE;
     }
     if (status == OKAY) {
@@ -138,34 +138,34 @@ void LibTec::waveformStart()
     if (m_waveformType == WAVEFORM_TYPE_CONSTANT || m_isWaveformRunning)  {
         return;
     }
-    TickType_t ticksPeriod = pdMS_TO_TICKS(m_waveformPeriod * 1000);
-    TickType_t ticksStep   = ticksPeriod / 1000;
+    float ticksPeriod = pdMS_TO_TICKS(m_waveformPeriod);
+    float ticksStep = ticksPeriod / 1000;
     switch (m_waveformType) {
     default:
         return;
     case WAVEFORM_TYPE_SINUSOIDAL:
         for (int i = 0; i < 1000; i++) {
-            TickType_t ticks = ticksStep * i;
-            float value = sin(2 * 3.141 * ticks / ticksPeriod);
+            float ticks = ticksStep * i;
+            float value = sin(i * 2 * 3.141 / 1000);
             m_waveform[i].m_ticks = ticks;
             m_waveform[i].m_value = value;
         }
         break;
     case WAVEFORM_TYPE_TRIANGULAR:
         for (int i = 0; i < 250; i++) {
-            TickType_t ticks = ticksStep * i;
+            float ticks = ticksStep * i;
             float value = 4.0 * ticks / ticksPeriod;
             m_waveform[i].m_ticks = ticks;
             m_waveform[i].m_value = value;
         }
         for (int i = 250; i < 750; i++) {
-            TickType_t ticks = ticksStep * i;
+            float ticks = ticksStep * i;
             float value = 2.0 - 4.0 * ticks / ticksPeriod;
             m_waveform[i].m_ticks = ticks;
             m_waveform[i].m_value = value;
         }
         for (int i = 750; i < 1000; i++) {
-            TickType_t ticks = ticksStep * i;
+            float ticks = ticksStep * i;
             float value = 4.0 * ticks / ticksPeriod - 4.0;
             m_waveform[i].m_ticks = ticks;
             m_waveform[i].m_value = value;
@@ -173,12 +173,12 @@ void LibTec::waveformStart()
         break;
     case WAVEFORM_TYPE_SQUARE:
         for (int i = 0; i < 500; i++) {
-            TickType_t ticks = ticksStep * i;
+            float ticks = ticksStep * i;
             m_waveform[i].m_ticks = ticks;
             m_waveform[i].m_value = 1;
         }
         for (int i = 500; i < 1000; i++) {
-            TickType_t ticks = ticksStep * i;
+            float ticks = ticksStep * i;
             m_waveform[i].m_ticks = ticks;
             m_waveform[i].m_value = -1;
         }
@@ -206,6 +206,7 @@ bool LibTec::isWaveformStarted()
 void LibTec::closedLoopEnable()
 {
     LibMutex libMutex(s_mutex);
+    m_isCloseLoopInitialized = false;
     m_isClosedLoopEnabled = true;
 }
 
@@ -215,27 +216,59 @@ void LibTec::closedLoopDisable()
     m_isClosedLoopEnabled = false;
 }
 
-int LibTec::setGain(float gain)
+int LibTec::setProportionalGain(float gain)
 {
     LibMutex libMutex(s_mutex);
     if (gain < 0.01 || gain > 100) {
-        return ERROR_GAIN_OUT_OF_RANGE;
+        return ERROR_PROPORTIONAL_GAIN_OUT_OF_RANGE;
     }
-    m_pidGain = gain;
+    m_pidProportionalGain = gain;
     return OKAY;
 }
 
-float LibTec::getGain()
+float LibTec::getProportionalGain()
 {
     LibMutex libMutex(s_mutex);
-    return m_pidGain;
+    return m_pidProportionalGain;
+}
+
+int LibTec::setIntegralGain(float gain)
+{
+    LibMutex libMutex(s_mutex);
+    if (gain < 0 || gain > 100) {
+        return ERROR_INTEGRAL_GAIN_OUT_OF_RANGE;
+    }
+    m_pidIntegralGain = gain;
+    return OKAY;
+}
+
+float LibTec::getIntegrallGain()
+{
+    LibMutex libMutex(s_mutex);
+    return m_pidIntegralGain;
+}
+
+int LibTec::setDerivativeGain(float gain)
+{
+    LibMutex libMutex(s_mutex);
+    if (gain < 0 || gain > 100) {
+        return ERROR_DERIVATIVE_GAIN_OUT_OF_RANGE;
+    }
+    m_pidDerivativeGain = gain;
+    return OKAY;
+}
+
+float LibTec::getDerivativeGain()
+{
+    LibMutex libMutex(s_mutex);
+    return m_pidDerivativeGain;
 }
 
 int LibTec::setOffset(float offset)
 {
     LibMutex libMutex(s_mutex);
     if (offset < -1.0 || offset > 1.0) {
-        return ERROR_OFFSET_OUT_OF_RANGE;
+        return ERROR_DAC_OFFSET_OUT_OF_RANGE;
     }
     m_offset = offset;
     return OKAY;
@@ -276,18 +309,35 @@ void LibTec::run()
             }
         }
         float ref = value * m_refCurrent;
-        float control = ref; // open loop by default
-        if (m_isClosedLoopEnabled) {
-            float iSense;
-            if (getISense(iSense) == OKAY) {
-                control = ref - iSense;
+        float control = 0;
+        float iSense = 0;
+        int result = getISense(iSense);
+        float error = ref - iSense;
+        if (m_isClosedLoopEnabled && result == OKAY) {
+            if (!m_isCloseLoopInitialized || !m_isEnabled) {
+                m_prevError = error;
+                m_accError = 0;
+                if (!m_isCloseLoopInitialized) {
+                    m_isCloseLoopInitialized = true;
+                }
             }
+            if (m_pidDerivativeGain == 0) {
+                m_prevError  = error;
+            }
+            if (m_pidIntegralGain == 0) {
+                m_accError = 0;
+            }
+            control =  error * m_pidProportionalGain
+                    +  m_accError * m_pidIntegralGain
+                    + (error - m_prevError) * m_pidDerivativeGain;
+            m_prevError  = error;
+            m_accError  += error;
         }
-        control *= m_pidGain;
+        else {
+            control = ref;
+        }
         control *= 2.5 / 15;
         control += m_offset;
-        if (m_isEnabled) {
-            driveControl(control);
-        }
+        driveControl(control);
     }
 }

@@ -21,8 +21,10 @@ public:
        ERROR_SET_REF_CURRENT,
        ERROR_WAVEFORM_TYPE_OUT_OF_RANGE,
        ERROR_WAVEFORM_PERIOD_OUT_OF_RANGE,
-       ERROR_GAIN_OUT_OF_RANGE,
-       ERROR_OFFSET_OUT_OF_RANGE,
+       ERROR_DAC_OFFSET_OUT_OF_RANGE,
+       ERROR_PROPORTIONAL_GAIN_OUT_OF_RANGE,
+       ERROR_INTEGRAL_GAIN_OUT_OF_RANGE,
+       ERROR_DERIVATIVE_GAIN_OUT_OF_RANGE,
     };
     enum WaveformType {
         WAVEFORM_TYPE_CONSTANT,
@@ -42,15 +44,19 @@ public:
     float getRefCurrent();
     int setWaveformType(uint32 waveformType);
     uint32 getWaveformType();
-    int setWaveformPeriod(uint32 waveformPeriod);
+    int setWaveformPeriod(uint32 waveformPeriod); // 2ms-10,000ms
     uint32 getWaveformPeriod();
     void waveformStart();
     void waveformStop();
     bool isWaveformStarted();
     void closedLoopEnable();
     void closedLoopDisable();
-    int setGain(float gain); // 0.01-100
-    float getGain();
+    int setProportionalGain(float gain); // 0.01-100
+    float getProportionalGain();
+    int setIntegralGain(float gain); // 0-100
+    float getIntegrallGain();
+    int setDerivativeGain(float gain); // 0-100
+    float getDerivativeGain();
     int setOffset(float offset); // -1.0-1.0
     float getOffset();
     bool isClosedLoopEnabled();
@@ -60,7 +66,7 @@ private:
         VSENSE = LibAdc::CHANNEL_0,
     };
     struct WaveformSample {
-        TickType_t m_ticks;
+        float m_ticks;
         float m_value;
     };
 private:
@@ -74,11 +80,16 @@ private:
     static SemaphoreHandle_t s_mutex;
     uint32 m_waveformType;
     struct WaveformSample m_waveform[1000];
-    uint32 m_waveformPeriod; // 1s-10s
+    uint32 m_waveformPeriod;
     TickType_t m_ticks;
+    float m_prevError;
+    float m_accError;
+    bool m_isCloseLoopInitialized;
     bool m_isWaveformRunning;
     float m_refCurrent;
-    float m_pidGain;
+    float m_pidProportionalGain;
+    float m_pidIntegralGain;
+    float m_pidDerivativeGain;
     float m_offset;
     bool m_isClosedLoopEnabled;
     bool m_isEnabled;

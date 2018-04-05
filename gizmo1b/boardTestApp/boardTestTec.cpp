@@ -58,16 +58,28 @@ int BoardTestTec::get(uint32 address, uint32& value)
     case TEC_WAVEFORM_PERIOD:
         value = m_libTec.getWaveformPeriod();
         break;
-    case TEC_IREF_GAIN:
-        {
-            float gain = m_libTec.getGain();
-            value = *reinterpret_cast<uint32*>(&gain);
-        }
-        break;
-    case TEC_IREF_OFFSET:
+    case TEC_DAC_OFFSET:
         {
             float offset = m_libTec.getOffset();
             value = *reinterpret_cast<uint32*>(&offset);
+        }
+        break;
+    case TEC_PROPORTIONAL_GAIN:
+        {
+            float proportionalGain = m_libTec.getProportionalGain();
+            value = *reinterpret_cast<uint32*>(&proportionalGain);
+        }
+        break;
+    case TEC_INTEGRAL_GAIN:
+        {
+            float integralGain = m_libTec.getIntegrallGain();
+            value = *reinterpret_cast<uint32*>(&integralGain);
+        }
+        break;
+    case TEC_DERIVATIVE_GAIN:
+        {
+            float derivativeGain = m_libTec.getDerivativeGain();
+            value = *reinterpret_cast<uint32*>(&derivativeGain);
         }
         break;
     }
@@ -115,16 +127,28 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TEC_WAVEFORM_PERIOD:
         m_status = m_libTec.setWaveformPeriod(value);
         break;
-    case TEC_IREF_GAIN:
-        {
-            float gain = *reinterpret_cast<float*>(&value);
-            m_status = m_libTec.setGain(gain);
-        }
-        break;
-    case TEC_IREF_OFFSET:
+    case TEC_DAC_OFFSET:
         {
             float offset = *reinterpret_cast<float*>(&value);
             m_status = m_libTec.setOffset(offset);
+        }
+        break;
+    case TEC_PROPORTIONAL_GAIN:
+        {
+            float proportionalGain = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.setProportionalGain(proportionalGain);
+        }
+        break;
+    case TEC_INTEGRAL_GAIN:
+        {
+            float integralGain = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.setIntegralGain(integralGain);
+        }
+        break;
+    case TEC_DERIVATIVE_GAIN:
+        {
+            float derivativeGain = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.setDerivativeGain(derivativeGain);
         }
         break;
     }
