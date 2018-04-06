@@ -1,6 +1,8 @@
 #ifndef _LIB_TEC_H_
 #define _LIB_TEC_H_
 
+#include <vector>
+#include <queue>
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "libWrapGioPort.h"
@@ -72,6 +74,8 @@ private:
 private:
     virtual void run();
     bool driveControl(float control);
+    float filter(float value);
+    float getIrefFromWaveform(TickType_t tick);
 private:
     LibWrapGioPort::Port m_tecEnable;
     LibAdc m_libAdc;
@@ -93,6 +97,8 @@ private:
     float m_offset;
     bool m_isClosedLoopEnabled;
     bool m_isEnabled;
+    std::queue<float> m_filterQueue;
+    std::vector<float> m_filterTaps;
 };
 
 #endif // _LIB_TEC_H_

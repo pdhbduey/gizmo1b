@@ -18,6 +18,32 @@ LibTec::LibTec(const char* name) :
         m_tecEnable.m_libWrapGioPort->setPin(m_tecEnable.m_pin, false);
         s_isInitialized = true;
     }
+    // Matlab LP taps:
+    // firls(20,[0 0.2 0.25 1],[1 1 0 0], [100 1])
+    m_filterTaps.push_back( 0.007794814985338);
+    m_filterTaps.push_back( 0.026552774207396);
+    m_filterTaps.push_back( 0.011742309467546);
+    m_filterTaps.push_back(-0.021356465458395);
+    m_filterTaps.push_back(-0.048362325215853);
+    m_filterTaps.push_back(-0.046379464057561);
+    m_filterTaps.push_back(-0.004390272701631);
+    m_filterTaps.push_back( 0.071104494811224);
+    m_filterTaps.push_back( 0.157852120303661);
+    m_filterTaps.push_back( 0.226497563253852);
+    m_filterTaps.push_back( 0.252541521407335);
+    m_filterTaps.push_back( 0.226497563253852);
+    m_filterTaps.push_back( 0.157852120303661);
+    m_filterTaps.push_back( 0.071104494811224);
+    m_filterTaps.push_back(-0.004390272701631);
+    m_filterTaps.push_back(-0.046379464057561);
+    m_filterTaps.push_back(-0.048362325215853);
+    m_filterTaps.push_back(-0.021356465458395);
+    m_filterTaps.push_back( 0.011742309467546);
+    m_filterTaps.push_back( 0.026552774207396);
+    m_filterTaps.push_back( 0.007794814985338);
+    for (int i = 0; i < m_filterTaps.size(); i++) {
+        m_filterQueue.push(0);
+    }
 }
 
 LibTec::~LibTec()
@@ -67,6 +93,7 @@ int LibTec::getVSense(float& vSense)
 bool LibTec::driveControl(float control)
 {
     float ref = control + 2.5;
+    ref = ref > 5 ? 5 : ref < 0 ? 0 : ref; // limit to [0,5]
     int result = m_libDac.set(ref);
     return result != LibDac::OKAY ? ERROR_SET_REF_CURRENT : OKAY;
 }
@@ -286,58 +313,80 @@ bool LibTec::isClosedLoopEnabled()
     return m_isClosedLoopEnabled;
 }
 
+float LibTec::filter(float value)
+{
+    std::queue<float> temp;
+    m_filterQueue.push(value);
+    m_filterQueue.pop();
+    float acc = 0;
+    for (int i = 0; i < m_filterTaps.size(); i++) {
+        float value = m_filterQueue.front();
+        float tap   = m_filterTaps[i];
+        acc += m_filterTaps[i] * m_filterQueue.front();
+        temp.push(m_filterQueue.front());
+        m_filterQueue.pop();
+    }
+    for (int i = 0; i < m_filterTaps.size(); i++) {
+        m_filterQueue.push(temp.front());
+        temp.pop();
+    }
+    return acc;
+}
+
+float LibTec::getIrefFromWaveform(TickType_t tick)
+{
+    float value = 1;
+    if (m_isWaveformRunning) {
+        TickType_t ticks = tick - m_ticks;
+        if (m_waveform[999].m_ticks < ticks) {
+            m_ticks = xTaskGetTickCount();
+            ticks   = 0;
+        }
+        for (int i = 0; i < 1000; i++) {
+            if (ticks >= m_waveform[i].m_ticks
+             && ticks <= m_waveform[i + 1].m_ticks) {
+                value = m_waveform[i].m_value
+                      + (m_waveform[i + 1].m_value - m_waveform[i].m_value)
+                      * (ticks - m_waveform[i].m_ticks)
+                      / (m_waveform[i + 1].m_ticks - m_waveform[i].m_ticks);
+                break;
+            }
+        }
+    }
+    return value * m_refCurrent;
+}
+
 void LibTec::run()
 {
     while (true) {
         vTaskDelay(1);
-        float value = 1;
-        if (m_isWaveformRunning) {
-            TickType_t ticks = xTaskGetTickCount() - m_ticks;
-            if (m_waveform[999].m_ticks < ticks) {
-                m_ticks = xTaskGetTickCount();
-                ticks   = 0;
-            }
-            for (int i = 0; i < 1000; i++) {
-                if (ticks >= m_waveform[i].m_ticks
-                 && ticks <= m_waveform[i + 1].m_ticks) {
-                    value = m_waveform[i].m_value
-                          + (m_waveform[i + 1].m_value - m_waveform[i].m_value)
-                          * (ticks - m_waveform[i].m_ticks)
-                          / (m_waveform[i + 1].m_ticks - m_waveform[i].m_ticks);
-                    break;
-                }
-            }
-        }
-        float ref = value * m_refCurrent;
-        float control = 0;
+        TickType_t tick = xTaskGetTickCount();
+        float error = getIrefFromWaveform(tick);
         float iSense = 0;
-        int result = getISense(iSense);
-        float error = ref - iSense;
-        if (m_isClosedLoopEnabled && result == OKAY) {
-            if (!m_isCloseLoopInitialized || !m_isEnabled) {
-                m_prevError = error;
-                m_accError = 0;
-                if (!m_isCloseLoopInitialized) {
-                    m_isCloseLoopInitialized = true;
-                }
-            }
-            if (m_pidDerivativeGain == 0) {
-                m_prevError  = error;
-            }
-            if (m_pidIntegralGain == 0) {
-                m_accError = 0;
-            }
-            control =  error * m_pidProportionalGain
-                    +  m_accError * m_pidIntegralGain
-                    + (error - m_prevError) * m_pidDerivativeGain;
-            m_prevError  = error;
-            m_accError  += error;
+        if (m_isClosedLoopEnabled && getISense(iSense) == OKAY) {
+            error -= iSense;
         }
-        else {
-            control = ref;
+        error = filter(error);
+        if (!m_isCloseLoopInitialized || !m_isEnabled) {
+            m_prevError = error;
+            m_accError = 0;
+            if (!m_isCloseLoopInitialized) {
+                m_isCloseLoopInitialized = true;
+            }
         }
+        if (m_pidDerivativeGain == 0) {
+            m_prevError = error;
+        }
+        if (m_pidIntegralGain == 0) {
+            m_accError = 0;
+        }
+        float control =  error * m_pidProportionalGain
+                      +  m_accError * m_pidIntegralGain
+                      + (error - m_prevError) * m_pidDerivativeGain;
         control *= 2.5 / 15;
         control += m_offset;
         driveControl(control);
+        m_prevError  = error;
+        m_accError  += error;
     }
 }

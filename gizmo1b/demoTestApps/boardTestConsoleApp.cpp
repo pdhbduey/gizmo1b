@@ -85,7 +85,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec get intgain\n\r";
     help += "tec set dergain [0,100]\n\r";
     help += "tec get dergain\n\r";
-    help += "dac set dacoffset [-1.0V,1.0V]\n\r";
+    help += "tec set dacoffset [-1.0V,1.0V]\n\r";
     help += "tec get dacoffset\n\r";
     help += "thermistor get a|b|c|d\n\r";
 }
