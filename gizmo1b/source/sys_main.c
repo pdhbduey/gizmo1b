@@ -50,6 +50,9 @@
 #include "sys_common.h"
 
 /* USER CODE BEGIN (1) */
+#include <stdlib.h>
+#include <string.h>
+#include "FreeRTOS.h"
 #include "boardTestAppStart.h"
 #include "unitTestAppStart.h"
 #include "boardTestConsoleAppStart.h"
@@ -79,4 +82,35 @@ int main(void)
 
 
 /* USER CODE BEGIN (4) */
+void* calloc(size_t _num, size_t _size)
+{
+    void* p = pvPortMalloc(_num * _size);
+    memset(p, 0, _num * _size);
+    return p;
+}
+
+ void* malloc(size_t size)
+{
+     void* p = pvPortMalloc(size);
+     return p;
+}
+
+void* realloc(void* _ptr, size_t _size)
+{
+    void* p = pvPortMalloc(_size);
+    memcpy(p, _ptr, _size);
+    vPortFree(_ptr);
+    return p;
+}
+
+void free(void* _ptr)
+{
+    vPortFree(_ptr);
+}
+
+void* memalign(size_t _aln, size_t _size)
+{
+    abort();
+    return NULL;
+}
 /* USER CODE END */
