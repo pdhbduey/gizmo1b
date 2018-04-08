@@ -1,8 +1,7 @@
-﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
+﻿ // <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
 namespace DeviceManager.ViewModel
 {
-    using Common;
     using Common.Bindings;
     using DeviceManager.Model;
 
@@ -12,105 +11,127 @@ namespace DeviceManager.ViewModel
     public class LedViewModel : BindableBase
     {
         private ILedModel ledModel;
-        private string MessageSent;
-        private string messageReceived;
-        private bool statusLedRed;
-        private bool statusLedGreen;
-        private string message;
+        private string ledStatus;
+        private string greenLedStatus;
+        private string redLedStatus;
 
         public LedViewModel(ILedModel ledModel)
         {
             this.ledModel = ledModel;
-            MessageSent = string.Empty;
-            MessageReceived = string.Empty;
+            ledStatus = string.Empty;
+            redLedStatus = LedDefaults.redLedOn;
+            greenLedStatus = LedDefaults.greenLedOn;
 
             // Sets up the commands
             ToggleLedRedCommand = new RelayCommand(param => ToggleLedRed());
             ToggleLedGreenCommand = new RelayCommand(param => ToggleLedGreen());
-            SendMessageCommand = new RelayCommand(param => SendMessage());
         }
 
-        public string Message { get; set; }
+        /// <summary>
+        /// Toggle Red LED command.
+        /// </summary>
+        public RelayCommand ToggleLedRedCommand { get; set; }
 
-        public string MessageReceived {
+        /// <summary>
+        /// Toggle Green LED command.
+        /// </summary>
+        public RelayCommand ToggleLedGreenCommand { get; set; }
+
+        /// <summary>
+        /// LED status value.
+        /// </summary>
+        public string LedStatus {
             get
             {
-                return messageReceived;
+                return ledStatus;
             }
             set
             {
-                messageReceived = value;
-                OnPropertyChanged(nameof(MessageReceived));
+                ledStatus = value;
+                OnPropertyChanged(nameof(LedStatus));
             }
         }
 
-        public RelayCommand ToggleLedRedCommand { get; set; }
-
-        public RelayCommand ToggleLedGreenCommand { get; set; }
-
-        public RelayCommand SendMessageCommand { get; set; }
-
-        private void ToggleLedRed()
+        /// <summary>
+        /// Green LED status value.
+        /// </summary>
+        public string GreenLedStatus
         {
-            statusLedRed = statusLedRed == true ? false : true;
-            switch (statusLedRed)
+            get
             {
-                case true:
-                    ToggleLed(DataHelper.REGISTER_WRITE, DataHelper.LED_RED_ON);
-                    break;
-                case false:
-                    ToggleLed(DataHelper.REGISTER_WRITE, DataHelper.LED_RED_OFF);
-                    break;
+                return greenLedStatus;
+            }
+            set
+            {
+                greenLedStatus = value;
+                OnPropertyChanged(nameof(GreenLedStatus));
             }
         }
 
-        private void ToggleLedGreen()
+        /// <summary>
+        /// Red LED status value.
+        /// </summary>
+        public string RedLedStatus
         {
-            statusLedGreen = statusLedGreen == true ? false : true;
-            switch (statusLedGreen)
+            get
             {
-                case true:
-                    ToggleLed(DataHelper.REGISTER_WRITE, DataHelper.LED_GREEN_ON);
-                    break;
-                case false:
-                    ToggleLed(DataHelper.REGISTER_WRITE, DataHelper.LED_GREEN_OFF);
-                    break;
+                return redLedStatus;
+            }
+            set
+            {
+                redLedStatus = value;
+                OnPropertyChanged(nameof(RedLedStatus));
             }
         }
 
-        private async void ToggleLed(byte rw, byte led)
+        /// <summary>
+        /// Toggles the red LED.
+        /// </summary>
+        private async void ToggleLedRed()
         {
-            var request = ComCommands.GetLedCommand(rw, led);
-            var response = await ledModel.WriteData(request);
-            MessageReceived = DataHelper.ProcessCommandResponse(response, ComCommands.CommandType.LED);
+            var state = redLedStatus;
+            RedLedStatus = redLedStatus == LedDefaults.redLedOn ? LedDefaults.redLedOff : LedDefaults.redLedOn;
+            var status = await ledModel.SetLedCommand(state);
+            ProcessStatus(status);
         }
 
-        private async void SendMessage()
+        /// <summary>
+        /// Toggles the green LED.
+        /// </summary>
+        private async void ToggleLedGreen()
         {
-            if (string.IsNullOrEmpty(Message))
+            var state = greenLedStatus;
+            GreenLedStatus = greenLedStatus == LedDefaults.greenLedOn ? LedDefaults.greenLedOff : LedDefaults.greenLedOn;
+            var status = await ledModel.SetLedCommand(state);
+            ProcessStatus(status);
+        }
+
+        /// <summary>
+        /// Processes LED register status.
+        /// </summary>
+        /// <param name="status"> LED register response. </param>
+        private void ProcessStatus(byte[] status)
+        {
+            if (status.Length < 4)
             {
-                MessageReceived = "Message must be proper format";
+                ledStatus = "Communication Error";
+                return;
             }
 
-            var request = DataHelper.ParseStringToByteArray(Message);
-            var response = await ledModel.WriteData(request);
+            LedStatus = GetErrorMessage(status[4]);
+        }
 
-            byte[] address = new byte[4]
-            {
-                request[1],
-                request[2],
-                request[3],
-                request[4]
-            };
+        /// <summary>
+        /// Gets the error message for given LED response.
+        /// </summary>
+        /// <param name="value"> LED register response. </param>
+        /// <returns> Status for LED </returns>
+        private string GetErrorMessage(byte value)
+        {
+            string response;
+            LedDefaults.LedStatus.TryGetValue(value, out response);
 
-            if (Helper.AreByteArraysEqual(address, ComCommands.LED_ADDRESS))
-            {
-                MessageReceived = DataHelper.ProcessCommandResponse(response, ComCommands.CommandType.LED);
-            }
-            else
-            {
-                MessageReceived = DataHelper.ProcessCommandResponse(response, ComCommands.CommandType.Unknown);
-            }
+            return response == null ? "Unknown" : response;
         }
     }
 }

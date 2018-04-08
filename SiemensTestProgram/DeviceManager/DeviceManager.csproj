@@ -71,6 +71,7 @@
     <Compile Include="DeviceCommunication\ComCommunication.cs" />
     <Compile Include="DeviceCommunication\ComPortDefaults.cs" />
     <Compile Include="DeviceCommunication\IComCommunication.cs" />
+    <Compile Include="LedDefaults.cs" />
     <Compile Include="Model\AdcModel.cs" />
     <Compile Include="Model\CommunicationConfigurationModel.cs" />
     <Compile Include="Model\DacModel.cs" />

@@ -23,14 +23,16 @@ namespace DeviceManager.Model
         }
 
         /// <summary>
-        /// Writes data through the comp port.
+        /// Writes to LED request.
         /// </summary>
-        /// <param name="request"> Sends a request. </param>
-        /// <returns> Task which returns byte array of response when completed. </returns>
-        public Task<byte[]> WriteData(byte[] request)
+        /// <param name="request"> LED toggle status. </param>
+        /// <returns> Task which will return LED register response. </returns>
+        public Task<byte[]> SetLedCommand(string ledRequest)
         {
-            communication.WriteData(request);
-            return communication.ReadData();
+            var requestArray = LedDefaults.GetLedWriteCommand(ledRequest);
+            communication.WriteData(requestArray);
+            var data = communication.ReadData();
+            return data;
         }
     }
 }
