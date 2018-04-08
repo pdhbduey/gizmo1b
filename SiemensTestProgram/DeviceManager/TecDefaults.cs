@@ -87,27 +87,6 @@ namespace DeviceManager
             };
         }
 
-        //public static byte[] GetSetIrefCommand(byte[] data)
-        //{
-        //    if (data.Length != 4)
-        //    {
-        //        return null;
-        //    }
-
-        //    return new byte[]
-        //    {
-        //        DataHelper.REGISTER_WRITE,
-        //        0x00,
-        //        0x00,
-        //        0x07,
-        //        0x01,
-        //        data[0],
-        //        data[1],
-        //        data[2],
-        //        data[3]
-        //    };
-        //}
-
         public static byte[] GetIsenseCommand()
         {
             return new byte[]
@@ -214,7 +193,11 @@ namespace DeviceManager
             { 0x03, "Error ref current out of range"},
             { 0x04, "Error set ref current"},
             { 0x05, "Error waveform type out of range"},
-            { 0x06, "Error waveform period out of range"}
+            { 0x06, "Error waveform period out of range"},
+            { 0x07, "Error dac offset out of range"},
+            { 0x08, "Error proportional gain out of range"},
+            { 0x09, "Error integral gain out of range"},
+            { 0x0A, "Error derivative gain out of range"},
         };
 
         public static Dictionary<string, byte> WaveFormByteValues = new Dictionary<string, byte>()
