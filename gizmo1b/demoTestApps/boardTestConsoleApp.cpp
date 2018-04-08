@@ -75,7 +75,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec get enable\n\r";
     help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform|closedloop\n\r";
     help += "tec set iref [-15A,15A]\n\r";
-    help += "tec set waveformtype sin|tr|sq|const\n\r";
+    help += "tec set waveformtype sin|tr|sq|const|custom\n\r";
     help += "tec set waveformperiod 2..10,000ms\n\r";
     help += "tec set waveform start|stop\n\r";
     help += "tec set closedloop enable|disable\n\r";
@@ -85,8 +85,12 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec get intgain\n\r";
     help += "tec set dergain [0,100]\n\r";
     help += "tec get dergain\n\r";
-    help += "tec set dacoffset [-1.0V,1.0V]\n\r";
-    help += "tec get dacoffset\n\r";
+    help += "tec set customindex reset\n\r";
+    help += "tec set customindex inc\n\r";
+    help += "tec set customtime 0..9,999ms\n\r";
+    help += "tec set customiref [-15A,15A]\n\r";
+    help += "tec set customcycles 0..4,294,967,296\n\r";
+    help += "tec get customindex|customtime|customiref|customcycles\n\r";
     help += "thermistor get a|b|c|d\n\r";
 }
 
@@ -171,11 +175,12 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
     tecStatus.push_back("ERROR_SET_REF_CURRENT");
     tecStatus.push_back("ERROR_WAVE_FORM_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_WAVEFORM_PERIOD_OUT_OF_RANGE");
-    tecStatus.push_back("ERROR_DAC_OFFSET_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_CUSTOM_WAVEFORM_EMPTY");
     tecStatus.push_back("ERROR_PROPORTIONAL_GAIN_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_INTEGRAL_GAIN_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_DERIVATIVE_GAIN_OUT_OF_RANGE");
-
+    tecStatus.push_back("ERROR_CUSTOM_WAVEFORM_TIME_NOT_RISING");
+    tecStatus.push_back("ERROR_CUSTOM_WAVEFORM_NON_ZERO_START_TIME");
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "enable") {
             result = regWrite(BoardTest::TEC_CONTROL, BoardTestTec::ENABLE);
@@ -243,6 +248,7 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                     waveformTypes.push_back("sin");
                     waveformTypes.push_back("tr");
                     waveformTypes.push_back("sq");
+                    waveformTypes.push_back("custom");
                     res = waveformTypes[value];
                 }
                 isParsingError = false;
@@ -310,13 +316,43 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 }
                 isParsingError = false;
             }
-            else if (tokens[ARGUMENT] == "dacoffset") {
+            else if (tokens[ARGUMENT] == "customindex") {
                 uint32 value;
-                result = regRead(BoardTest::TEC_DAC_OFFSET, value);
+                result = regRead(BoardTest::TEC_WAVEFORM_SAMPLE_INDEX, value);
+                if (result == BoardTest::OKAY) {
+                    char t[16];
+                    sprintf(t, "%d", value);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "customtime") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_WAVEFORM_SAMPLE_TIME, value);
+                if (result == BoardTest::OKAY) {
+                    char t[16];
+                    sprintf(t, "%dms", value);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "customiref") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_WAVEFORM_SAMPLE_IREF, value);
                 if (result == BoardTest::OKAY) {
                     float f = *reinterpret_cast<float*>(&value);
                     char t[16];
-                    sprintf(t, "%.2fV", f);
+                    sprintf(t, "%.2fA", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "customcycles") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_WAVEFORM_CYCLES, value);
+                if (result == BoardTest::OKAY) {
+                    char t[16];
+                    sprintf(t, "%d", value);
                     res = t;
                 }
                 isParsingError = false;
@@ -339,13 +375,15 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "waveformtype" && tokens.size() > VALUE) {
                 std::map<std::string, int> waveformTypes;
-                waveformTypes["const"] = LibTec::WAVEFORM_TYPE_CONSTANT;
-                waveformTypes["sin"]   = LibTec::WAVEFORM_TYPE_SINUSOIDAL;
-                waveformTypes["tr"]    = LibTec::WAVEFORM_TYPE_TRIANGULAR;
-                waveformTypes["sq"]    = LibTec::WAVEFORM_TYPE_SQUARE;
+                waveformTypes["const"]  = LibTec::WAVEFORM_TYPE_CONSTANT;
+                waveformTypes["sin"]    = LibTec::WAVEFORM_TYPE_SINUSOIDAL;
+                waveformTypes["tr"]     = LibTec::WAVEFORM_TYPE_TRIANGULAR;
+                waveformTypes["sq"]     = LibTec::WAVEFORM_TYPE_SQUARE;
+                waveformTypes["custom"] = LibTec::WAVEFORM_TYPE_CUSTOM;
                 if (waveformTypes.find(tokens[VALUE]) != waveformTypes.end()) {
                     uint32 waveformType = waveformTypes[tokens[VALUE]];
-                    result = regWrite(BoardTest::TEC_WAVEFORM_TYPE, waveformType);
+                    result = regWrite(BoardTest::TEC_WAVEFORM_TYPE,
+                                                                  waveformType);
                     if (result == BoardTest::OKAY) {
                         uint32 status;
                         result = regRead(BoardTest::TEC_STATUS, status);
@@ -359,7 +397,8 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
             else if (tokens[ARGUMENT] == "waveformperiod" && tokens.size() > VALUE) {
                 uint32 waveformPeriod;
                 if (sscanf(tokens[VALUE].c_str(), "%d", &waveformPeriod) == 1) {
-                    result = regWrite(BoardTest::TEC_WAVEFORM_PERIOD, waveformPeriod);
+                    result = regWrite(BoardTest::TEC_WAVEFORM_PERIOD,
+                                                                waveformPeriod);
                     if (result == BoardTest::OKAY) {
                         uint32 v;
                         result = regRead(BoardTest::TEC_STATUS, v);
@@ -374,6 +413,13 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 if (tokens[VALUE] == "start") {
                     result = regWrite(BoardTest::TEC_CONTROL,
                                                   BoardTestTec::START_WAVEFORM);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::TEC_STATUS, v);
+                        if (v != LibTec::OKAY) {
+                            res = "tec status: " + tecStatus[v];
+                        }
+                    }
                     isParsingError = false;
                 }
                 else if (tokens[VALUE] == "stop") {
@@ -385,12 +431,12 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
             else if (tokens[ARGUMENT] == "closedloop" && tokens.size() > VALUE) {
                 if (tokens[VALUE] == "enable") {
                     result = regWrite(BoardTest::TEC_CONTROL,
-                                                  BoardTestTec::CLOSED_LOOP_ENABLE);
+                                              BoardTestTec::CLOSED_LOOP_ENABLE);
                     isParsingError = false;
                 }
                 else if (tokens[VALUE] == "disable") {
                     result = regWrite(BoardTest::TEC_CONTROL,
-                                                   BoardTestTec::CLOSED_LOOP_DISABLE);
+                                             BoardTestTec::CLOSED_LOOP_DISABLE);
                     isParsingError = false;
                 }
             }
@@ -436,18 +482,38 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                    isParsingError = false;
                 }
             }
-            else if (tokens[ARGUMENT] == "dacoffset" && tokens.size() > VALUE) {
-                float offset;
-                if (sscanf(tokens[VALUE].c_str(), "%f", &offset) == 1) {
-                   uint32 value = *reinterpret_cast<uint32*>(&offset);
-                   result = regWrite(BoardTest::TEC_DAC_OFFSET, value);
-                   if (result == BoardTest::OKAY) {
-                       result = regRead(BoardTest::TEC_STATUS, value);
-                       if (value != LibTec::OKAY) {
-                           res = "tec  status: " + tecStatus[value];
-                       }
-                   }
+            else if (tokens[ARGUMENT] == "customindex" && tokens.size() > VALUE) {
+                if (tokens[VALUE] == "reset") {
+                    result = regWrite(BoardTest::TEC_CONTROL,
+                                     BoardTestTec::CUSTOM_WAVEFORM_RESET_INDEX);
+                    isParsingError = false;
+                }
+                else if (tokens[VALUE] == "inc") {
+                    result = regWrite(BoardTest::TEC_CONTROL,
+                                       BoardTestTec::CUSTOM_WAVEFORM_INC_INDEX);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "customtime" && tokens.size() > VALUE) {
+                uint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &value) == 1) {
+                    result = regWrite(BoardTest::TEC_WAVEFORM_SAMPLE_TIME, value);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "customiref" && tokens.size() > VALUE) {
+                float customiref;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &customiref) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&customiref);
+                   result = regWrite(BoardTest::TEC_WAVEFORM_SAMPLE_IREF, value);
                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "customcycles" && tokens.size() > VALUE) {
+                uint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &value) == 1) {
+                    result = regWrite(BoardTest::TEC_WAVEFORM_CYCLES, value);
+                    isParsingError = false;
                 }
             }
         }

@@ -1,7 +1,7 @@
 #ifndef _BOARD_TEST_CONSOLE_APP_H_
 #define _BOARD_TEST_CONSOLE_APP_H_
 
-#include <map>
+#include <vector>
 #include "boardTestApp.h"
 
 class BoardTestConsoleApp: public BoardTestApp {
