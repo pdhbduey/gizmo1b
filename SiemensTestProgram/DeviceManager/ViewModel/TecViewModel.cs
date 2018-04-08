@@ -31,6 +31,9 @@ namespace DeviceManager.ViewModel
         private float vSense;
         private float iSense;
         private float iRef;
+        private float proportionalGain;
+        private int integralGain;
+        private int derivativeGain;
         private string statusMessage;
 
         private const int updateDelay = 300;
@@ -46,8 +49,8 @@ namespace DeviceManager.ViewModel
 
             // Initial values
             progressMaximum = 100;
-            tecPeriod = 1;
-            irefGain = 1;
+            tecPeriod = TecDefaults.PeriodMinimum;
+            //irefGain = TecDefaults.IrefGainMinimum;
             Waveforms = TecDefaults.Waveforms;
             selectedWaveForm = Waveforms[0];
             saveProgressValue = 0;
@@ -149,6 +152,84 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        public float ProportionalGain
+        {
+            get
+            {
+                return proportionalGain;
+            }
+            set
+            {
+                if (value < TecDefaults.ProportionalGainMinimum)
+                {
+                    proportionalGain = TecDefaults.ProportionalGainMinimum;
+                }
+                else if (value > TecDefaults.ProportionalGainMaximum)
+                {
+                    proportionalGain = TecDefaults.ProportionalGainMaximum;
+                }
+                else
+                {
+                    proportionalGain = value;
+                }
+
+                OnPropertyChanged(nameof(ProportionalGain));
+                UpdateProportionalGain();
+            }
+        }
+
+        public int IntegralGain
+        {
+            get
+            {
+                return integralGain;
+            }
+            set
+            {
+                if (value < TecDefaults.IntegralGainMinimum)
+                {
+                    integralGain = TecDefaults.IntegralGainMinimum;
+                }
+                else if (value > TecDefaults.IntegralGainMaximum)
+                {
+                    integralGain = TecDefaults.IntegralGainMaximum;
+                }
+                else
+                {
+                    integralGain = value;
+                }
+
+                OnPropertyChanged(nameof(IntegralGain));
+                UpdateIntegralGain();
+            }
+        }
+
+        public int DerivativeGain
+        {
+            get
+            {
+                return derivativeGain;
+            }
+            set
+            {
+                if (value < TecDefaults.DerivativeGainMinimum)
+                {
+                    derivativeGain = TecDefaults.DerivativeGainMinimum;
+                }
+                else if (value > TecDefaults.DerivativeGainMaximum)
+                {
+                    derivativeGain = TecDefaults.DerivativeGainMaximum;
+                }
+                else
+                {
+                    derivativeGain = value;
+                }
+
+                OnPropertyChanged(nameof(DerivativeGain));
+                UpdateDerivativeGain();
+            }
+        }
+
         public int TecPeriod
         {
             get
@@ -175,31 +256,31 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public int IRefGain
-        {
-            get
-            {
-                return irefGain;
-            }
-            set
-            {
-                if (value < TecDefaults.IrefGainMinimum)
-                {
-                    irefGain = TecDefaults.IrefGainMinimum;
-                }
-                else if (value > TecDefaults.IrefGainMaximum)
-                {
-                    irefGain = TecDefaults.IrefGainMaximum;
-                }
-                else
-                {
-                    irefGain = value;
-                }
+        //public int IRefGain
+        //{
+        //    get
+        //    {
+        //        return irefGain;
+        //    }
+        //    set
+        //    {
+        //        if (value < TecDefaults.IrefGainMinimum)
+        //        {
+        //            irefGain = TecDefaults.IrefGainMinimum;
+        //        }
+        //        else if (value > TecDefaults.IrefGainMaximum)
+        //        {
+        //            irefGain = TecDefaults.IrefGainMaximum;
+        //        }
+        //        else
+        //        {
+        //            irefGain = value;
+        //        }
 
-                OnPropertyChanged(nameof(IRefGain));
-                UpdateIrefGain();
-            }
-        }
+        //        OnPropertyChanged(nameof(IRefGain));
+        //        UpdateIrefGain();
+        //    }
+        //}
 
         public int NumberOfSamples
         {
@@ -430,10 +511,25 @@ namespace DeviceManager.ViewModel
             var status = await tecModel.SetPeriodCommand(tecPeriod);
         }
 
-        private async void UpdateIrefGain()
+        private async void UpdateProportionalGain()
         {
-            var status = await tecModel.SetIrefGainCommand(irefGain);
+            var status = await tecModel.SetProportionalGainCommand(proportionalGain);
         }
+
+        private async void UpdateIntegralGain()
+        {
+            var status = await tecModel.SetIntegralGainCommand(integralGain);
+        }
+
+        private async void UpdateDerivativeGain()
+        {
+            var status = await tecModel.SetDerivativeGainCommand(derivativeGain);
+        }
+        
+        //private async void UpdateIrefGain()
+        //{
+        //    var status = await tecModel.SetIrefGainCommand(irefGain);
+        //}
 
         private async void UpdateWaveform()
         {

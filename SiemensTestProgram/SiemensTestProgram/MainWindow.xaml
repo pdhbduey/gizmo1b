@@ -8,12 +8,12 @@
         xmlns:local="clr-namespace:SiemensTestProgram"
         mc:Ignorable="d"
         Title="Gizmo1B"
-        MinHeight="400"
-        MinWidth="450"
+        MinHeight="500"
+        MinWidth="800"
         MaxHeight="500"
-        MaxWidth="650"
-        Height="400" 
-        Width="525"
+        MaxWidth="800"
+        Height="500" 
+        Width="800"
         Background="WhiteSmoke">
 
     <Window.Resources>

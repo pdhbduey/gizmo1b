@@ -26,6 +26,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
 
@@ -35,8 +37,9 @@
                 <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=NumberOfSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Period (ms):"></Label>
                 <TextBox Height="25" Width="100" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=TecPeriod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Iref Gain (ms):"></Label>
+                <!--<Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Iref Gain (ms):"></Label>
                 <TextBox Height="25" Width="100" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=IRefGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                -->
                 <!--<StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
                     <Slider
                         IsEnabled="{Binding IsIRefEditable}"
@@ -51,8 +54,16 @@
                     <Label VerticalAlignment="Center" Content="{Binding IrefCurrentValueText}"></Label>
                 </StackPanel>-->
 
+                <!-- Gain Commands -->
+                <Label Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Integral Gain: "></Label>
+                <TextBox Height="25" Width="50" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Left" Text="{Binding Path=IntegralGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <Label Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Proportional Gain: "></Label>
+                <TextBox Height="25" Width="50" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Left" Text="{Binding Path=ProportionalGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"></TextBox>
+                <Label Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Derivative Gain: "></Label>
+                <TextBox Height="25" Width="50" Grid.Row="2" Grid.Column="3" HorizontalAlignment="Left" Text="{Binding Path=DerivativeGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                
                 <!-- TEC Commands -->
-                <StackPanel Grid.Row="0" Grid.RowSpan="3" Grid.Column="2" Orientation="Vertical">
+                <StackPanel Grid.Row="0" Grid.RowSpan="3" Grid.Column="4" Orientation="Vertical">
                     <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
                     <Button Margin="2" Width="100" Height="25" Content="Reset" Command="{Binding ResetTecCommand}"></Button>
                     <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>

@@ -8,10 +8,17 @@ namespace DeviceManager
     public static class TecDefaults
     {
         public const int MaximumNumberOfSamples = 30000;
-        public const int PeriodMinimum = 1;
-        public const int PeriodMaximum = 10;
-        public const int IrefGainMinimum = 1;
-        public const int IrefGainMaximum = 3;
+        public const int PeriodMinimum = 2;
+        public const int PeriodMaximum = 10000;
+        //public const int IrefGainMinimum = 1;
+        //public const int IrefGainMaximum = 3;
+
+        public const float ProportionalGainMinimum = 0.01F;
+        public const float ProportionalGainMaximum = 100;
+        public const int DerivativeGainMinimum = 0;
+        public const int DerivativeGainMaximum = 100;
+        public const int IntegralGainMinimum = 0;
+        public const int IntegralGainMaximum = 100;
 
         public const byte TEC_DISABLE = 0x01;
         public const byte TEC_ENABLE = 0x02;
@@ -54,22 +61,22 @@ namespace DeviceManager
             }; 
         }
 
-        public static byte[] GetIrefGainCommand(int value)
-        {
-            var period = Helper.ConvertIntToByteArray(value);
-            return new byte[]
-            {
-                DataHelper.REGISTER_WRITE,
-                0x00,
-                0x00,
-                0x07,
-                0x07,
-                0x00,
-                0x00,
-                0x00,
-                period[3]
-            };
-        }
+        //public static byte[] GetIrefGainCommand(int value)
+        //{
+        //    var gain = Helper.ConvertIntToByteArray(value);
+        //    return new byte[]
+        //    {
+        //        DataHelper.REGISTER_WRITE,
+        //        0x00,
+        //        0x00,
+        //        0x07,
+        //        0x07,
+        //        gain[0],
+        //        gain[1],
+        //        gain[2],
+        //        gain[3]
+        //    };
+        //}
 
         public static byte[] GetIrefCommand()
         {
@@ -178,10 +185,61 @@ namespace DeviceManager
                 0x00,
                 0x07,
                 0x06,
-                0x00,
-                0x00,
-                0x00,
+                waveformPeriodArray[0],
+                waveformPeriodArray[1],
+                waveformPeriodArray[2],
                 waveformPeriodArray[3]
+            };
+        }
+
+        public static byte[] GetDerivateGainCommand(int derivateGain)
+        {
+            var derivateGainArray = Helper.ConvertIntToByteArray(derivateGain);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x0A,
+                derivateGainArray[0],
+                derivateGainArray[1],
+                derivateGainArray[2],
+                derivateGainArray[3]
+            };
+        }
+
+        public static byte[] GetIntegralGainCommand(int integralGain)
+        {
+            var integralGainArray = Helper.ConvertIntToByteArray(integralGain);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x09,
+                integralGainArray[0],
+                integralGainArray[1],
+                integralGainArray[2],
+                integralGainArray[3]
+            };
+        }
+
+        public static byte[] GetProportionalGainCommand(float proportionalGain)
+        {
+            var proportionalGainArray = Helper.GetBigEndian(proportionalGain);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x08,
+                proportionalGainArray[0],
+                proportionalGainArray[1],
+                proportionalGainArray[2],
+                proportionalGainArray[3]
             };
         }
 

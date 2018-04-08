@@ -83,11 +83,32 @@ namespace DeviceManager.Model
             return communication.ReadData();
         }
 
-        public Task<byte[]> SetIrefGainCommand(int irefGain)
+        public Task<byte[]> SetDerivativeGainCommand(int derivateGain)
         {
-            var requestArray = TecDefaults.GetIrefGainCommand(irefGain);
+            var requestArray = TecDefaults.GetDerivateGainCommand(derivateGain);
             communication.WriteData(requestArray);
             return communication.ReadData();
         }
+
+        public Task<byte[]> SetIntegralGainCommand(int integralGain)
+        {
+            var requestArray = TecDefaults.GetIntegralGainCommand(integralGain);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
+        }
+
+        public Task<byte[]> SetProportionalGainCommand(float proportionalGain)
+        {
+            var requestArray = TecDefaults.GetProportionalGainCommand(proportionalGain);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
+        }
+
+        //public Task<byte[]> SetIrefGainCommand(int irefGain)
+        //{
+        //    var requestArray = TecDefaults.GetIrefGainCommand(irefGain);
+        //    communication.WriteData(requestArray);
+        //    return communication.ReadData();
+        //}
     }
 }
