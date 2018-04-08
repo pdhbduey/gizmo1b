@@ -14,13 +14,13 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public Task<byte[]> SetIRef(byte[] data)
-        {
-            var requestArray = TecDefaults.GetSetIrefCommand(data);
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
-        }
+        //public Task<byte[]> SetIRef(byte[] data)
+        //{
+        //    var requestArray = TecDefaults.GetSetIrefCommand(data);
+        //    communication.WriteData(requestArray);
+        //    var response = communication.ReadData();
+        //    return response;
+        //}
 
         public Task<byte[]> Reset()
         {
@@ -82,5 +82,33 @@ namespace DeviceManager.Model
             communication.WriteData(requestArray);
             return communication.ReadData();
         }
+
+        public Task<byte[]> SetDerivativeGainCommand(int derivateGain)
+        {
+            var requestArray = TecDefaults.GetDerivateGainCommand(derivateGain);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
+        }
+
+        public Task<byte[]> SetIntegralGainCommand(int integralGain)
+        {
+            var requestArray = TecDefaults.GetIntegralGainCommand(integralGain);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
+        }
+
+        public Task<byte[]> SetProportionalGainCommand(float proportionalGain)
+        {
+            var requestArray = TecDefaults.GetProportionalGainCommand(proportionalGain);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
+        }
+
+        //public Task<byte[]> SetIrefGainCommand(int irefGain)
+        //{
+        //    var requestArray = TecDefaults.GetIrefGainCommand(irefGain);
+        //    communication.WriteData(requestArray);
+        //    return communication.ReadData();
+        //}
     }
 }

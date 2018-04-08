@@ -20,6 +20,14 @@ namespace DeviceManager.Model
 
         Task<byte[]> SetPeriodCommand(int period);
 
+        Task<byte[]> SetDerivativeGainCommand(int derivateGain);
+
+        Task<byte[]> SetIntegralGainCommand(int integralGain);
+
+        Task<byte[]> SetProportionalGainCommand(float proportionalGain);
+
+        //Task<byte[]> SetIrefGainCommand(int irefGain);
+
         Task<byte[]> Reset();
     }
 }

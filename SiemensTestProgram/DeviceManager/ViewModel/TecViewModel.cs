@@ -20,23 +20,22 @@ namespace DeviceManager.ViewModel
         private string enableButtonState;
         private string captureButtonState;
         private string waveformButtonState;
+        private string closedLoopButtonState;
         private int saveProgressValue;
         private int numberOfSamples;
         private float irefCurrentValue;
-        private int sliderIrefValue;
+        //private int sliderIrefValue;
+        private int irefGain;
         private int tecPeriod;
 
         private float vSense;
         private float iSense;
         private float iRef;
+        private float proportionalGain;
+        private int integralGain;
+        private int derivativeGain;
         private string statusMessage;
 
-        private const string StartCaptureText = "Start Capture";
-        private const string StopCaptureText = "Stop Capture";
-        private const string EnableText = "Enable";
-        private const string DisableText = "Disable";
-        private const string StartWaveformText = "Start Waveform";
-        private const string StopWaveformText = "Stop Waveform";
         private const int updateDelay = 300;
         private bool saving;
         private bool updating;
@@ -50,22 +49,25 @@ namespace DeviceManager.ViewModel
 
             // Initial values
             progressMaximum = 100;
-            tecPeriod = 1000;
+            tecPeriod = TecDefaults.PeriodMinimum;
+            //irefGain = TecDefaults.IrefGainMinimum;
             Waveforms = TecDefaults.Waveforms;
             selectedWaveForm = Waveforms[0];
             saveProgressValue = 0;
             saveProgress = string.Empty;
-            captureButtonState = StartCaptureText;
-            waveformButtonState = StartWaveformText;
-            enableButtonState = EnableText;
+            captureButtonState = TecDefaults.StartCaptureText;
+            waveformButtonState = TecDefaults.StartWaveformText;
+            enableButtonState = TecDefaults.EnableText;
+            closedLoopButtonState = TecDefaults.EnableClosedLoopText;
             numberOfSamples = 0;
-            SliderIrefValue = 0;
+            //SliderIrefValue = 0;
 
             // Set commands
             SaveDataCommand = new RelayCommand(param => SaveData());
             EnableCommand = new RelayCommand(param => EnableToggle());
             CaptureStartStopCommand = new RelayCommand(param => CaptureToggle());
             StartStopWaveformCommand = new RelayCommand(param => WaveformToggle());
+            ClosedLoopToggleCommand = new RelayCommand(param => ClosedLoopToggle());
             ResetTecCommand = new RelayCommand(param => ResetTec());
 
             StartUpdateTask();
@@ -80,6 +82,8 @@ namespace DeviceManager.ViewModel
         public RelayCommand CaptureStartStopCommand { get; set; }
 
         public RelayCommand StartStopWaveformCommand { get; set; }
+
+        public RelayCommand ClosedLoopToggleCommand { get; set; }
 
         public List<string> Waveforms { get; set; }
 
@@ -97,11 +101,25 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        public string ClosedLoopButtonState
+        {
+            get
+            {
+                return closedLoopButtonState;
+            }
+
+            set
+            {
+                closedLoopButtonState = value;
+                OnPropertyChanged(nameof(ClosedLoopButtonState));
+            }
+        }
+
         public bool IsIRefEditable
         {
             get
             {
-                return (waveformButtonState == StartWaveformText);
+                return (waveformButtonState == TecDefaults.StartWaveformText);
             }
         }
 
@@ -134,6 +152,84 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        public float ProportionalGain
+        {
+            get
+            {
+                return proportionalGain;
+            }
+            set
+            {
+                if (value < TecDefaults.ProportionalGainMinimum)
+                {
+                    proportionalGain = TecDefaults.ProportionalGainMinimum;
+                }
+                else if (value > TecDefaults.ProportionalGainMaximum)
+                {
+                    proportionalGain = TecDefaults.ProportionalGainMaximum;
+                }
+                else
+                {
+                    proportionalGain = value;
+                }
+
+                OnPropertyChanged(nameof(ProportionalGain));
+                UpdateProportionalGain();
+            }
+        }
+
+        public int IntegralGain
+        {
+            get
+            {
+                return integralGain;
+            }
+            set
+            {
+                if (value < TecDefaults.IntegralGainMinimum)
+                {
+                    integralGain = TecDefaults.IntegralGainMinimum;
+                }
+                else if (value > TecDefaults.IntegralGainMaximum)
+                {
+                    integralGain = TecDefaults.IntegralGainMaximum;
+                }
+                else
+                {
+                    integralGain = value;
+                }
+
+                OnPropertyChanged(nameof(IntegralGain));
+                UpdateIntegralGain();
+            }
+        }
+
+        public int DerivativeGain
+        {
+            get
+            {
+                return derivativeGain;
+            }
+            set
+            {
+                if (value < TecDefaults.DerivativeGainMinimum)
+                {
+                    derivativeGain = TecDefaults.DerivativeGainMinimum;
+                }
+                else if (value > TecDefaults.DerivativeGainMaximum)
+                {
+                    derivativeGain = TecDefaults.DerivativeGainMaximum;
+                }
+                else
+                {
+                    derivativeGain = value;
+                }
+
+                OnPropertyChanged(nameof(DerivativeGain));
+                UpdateDerivativeGain();
+            }
+        }
+
         public int TecPeriod
         {
             get
@@ -146,9 +242,9 @@ namespace DeviceManager.ViewModel
                 {
                     tecPeriod = TecDefaults.PeriodMinimum;
                 }
-                else if (value > TecDefaults.MaximumNumberOfSamples)
+                else if (value > TecDefaults.PeriodMaximum)
                 {
-                    tecPeriod = TecDefaults.MaximumNumberOfSamples;
+                    tecPeriod = TecDefaults.PeriodMaximum;
                 }
                 else
                 {
@@ -159,6 +255,32 @@ namespace DeviceManager.ViewModel
                 UpdatePeriod();
             }
         }
+
+        //public int IRefGain
+        //{
+        //    get
+        //    {
+        //        return irefGain;
+        //    }
+        //    set
+        //    {
+        //        if (value < TecDefaults.IrefGainMinimum)
+        //        {
+        //            irefGain = TecDefaults.IrefGainMinimum;
+        //        }
+        //        else if (value > TecDefaults.IrefGainMaximum)
+        //        {
+        //            irefGain = TecDefaults.IrefGainMaximum;
+        //        }
+        //        else
+        //        {
+        //            irefGain = value;
+        //        }
+
+        //        OnPropertyChanged(nameof(IRefGain));
+        //        UpdateIrefGain();
+        //    }
+        //}
 
         public int NumberOfSamples
         {
@@ -348,19 +470,19 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public int SliderIrefValue
-        {
-            get
-            {
-                return sliderIrefValue;
-            }
-            set
-            {
-                sliderIrefValue = value;
-                IrefCurrentValue = (float)sliderIrefValue / 100;
-                OnPropertyChanged(nameof(SliderIrefValue));
-            }
-        }
+        //public int SliderIrefValue
+        //{
+        //    get
+        //    {
+        //        return sliderIrefValue;
+        //    }
+        //    set
+        //    {
+        //        sliderIrefValue = value;
+        //        IrefCurrentValue = (float)sliderIrefValue / 100;
+        //        OnPropertyChanged(nameof(SliderIrefValue));
+        //    }
+        //}
 
         private void SaveData()
         {
@@ -379,30 +501,58 @@ namespace DeviceManager.ViewModel
 
         private async void EnableToggle()
         {
-            EnableButtonState = enableButtonState == EnableText ? DisableText : EnableText;
-            var status = await tecModel.ControlCommand(enableButtonState);
+            var state = enableButtonState;
+            EnableButtonState = enableButtonState == TecDefaults.EnableText ? TecDefaults.DisableText : TecDefaults.EnableText;
+            var status = await tecModel.ControlCommand(state);
         }
 
         private async void UpdatePeriod()
         {
             var status = await tecModel.SetPeriodCommand(tecPeriod);
-            ProcessStatus(status);
         }
+
+        private async void UpdateProportionalGain()
+        {
+            var status = await tecModel.SetProportionalGainCommand(proportionalGain);
+        }
+
+        private async void UpdateIntegralGain()
+        {
+            var status = await tecModel.SetIntegralGainCommand(integralGain);
+        }
+
+        private async void UpdateDerivativeGain()
+        {
+            var status = await tecModel.SetDerivativeGainCommand(derivativeGain);
+        }
+        
+        //private async void UpdateIrefGain()
+        //{
+        //    var status = await tecModel.SetIrefGainCommand(irefGain);
+        //}
 
         private async void UpdateWaveform()
         {
             var status = await tecModel.SetWaveformCommand(selectedWaveForm);
-            ProcessStatus(status);
         }
 
         private void CaptureToggle()
         {
-            CaptureButtonState = captureButtonState == StartCaptureText ? StopCaptureText : StartCaptureText;
+            CaptureButtonState = captureButtonState == TecDefaults.StartCaptureText ? TecDefaults.StopCaptureText : TecDefaults.StartCaptureText;
         }
 
-        private void WaveformToggle()
+        private async void WaveformToggle()
         {
-            WaveformButtonState = waveformButtonState == StartWaveformText ? StopWaveformText : StartWaveformText;
+            var state = waveformButtonState;
+            WaveformButtonState = waveformButtonState == TecDefaults.StartWaveformText ? TecDefaults.StopWaveformText : TecDefaults.StartWaveformText;
+            var status = await tecModel.ControlCommand(state);
+        }
+
+        private async void ClosedLoopToggle()
+        {
+            var state = closedLoopButtonState;
+            ClosedLoopButtonState = closedLoopButtonState == TecDefaults.EnableClosedLoopText ? TecDefaults.DisableClosedLoopText : TecDefaults.EnableClosedLoopText;
+            var status = await tecModel.ControlCommand(state);
         }
 
         private async void ResetTec()
