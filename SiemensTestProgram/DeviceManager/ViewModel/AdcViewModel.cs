@@ -279,7 +279,7 @@ namespace DeviceManager.ViewModel
         {
             if (status.Length < 4)
             {
-                statusMessage = "Communication Error";
+                StatusMessage = "Communication Error";
                 return false;
             }
 

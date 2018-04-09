@@ -1,18 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
 namespace DeviceManager.Model
 {
+    using System.Threading.Tasks;
+
     public interface IDacModel
     {
         /// <summary>
-        /// Writes data through the comp port.
+        /// Set DAC value.
         /// </summary>
-        /// <param name="request"> Sends a request. </param>
-        /// <returns> Task which returns byte array of response when completed. </returns>
-        Task<byte[]> WriteData(float voltage);
+        /// <param name="voltage"> Voltage value. </param>
+        /// <returns> Returns the value from DAC set request. </returns>
+        Task<byte[]> SetDacCommand(float voltage);
+
+        /// <summary>
+        /// Read DAC status.
+        /// </summary>
+        /// <returns> Returns the DAC status. </returns>
+        Task<byte[]> ReadDacStatusCommand();
     }
 }

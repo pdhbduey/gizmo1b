@@ -17,7 +17,7 @@ namespace DeviceManager
             var led = LedSetValue[ledCommand];
             return new byte[]
             {
-                ComCommands.REGISTER_WRITE,
+                DataHelper.REGISTER_WRITE,
                 0x00,
                 0x00,
                 0x09,
@@ -34,7 +34,7 @@ namespace DeviceManager
         {
             return new byte[]
             {
-                ComCommands.REGISTER_READ,
+                DataHelper.REGISTER_READ,
                 0x00,
                 0x00,
                 0x09,

@@ -22,7 +22,7 @@
         </StackPanel>
 
         <!-- Response message -->
-        <StackPanel Grid.Row="1"  HorizontalAlignment="Right" VerticalAlignment="Bottom">
+        <StackPanel Grid.Row="1"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
             <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding LedStatus}"></Label>
         </StackPanel>
     </Grid>

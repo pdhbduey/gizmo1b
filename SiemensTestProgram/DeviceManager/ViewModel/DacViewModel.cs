@@ -2,44 +2,65 @@
 
 namespace DeviceManager.ViewModel
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     using Common.Bindings;
     using DeviceManager.Model;
 
+    /// <summary>
+    /// This class is responsible for updating DAC.
+    /// </summary>
     public class DacViewModel : BindableBase
     {
         private IDacModel dacModel;
-        private bool continuousMode;
         private float voltageValue;
         private int sliderVoltageValue;
+        private string dacStatus;
+
+        private Task updateTask;
+        CancellationTokenSource cts;
+        CancellationToken token;
+        private int updateDelay = 1000;
 
         public DacViewModel(IDacModel dacModel)
         {
+            // Set default settings
             this.dacModel = dacModel;
-            ContinuousMode = true;
             SendDacValueCommand = new RelayCommand(param => SendDacValue());
+            SliderVoltageValue = 250;
+            dacStatus = string.Empty;
+
+            // Check DAC status
+            StartUpdateTask();
         }
 
+        /// <summary>
+        /// Command to set the DAC.
+        /// </summary>
         public RelayCommand SendDacValueCommand { get; set; }
 
-        public bool StepMode
+        /// <summary>
+        /// The DAC status.
+        /// </summary>
+        public string DacStatus
         {
             get
             {
-                return !continuousMode;
+                return dacStatus;
             }
 
             set
             {
-                continuousMode = !value;
-                OnPropertyChanged(nameof(ContinuousMode));
-                OnPropertyChanged(nameof(StepMode));
-
-                // reset to 0
-                SliderVoltageValue = 250;
-                SendDacValue();
+                dacStatus = value;
+                OnPropertyChanged(nameof(DacStatus));
             }
         }
 
+        /// <summary>
+        /// The voltage value that is on the slider.
+        /// </summary>
         public int SliderVoltageValue
         {
             get
@@ -52,27 +73,7 @@ namespace DeviceManager.ViewModel
                 VoltageValue = (float)sliderVoltageValue / 100;
                 OnPropertyChanged(nameof(SliderVoltageValue));
 
-                if (continuousMode)
-                {
-                    SendDacValue();
-                }
-            }
-        }
-
-        public bool ContinuousMode
-        {
-            get
-            {
-                return continuousMode;
-            }
-            set
-            {                
-                continuousMode = value;
-                OnPropertyChanged(nameof(ContinuousMode));
-                OnPropertyChanged(nameof(StepMode));
-
-                // reset to 0
-                SliderVoltageValue = 250;
+                // Update DAC value when we scroll slider
                 SendDacValue();
             }
         }
@@ -114,7 +115,75 @@ namespace DeviceManager.ViewModel
         /// </summary>
         private async void SendDacValue()
         {
-            var response = await dacModel.WriteData(VoltageValue);
+            var response = await dacModel.SetDacCommand(VoltageValue);
+        }
+
+        /// <summary>
+        /// Updates DAC.
+        /// </summary>
+        private void StartUpdateTask()
+        {
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            updateTask = Task.Factory.StartNew(() =>
+            {
+                CheckDacStatus();
+            }, token);
+        }
+
+        /// <summary>
+        /// Checks the DAC status.
+        /// </summary>
+        private async void CheckDacStatus()
+        {
+            while (true)
+            {
+                if (token.IsCancellationRequested == true)
+                {
+                    break;
+                }
+
+                try
+                {
+
+                    var status = await dacModel.ReadDacStatusCommand();
+                    ProcessStatus(status);
+                    Thread.Sleep(updateDelay);
+                }
+                catch (Exception e)
+                {
+                    DacStatus = e.Message;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Processes DAC register status.
+        /// </summary>
+        /// <param name="status"> DAC register response. </param>
+        private void ProcessStatus(byte[] status)
+        {
+            if (status.Length < 4)
+            {
+                DacStatus = "Communication Error";
+                return;
+            }
+
+            DacStatus = $"Status: {GetStatusMessage(status[4])}";
+        }
+
+        /// <summary>
+        /// Gets the status message for given DAC response.
+        /// </summary>
+        /// <param name="value"> DAC register response. </param>
+        /// <returns> Status for DAC. </returns>
+        private string GetStatusMessage(byte value)
+        {
+            string response;
+            DacDefaults.DacStatus.TryGetValue(value, out response);
+
+            return response == null ? "Unknown Response" : response;
         }
     }
 }
