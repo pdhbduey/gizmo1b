@@ -58,12 +58,6 @@ int BoardTestTec::get(uint32 address, uint32& value)
     case TEC_WAVEFORM_PERIOD:
         value = m_libTec.getWaveformPeriod();
         break;
-    case TEC_DAC_OFFSET:
-        {
-            float offset = m_libTec.getOffset();
-            value = *reinterpret_cast<uint32*>(&offset);
-        }
-        break;
     case TEC_PROPORTIONAL_GAIN:
         {
             float proportionalGain = m_libTec.getProportionalGain();
@@ -82,6 +76,18 @@ int BoardTestTec::get(uint32 address, uint32& value)
             value = *reinterpret_cast<uint32*>(&derivativeGain);
         }
         break;
+    case TEC_WAVEFORM_SAMPLE_INDEX:
+        value = m_customWaveform.size();
+        break;
+    case TEC_WAVEFORM_SAMPLE_TIME:
+        value = m_irefSample.m_time;
+        break;
+    case TEC_WAVEFORM_SAMPLE_IREF:
+        value = *reinterpret_cast<uint32*>(&m_irefSample.m_iref);
+        break;
+    case TEC_WAVEFORM_CYCLES:
+        value = m_customeWaveformCycles;
+        break;
     }
     return OKAY;
 }
@@ -94,6 +100,7 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TEC_ISENSE_VALUE:
     case TEC_VSENSE_VALUE:
     case TEC_STATUS:
+    case TEC_WAVEFORM_SAMPLE_INDEX:
         return ERROR_RO;
     case TEC_CONTROL:
         if (value & DISABLE) {
@@ -103,7 +110,15 @@ int BoardTestTec::set(uint32 address, uint32 value)
             m_libTec.enable(true);
         }
         if (value & START_WAVEFORM) {
-            m_libTec.waveformStart();
+            uint32 status = LibTec::OKAY;
+            if (m_libTec.getWaveformType() == LibTec::WAVEFORM_TYPE_CUSTOM) {
+                m_status = m_libTec.setCustomWaveform(m_customWaveform,
+                                                       m_customeWaveformCycles);
+                status = m_status;
+            }
+            if (status == LibTec::OKAY) {
+                m_libTec.waveformStart();
+            }
         }
         if (value & STOP_WAVEFORM) {
             m_libTec.waveformStop();
@@ -113,6 +128,14 @@ int BoardTestTec::set(uint32 address, uint32 value)
         }
         if (value & CLOSED_LOOP_ENABLE) {
             m_libTec.closedLoopEnable();
+        }
+        if (value & CUSTOM_WAVEFORM_RESET_INDEX) {
+            m_customWaveform.clear();
+            m_irefSample.clear();
+        }
+        if (value & CUSTOM_WAVEFORM_INC_INDEX) {
+            m_customWaveform.push_back(m_irefSample);
+            m_irefSample.clear();
         }
         break;
     case TEC_IREF_VALUE:
@@ -126,12 +149,6 @@ int BoardTestTec::set(uint32 address, uint32 value)
         break;
     case TEC_WAVEFORM_PERIOD:
         m_status = m_libTec.setWaveformPeriod(value);
-        break;
-    case TEC_DAC_OFFSET:
-        {
-            float offset = *reinterpret_cast<float*>(&value);
-            m_status = m_libTec.setOffset(offset);
-        }
         break;
     case TEC_PROPORTIONAL_GAIN:
         {
@@ -150,6 +167,15 @@ int BoardTestTec::set(uint32 address, uint32 value)
             float derivativeGain = *reinterpret_cast<float*>(&value);
             m_status = m_libTec.setDerivativeGain(derivativeGain);
         }
+        break;
+    case TEC_WAVEFORM_SAMPLE_TIME:
+        m_irefSample.m_time = value;
+        break;
+    case TEC_WAVEFORM_SAMPLE_IREF:
+        m_irefSample.m_iref = *reinterpret_cast<float*>(&value);
+        break;
+    case TEC_WAVEFORM_CYCLES:
+        m_customeWaveformCycles = value;
         break;
     }
     return OKAY;
