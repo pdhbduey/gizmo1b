@@ -32,6 +32,9 @@
         <DataTemplate x:Name="AdcViewName" DataType="{x:Type viewmodels:AdcViewModel}">
             <views:AdcView DataContext="{Binding}"></views:AdcView>
         </DataTemplate>
+        <DataTemplate x:Name="MotorViewName" DataType="{x:Type viewmodels:MotorViewModel}">
+            <views:MotorView DataContext="{Binding}"></views:MotorView>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
