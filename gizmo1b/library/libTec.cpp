@@ -502,7 +502,9 @@ void LibTec::run()
                       +  m_accError * m_pidIntegralGain
                       + (error - m_prevError) * m_pidDerivativeGain;
         control *= 2.5 / 15;
-        driveControl(control);
+        if (m_isEnabled) {
+            driveControl(control);
+        }
         m_prevError  = error;
         m_accError  += error;
     }
