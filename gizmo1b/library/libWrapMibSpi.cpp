@@ -64,6 +64,17 @@ void LibWrapMibSpi::unlock()
     xSemaphoreGive(getMibSpiMutex());
 }
 
+LibWrapMibSpi::Lock::Lock(LibWrapMibSpi& libWrapMibSpi) :
+    m_libWrapMibSpi(libWrapMibSpi)
+{
+    m_libWrapMibSpi.lock();
+}
+
+LibWrapMibSpi::Lock::~Lock()
+{
+    m_libWrapMibSpi.unlock();
+}
+
 void LibWrapMibSpi::notification(uint32 group)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
