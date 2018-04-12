@@ -10,6 +10,10 @@ namespace DeviceManager
         public const int MaximumNumberOfSamples = 30000;
         public const int PeriodMinimum = 2;
         public const int PeriodMaximum = 10000;
+        public const int WaveformCyclesMinimum = 0;
+        public const int WaveformCyclesMaximum = int.MaxValue;
+        public const int SampleTimeMinimum = 0;
+        public const int SampleTimeMaximum = 9999;
         //public const int IrefGainMinimum = 1;
         //public const int IrefGainMaximum = 3;
 
@@ -26,6 +30,8 @@ namespace DeviceManager
         public const byte TEC_STOP_WAVEFORM = 0x08;
         public const byte CLOSED_LOOP_DISABLE = 0x10;
         public const byte CLOSED_LOOP_ENABLE = 0x20;
+        public const byte RESET_TEC_CUSTOM_WAVEFORM = 0x40;
+        public const byte INCREMENT_TEC_CUSTOM_WAVEFORM = 0x80;
 
         internal const string StartCaptureText = "Start Capture";
         internal const string StopCaptureText = "Stop Capture";
@@ -35,7 +41,9 @@ namespace DeviceManager
         internal const string StopWaveformText = "Stop Waveform";
         internal const string EnableClosedLoopText = "Start Closed Loop";
         internal const string DisableClosedLoopText = "Stop Closed Loop";
-
+        internal const string ResetTecWaveform = "ResetTecWaveform";
+        internal const string IncrementTecWaveform = "IncrementTecWaveform";
+        
         public static List<string> Waveforms = new List<string>
         {
             "Continuous",
@@ -61,22 +69,22 @@ namespace DeviceManager
             }; 
         }
 
-        //public static byte[] GetIrefGainCommand(int value)
-        //{
-        //    var gain = Helper.ConvertIntToByteArray(value);
-        //    return new byte[]
-        //    {
-        //        DataHelper.REGISTER_WRITE,
-        //        0x00,
-        //        0x00,
-        //        0x07,
-        //        0x07,
-        //        gain[0],
-        //        gain[1],
-        //        gain[2],
-        //        gain[3]
-        //    };
-        //}
+        public static byte[] SetIrefCommand(float value)
+        {
+            var iref = Helper.GetBigEndian(value);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x0D,
+                iref[0],
+                iref[1],
+                iref[2],
+                iref[3]
+            };
+        }
 
         public static byte[] GetIrefCommand()
         {
@@ -175,6 +183,40 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] GetSampleTimeCommand(int sampleTime)
+        {
+            var sampleTimeValue = Helper.ConvertIntToByteArray(sampleTime);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x0C,
+                sampleTimeValue[0],
+                sampleTimeValue[1],
+                sampleTimeValue[2],
+                sampleTimeValue[3]
+            };
+        }
+
+        public static byte[] GetWaveNumberOfCyclesCommand(int cycles)
+        {
+            var cycleValue = Helper.ConvertIntToByteArray(cycles);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x0E,
+                cycleValue[0],
+                cycleValue[1],
+                cycleValue[2],
+                cycleValue[3]
+            };
+        }
+
         public static byte[] GetWaveformPeriodCommand(int waveformPeriod)
         {
             var waveformPeriodArray = Helper.ConvertIntToByteArray(waveformPeriod);
@@ -256,6 +298,8 @@ namespace DeviceManager
             { 0x08, "Error proportional gain out of range"},
             { 0x09, "Error integral gain out of range"},
             { 0x0A, "Error derivative gain out of range"},
+            { 0x0B, "Error custom waveform time not rising"},
+            { 0x0C, "Error custom waveform non zero start time"}
         };
 
         public static Dictionary<string, byte> WaveFormByteValues = new Dictionary<string, byte>()
@@ -273,7 +317,9 @@ namespace DeviceManager
             { StartWaveformText, TEC_START_WAVEFORM },
             { StopWaveformText, TEC_STOP_WAVEFORM },
             { EnableClosedLoopText, CLOSED_LOOP_ENABLE },
-            { DisableClosedLoopText, CLOSED_LOOP_DISABLE }
+            { DisableClosedLoopText, CLOSED_LOOP_DISABLE },
+            { ResetTecWaveform, RESET_TEC_CUSTOM_WAVEFORM },
+            { IncrementTecWaveform, INCREMENT_TEC_CUSTOM_WAVEFORM}
         };
     }
 }
