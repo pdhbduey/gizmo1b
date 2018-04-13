@@ -117,7 +117,7 @@ int BoardTestMotor::set(uint32 address, uint32 value)
             step[BoardTestMotor::STEP_MICRO_1_16TH]  = LibMotor::STEP_MICRO_1_16TH;
             step[BoardTestMotor::STEP_MICRO_1_32TH]  = LibMotor::STEP_MICRO_1_32TH;
             step[BoardTestMotor::STEP_MICRO_1_64TH]  = LibMotor::STEP_MICRO_1_64TH;
-            step[BoardTestMotor::STEP_MICRO_1_128TH] = LibMotor::STEP_MICRO_1_64TH;
+            step[BoardTestMotor::STEP_MICRO_1_128TH] = LibMotor::STEP_MICRO_1_128TH;
             value &= STEP_MASK;
             if (step.find(value) != step.end()) {
                 m_status = m_libMotor.setMicroSteps(step[value]);
