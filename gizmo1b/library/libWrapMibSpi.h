@@ -33,6 +33,14 @@ public:
     void transfer(uint32 group);
     bool waitForTransferComplete(uint32 group, int msTimeout = 1000);
     friend void mibspiGroupNotification(mibspiBASE_t* mibspiReg, uint32 group);
+    friend class Lock;
+    class Lock {
+    public:
+        Lock(LibWrapMibSpi& libWrapMibSpi);
+        ~Lock();
+    private:
+        LibWrapMibSpi& m_libWrapMibSpi;
+    };
 protected:
     virtual SemaphoreHandle_t& getMibSpiMutex() = 0;
     virtual mibspiBASE_t* getMibSpiBase() = 0;

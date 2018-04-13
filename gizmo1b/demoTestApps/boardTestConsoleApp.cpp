@@ -10,6 +10,7 @@
 #include "libAdc.h"
 #include "libTec.h"
 #include "boardTestAdc.h"
+#include "boardTestMotor.h"
 #include "boardTestConsoleApp.h"
 
 BoardTestConsoleApp::BoardTestConsoleApp(const char* name) :
@@ -23,12 +24,14 @@ BoardTestConsoleApp::~BoardTestConsoleApp()
 
 void BoardTestConsoleApp::run()
 {
-    LibSci2 libSci(1024, 1024);
+    int rxQueueLength = 2048;
+    int txQueueLength = 2048;
+    LibSci2 libSci(rxQueueLength, txQueueLength);
     bool resetSci = true;
     std::vector<uint8> message;
-    message.reserve(32);
+    message.reserve(rxQueueLength);
     std::vector<uint8> response;
-    response.reserve(32);
+    response.reserve(txQueueLength);
     while (true) {
         if (resetSci) {
             libSci.close();
@@ -92,6 +95,14 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec set customcycles 0..4,294,967,296\n\r";
     help += "tec get customindex|customtime|customiref|customcycles\n\r";
     help += "thermistor get a|b|c|d\n\r";
+    help += "motor reset|initialize|limp|energize\n\r";
+    help += "motor get regaddress|regvalue|step|abspos|relpos|pos|status\n\r";
+    help += "motor set regaddress|regvalue 0x<hex>\n\r";
+    help += "motor set step full|half|1/4|1/8|1/16|1/32|1/64|1/128\n\r";
+    help += "motor regread|regwrite\n\r";
+    help += "motor set abspos -2097152..2097151\n\r";
+    help += "motor set relpos 0..4194303\n\r";
+    help += "motor moveabs|moverel forward|reverse\n\r";
 }
 
 void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
@@ -145,6 +156,9 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
             else if (tokens[COMPONENT] == "adc") {
                 isParsingError = parseAdcCommand(tokens, res, result);
             }
+            else if (tokens[COMPONENT] == "motor") {
+                isParsingError = parseMotorCommand(tokens, res, result);
+            }
         }
     }
     if (isParsingError) {
@@ -156,6 +170,13 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
         }
         res += status[result];
         res += "\n\r";
+    }
+    if (res.size() > response.capacity()) {
+        int size = res.size();
+        char error[256];
+        sprintf(error, "Error: resp message size: %d exceeds buffer capacity: %d\n\r",
+                                                     size, response.capacity());
+        res = error;
     }
     response.clear();
     for (int i = 0; i < res.size(); i++) {
@@ -699,6 +720,311 @@ bool BoardTestConsoleApp::parseAdcCommand(std::vector<std::string>& tokens,
                 }
                 isParsingError = false;
             }
+        }
+    }
+    return isParsingError;
+}
+
+bool BoardTestConsoleApp::parseMotorCommand(std::vector<std::string>& tokens,
+                                                  std::string& res, int& result)
+{
+    bool isParsingError = true;
+    std::vector<std::string> commStatus;
+    commStatus.push_back("OKAY");
+    commStatus.push_back("ERROR_INVALID_DIRECTION");
+    commStatus.push_back("ERROR_STEPS_COUNT");
+    commStatus.push_back("ERROR_INVALID_MICROSTEPS");
+    commStatus.push_back("ERROR_TIME_OUT");
+    commStatus.push_back("ERROR_INVALID_REG");
+    std::map<int, std::string> statusFlags;
+    statusFlags[LibMotor::HIZ]                           = "HIZ";
+    statusFlags[LibMotor::BUSY]                          = "BUSY";
+    statusFlags[LibMotor::SW_CLOSED]                     = "SW_CLOSED";
+    statusFlags[LibMotor::SW_OPEN]                       = "SW_OPEN";
+    statusFlags[LibMotor::DIR_FORWARD]                   = "DIR_FORWARD";
+    statusFlags[LibMotor::DIR_REVERSE]                   = "DIR_REVERSE";
+    statusFlags[LibMotor::STOPPED]                       = "STOPPED";
+    statusFlags[LibMotor::ACCELERATING]                  = "ACCELERATING";
+    statusFlags[LibMotor::DECELERATING]                  = "DECELERATING";
+    statusFlags[LibMotor::RUN_AT_CONST_SPEED]            = "RUN_AT_CONST_SPEED";
+    statusFlags[LibMotor::THERMAL_WARNING]               = "THERMAL_WARNING";
+    statusFlags[LibMotor::THERMAL_SHUTDOWN]              = "THERMAL_SHUTDOWN";
+    statusFlags[LibMotor::OVERCURRENT]                   = "OVERCURRENT";
+    statusFlags[LibMotor::BRIDGE_A_STALL]                = "BRIDGE_A_STALL";
+    statusFlags[LibMotor::BRIDGE_B_STALL]                = "BRIDGE_B_STALL";
+    if (tokens.size() > ACTION) {
+        if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
+            uint32 value;
+            if (tokens[ARGUMENT] == "regaddress") {
+                result = regRead(BoardTest::MOTOR_REGISTER_ADDRESS, value);
+                char t[16];
+                sprintf(t, "0x%08x", value);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "regvalue") {
+                result = regRead(BoardTest::MOTOR_REGISTER_VALUE, value);
+                char t[16];
+                sprintf(t, "0x%08x", value);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "step") {
+                result = regRead(BoardTest::MOTOR_CONTROL, value);
+                if (result == BoardTest::OKAY) {
+                    uint32 v;
+                    result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                    if (v != LibMotor::OKAY) {
+                        res = "motor comm status: " + commStatus[v];
+                    }
+                    else {
+                        std::map<int, std::string> step;
+                        step[BoardTestMotor::STEP_FULL]          = "full";
+                        step[BoardTestMotor::STEP_HALF]          = "half";
+                        step[BoardTestMotor::STEP_MICRO_1_4TH]   = "1/4";
+                        step[BoardTestMotor::STEP_MICRO_1_8TH]   = "1/8";
+                        step[BoardTestMotor::STEP_MICRO_1_16TH]  = "1/16";
+                        step[BoardTestMotor::STEP_MICRO_1_32TH]  = "1/32";
+                        step[BoardTestMotor::STEP_MICRO_1_64TH]  = "1/64";
+                        step[BoardTestMotor::STEP_MICRO_1_128TH] = "1/128";
+                        char t[16];
+                        sprintf(t, "%s", step[value].c_str());
+                        res = t;
+                    }
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "abspos") {
+                result = regRead(BoardTest::MOTOR_ABSOLUTE_POSITION, value);
+                char t[16];
+                sint32 v = *reinterpret_cast<sint32*>(&value);
+                sprintf(t, "%d", v);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "relpos") {
+                result = regRead(BoardTest::MOTOR_RELATIVE_POSITION, value);
+                char t[16];
+                sprintf(t, "%d", value);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "pos") {
+                result = regRead(BoardTest::MOTOR_CURRENT_POSITION, value);
+                if (result == BoardTest::OKAY) {
+                    uint32 v;
+                    result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                    if (v != LibMotor::OKAY) {
+                        res = "motor comm status: " + commStatus[v];
+                    }
+                    else {
+                        char t[16];
+                        sint32 position = *reinterpret_cast<sint32*>(&value);
+                        sprintf(t, "%d", position);
+                        res = t;
+                    }
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "status") {
+                result = regRead(BoardTest::MOTOR_STATUS, value);
+                if (result == BoardTest::OKAY) {
+                    uint32 v;
+                    result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                    if (v != LibMotor::OKAY) {
+                        res = "motor comm status: " + commStatus[v];
+                    }
+                    else {
+                        res.clear();
+                        for (std::map<int, std::string>::iterator it = statusFlags.begin();
+                                                it != statusFlags.end(); it++) {
+                            if (value & it->first) {
+                                res += it->second + "|";
+                            }
+                        }
+                    }
+                }
+                isParsingError = false;
+            }
+        }
+        else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "regaddress" && tokens.size() > VALUE) {
+                uint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "0x%x", &value) == 1) {
+                    result = regWrite(BoardTest::MOTOR_REGISTER_ADDRESS, value);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                        if (v != LibMotor::OKAY) {
+                            res = "motor comm status: " + commStatus[v];
+                        }
+                    }
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "regvalue" && tokens.size() > VALUE) {
+                uint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "0x%x", &value) == 1) {
+                    result = regWrite(BoardTest::MOTOR_REGISTER_VALUE, value);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                        if (v != LibMotor::OKAY) {
+                            res = "motor comm status: " + commStatus[v];
+                        }
+                    }
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "step" && tokens.size() > VALUE) {
+                std::map<std::string, int> step;
+                step["full"]  = BoardTestMotor::STEP_FULL;
+                step["half"]  = BoardTestMotor::STEP_HALF;
+                step["1/4"]   = BoardTestMotor::STEP_MICRO_1_4TH;
+                step["1/8"]   = BoardTestMotor::STEP_MICRO_1_8TH;
+                step["1/16"]  = BoardTestMotor::STEP_MICRO_1_16TH;
+                step["1/32"]  = BoardTestMotor::STEP_MICRO_1_32TH;
+                step["1/64"]  = BoardTestMotor::STEP_MICRO_1_64TH;
+                step["1/128"] = BoardTestMotor::STEP_MICRO_1_128TH;
+                if (step.find(tokens[VALUE]) != step.end()) {
+                    uint32 value = step[tokens[VALUE]];
+                    result = regWrite(BoardTest::MOTOR_CONTROL, value);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                        if (v != LibMotor::OKAY) {
+                            res = "motor comm status: " + commStatus[v];
+                        }
+                    }
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "abspos" && tokens.size() > VALUE) {
+                sint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &value) == 1) {
+                    uint32 v = *reinterpret_cast<uint32*>(&value);
+                    result = regWrite(BoardTest::MOTOR_ABSOLUTE_POSITION, v);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "relpos" && tokens.size() > VALUE) {
+                uint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &value) == 1) {
+                    result = regWrite(BoardTest::MOTOR_RELATIVE_POSITION, value);
+                    isParsingError = false;
+                }
+            }
+        }
+        else if (tokens[ACTION] == "moveabs" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "forward") {
+                result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::DIRECTION_FORWARD
+                                                          | BoardTestMotor::MOVE_ABSOLUTE);
+                if (result == BoardTest::OKAY) {
+                    uint32 v;
+                    result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                    if (v != LibMotor::OKAY) {
+                        res = "motor comm status: " + commStatus[v];
+                    }
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "reverse") {
+                result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::DIRECTION_REVERSE
+                                                          | BoardTestMotor::MOVE_ABSOLUTE);
+                if (result == BoardTest::OKAY) {
+                    uint32 v;
+                    result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                    if (v != LibMotor::OKAY) {
+                        res = "motor comm status: " + commStatus[v];
+                    }
+                }
+                isParsingError = false;
+            }
+        }
+        else if (tokens[ACTION] == "moverel" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "forward") {
+                result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::DIRECTION_FORWARD
+                                                          | BoardTestMotor::MOVE_RELATIVE);
+                if (result == BoardTest::OKAY) {
+                    uint32 v;
+                    result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                    if (v != LibMotor::OKAY) {
+                        res = "motor comm status: " + commStatus[v];
+                    }
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "reverse") {
+                result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::DIRECTION_REVERSE
+                                                          | BoardTestMotor::MOVE_RELATIVE);
+                if (result == BoardTest::OKAY) {
+                    uint32 v;
+                    result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                    if (v != LibMotor::OKAY) {
+                        res = "motor comm status: " + commStatus[v];
+                    }
+                }
+                isParsingError = false;
+            }
+        }
+        else if (tokens[ACTION] == "reset") {
+            result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::RESET);
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "initialize") {
+            result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::INITIALIZE);
+            if (result == BoardTest::OKAY) {
+                uint32 v;
+                result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                if (v != LibMotor::OKAY) {
+                    res = "motor comm status: " + commStatus[v];
+                }
+            }
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "limp") {
+            result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::LIMP);
+            if (result == BoardTest::OKAY) {
+                uint32 v;
+                result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                if (v != LibMotor::OKAY) {
+                    res = "motor comm status: " + commStatus[v];
+                }
+            }
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "energize") {
+            result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::ENERGIZE);
+            if (result == BoardTest::OKAY) {
+                uint32 v;
+                result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                if (v != LibMotor::OKAY) {
+                    res = "motor comm status: " + commStatus[v];
+                }
+            }
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "regread") {
+            result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::REGISTER_READ);
+            if (result == BoardTest::OKAY) {
+                uint32 v;
+                result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                if (v != LibMotor::OKAY) {
+                    res = "motor comm status: " + commStatus[v];
+                }
+            }
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "regwrite") {
+            result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::REGISTER_WRITE);
+            if (result == BoardTest::OKAY) {
+                uint32 v;
+                result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                if (v != LibMotor::OKAY) {
+                    res = "motor comm status: " + commStatus[v];
+                }
+            }
+            isParsingError = false;
         }
     }
     return isParsingError;
