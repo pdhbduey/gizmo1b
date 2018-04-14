@@ -86,6 +86,7 @@
     <Compile Include="Model\MotorModel.cs" />
     <Compile Include="Model\TecModel.cs" />
     <Compile Include="Model\ThermistorModel.cs" />
+    <Compile Include="MotorDefaults.cs" />
     <Compile Include="TecDefaults.cs" />
     <Compile Include="ThermistorDefaults.cs" />
     <Compile Include="ViewModel\AdcViewModel.cs" />

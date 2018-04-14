@@ -5,17 +5,79 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DeviceManager.View"
              mc:Ignorable="d" 
-             d:DesignHeight="300" 
-             d:DesignWidth="300"
-             Background="#E4FDE1">
+             Background="WhiteSmoke">
     <!-- Layouts Display for Motor tests -->
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Status menu for motor -->
-        <Label Content="Motor View"></Label>
+        <!-- Initialize and Setup Commands -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Motor Setup -->
+            <StackPanel Grid.Column="0">
+                <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding StepSizes}" SelectedItem="{Binding SelectedStepSize}"></ComboBox>
+                <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding Directions}" SelectedItem="{Binding SelectedDirection}"></ComboBox>
+                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Set" Command="{Binding SetConfigurationCommand}"></Button>
+            </StackPanel>
+
+            <!-- Register Setup -->
+            <StackPanel Grid.Column="1">
+                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Reset" Command="{Binding ResetCommand}"></Button>
+                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Limp" Command="{Binding LimpCommand}"></Button>
+                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Initialize" Command="{Binding InitializeCommand}"></Button>
+                <Button Height="25" Width="100" HorizontalAlignment="Left" Margin="2" Content="Home" Command="{Binding HomeCommand}"></Button>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Move Commands -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.Column="0">
+                <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding RegisterAddresses}" SelectedItem="{Binding SelectedRegisterAddress}"></ComboBox>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="100" Content="Register Value:"></Label>
+                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding RegisterWriteValue}"></TextBox>
+                </StackPanel>
+                <Label Width="100" HorizontalAlignment="Right" Content="{Binding RegisterReadValue}"></Label>
+                <Button Height="25" Width="100" HorizontalAlignment="Right" Margin="2" Content="Set" Command="{Binding SetRegisterValueCommand}"></Button>
+            </StackPanel>
+
+            <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="105" Content="Absolute Position:"></Label>
+                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=AbsoluteDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Move" Command="{Binding MoveAbsoluteCommand}"></Button>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Label Width="105" Content="Relative Position:"></Label>
+                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=RelativeDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Move" Command="{Binding MoveRelativeCommand}"></Button>
+                </StackPanel>
+                <Label Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Position"></Label>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Status -->
+        <Grid Grid.Row="2">
+            
+        </Grid>
+        
     </Grid>
 </UserControl>

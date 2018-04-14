@@ -23,7 +23,7 @@
                 "LED/Switch",
                 "ADC",
                 "DAC",
-                //"Motor",
+                "Motor",
                 //"Fan",
                 "Thermistor",
                 "TEC"
@@ -131,7 +131,7 @@
                     Content = DeviceManager.Factory.Instance.GetAdcView();
                     break;
                 case "Motor":
-                    //Content = DeviceManager.Factory.Instance.GetMotorView();
+                    Content = DeviceManager.Factory.Instance.GetMotorView();
                     break;
                 case "Fan":
                     //Content = DeviceManager.Factory.Instance.GetFanView();
