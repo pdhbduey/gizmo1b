@@ -14,6 +14,10 @@ public:
         DIN_3_STATE = (uint32)((uint32)1U << 3U),
         DIN_4_STATE = (uint32)((uint32)1U << 4U),
         DIN_5_STATE = (uint32)((uint32)1U << 5U),
+        DIN_6_STATE = (uint32)((uint32)1U << 6U),
+        DIN_7_STATE = (uint32)((uint32)1U << 7U),
+        DIN_8_STATE = (uint32)((uint32)1U << 8U),
+        DIN_9_STATE = (uint32)((uint32)1U << 9U),
     };
     enum OutBits {
         DOUT_0_ON  = (uint32)((uint32)1U <<  0U),

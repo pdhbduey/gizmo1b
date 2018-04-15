@@ -7,11 +7,11 @@
 class LibFault
 {
 public:
-    enum State {
+    enum Fault {
         TEC_OCD_POS,
         TEC_OCD_NEG,
-        OVERTEMP1, // only valid if NTC1 present
-        OVERTEMP2, // only valid if NTC2 present
+        OVERTEMP1, // valid if NTC1 present
+        OVERTEMP2, // valid if NTC2 present
     };
     enum Ntc {
         NTC1,
@@ -22,17 +22,18 @@ public:
     };
     enum Status {
         OKAY,
-        INVALID_STATE,
-        INVALID_NTC,
+        ERROR_INVALID_FAULT,
+        ERROR_INVALID_NTC,
+        ERROR_NOT_IMPLEMENTED,
     };
 public:
     LibFault();
     virtual ~LibFault();
     void reset();
-    int readState(int state, bool& isFault); // monitor every 1s
-    int readNtcPresent(int ntc, bool& isNtcPresent);
+    int getFault(int fault, bool& isFault);
+    int getNtcPresent(int ntc, bool& isNtcPresent);
 private:
-    std::map<int, LibWrapGioPort::Port*> m_stateMap;
+    std::map<int, LibWrapGioPort::Port*> m_faultMap;
     std::map<int, LibWrapGioPort::Port*> m_ntcMap;
     LibWrapGioPort::Port m_drvErrClr;
 };

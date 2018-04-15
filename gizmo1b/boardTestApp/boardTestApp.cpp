@@ -13,14 +13,14 @@
 BoardTestApp::BoardTestApp(const char* name) :
     LibTask(name)
 {
-    BoardTest* boardTestAdc = new BoardTestAdc;
+    BoardTest* boardTestAdc                = new BoardTestAdc;
     m_boardTestMap[BoardTest::ADC_CONTROL] = boardTestAdc;
     m_boardTestMap[BoardTest::ADC_STATUS]  = boardTestAdc;
     m_boardTestMap[BoardTest::ADC_RESULT]  = boardTestAdc;
-    BoardTest* boardTestDac = new BoardTestDac;
+    BoardTest* boardTestDac               = new BoardTestDac;
     m_boardTestMap[BoardTest::DAC_VALUE]  = boardTestDac;
     m_boardTestMap[BoardTest::DAC_STATUS] = boardTestDac;
-    BoardTest* boardTestFan = new BoardTestFan;
+    BoardTest* boardTestFan                          = new BoardTestFan;
     m_boardTestMap[BoardTest::FAN_PWM1_DUTY_CYCLE]   = boardTestFan;
     m_boardTestMap[BoardTest::FAN_PWM1_PERIOD_IN_US] = boardTestFan;
     m_boardTestMap[BoardTest::FAN_PWM2_DUTY_CYCLE]   = boardTestFan;
@@ -28,13 +28,14 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::FAN_STATUS]            = boardTestFan;
     m_boardTestMap[BoardTest::FAN_SENSOR1_RPM]       = boardTestFan;
     m_boardTestMap[BoardTest::FAN_SENSOR2_RPM]       = boardTestFan;
-    BoardTest* boardTestFault = new BoardTestFault;
-    m_boardTestMap[BoardTest::FAULT_RESET] = boardTestFault;
-    m_boardTestMap[BoardTest::FAULT_STATE] = boardTestFault;
-    BoardTest* boardTestDio = new BoardTestDio;
+    BoardTest* boardTestFault                    = new BoardTestFault;
+    m_boardTestMap[BoardTest::FAULT_RESET]       = boardTestFault;
+    m_boardTestMap[BoardTest::FAULT_STATE]       = boardTestFault;
+    m_boardTestMap[BoardTest::FAULT_NTC_PRESENT] = boardTestFault;
+    BoardTest* boardTestDio            = new BoardTestDio;
     m_boardTestMap[BoardTest::DIO_IN]  = boardTestDio;
     m_boardTestMap[BoardTest::DIO_OUT] = boardTestDio;
-    BoardTest* boardTestMotor = new BoardTestMotor;
+    BoardTest* boardTestMotor                             = new BoardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_CONTROL]              = boardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_COMMUNICATION_STATUS] = boardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_RELATIVE_POSITION]    = boardTestMotor;
@@ -46,7 +47,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::MOTOR_STATUS]               = boardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_REGISTER_ADDRESS]     = boardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_REGISTER_VALUE]       = boardTestMotor;
-    BoardTest* boardTestTec = new BoardTestTec;
+    BoardTest* boardTestTec                              = new BoardTestTec;
     m_boardTestMap[BoardTest::TEC_CONTROL]               = boardTestTec;
     m_boardTestMap[BoardTest::TEC_IREF_VALUE]            = boardTestTec;
     m_boardTestMap[BoardTest::TEC_ISENSE_VALUE]          = boardTestTec;
@@ -61,7 +62,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_TIME]  = boardTestTec;
     m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_IREF]  = boardTestTec;
     m_boardTestMap[BoardTest::TEC_WAVEFORM_CYCLES]       = boardTestTec;
-    BoardTest* boardTestThermistor = new BoardTestThermistor;
+    BoardTest* boardTestThermistor                     = new BoardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_STATUS]       = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A] = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_B] = boardTestThermistor;
