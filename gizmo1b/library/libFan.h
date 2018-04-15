@@ -20,6 +20,8 @@ public:
     float getSensor1Rpm();
     float getSensor2Rpm();
 private:
+    float getRpmFromPerid(float periodInUs);
+private:
     LibWrapHet1 m_libWrapHet1;
 };
 
