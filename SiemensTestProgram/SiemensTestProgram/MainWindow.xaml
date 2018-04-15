@@ -35,6 +35,9 @@
         <DataTemplate x:Name="MotorViewName" DataType="{x:Type viewmodels:MotorViewModel}">
             <views:MotorView DataContext="{Binding}"></views:MotorView>
         </DataTemplate>
+        <DataTemplate x:Name="FanViewName" DataType="{x:Type viewmodels:FanViewModel}">
+            <views:FanView DataContext="{Binding}"></views:FanView>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
