@@ -14,13 +14,13 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        //public Task<byte[]> SetIRef(byte[] data)
-        //{
-        //    var requestArray = TecDefaults.GetSetIrefCommand(data);
-        //    communication.WriteData(requestArray);
-        //    var response = communication.ReadData();
-        //    return response;
-        //}
+        public Task<byte[]> SetIrefCommand(float value)
+        {
+            var requestArray = TecDefaults.SetIrefCommand(value);
+            communication.WriteData(requestArray);
+            var response = communication.ReadData();
+            return response;
+        }
 
         public Task<byte[]> Reset()
         {
@@ -72,6 +72,20 @@ namespace DeviceManager.Model
         public Task<byte[]> SetWaveformCommand(string waveform)
         {
             var requestArray = TecDefaults.GetWaveformTypeCommand(waveform);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
+        }
+
+        public Task<byte[]> SetSampleTimeCommand(int sampleTime)
+        {
+            var requestArray = TecDefaults.GetSampleTimeCommand(sampleTime);
+            communication.WriteData(requestArray);
+            return communication.ReadData();
+        }
+
+        public Task<byte[]> SetWaveformCyclesCommand(int cycles)
+        {
+            var requestArray = TecDefaults.GetWaveNumberOfCyclesCommand(cycles);
             communication.WriteData(requestArray);
             return communication.ReadData();
         }

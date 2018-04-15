@@ -9,16 +9,6 @@
     <Grid>
         <StackPanel Margin="10">
             <StackPanel Orientation="Horizontal">
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Continuous:"></Label>
-                    <RadioButton VerticalAlignment="Center" IsChecked="{Binding ContinuousMode}"></RadioButton>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Step:"></Label>
-                    <RadioButton VerticalAlignment="Center" IsChecked="{Binding StepMode}"></RadioButton>
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
                 <Slider
                     Width="250" 
                     Orientation="Horizontal" 
@@ -27,9 +17,14 @@
                     Maximum="500" 
                     Value="{Binding SliderVoltageValue}">
                 </Slider>
-                <TextBox Text="{Binding Path=VoltageValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2}" HorizontalAlignment="Left" MaxLength="5" Width="40"></TextBox>
-                <Button Content="Set" Command="{Binding SendDacValueCommand}"></Button>
+                <TextBox Text="{Binding Path=VoltageValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2, Delay=500}" HorizontalAlignment="Left" MaxLength="5" Width="40"></TextBox>
+                <Button Content="Set" Margin="1" Height="25" Width="100" Command="{Binding SendDacValueCommand}"></Button>
             </StackPanel>
+        </StackPanel>
+
+        <!-- Status message -->
+        <StackPanel Grid.Row="1"  HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding DacStatus}"></Label>
         </StackPanel>
     </Grid>
 </UserControl>

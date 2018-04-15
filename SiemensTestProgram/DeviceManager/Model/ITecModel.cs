@@ -18,6 +18,10 @@ namespace DeviceManager.Model
 
         Task<byte[]> SetWaveformCommand(string waveform);
 
+        Task<byte[]> SetWaveformCyclesCommand(int cycles);
+
+        Task<byte[]> SetSampleTimeCommand(int sampleTime);
+
         Task<byte[]> SetPeriodCommand(int period);
 
         Task<byte[]> SetDerivativeGainCommand(int derivateGain);
@@ -26,7 +30,7 @@ namespace DeviceManager.Model
 
         Task<byte[]> SetProportionalGainCommand(float proportionalGain);
 
-        //Task<byte[]> SetIrefGainCommand(int irefGain);
+        Task<byte[]> SetIrefCommand(float irefGain);
 
         Task<byte[]> Reset();
     }

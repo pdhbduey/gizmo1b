@@ -49,18 +49,6 @@ namespace DeviceManager
         }
 
         /// <summary>
-        /// Sets the data context for device manager view.
-        /// </summary>
-        /// <returns> Device Manager View </returns>
-        public DeviceManagerView GetDeviceManagerView()
-        {
-            return new DeviceManagerView()
-            {
-                DataContext = new DeviceManagerViewModel(GetDeviceManager())
-            };
-        }
-
-        /// <summary>
         ///  Sets the data context for DAC view.
         /// </summary>
         /// <returns> DAC view </returns>
@@ -144,25 +132,28 @@ namespace DeviceManager
             return adcView;
         }
 
+        /// <summary>
+        ///  Sets the data context for com configuration view.
+        /// </summary>
+        /// <returns> Communication configuration view. </returns>
         public CommunicationConfigurationView GetCommunicationConfigurationView()
         {
             return new CommunicationConfigurationView()
             {
                 DataContext = new CommunicationConfigurationViewModel(GetCommunicationConfigurationModel(serialCommunication))
             };
-        } 
+        }
 
+        /// <summary>
+        ///  Sets the data context for motor view.
+        /// </summary>
+        /// <returns> Motor view. </returns>
         public MotorView GetMotorView()
         {
             return new MotorView()
             {
                 DataContext = new MotorViewModel(GetMotorModel(serialCommunication))
             };
-        }
-
-        private DeviceManager GetDeviceManager()
-        {
-            return new DeviceManager();
         }
 
         private LedModel GetLedModel(IComCommunication communication)

@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
-using System.Linq;
 using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
@@ -94,7 +93,7 @@ namespace DeviceManager.DeviceCommunication
                         requestSemaphore.Release(1);
                     }
                 }
-                catch (Exception e)
+                catch 
                 {
                    return new byte[0];
                 }

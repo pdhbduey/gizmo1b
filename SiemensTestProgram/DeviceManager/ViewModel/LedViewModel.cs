@@ -6,7 +6,7 @@ namespace DeviceManager.ViewModel
     using DeviceManager.Model;
 
     /// <summary>
-    /// This class is responsible for updating LED and switch data
+    /// This class is responsible for updating LED.
     /// </summary>
     public class LedViewModel : BindableBase
     {
@@ -118,20 +118,20 @@ namespace DeviceManager.ViewModel
                 return;
             }
 
-            LedStatus = GetErrorMessage(status[4]);
+            LedStatus = $"Status: {GetErrorMessage(status[4])}";
         }
 
         /// <summary>
         /// Gets the error message for given LED response.
         /// </summary>
         /// <param name="value"> LED register response. </param>
-        /// <returns> Status for LED </returns>
+        /// <returns> Status for LED. </returns>
         private string GetErrorMessage(byte value)
         {
             string response;
             LedDefaults.LedStatus.TryGetValue(value, out response);
 
-            return response == null ? "Unknown" : response;
+            return response == null ? "Unknown Response" : response;
         }
     }
 }

@@ -24,9 +24,12 @@ namespace DeviceManager.ViewModel
         private int saveProgressValue;
         private int numberOfSamples;
         private float irefCurrentValue;
-        //private int sliderIrefValue;
+        private int sliderIrefValue;
         private int irefGain;
         private int tecPeriod;
+        private int counter;
+        private int waveformCycles;
+        private int sampleTime;
 
         private float vSense;
         private float iSense;
@@ -48,8 +51,11 @@ namespace DeviceManager.ViewModel
             this.tecModel = tecModel;
 
             // Initial values
+            counter = 0;
             progressMaximum = 100;
             tecPeriod = TecDefaults.PeriodMinimum;
+            waveformCycles = TecDefaults.WaveformCyclesMinimum;
+            sampleTime = TecDefaults.SampleTimeMinimum;
             //irefGain = TecDefaults.IrefGainMinimum;
             Waveforms = TecDefaults.Waveforms;
             selectedWaveForm = Waveforms[0];
@@ -60,6 +66,8 @@ namespace DeviceManager.ViewModel
             enableButtonState = TecDefaults.EnableText;
             closedLoopButtonState = TecDefaults.EnableClosedLoopText;
             numberOfSamples = 0;
+
+            InitialUpdate();
             //SliderIrefValue = 0;
 
             // Set commands
@@ -69,6 +77,9 @@ namespace DeviceManager.ViewModel
             StartStopWaveformCommand = new RelayCommand(param => WaveformToggle());
             ClosedLoopToggleCommand = new RelayCommand(param => ClosedLoopToggle());
             ResetTecCommand = new RelayCommand(param => ResetTec());
+            ResetCustomWaveformCommand = new RelayCommand(param => Reset());
+            UpdateIrefCommand = new RelayCommand(param => UpdateIrefForWaveform());
+            IncrementCommand = new RelayCommand(param => IncrementCounter());
 
             StartUpdateTask();
         }
@@ -79,11 +90,17 @@ namespace DeviceManager.ViewModel
 
         public RelayCommand ResetTecCommand { get; set; }
 
+        public RelayCommand ResetCustomWaveformCommand { get; set; }
+
         public RelayCommand CaptureStartStopCommand { get; set; }
 
         public RelayCommand StartStopWaveformCommand { get; set; }
 
         public RelayCommand ClosedLoopToggleCommand { get; set; }
+
+        public RelayCommand UpdateIrefCommand { get; set; }
+
+        public RelayCommand IncrementCommand { get; set; }
 
         public List<string> Waveforms { get; set; }
 
@@ -98,6 +115,20 @@ namespace DeviceManager.ViewModel
             {
                 enableButtonState = value;
                 OnPropertyChanged(nameof(EnableButtonState));
+            }
+        }
+
+        public int Counter
+        {
+            get
+            {
+                return counter;
+            }
+
+            set
+            {
+                counter = value;
+                OnPropertyChanged(nameof(Counter));
             }
         }
 
@@ -227,6 +258,60 @@ namespace DeviceManager.ViewModel
 
                 OnPropertyChanged(nameof(DerivativeGain));
                 UpdateDerivativeGain();
+            }
+        }
+
+        public int WaveformCycles
+        {
+            get
+            {
+                return waveformCycles;
+            }
+
+            set
+            {
+                if (value < TecDefaults.WaveformCyclesMinimum)
+                {
+                    waveformCycles = TecDefaults.WaveformCyclesMinimum;
+                }
+                else if (value > TecDefaults.WaveformCyclesMaximum)
+                {
+                    waveformCycles = TecDefaults.WaveformCyclesMaximum;
+                }
+                else
+                {
+                    waveformCycles = value;
+                }
+                OnPropertyChanged(nameof(WaveformCycles));
+
+                SetWaveformCycles();
+            }
+        }
+
+        public int SampleTime
+        {
+            get
+            {
+                return sampleTime;
+            }
+
+            set
+            {
+                if (value < TecDefaults.SampleTimeMinimum)
+                {
+                    sampleTime = TecDefaults.SampleTimeMinimum;
+                }
+                else if (value > TecDefaults.SampleTimeMaximum)
+                {
+                    sampleTime = TecDefaults.SampleTimeMaximum;
+                }
+                else
+                {
+                    sampleTime = value;
+                }
+                OnPropertyChanged(nameof(SampleTime));
+
+                SetSampleTime();
             }
         }
 
@@ -373,25 +458,27 @@ namespace DeviceManager.ViewModel
 
             set
             {
-                irefCurrentValue = value;
+                irefCurrentValue = value; 
                 OnPropertyChanged(nameof(IrefCurrentValue));
-                OnPropertyChanged(nameof(IrefCurrentValueText));
+
+                sliderIrefValue = (int)irefCurrentValue * 100;
+                OnPropertyChanged(nameof(SliderIrefValue));
             }
         }
 
-        public string IrefCurrentValueText
-        {
-            get
-            {
-                return $"{IrefCurrentValue} A";
-            }
-        }
+        //public string IrefCurrentValueText
+        //{
+        //    get
+        //    {
+        //        return $"{IrefCurrentValue.ToString("0.##")} A";
+        //    }
+        //}
 
         public string IRefText
         {
             get
             {
-                return $"IRef: {iRef} A";
+                return $"IRef: {iRef.ToString("0.##")} A";
             }
         }
 
@@ -414,7 +501,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"VSense: {vSense} V";
+                return $"VSense: {vSense.ToString("0.##")} V";
             }
         }
 
@@ -437,7 +524,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"ISense: {iSense} A";
+                return $"ISense: {iSense.ToString("0.##")} A";
             }
         }
 
@@ -470,19 +557,22 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        //public int SliderIrefValue
-        //{
-        //    get
-        //    {
-        //        return sliderIrefValue;
-        //    }
-        //    set
-        //    {
-        //        sliderIrefValue = value;
-        //        IrefCurrentValue = (float)sliderIrefValue / 100;
-        //        OnPropertyChanged(nameof(SliderIrefValue));
-        //    }
-        //}
+        public int SliderIrefValue
+        {
+            get
+            {
+                return sliderIrefValue;
+            }
+            set
+            {
+                sliderIrefValue = value;
+                IrefCurrentValue = (float)sliderIrefValue / 100;
+                OnPropertyChanged(nameof(SliderIrefValue));
+
+                // Send Iref command
+                UpdateIrefForWaveform();
+            }
+        }
 
         private void SaveData()
         {
@@ -525,11 +615,11 @@ namespace DeviceManager.ViewModel
         {
             var status = await tecModel.SetDerivativeGainCommand(derivativeGain);
         }
-        
-        //private async void UpdateIrefGain()
-        //{
-        //    var status = await tecModel.SetIrefGainCommand(irefGain);
-        //}
+
+        private async void UpdateIrefForWaveform()
+        {
+            var status = await tecModel.SetIrefCommand(irefCurrentValue);
+        }
 
         private async void UpdateWaveform()
         {
@@ -595,6 +685,30 @@ namespace DeviceManager.ViewModel
             StatusMessage = GetErrorMessage(status[4]);
         }
 
+        private async void SetWaveformCycles()
+        {
+            await tecModel.SetWaveformCyclesCommand(waveformCycles);
+        }
+
+        private async void SetSampleTime()
+        {
+            await tecModel.SetSampleTimeCommand(sampleTime);
+        }
+
+        private async void IncrementCounter()
+        {
+            Counter += 1;
+            await tecModel.ControlCommand(TecDefaults.IncrementTecWaveform);
+        }
+
+        private async void Reset()
+        {
+            Counter = 0;
+
+            // Reset
+            await tecModel.ControlCommand(TecDefaults.ResetTecWaveform);
+        }
+
         private void StartUpdateTask()
         {
             cts = new CancellationTokenSource();
@@ -619,20 +733,7 @@ namespace DeviceManager.ViewModel
 
                 try
                 {
-                    var iRefData = await tecModel.ReadIref();
-                    IRef = Helper.GetFloatFromBigEndian(iRefData);
-                    Thread.Sleep(updateDelay);
-
-                    var iSenseData = await tecModel.ReadIsense();
-                    ISense = Helper.GetFloatFromBigEndian(iSenseData);
-                    Thread.Sleep(updateDelay);
-
-                    var vSenseData = await tecModel.ReadVsense();
-                    VSense = Helper.GetFloatFromBigEndian(vSenseData);
-                    Thread.Sleep(updateDelay);
-
-                    var status = await tecModel.ReadStatus();
-                    ProcessStatus(status);
+                    Update();
                     Thread.Sleep(updateDelay);
                 }
                 catch (Exception e)
@@ -640,6 +741,36 @@ namespace DeviceManager.ViewModel
                     StatusMessage = e.Message;
                 }
             }
+        }
+
+        private async void Update()
+        {
+            var iRefData = await tecModel.ReadIref();
+            IRef = Helper.GetFloatFromBigEndian(iRefData);
+
+            var iSenseData = await tecModel.ReadIsense();
+            ISense = Helper.GetFloatFromBigEndian(iSenseData);
+
+            var vSenseData = await tecModel.ReadVsense();
+            VSense = Helper.GetFloatFromBigEndian(vSenseData);
+
+            var status = await tecModel.ReadStatus();
+            ProcessStatus(status);
+        }
+
+        private void InitialUpdate()
+        {
+            var iRefData = tecModel.ReadIref().Result;
+            IRef = Helper.GetFloatFromBigEndian(iRefData);
+
+            var iSenseData = tecModel.ReadIsense().Result;
+            ISense = Helper.GetFloatFromBigEndian(iSenseData);
+
+            var vSenseData = tecModel.ReadVsense().Result;
+            VSense = Helper.GetFloatFromBigEndian(vSenseData);
+
+            var status = tecModel.ReadStatus().Result;
+            ProcessStatus(status);
         }
 
         private string FormatSaveProgress()

@@ -9,7 +9,7 @@ namespace DeviceManager
     /// </summary>
     public static class DataHelper
     {
-        // Commands
+        // Register read/write 
         public const byte REGISTER_READ = 0x01;
         public const byte REGISTER_WRITE = 0x02;
 

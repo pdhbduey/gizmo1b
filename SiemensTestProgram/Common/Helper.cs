@@ -71,5 +71,21 @@ namespace Common
                 Array.Reverse(bytes);
             return bytes;
         }
+
+        public static byte[] ConvertStringToByteArray(String hex)
+        {
+            
+
+            if (hex.Length % 2 != 0)
+            {
+                hex = "0" + hex;
+            }
+
+            var numberCharacters = hex.Length;
+            byte[] bytes = new byte[numberCharacters / 2];
+            for (int i = 0; i < numberCharacters; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
+        }
     }
 }

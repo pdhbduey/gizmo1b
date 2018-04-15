@@ -2,8 +2,9 @@
 
 namespace DeviceManager.DeviceCommunication
 {
-    internal static class ComPortDefaults
-    {
+     public static class ComPortDefaults
+     {
+        // Baud Rate defaults
         public static List<int> BaudRates = new List<int>()
         {
             19200,
@@ -11,6 +12,7 @@ namespace DeviceManager.DeviceCommunication
             128000
         };
 
+        // Parities
         public static List<System.IO.Ports.Parity> Parities = new List<System.IO.Ports.Parity>()
         {
             System.IO.Ports.Parity.Even,
@@ -20,6 +22,7 @@ namespace DeviceManager.DeviceCommunication
             System.IO.Ports.Parity.Mark,
         };
 
+        // Stop bits
         public static List<System.IO.Ports.StopBits> StopBits = new List<System.IO.Ports.StopBits>()
         {
             System.IO.Ports.StopBits.None,

@@ -66,7 +66,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AdcDefaults.cs" />
-    <Compile Include="ComCommands.cs" />
+    <Compile Include="DacDefaults.cs" />
     <Compile Include="DataHelper.cs" />
     <Compile Include="DeviceCommunication\ComCommunication.cs" />
     <Compile Include="DeviceCommunication\ComPortDefaults.cs" />
@@ -75,11 +75,9 @@
     <Compile Include="Model\AdcModel.cs" />
     <Compile Include="Model\CommunicationConfigurationModel.cs" />
     <Compile Include="Model\DacModel.cs" />
-    <Compile Include="Model\DeviceManager.cs" />
     <Compile Include="Model\IAdcModel.cs" />
     <Compile Include="Model\ICommunicationConfigurationModel.cs" />
     <Compile Include="Model\IDacModel.cs" />
-    <Compile Include="Model\IDeviceManager.cs" />
     <Compile Include="Model\ILedModel.cs" />
     <Compile Include="Model\IMotorModel.cs" />
     <Compile Include="Model\ITecModel.cs" />
@@ -88,12 +86,12 @@
     <Compile Include="Model\MotorModel.cs" />
     <Compile Include="Model\TecModel.cs" />
     <Compile Include="Model\ThermistorModel.cs" />
+    <Compile Include="MotorDefaults.cs" />
     <Compile Include="TecDefaults.cs" />
     <Compile Include="ThermistorDefaults.cs" />
     <Compile Include="ViewModel\AdcViewModel.cs" />
     <Compile Include="ViewModel\CommunicationConfigurationViewModel.cs" />
     <Compile Include="ViewModel\DacViewModel.cs" />
-    <Compile Include="ViewModel\DeviceManagerViewModel.cs" />
     <Compile Include="ViewModel\MotorViewModel.cs" />
     <Compile Include="ViewModel\LedViewModel.cs" />
     <Compile Include="ViewModel\TecViewModel.cs" />
@@ -106,9 +104,6 @@
     </Compile>
     <Compile Include="View\DacView.xaml.cs">
       <DependentUpon>DacView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\DeviceManagerView.xaml.cs">
-      <DependentUpon>DeviceManagerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\LedView.xaml.cs">
       <DependentUpon>LedView.xaml</DependentUpon>
@@ -144,10 +139,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\DacView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\DeviceManagerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
