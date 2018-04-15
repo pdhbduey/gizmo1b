@@ -3,14 +3,13 @@
 #include <stdio.h>
 #include <map>
 #include "libSci2.h"
+#include "boardTestDac.h"
 #include "boardTestTec.h"
 #include "boardTestFault.h"
 #include "boardTestLed.h"
-#include "libDac.h"
-#include "libAdc.h"
-#include "libTec.h"
 #include "boardTestAdc.h"
 #include "boardTestMotor.h"
+#include "boardTestFan.h"
 #include "boardTestConsoleApp.h"
 
 BoardTestConsoleApp::BoardTestConsoleApp(const char* name) :
@@ -68,7 +67,7 @@ void BoardTestConsoleApp::help(std::string& help)
 {
     help  = "ERROR: Unrecognized command\n\r";
     help += "USAGE:\n\r";
-    help += "dac set [0V,5V]\n\r";
+    help += "dac set [0,5](V)\n\r";
     help += "dac get\n\r";
     help += "adc get 0..5\n\r";
     help += "led set green|red on|off\n\r";
@@ -77,9 +76,9 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec enable|disable\n\r";
     help += "tec get enable\n\r";
     help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform|closedloop\n\r";
-    help += "tec set iref [-15A,15A]\n\r";
+    help += "tec set iref [-15,15](A)\n\r";
     help += "tec set waveformtype sin|tr|sq|const|custom\n\r";
-    help += "tec set waveformperiod 2..10,000ms\n\r";
+    help += "tec set waveformperiod 2..10,000(ms)\n\r";
     help += "tec set waveform start|stop\n\r";
     help += "tec set closedloop enable|disable\n\r";
     help += "tec set propgain [0.01,100]\n\r";
@@ -91,7 +90,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec set customindex reset\n\r";
     help += "tec set customindex inc\n\r";
     help += "tec set customtime 0..9,999ms\n\r";
-    help += "tec set customiref [-15A,15A]\n\r";
+    help += "tec set customiref [-15,15](A)\n\r";
     help += "tec set customcycles 0..4,294,967,296\n\r";
     help += "tec get customindex|customtime|customiref|customcycles\n\r";
     help += "thermistor get a|b|c|d\n\r";
@@ -103,6 +102,9 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "motor set abspos -2097152..2097151\n\r";
     help += "motor set relpos 0..4194303\n\r";
     help += "motor moveabs|moverel forward|reverse\n\r";
+    help += "fan set duty1|duty2 0..100\n\r";
+    help += "fan set per1|per2 [10.0,1000000.0](us)\n\r";
+    help += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
 }
 
 void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
@@ -158,6 +160,9 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
             }
             else if (tokens[COMPONENT] == "motor") {
                 isParsingError = parseMotorCommand(tokens, res, result);
+            }
+            else if (tokens[COMPONENT] == "fan") {
+                isParsingError = parseFanCommand(tokens, res, result);
             }
         }
     }
@@ -1025,6 +1030,133 @@ bool BoardTestConsoleApp::parseMotorCommand(std::vector<std::string>& tokens,
                 }
             }
             isParsingError = false;
+        }
+    }
+    return isParsingError;
+}
+
+bool BoardTestConsoleApp::parseFanCommand(std::vector<std::string>& tokens,
+                                                  std::string& res, int& result)
+{
+    bool isParsingError = true;
+    std::vector<std::string> status;
+    status.push_back("OKAY");
+    status.push_back("ERROR_DUTY_CYCLE_OUT_OF_RANGE");
+    status.push_back("ERROR_PERIOD_IN_US_OUT_OF_RANGE");
+    if (tokens.size() > ACTION) {
+        if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "per1") {
+                uint32 period;
+                result = regRead(BoardTest::FAN_PWM1_PERIOD_IN_US, period);
+                float f = *reinterpret_cast<float*>(&period);
+                char t[16];
+                sprintf(t, "%.2fus", f);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "duty1") {
+                uint32 value;
+                result = regRead(BoardTest::FAN_PWM1_DUTY_CYCLE, value);
+                char t[16];
+                sprintf(t, "%d%%", value);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "per2") {
+                uint32 period;
+                result = regRead(BoardTest::FAN_PWM2_PERIOD_IN_US, period);
+                float f = *reinterpret_cast<float*>(&period);
+                char t[16];
+                sprintf(t, "%.2fus", f);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "duty2") {
+                uint32 value;
+                result = regRead(BoardTest::FAN_PWM2_DUTY_CYCLE, value);
+                char t[16];
+                sprintf(t, "%d%%", value);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "sens1") {
+                uint32 rpm;
+                result = regRead(BoardTest::FAN_SENSOR1_RPM, rpm);
+                float f = *reinterpret_cast<float*>(&rpm);
+                char t[16];
+                sprintf(t, "%.2fR.P.M.", f);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "sens2") {
+                uint32 rpm;
+                result = regRead(BoardTest::FAN_SENSOR2_RPM, rpm);
+                float f = *reinterpret_cast<float*>(&rpm);
+                char t[16];
+                sprintf(t, "%.2fR.P.M.", f);
+                res = t;
+                isParsingError = false;
+            }
+        }
+        else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "duty1" && tokens.size() > VALUE) {
+                uint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &value) == 1) {
+                    result = regWrite(BoardTest::FAN_PWM1_DUTY_CYCLE, value);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::FAN_STATUS, v);
+                        if (v != LibWrapHet::OKAY) {
+                            res = "fan status: " + status[v];
+                        }
+                    }
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "duty2" && tokens.size() > VALUE) {
+                uint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &value) == 1) {
+                    result = regWrite(BoardTest::FAN_PWM2_DUTY_CYCLE, value);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::FAN_STATUS, v);
+                        if (v != LibWrapHet::OKAY) {
+                            res = "fan status: " + status[v];
+                        }
+                    }
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "per1" && tokens.size() > VALUE) {
+                float period;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &period) == 1) {
+                    uint32 value = *reinterpret_cast<uint32*>(&period);
+                    result = regWrite(BoardTest::FAN_PWM1_PERIOD_IN_US, value);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::FAN_STATUS, v);
+                        if (v != LibWrapHet::OKAY) {
+                            res = "fan status: " + status[v];
+                        }
+                    }
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "per2" && tokens.size() > VALUE) {
+                float period;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &period) == 1) {
+                    uint32 value = *reinterpret_cast<uint32*>(&period);
+                    result = regWrite(BoardTest::FAN_PWM2_PERIOD_IN_US, value);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::FAN_STATUS, v);
+                        if (v != LibWrapHet::OKAY) {
+                            res = "fan status: " + status[v];
+                        }
+                    }
+                    isParsingError = false;
+                }
+            }
         }
     }
     return isParsingError;

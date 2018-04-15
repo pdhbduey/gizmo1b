@@ -34,6 +34,8 @@ private:
                                                  std::string& res, int& result);
     bool parseMotorCommand(std::vector<std::string>& tokens,
                                                  std::string& res, int& result);
+    bool parseFanCommand(std::vector<std::string>& tokens,
+                                                 std::string& res, int& result);
 };
 
 #endif // _BOARD_TEST_CONSOLE_APP_H_

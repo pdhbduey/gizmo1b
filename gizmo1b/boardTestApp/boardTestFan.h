@@ -13,6 +13,7 @@ public:
     virtual int set(uint32 address, uint32 value);
 private:
     LibFan m_libFan;
+    uint32 m_status;
 };
 
 #endif // _BOARD_TEST_FAN_H_
