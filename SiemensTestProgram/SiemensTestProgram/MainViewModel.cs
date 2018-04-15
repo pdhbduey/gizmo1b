@@ -24,7 +24,7 @@
                 "ADC",
                 "DAC",
                 "Motor",
-                //"Fan",
+                "Fan",
                 "Thermistor",
                 "TEC"
             };
@@ -134,7 +134,7 @@
                     Content = DeviceManager.Factory.Instance.GetMotorView();
                     break;
                 case "Fan":
-                    //Content = DeviceManager.Factory.Instance.GetFanView();
+                    Content = DeviceManager.Factory.Instance.GetFanView();
                     break;
                 case "Thermistor":
                     Content = DeviceManager.Factory.Instance.GetThermistorView();

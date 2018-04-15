@@ -145,6 +145,18 @@ namespace DeviceManager
         }
 
         /// <summary>
+        ///  Sets the data context for fan view.
+        /// </summary>
+        /// <returns> Fan view. </returns>
+        public FanView GetFanView()
+        {
+            return new FanView()
+            {
+                DataContext = new FanViewModel(GetFanModel())
+            };
+        }
+
+        /// <summary>
         ///  Sets the data context for motor view.
         /// </summary>
         /// <returns> Motor view. </returns>
@@ -179,6 +191,11 @@ namespace DeviceManager
         private IAdcModel GetAdcModel()
         {
             return new AdcModel(serialCommunication);
+        }
+
+        private IFanModel GetFanModel()
+        {
+            return new FanModel(serialCommunication);
         }
 
         private IMotorModel GetMotorModel(IComCommunication communication)
