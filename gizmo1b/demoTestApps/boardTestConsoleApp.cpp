@@ -1084,7 +1084,7 @@ bool BoardTestConsoleApp::parseFanCommand(std::vector<std::string>& tokens,
                 result = regRead(BoardTest::FAN_SENSOR1_RPM, rpm);
                 float f = *reinterpret_cast<float*>(&rpm);
                 char t[16];
-                sprintf(t, "%.2fR.P.M.", f);
+                sprintf(t, "%.2fRPM", f);
                 res = t;
                 isParsingError = false;
             }
@@ -1093,7 +1093,7 @@ bool BoardTestConsoleApp::parseFanCommand(std::vector<std::string>& tokens,
                 result = regRead(BoardTest::FAN_SENSOR2_RPM, rpm);
                 float f = *reinterpret_cast<float*>(&rpm);
                 char t[16];
-                sprintf(t, "%.2fR.P.M.", f);
+                sprintf(t, "%.2fRPM.", f);
                 res = t;
                 isParsingError = false;
             }

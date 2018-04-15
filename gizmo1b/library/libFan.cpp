@@ -1,5 +1,4 @@
 #include "libFan.h"
-//#include "libWrapHet.h"
 
 //23:N2HET1[1]:FAN_SENSOR1
 //24:N2HET1[3]:FAN_SENSOR2
@@ -54,14 +53,20 @@ float LibFan::getPwm2PeriodInUs()
     return m_libWrapHet1.getPwmPeriodInUs(LibWrapHet::PWM_1);
 }
 
+float LibFan::getRpmFromPerid(float periodInUs)
+{
+    float rpm = periodInUs != 0 ? 30.0 / (periodInUs * 1e-6) : 0; // AUB0812VH-SP00
+    return rpm;
+}
+
 float LibFan::getSensor1Rpm()
 {
     float periodInUs = m_libWrapHet1.getCapPeriodInUs(LibWrapHet::CAP_0);
-    return 30.0 / (periodInUs * 1e-6); // AUB0812VH-SP00
+    return getRpmFromPerid(periodInUs);
 }
 
 float LibFan::getSensor2Rpm()
 {
     float periodInUs = m_libWrapHet1.getCapPeriodInUs(LibWrapHet::CAP_1);
-    return 30.0 / (periodInUs * 1e-6); // AUB0812VH-SP00
+    return getRpmFromPerid(periodInUs);
 }
