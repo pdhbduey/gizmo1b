@@ -68,7 +68,7 @@
                 <!-- TEC Commands -->
                 <StackPanel Grid.Row="0" Grid.RowSpan="3" Grid.Column="4" Orientation="Vertical">
                     <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
-                    <Button Margin="2" Width="100" Height="25" Content="Reset" Command="{Binding ResetTecCommand}"></Button>
+                    <!--<Button Margin="2" Width="100" Height="25" Content="Reset" Command="{Binding ResetTecCommand}"></Button>-->
                     <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>
                     <ToggleButton Margin="2" Width="100" Height="25" Content="{Binding ClosedLoopButtonState}" Command="{Binding ClosedLoopToggleCommand}"></ToggleButton>
                 </StackPanel>
