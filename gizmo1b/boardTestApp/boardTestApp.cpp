@@ -20,7 +20,14 @@ BoardTestApp::BoardTestApp(const char* name) :
     BoardTest* boardTestDac = new BoardTestDac;
     m_boardTestMap[BoardTest::DAC_VALUE]  = boardTestDac;
     m_boardTestMap[BoardTest::DAC_STATUS] = boardTestDac;
-    m_boardTestMap[BoardTest::FAN_VALUE] = new BoardTestFan;
+    BoardTest* boardTestFan = new BoardTestFan;
+    m_boardTestMap[BoardTest::FAN_PWM1_DUTY_CYCLE]   = boardTestFan;
+    m_boardTestMap[BoardTest::FAN_PWM1_PERIOD_IN_US] = boardTestFan;
+    m_boardTestMap[BoardTest::FAN_PWM2_DUTY_CYCLE]   = boardTestFan;
+    m_boardTestMap[BoardTest::FAN_PWM2_PERIOD_IN_US] = boardTestFan;
+    m_boardTestMap[BoardTest::FAN_STATUS]            = boardTestFan;
+    m_boardTestMap[BoardTest::FAN_SENSOR1_RPM]       = boardTestFan;
+    m_boardTestMap[BoardTest::FAN_SENSOR2_RPM]       = boardTestFan;
     BoardTest* boardTestFault = new BoardTestFault;
     m_boardTestMap[BoardTest::FAULT_RESET] = boardTestFault;
     m_boardTestMap[BoardTest::FAULT_STATE] = boardTestFault;
