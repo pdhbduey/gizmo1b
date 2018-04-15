@@ -10,6 +10,12 @@ namespace DeviceManager.Model
 
         Task<byte[]> SetDirection(string selectedDirection);
 
+        Task<byte[]> SetRegisterValue(byte[] selectedDirection);
+
+        Task<byte[]> SetRegisterAddress(string address);
+
+        Task<byte[]> ReadRegisterValue();
+
         Task<byte[]> Home();
 
         Task<byte[]> Initialize();
@@ -18,8 +24,8 @@ namespace DeviceManager.Model
 
         Task<byte[]> Limp();
 
-        Task<byte[]> MoveRelative();
+        Task<byte[]> MoveRelative(int relativeMoveValue);
 
-        Task<byte[]> MoveAbsolute();
+        Task<byte[]> MoveAbsolute(int absoluteMoveValue);
     }
 }

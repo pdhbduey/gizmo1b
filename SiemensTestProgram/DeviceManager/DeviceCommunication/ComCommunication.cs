@@ -93,7 +93,7 @@ namespace DeviceManager.DeviceCommunication
                         requestSemaphore.Release(1);
                     }
                 }
-                catch (Exception e)
+                catch 
                 {
                    return new byte[0];
                 }

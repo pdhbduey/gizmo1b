@@ -1,11 +1,17 @@
 ﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
+using Common;
 using System.Collections.Generic;
 
 namespace DeviceManager
 {
     public static class MotorDefaults
     {
+        public const int RelativePositionMinimum = 0;
+        public const int RelativePositionMaximum = 4194303;
+        public const int AbsolutePositionMinimum = -2197152;
+        public const int AbsolutePositionMaximum = 2197153;
+
         public static List<string> StepSizes = new List<string>
         {
             "Full Step",
@@ -70,6 +76,56 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 value,
+                0x00
+            };
+        }
+
+        public static byte[] SetRelativePositionCommand(int relativePosition)
+        {
+            var value = Helper.ConvertIntToByteArray(relativePosition);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x02,
+                value[3],
+                value[2],
+                value[1],
+                value[0]
+            };
+        }
+
+        public static byte[] SetAbsolutePositionCommand(int absolutePosition)
+        {
+            var value = Helper.ConvertIntToByteArray(absolutePosition);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x03,
+                value[3],
+                value[2],
+                value[1],
+                value[0]
+            };
+        }
+
+        public static byte[] ReadPositionCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x07,
+                0x00,
+                0x00,
+                0x00,
                 0x00
             };
         }
@@ -170,6 +226,55 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] ReadRegisterValueCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x0A,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] SetRegisterValueCommand(byte[] value)
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x0A,
+                value[3],
+                value[2],
+                value[1],
+                value[0],
+            };
+        }
+
+        public static byte[] SetRegisterAddressCommand(string address)
+        {
+            var addressValue = RegisterAddressValues[address];
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x0A,
+                0x00,
+                0x00,
+                0x00,
+                addressValue,
+            };
+        }
+
         public static byte[] MotorControlAddress = new byte[]
         {
             0x00,
@@ -227,32 +332,32 @@ namespace DeviceManager
 
         public static Dictionary<string, byte> RegisterAddressValues = new Dictionary<string, byte>()
         {
-            {RegisterAddresses[0], 0x02 },
-            {RegisterAddresses[1], 0x03 },
-            {RegisterAddresses[2], 0x04 },
-            {RegisterAddresses[3], 0x05 },
-            {RegisterAddresses[4], 0x06 },
-            {RegisterAddresses[5], 0x07 },
-            {RegisterAddresses[6], 0x08 },
-            {RegisterAddresses[7], 0x15 },
-            {RegisterAddresses[8], 0x09 },
-            {RegisterAddresses[9], 0x0a },
-            {RegisterAddresses[10], 0x0b },
-            {RegisterAddresses[11], 0x0c },
-            {RegisterAddresses[12], 0x0d },
-            {RegisterAddresses[13], 0x0e },
-            {RegisterAddresses[14], 0x0f },
-            {RegisterAddresses[15], 0x10 },
-            {RegisterAddresses[16], 0x11 },
-            {RegisterAddresses[17], 0x12 },
-            {RegisterAddresses[18], 0x13 },
-            {RegisterAddresses[19], 0x14 },
-            {RegisterAddresses[20], 0x16 },
-            {RegisterAddresses[21], 0x17 },
-            {RegisterAddresses[22], 0x18 },
-            {RegisterAddresses[23], 0x19 },
+            {RegisterAddresses[0], 0x01 },
+            {RegisterAddresses[1], 0x02 },
+            {RegisterAddresses[2], 0x03 },
+            {RegisterAddresses[3], 0x04 },
+            {RegisterAddresses[4], 0x05 },
+            {RegisterAddresses[5], 0x06 },
+            {RegisterAddresses[6], 0x07 },
+            {RegisterAddresses[7], 0x08 },
+            {RegisterAddresses[8], 0x15 },
+            {RegisterAddresses[9], 0x09 },
+            {RegisterAddresses[10], 0x0a },
+            {RegisterAddresses[11], 0x0b },
+            {RegisterAddresses[12], 0x0c },
+            {RegisterAddresses[13], 0x0d },
+            {RegisterAddresses[14], 0x0e },
+            {RegisterAddresses[15], 0x0f },
+            {RegisterAddresses[16], 0x10 },
+            {RegisterAddresses[17], 0x11 },
+            {RegisterAddresses[18], 0x12 },
+            {RegisterAddresses[19], 0x13 },
+            {RegisterAddresses[20], 0x14 },
+            {RegisterAddresses[21], 0x16 },
+            {RegisterAddresses[22], 0x17 },
+            {RegisterAddresses[23], 0x18 },
+            {RegisterAddresses[24], 0x19 },
         };
-
              
         public static byte[] GetStepModeValue(int mode)
         {

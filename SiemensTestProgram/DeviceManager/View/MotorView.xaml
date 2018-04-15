@@ -52,7 +52,7 @@
                 <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding RegisterAddresses}" SelectedItem="{Binding SelectedRegisterAddress}"></ComboBox>
                 <StackPanel Orientation="Horizontal">
                     <Label Width="100" Content="Register Value:"></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding RegisterWriteValue}"></TextBox>
+                    <TextBox Name="registerTextbox" MaxLength="8" Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding RegisterWriteValue}" TextChanged="TextBox_TextChanged"></TextBox>
                 </StackPanel>
                 <Label Width="100" HorizontalAlignment="Right" Content="{Binding RegisterReadValue}"></Label>
                 <Button Height="25" Width="100" HorizontalAlignment="Right" Margin="2" Content="Set" Command="{Binding SetRegisterValueCommand}"></Button>
@@ -61,16 +61,16 @@
             <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal">
                     <Label Width="105" Content="Absolute Position:"></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=AbsoluteDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1"  HorizontalAlignment="Left" Text="{Binding Path=AbsoluteMoveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Move" Command="{Binding MoveAbsoluteCommand}"></Button>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <Label Width="105" Content="Relative Position:"></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=RelativeDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=RelativeMoveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Move" Command="{Binding MoveRelativeCommand}"></Button>
                 </StackPanel>
-                <Label Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Position"></Label>
+                <Label Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{Binding MotorPosition}"></Label>
             </StackPanel>
         </Grid>
         
