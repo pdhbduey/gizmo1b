@@ -23,6 +23,16 @@ namespace DeviceManager.Model
         /// </summary>
         Task<byte[]> SetFanPwmPeriod(int pwmChannel, int period);
 
+        /// <summary>
+        /// Gets pwm period.
+        /// </summary>
+        Task<byte[]> GetFanPwmPeriod(int channel);
+
+        /// <summary>
+        /// Gets pwm duty cycle.
+        /// </summary>
+        Task<byte[]> GetFanPwmDutyCycle(int channel);
+
 
         /// <summary>
         /// Gets sensor rpm.
