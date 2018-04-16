@@ -10,6 +10,7 @@
 #include "boardTestAdc.h"
 #include "boardTestMotor.h"
 #include "boardTestFan.h"
+#include "boardTestDio.h"
 #include "boardTestConsoleApp.h"
 
 BoardTestConsoleApp::BoardTestConsoleApp(const char* name) :
@@ -73,6 +74,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "led set green|red on|off\n\r";
     help += "led get green|red\n\r";
     help += "fault reset\n\r";
+    help += "fault get ntc|alarms\n\r";
     help += "tec enable|disable\n\r";
     help += "tec get enable\n\r";
     help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform|closedloop\n\r";
@@ -105,6 +107,8 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "fan set duty1|duty2 0..100\n\r";
     help += "fan set per1|per2 [10.0,1000000.0](us)\n\r";
     help += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
+    help += "dio get 0..9\n\r";
+    help += "dio set|clear 0..7\n\r";
 }
 
 void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
@@ -164,6 +168,9 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
             else if (tokens[COMPONENT] == "fan") {
                 isParsingError = parseFanCommand(tokens, res, result);
             }
+            else if (tokens[COMPONENT] == "dio") {
+                isParsingError = parseDioCommand(tokens, res, result);
+            }
         }
     }
     if (isParsingError) {
@@ -214,11 +221,6 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
         }
         else if (tokens[ACTION] == "disable") {
             result = regWrite(BoardTest::TEC_CONTROL, BoardTestTec::DISABLE);
-            isParsingError = false;
-        }
-        else if (tokens[ACTION] == "reset") {
-            result = regWrite(BoardTest::FAULT_RESET,
-                                              BoardTestFault::FAULT_RESET_MASK);
             isParsingError = false;
         }
         else if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
@@ -556,6 +558,40 @@ bool BoardTestConsoleApp::parseFaultCommand(std::vector<std::string>& tokens,
             result = regWrite(BoardTest::FAULT_RESET,
                                               BoardTestFault::FAULT_RESET_MASK);
             isParsingError = false;
+        }
+        else if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "ntc") {
+                uint32 value;
+                result = regRead(BoardTest::FAULT_NTC_PRESENT, value);
+                res.clear();
+                std::map<int, std::string> ntcFlags;
+                ntcFlags[BoardTestFault::NTC1_PRESENT] = "NTC1_PRESENT";
+                ntcFlags[BoardTestFault::NTC2_PRESENT] = "NTC2_PRESENT";
+                for (std::map<int, std::string>::iterator it = ntcFlags.begin();
+                                                   it != ntcFlags.end(); it++) {
+                    if (value & it->first) {
+                        res += it->second + "|";
+                    }
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "alarms") {
+                uint32 value;
+                result = regRead(BoardTest::FAULT_STATE, value);
+                res.clear();
+                std::map<int, std::string> faultFlags;
+                faultFlags[BoardTestFault::TEC_OCD_POS] = "TEC_OCD_POS";
+                faultFlags[BoardTestFault::TEC_OCD_NEG] = "TEC_OCD_NEG";
+                faultFlags[BoardTestFault::OVERTEMP1]   = "OVERTEMP1";
+                faultFlags[BoardTestFault::OVERTEMP2]   = "OVERTEMP2";
+                for (std::map<int, std::string>::iterator it = faultFlags.begin();
+                                                 it != faultFlags.end(); it++) {
+                    if (value & it->first) {
+                        res += it->second + "|";
+                    }
+                }
+                isParsingError = false;
+            }
         }
     }
     return isParsingError;
@@ -1156,6 +1192,70 @@ bool BoardTestConsoleApp::parseFanCommand(std::vector<std::string>& tokens,
                     }
                     isParsingError = false;
                 }
+            }
+        }
+    }
+    return isParsingError;
+}
+
+bool BoardTestConsoleApp::parseDioCommand(std::vector<std::string>& tokens,
+                                                  std::string& res, int& result)
+{
+    bool isParsingError = true;
+    if (tokens.size() > ACTION) {
+        if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
+            uint32 pin;
+            std::map<int, int> pinsMap;
+            pinsMap[0] = BoardTestDio::DIN_0_STATE;
+            pinsMap[1] = BoardTestDio::DIN_1_STATE;
+            pinsMap[2] = BoardTestDio::DIN_2_STATE;
+            pinsMap[3] = BoardTestDio::DIN_3_STATE;
+            pinsMap[4] = BoardTestDio::DIN_4_STATE;
+            pinsMap[5] = BoardTestDio::DIN_5_STATE;
+            pinsMap[6] = BoardTestDio::DIN_6_STATE;
+            pinsMap[7] = BoardTestDio::DIN_7_STATE;
+            pinsMap[8] = BoardTestDio::DIN_8_STATE;
+            pinsMap[9] = BoardTestDio::DIN_9_STATE;
+            if (sscanf(tokens[ARGUMENT].c_str(), "%d", &pin) == 1
+             && pinsMap.find(pin) != pinsMap.end()) {
+                uint32 value;
+                result = regRead(BoardTest::DIO_IN, value);
+                res = value & pinsMap[pin] ? "set" : "clear";
+                isParsingError = false;
+            }
+        }
+        else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
+            uint32 pin;
+            std::map<int, int> pinsMap;
+            pinsMap[0] = BoardTestDio::DOUT_0_ON;
+            pinsMap[1] = BoardTestDio::DOUT_1_ON;
+            pinsMap[2] = BoardTestDio::DOUT_2_ON;
+            pinsMap[3] = BoardTestDio::DOUT_3_ON;
+            pinsMap[4] = BoardTestDio::DOUT_4_ON;
+            pinsMap[5] = BoardTestDio::DOUT_5_ON;
+            pinsMap[6] = BoardTestDio::DOUT_6_ON;
+            pinsMap[7] = BoardTestDio::DOUT_7_ON;
+            if (sscanf(tokens[ARGUMENT].c_str(), "%d", &pin) == 1
+             && pinsMap.find(pin) != pinsMap.end()) {
+                result = regWrite(BoardTest::DIO_OUT, pinsMap[pin]);
+                isParsingError = false;
+            }
+        }
+        else if (tokens[ACTION] == "clear" && tokens.size() > ARGUMENT) {
+            uint32 pin;
+            std::map<int, int> pinsMap;
+            pinsMap[0] = BoardTestDio::DOUT_0_OFF;
+            pinsMap[1] = BoardTestDio::DOUT_1_OFF;
+            pinsMap[2] = BoardTestDio::DOUT_2_OFF;
+            pinsMap[3] = BoardTestDio::DOUT_3_OFF;
+            pinsMap[4] = BoardTestDio::DOUT_4_OFF;
+            pinsMap[5] = BoardTestDio::DOUT_5_OFF;
+            pinsMap[6] = BoardTestDio::DOUT_6_OFF;
+            pinsMap[7] = BoardTestDio::DOUT_7_OFF;
+            if (sscanf(tokens[ARGUMENT].c_str(), "%d", &pin) == 1
+             && pinsMap.find(pin) != pinsMap.end()) {
+                result = regWrite(BoardTest::DIO_OUT, pinsMap[pin]);
+                isParsingError = false;
             }
         }
     }

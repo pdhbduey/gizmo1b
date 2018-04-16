@@ -41,6 +41,7 @@ public:
         FAULT_BASE  = 0x00000400,
         FAULT_RESET = FAULT_BASE,
         FAULT_STATE,
+        FAULT_NTC_PRESENT,
         DIO_BASE = 0x00000500,
         DIO_IN   = DIO_BASE,
         DIO_OUT,
