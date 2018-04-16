@@ -46,8 +46,8 @@ namespace DeviceManager.ViewModel
             absoluteMoveValue = 0;
             relativeMoveValue = 0;
 
-            motorPosition = "MOTOR ADD";
-            registerReadValue = "REGISTER ADD";
+            // Initial Update
+            InitialUpdate();
 
             SetConfigurationCommand = new RelayCommand(param => SetConfiguration());
             HomeCommand = new RelayCommand(param => Home());
@@ -56,9 +56,12 @@ namespace DeviceManager.ViewModel
             InitializeCommand = new RelayCommand(param => Initialize());
             MoveAbsoluteCommand = new RelayCommand(param => MoveToAbsolutePosition());
             MoveRelativeCommand = new RelayCommand(param => MoveToRelativePosition());
+            EnergizeCommand = new RelayCommand(param => Energize());
 
             StartUpdateTask();
         }
+
+        public RelayCommand EnergizeCommand { get; set; }
 
         public RelayCommand MoveRelativeCommand { get; set; }
 
@@ -167,6 +170,17 @@ namespace DeviceManager.ViewModel
         public int AbsoluteMoveValue { get; set; }
 
         public int RelativeMoveValue { get; set; }
+
+        private void InitialUpdate()
+        {
+            motorPosition = "MOTOR ADD";
+            registerReadValue = "REGISTER ADD";
+        }
+
+        private async void Energize()
+        {
+            await motorModel.Energize();
+        }
 
         private async void SetRegister()
         {

@@ -62,6 +62,14 @@ namespace DeviceManager.Model
             return response;
         }
 
+        public Task<byte[]> Energize()
+        {
+            var requestArray = MotorDefaults.SetEnergizeCommand();
+            communication.WriteData(requestArray);
+            var response = communication.ReadData();
+            return response;
+        }
+
         public Task<byte[]> Limp()
         {
             var requestArray = MotorDefaults.SetLimpCommand();

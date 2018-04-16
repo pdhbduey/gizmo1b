@@ -20,6 +20,8 @@ namespace DeviceManager.Model
 
         Task<byte[]> Initialize();
 
+        Task<byte[]> Energize();
+
         Task<byte[]> Reset();
 
         Task<byte[]> Limp();

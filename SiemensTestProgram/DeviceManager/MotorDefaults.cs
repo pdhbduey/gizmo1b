@@ -189,7 +189,7 @@ namespace DeviceManager
                 MotorControlAddress[3],
                 0x00,
                 0x00,
-                0x40,
+                0x10,
                 0x00
             };
         }
@@ -206,7 +206,7 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x00,
-                0x0A
+                0x20
             };
         }
 
@@ -314,8 +314,8 @@ namespace DeviceManager
 
         public static Dictionary<string, byte> DirectionValues = new Dictionary<string, byte>()
         {
-            { Directions[0], 0x08},
-            { Directions[1], 0x04}
+            { Directions[0], 0x10},
+            { Directions[1], 0x20}
         };
 
         public static Dictionary<string, byte[]> StepSizeValues = new Dictionary<string, byte[]>()

@@ -33,6 +33,7 @@
                 <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Reset" Command="{Binding ResetCommand}"></Button>
                 <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Limp" Command="{Binding LimpCommand}"></Button>
                 <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Initialize" Command="{Binding InitializeCommand}"></Button>
+                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Energize" Command="{Binding EnergizeCommand}"></Button>
                 <Button Height="25" Width="100" HorizontalAlignment="Left" Margin="2" Content="Home" Command="{Binding HomeCommand}"></Button>
             </StackPanel>
         </Grid>
