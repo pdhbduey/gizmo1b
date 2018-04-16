@@ -28,6 +28,28 @@ namespace DeviceManager.Model
         }
 
         /// <summary>
+        /// Gets pwm period.
+        /// </summary>
+        public Task<byte[]> GetFanPwmPeriod(int channel)
+        {
+            var requestArray = FanDefaults.GetFanPeriodCommand(channel);
+            communication.WriteData(requestArray);
+            var status = communication.ReadData();
+            return status;
+        }
+
+        /// <summary>
+        /// Gets pwm duty cycle.
+        /// </summary>
+        public Task<byte[]> GetFanPwmDutyCycle(int channel)
+        {
+            var requestArray = FanDefaults.GetFanDutyCycleCommand(channel);
+            communication.WriteData(requestArray);
+            var status = communication.ReadData();
+            return status;
+        }
+
+        /// <summary>
         /// Sets pwm one duty cycle.
         /// </summary>
         public Task<byte[]> SetFanPwmDutyCycle(int pwmChannel, int dutyCycle)

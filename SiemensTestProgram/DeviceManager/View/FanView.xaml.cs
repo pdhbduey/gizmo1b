@@ -24,5 +24,17 @@ namespace DeviceManager.View
         {
             InitializeComponent();
         }
+
+        private void EnterUpdate(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                TextBox textBox = (TextBox)sender;
+                DependencyProperty property = TextBox.TextProperty;
+
+                BindingExpression binding = BindingOperations.GetBindingExpression(textBox, property);
+                if (binding != null) { binding.UpdateSource(); }
+            }
+        }
     }
 }

@@ -53,13 +53,13 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] SetFanDutyCycleCommand(int pwmChannel, int dutyCycle)
+        public static byte[] SetFanDutyCycleCommand(int channel, int dutyCycle)
         {
             var dutyCycleValue = Helper.ConvertIntToByteArray(dutyCycle);
             byte channelByte;
 
             channelByte = 0x01;
-            if (pwmChannel == 1)
+            if (channel == 1)
             {
                 channelByte = 0x00;
             }
@@ -78,13 +78,37 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] SetFanPeriodCommand(int pwmChannel, int period)
+        public static byte[] GetFanDutyCycleCommand(int channel)
+        {
+            byte channelByte;
+
+            channelByte = 0x01;
+            if (channel == 1)
+            {
+                channelByte = 0x00;
+            }
+
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x03,
+                channelByte,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] SetFanPeriodCommand(int channel, int period)
         {
             var periodValue = Helper.ConvertIntToByteArray(period);
             byte channelByte;
 
             channelByte = 0x03;
-            if (pwmChannel == 1)
+            if (channel == 1)
             {
                 channelByte = 0x02;
             }
@@ -100,6 +124,30 @@ namespace DeviceManager
                 periodValue[1],
                 periodValue[2],
                 periodValue[3]
+            };
+        }
+
+        public static byte[] GetFanPeriodCommand(int channel)
+        {
+            byte channelByte;
+
+            channelByte = 0x03;
+            if (channel == 1)
+            {
+                channelByte = 0x02;
+            }
+
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x03,
+                channelByte,
+                0x00,
+                0x00,
+                0x00,
+                0x00
             };
         }
 

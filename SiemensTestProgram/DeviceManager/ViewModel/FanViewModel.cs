@@ -41,22 +41,10 @@ namespace DeviceManager.ViewModel
             periodTwo = FanDefaults.DefaultPeriod;
             statusMessage = "";
 
-            // Command bindings 
-
             // Update statuses
             InitialUpdate();
             StartUpdateTask();
         }
-
-        /// <summary>
-        /// Fan one command binding.
-        /// </summary>
-        public RelayCommand SetFanOneCommand { get; set; }
-
-        /// <summary>
-        /// Fan two command binding.
-        /// </summary>
-        public RelayCommand SetFanTwoCommand { get; set; }
 
         public int DutyCycleOne
         {
@@ -81,6 +69,7 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(DutyCycleOne));
+                SetFanDutyCycle(channel: 1);
             }
         }
 
@@ -107,6 +96,7 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(DutyCycleTwo));
+                SetFanDutyCycle(channel: 2);
             }
         }
 
@@ -133,6 +123,7 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(PeriodOne));
+                SetFanPeriod(channel: 1);
             }
         }
 
@@ -159,6 +150,7 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(PeriodTwo));
+                SetFanPeriod(channel: 2);
             }
         }
 
@@ -235,6 +227,17 @@ namespace DeviceManager.ViewModel
         /// </summary>
         private void InitialUpdate()
         {
+            // Read duty cycle/period
+            var cycleOneValue = fanModel.GetFanPwmDutyCycle(channel: 1).Result;
+            DutyCycleOne = Helper.GetIntFromBigEndian(cycleOneValue);
+            var cycleTwoValue = fanModel.GetFanPwmDutyCycle(channel: 2).Result;
+            DutyCycleTwo = Helper.GetIntFromBigEndian(cycleTwoValue);
+            var periodOneValue = fanModel.GetFanPwmPeriod(channel: 1).Result;
+            PeriodOne = Helper.GetIntFromBigEndian(periodOneValue);
+            var periodTwoValue = fanModel.GetFanPwmPeriod(channel: 2).Result;
+            PeriodTwo = Helper.GetIntFromBigEndian(periodTwoValue);
+
+            // Sensor updates
             var sensorOneValue = fanModel.GetFanSensorRpm(sensor: 1).Result;
             SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue);
 
@@ -299,6 +302,32 @@ namespace DeviceManager.ViewModel
             FanDefaults.Statuses.TryGetValue(value, out response);
 
             return response == null ? "Unknown" : response;
+        }
+
+        private void SetFanDutyCycle(int channel)
+        {
+            switch (channel)
+            {
+                case 1:
+                    fanModel.SetFanPwmDutyCycle(channel, dutyCycleOne);
+                    break;
+                case 2:
+                    fanModel.SetFanPwmDutyCycle(channel, dutyCycleTwo);
+                    break;
+            }
+        }
+
+        private void SetFanPeriod(int channel)
+        {
+            switch (channel)
+            {
+                case 1:
+                    fanModel.SetFanPwmPeriod(channel, periodTwo);
+                    break;
+                case 2:
+                    fanModel.SetFanPwmPeriod(channel, periodTwo);
+                    break;
+            }
         }
     }
 }

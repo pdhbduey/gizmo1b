@@ -25,35 +25,23 @@
 
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
-                    <Label Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Duty Cycle: "></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=DutyCycleOne}"></TextBox>
+                    <Label Width="75" Content="DutyCycle:"></Label>
+                    <Slider
+                    Width="100" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Left" 
+                    VerticalAlignment="Center"
+                    Minimum="0" 
+                    Maximum="100" 
+                    Value="{Binding DutyCycleOne}">
+                    </Slider>
+                    <Label Margin="5,0,0,0" Content="{Binding DutyCycleOne}"></Label>
+                    <Label Content="%"></Label>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
                     <Label Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Period: "></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=PeriodOne}"></TextBox>
+                    <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=PeriodOne}" KeyUp="EnterUpdate"></TextBox>
                 </StackPanel>
-
-                <Button HorizontalAlignment="Right" Content="Set" Margin="1" Width="100" Height="25" Command="{Binding SetFanOneCommand}"></Button>
-            </StackPanel>
-        </GroupBox>
-        
-        <!-- Pwm One -->
-        <GroupBox Grid.Row="0" Grid.Column="0">
-            <GroupBox.Header>
-                <TextBlock Text="Pwm 1" FontWeight="Bold"/>
-            </GroupBox.Header>
-
-            <StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="1">
-                    <Label Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Duty Cycle: "></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=DutyCycleOne}"></TextBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="1">
-                    <Label Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Period: "></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=PeriodOne}"></TextBox>
-                </StackPanel>
-
-                <Button HorizontalAlignment="Right" Content="Set" Margin="1" Width="100" Height="25" Command="{Binding SetFanOneCommand}"></Button>
             </StackPanel>
         </GroupBox>
 
@@ -64,16 +52,24 @@
             </GroupBox.Header>
 
             <StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="1">
-                    <Label Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Duty Cycle: "></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=DutyCycleTwo}"></TextBox>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="75" Content="DutyCycle:"></Label>
+                    <Slider
+                    Width="100" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Left" 
+                    VerticalAlignment="Center"
+                    Minimum="0" 
+                    Maximum="100" 
+                    Value="{Binding DutyCycleTwo}">
+                    </Slider>
+                    <Label VerticalAlignment="Center" Margin="5,0,0,0" Content="{Binding DutyCycleTwo}"></Label>
+                    <Label Content="%"></Label>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
                     <Label Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Period: "></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=PeriodTwo}"></TextBox>
+                    <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=PeriodTwo}" KeyUp="EnterUpdate"></TextBox>
                 </StackPanel>
-
-                <Button HorizontalAlignment="Right" Content="Set" Margin="1" Width="100" Height="25" Command="{Binding SetFanTwoCommand}"></Button>
             </StackPanel>
         </GroupBox>
 
