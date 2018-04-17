@@ -157,6 +157,18 @@ namespace DeviceManager
         }
 
         /// <summary>
+        ///  Sets the data context for dio view.
+        /// </summary>
+        /// <returns> Dio view. </returns>
+        public DioView GetDioView()
+        {
+            return new DioView()
+            {
+                DataContext = new DioViewModel(GetDioModel())
+            };
+        }
+
+        /// <summary>
         ///  Sets the data context for motor view.
         /// </summary>
         /// <returns> Motor view. </returns>
@@ -171,6 +183,11 @@ namespace DeviceManager
         private LedModel GetLedModel(IComCommunication communication)
         {
             return new LedModel(communication);
+        }
+
+        private IDioModel GetDioModel()
+        {
+            return new DioModel(serialCommunication);
         }
 
         private IDacModel GetDacModel(IComCommunication communication)

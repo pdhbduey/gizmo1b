@@ -71,15 +71,18 @@
     <Compile Include="DeviceCommunication\ComCommunication.cs" />
     <Compile Include="DeviceCommunication\ComPortDefaults.cs" />
     <Compile Include="DeviceCommunication\IComCommunication.cs" />
+    <Compile Include="DioDefaults.cs" />
     <Compile Include="FanDefaults.cs" />
     <Compile Include="LedDefaults.cs" />
     <Compile Include="Model\AdcModel.cs" />
     <Compile Include="Model\CommunicationConfigurationModel.cs" />
     <Compile Include="Model\DacModel.cs" />
+    <Compile Include="Model\DioModel.cs" />
     <Compile Include="Model\FanModel.cs" />
     <Compile Include="Model\IAdcModel.cs" />
     <Compile Include="Model\ICommunicationConfigurationModel.cs" />
     <Compile Include="Model\IDacModel.cs" />
+    <Compile Include="Model\IDioModel.cs" />
     <Compile Include="Model\IFanModel.cs" />
     <Compile Include="Model\ILedModel.cs" />
     <Compile Include="Model\IMotorModel.cs" />
@@ -95,6 +98,7 @@
     <Compile Include="ViewModel\AdcViewModel.cs" />
     <Compile Include="ViewModel\CommunicationConfigurationViewModel.cs" />
     <Compile Include="ViewModel\DacViewModel.cs" />
+    <Compile Include="ViewModel\DioViewModel.cs" />
     <Compile Include="ViewModel\FanViewModel.cs" />
     <Compile Include="ViewModel\MotorViewModel.cs" />
     <Compile Include="ViewModel\LedViewModel.cs" />
@@ -108,6 +112,9 @@
     </Compile>
     <Compile Include="View\DacView.xaml.cs">
       <DependentUpon>DacView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DioView.xaml.cs">
+      <DependentUpon>DioView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\FanView.xaml.cs">
       <DependentUpon>FanView.xaml</DependentUpon>
@@ -146,6 +153,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\DacView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DioView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

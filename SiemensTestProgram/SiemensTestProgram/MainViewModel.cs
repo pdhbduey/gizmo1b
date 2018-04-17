@@ -20,11 +20,12 @@
 
             TestViews = new ObservableCollection<string>()
             {
-                "LED/Switch",
                 "ADC",
                 "DAC",
-                "Motor",
+                "DIO",
                 "Fan",
+                "LED",
+                "Motor",
                 "Thermistor",
                 "TEC"
             };
@@ -121,11 +122,14 @@
         {
             switch (selectedTestView)
             {
-                case "LED/Switch":
+                case "LED":
                     Content = DeviceManager.Factory.Instance.GetLedView();
                     break;
                 case "DAC":
                     Content = DeviceManager.Factory.Instance.GetDacView();
+                    break;
+                case "DIO":
+                    Content = DeviceManager.Factory.Instance.GetDioView();
                     break;
                 case "ADC":
                     Content = DeviceManager.Factory.Instance.GetAdcView();

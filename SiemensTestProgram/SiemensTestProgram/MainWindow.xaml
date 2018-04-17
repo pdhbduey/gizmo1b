@@ -38,6 +38,9 @@
         <DataTemplate x:Name="FanViewName" DataType="{x:Type viewmodels:FanViewModel}">
             <views:FanView DataContext="{Binding}"></views:FanView>
         </DataTemplate>
+        <DataTemplate x:Name="DioViewName" DataType="{x:Type viewmodels:DioViewModel}">
+            <views:DioView DataContext="{Binding}"></views:DioView>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>

@@ -42,7 +42,7 @@ namespace Common
         public static bool IsBitSet(byte dataByte, int position, int value = 1)
         {
             return ((dataByte >> position) & value) != 0;
-        }
+        } 
 
         public static byte IntegerToByte(int num)
         {

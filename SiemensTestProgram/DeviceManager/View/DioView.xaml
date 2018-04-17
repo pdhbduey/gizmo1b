@@ -1,0 +1,95 @@
+﻿<UserControl x:Class="DeviceManager.View.DioView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DeviceManager.View"
+             mc:Ignorable="d" 
+             Background="WhiteSmoke">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- DIN -->
+        <GroupBox Grid.Row="0" Grid.Column="0">
+            <GroupBox.Header>
+                <TextBlock Text="DIO In" FontWeight="Bold"/>
+            </GroupBox.Header>
+
+            <StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinZeroColour}" Width="10" Height="10" />
+                        <Label Content="DIN0"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinOneColour}" Width="10" Height="10" />
+                        <Label Content="DIN1"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinTwoColour}" Width="10" Height="10" />
+                        <Label Content="DIN2"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinThreeColour}" Width="10" Height="10" />
+                        <Label Content="DIN3"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinFourColour}" Width="10" Height="10" />
+                        <Label Content="DIN4"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinFiveColour}" Width="10" Height="10" />
+                        <Label Content="DIN5"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinSixColour}" Width="10" Height="10" />
+                        <Label Content="DIN6"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinSevenColour}" Width="10" Height="10" />
+                        <Label Content="DIN7"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinEightColour}" Width="10" Height="10" />
+                        <Label Content="DIN8"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DinNineColour}" Width="10" Height="10" />
+                        <Label Content="DIN9"></Label>
+                    </StackPanel>
+
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- DOUT -->
+        <GroupBox Grid.Row="0" Grid.Column="1">
+            <GroupBox.Header>
+                <TextBlock Text="DIO Out" FontWeight="Bold"/>
+            </GroupBox.Header>
+
+            <StackPanel>
+                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding DoutZeroStatus}" HorizontalAlignment="Left" Command="{Binding SetDioZeroCommand}"></ToggleButton>
+                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding DoutOneStatus}" HorizontalAlignment="Left" Command="{Binding SetDioOneCommand}"></ToggleButton>
+                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding DoutTwoStatus}" HorizontalAlignment="Left" Command="{Binding SetDioTwoCommand}"></ToggleButton>
+                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding DoutThreeStatus}" HorizontalAlignment="Left" Command="{Binding SetDioThreeCommand}"></ToggleButton>
+                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding DoutFourStatus}" HorizontalAlignment="Left" Command="{Binding SetDioFourCommand}"></ToggleButton>
+                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding DoutFiveStatus}" HorizontalAlignment="Left" Command="{Binding SetDioFiveCommand}"></ToggleButton>
+                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding DoutSixStatus}" HorizontalAlignment="Left" Command="{Binding SetDioSixCommand}"></ToggleButton>
+                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding DoutSevenStatus}" HorizontalAlignment="Left" Command="{Binding SetDioSevenCommand}"></ToggleButton>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>
