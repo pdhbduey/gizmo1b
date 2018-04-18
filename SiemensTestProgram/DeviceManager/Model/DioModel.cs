@@ -15,5 +15,19 @@ namespace DeviceManager.Model
         {
             this.communication = communication;
         }
+
+        public Task<byte[]> SetDout(int channel, bool set)
+        {
+            var request = DioDefaults.SetDataOutByteArray(channel, set);
+            communication.WriteData(request);
+            return communication.ReadData();
+        }
+
+        public Task<byte[]> ReadDin()
+        {
+            var request = DioDefaults.ReadDioInCommand();
+            communication.WriteData(request);
+            return communication.ReadData();
+        }
     }
 }

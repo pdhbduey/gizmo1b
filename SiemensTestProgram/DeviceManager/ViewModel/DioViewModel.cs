@@ -57,11 +57,11 @@ namespace DeviceManager.ViewModel
         {
             if (status.Contains("Set"))
             {
-                //await dioModel.SetDout(channel, set: true);
+                await dioModel.SetDout(channel, set: true);
             }
             else
             {
-                //await dioModel.SetDout(channel, set: false);
+                await dioModel.SetDout(channel, set: false);
             }
 
             UpdateChannelDout(channel);
@@ -385,13 +385,31 @@ namespace DeviceManager.ViewModel
             doutSevenStatus = "Set Dout 7";
         }
 
-        private void DinUpdate()
+        private async void DinUpdate()
         {
             while (true)
             {
                 try
                 {
-                    
+                    var din = await dioModel.ReadDin();
+
+                    var zeroSet = DioDefaults.IsDinSet(din, 0, true);
+                    var oneSet = DioDefaults.IsDinSet(din, 1, true);
+                    var twoSet = DioDefaults.IsDinSet(din, 2, true);
+                    var threeSet = DioDefaults.IsDinSet(din, 3, true);
+                    var fourSet = DioDefaults.IsDinSet(din, 4, true);
+                    var fiveSet = DioDefaults.IsDinSet(din, 5, true);
+                    var sixSet = DioDefaults.IsDinSet(din, 6, true);
+                    var sevenSet = DioDefaults.IsDinSet(din, 7, true);
+
+                    updateDinStatus(0, zeroSet);
+                    updateDinStatus(1, oneSet);
+                    updateDinStatus(2, twoSet);
+                    updateDinStatus(3, threeSet);
+                    updateDinStatus(4, fourSet);
+                    updateDinStatus(5, fiveSet);
+                    updateDinStatus(6, sixSet);
+                    updateDinStatus(7, sevenSet);
 
                     Thread.Sleep(updateDelay);
                 }
@@ -399,6 +417,103 @@ namespace DeviceManager.ViewModel
                 {
                     
                 }
+            }
+        }
+
+        private void updateDinStatus(int channel, bool isSet)
+        {
+            switch (channel)
+            {
+                case 0:
+                    if (isSet)
+                    {
+                        DinZeroColour = "Green";
+                        break;
+                    }
+
+                    DinZeroColour = "Red";
+                    break;
+                case 1:
+                    if (isSet)
+                    {
+                        DinOneColour = "Green";
+                        break;
+                    }
+
+                    DinOneColour = "Red";
+                    break;
+                case 2:
+                    if (isSet)
+                    {
+                        DinTwoColour = "Green";
+                        break;
+                    }
+
+                    DinTwoColour = "Red";
+                    break;
+                case 3:
+                    if (isSet)
+                    {
+                        DinThreeColour = "Green";
+                        break;
+                    }
+
+                    DinThreeColour = "Red";
+                    break;
+                case 4:
+                    if (isSet)
+                    {
+                        DinFourColour = "Green";
+                        break;
+                    }
+
+                    DinFourColour = "Red";
+                    break;
+                case 5:
+                    if (isSet)
+                    {
+                        DinFiveColour = "Green";
+                        break;
+                    }
+
+                    DinFiveColour = "Red";
+                    break;
+                case 6:
+                    if (isSet)
+                    {
+                        DinSixColour = "Green";
+                        break;
+                    }
+
+                    DinSixColour = "Red";
+                    break;
+                case 7:
+                    if (isSet)
+                    {
+                        DinSevenColour = "Green";
+                        break;
+                    }
+
+                    DinSevenColour = "Red";
+                    break;
+                case 8:
+                    if (isSet)
+                    {
+                        DinEightColour = "Green";
+                        break;
+                    }
+
+                    DinEightColour = "Red";
+                    break;
+                case 9:
+                    if (isSet)
+                    {
+                        DinNineColour = "Green";
+                        break;
+                    }
+
+                    DinNineColour = "Red";
+                    break;
             }
         }
 
