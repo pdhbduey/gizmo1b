@@ -28,6 +28,14 @@ int BoardTestDio::get(uint32 address, uint32& value)
         value |= isSet ? DIN_4_STATE : 0;
         m_libDio.getPin(LibDio::DIN_5, isSet);
         value |= isSet ? DIN_5_STATE : 0;
+        m_libDio.getPin(LibDio::DIN_6, isSet);
+        value |= isSet ? DIN_6_STATE : 0;
+        m_libDio.getPin(LibDio::DIN_7, isSet);
+        value |= isSet ? DIN_7_STATE : 0;
+        m_libDio.getPin(LibDio::DIN_8, isSet);
+        value |= isSet ? DIN_8_STATE : 0;
+        m_libDio.getPin(LibDio::DIN_9, isSet);
+        value |= isSet ? DIN_9_STATE : 0;
         break;
     case DIO_OUT:
         value = 0;
