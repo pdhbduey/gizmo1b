@@ -22,6 +22,13 @@ int LibWrapHet::setPwmDutyCycle(uint32 pwm, uint32 dutyCycle)
         return ERROR_DUTY_CYCLE_OUT_OF_RANGE;
     }
     LibMutex libMutex(getHetMutex());
+    if (dutyCycle == 0) {
+        pwmStop(getHetRamBase(), pwm);
+        dutyCycle = 1;
+    }
+    else {
+        pwmStart(getHetRamBase(), pwm);
+    }
     pwmSetDuty(getHetRamBase(), pwm, dutyCycle);
     return OKAY;
 }

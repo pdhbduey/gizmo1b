@@ -90,7 +90,7 @@ public:
     int getMicroSteps(int& microSteps);
     int readReg(uint16 address, uint32& value);
     int writeReg(uint16 address, uint32 value);
-    int moveToPosition(int direction, sint32 position); // -2097152..2097151
+    int moveToPosition(sint32 position); // -2097152..2097151
     int moveRelative(int direction, uint32 steps);      // 0..4194303
     int getStatus(uint32& status);
     int getPosition(sint32& position);
@@ -108,7 +108,7 @@ private:
         SET_PARAM = 0,
         GET_PARAM = 0x20,
         MOVE      = 0x40,
-        GOTO_DIR  = 0x68,
+        GOTO      = 0x60,
         HARD_STOP = 0xb8,
         HARD_HIZ  = 0xa8,
     };

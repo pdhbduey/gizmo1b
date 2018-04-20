@@ -1,16 +1,71 @@
 #include <map>
+#include "libMutex.h"
 #include "boardTestMotor.h"
 
-BoardTestMotor::BoardTestMotor()
+BoardTestMotor::BoardTestMotor() :
+    m_mutex(xSemaphoreCreateMutex()),
+    m_motorTask(this, "MotorTask")
 {
+    m_motorTask.start();
 }
 
 BoardTestMotor::~BoardTestMotor()
 {
 }
 
+BoardTestMotor::MotorTask::MotorTask(BoardTestMotor* boardTestMotor,
+                                                             const char* name) :
+    m_boardTestMotor(boardTestMotor),
+    LibTask(name)
+{
+}
+
+BoardTestMotor::MotorTask::~MotorTask()
+{
+}
+
+void BoardTestMotor::MotorTask::cycle()
+{
+    m_isCycling = true;
+}
+
+void BoardTestMotor::MotorTask::stop()
+{
+    m_isCycling = false;
+}
+
+void BoardTestMotor::MotorTask::run()
+{
+    while (true) {
+        vTaskDelay(1000);
+        if (m_isCycling) {
+            if (m_boardTestMotor->m_relPosition == 0) {
+                continue;
+            }
+            uint32 status;
+            if (m_boardTestMotor->get(BoardTest::MOTOR_STATUS, status)
+                                                           != BoardTest::OKAY) {
+                continue;
+            }
+            if (status & LibMotor::STOPPED) {
+                if (status & LibMotor::DIR_REVERSE) {
+                    m_boardTestMotor->set(BoardTest::MOTOR_CONTROL,
+                                               BoardTestMotor::DIRECTION_FORWARD
+                                             | BoardTestMotor::MOVE_RELATIVE);
+                }
+                else if (status & LibMotor::DIR_FORWARD) {
+                    m_boardTestMotor->set(BoardTest::MOTOR_CONTROL,
+                                               BoardTestMotor::DIRECTION_REVERSE
+                                             | BoardTestMotor::MOVE_RELATIVE);
+                }
+            }
+        }
+    }
+}
+
 int BoardTestMotor::get(uint32 address, uint32& value)
 {
+    LibMutex libMutex(m_mutex);
     switch (address) {
     default:
         return ERROR_ADDR;
@@ -71,6 +126,7 @@ int BoardTestMotor::get(uint32 address, uint32& value)
 
 int BoardTestMotor::set(uint32 address, uint32 value)
 {
+    LibMutex libMutex(m_mutex);
     switch (address) {
     default:
         return ERROR_ADDR;
@@ -89,15 +145,14 @@ int BoardTestMotor::set(uint32 address, uint32 value)
             case LIMP:
                 m_status = m_libMotor.limp();
                 break;
+            case STOP:
+                m_motorTask.stop();
+                // no break;
             case ENERGIZE:
                 m_status = m_libMotor.energize();
                 break;
             case MOVE_ABSOLUTE:
-                m_status = value & DIRECTION_REVERSE
-                         ? m_libMotor.moveToPosition(LibMotor::REVERSE, m_absPosition)
-                         : value & DIRECTION_FORWARD
-                         ? m_libMotor.moveToPosition(LibMotor::FORWARD, m_absPosition)
-                         : LibMotor::ERROR_INVALID_DIRECTION;
+                m_status = m_libMotor.moveToPosition(m_absPosition);
                 break;
             case MOVE_RELATIVE:
                 m_status = value & DIRECTION_REVERSE
@@ -105,6 +160,9 @@ int BoardTestMotor::set(uint32 address, uint32 value)
                          : value & DIRECTION_FORWARD
                          ? m_libMotor.moveRelative(LibMotor::FORWARD, m_relPosition)
                          : LibMotor::ERROR_INVALID_DIRECTION;
+                break;
+            case CYCLE:
+                m_motorTask.cycle();
                 break;
             }
         }
