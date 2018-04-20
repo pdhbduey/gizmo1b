@@ -96,14 +96,16 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec set customcycles 0..4,294,967,296\n\r";
     help += "tec get customindex|customtime|customiref|customcycles\n\r";
     help += "thermistor get a|b|c|d\n\r";
-    help += "motor reset|initialize|limp|energize\n\r";
+    help += "motor reset|initialize|limp|energize|stop\n\r";
     help += "motor get regaddress|regvalue|step|abspos|relpos|pos|status\n\r";
     help += "motor set regaddress|regvalue 0x<hex>\n\r";
     help += "motor set step full|half|1/4|1/8|1/16|1/32|1/64|1/128\n\r";
     help += "motor regread|regwrite\n\r";
     help += "motor set abspos -2097152..2097151\n\r";
     help += "motor set relpos 0..4194303\n\r";
-    help += "motor moveabs|moverel forward|reverse\n\r";
+    help += "motor moveabs\n\r";
+    help += "motor moverel forward|reverse\n\r";
+    help += "motor cycle\n\r";
     help += "fan set duty1|duty2 0..100\n\r";
     help += "fan set per1|per2 [10.0,1000000.0](us)\n\r";
     help += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
@@ -956,31 +958,17 @@ bool BoardTestConsoleApp::parseMotorCommand(std::vector<std::string>& tokens,
                 }
             }
         }
-        else if (tokens[ACTION] == "moveabs" && tokens.size() > ARGUMENT) {
-            if (tokens[ARGUMENT] == "forward") {
-                result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::DIRECTION_FORWARD
-                                                          | BoardTestMotor::MOVE_ABSOLUTE);
-                if (result == BoardTest::OKAY) {
-                    uint32 v;
-                    result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
-                    if (v != LibMotor::OKAY) {
-                        res = "motor comm status: " + commStatus[v];
-                    }
+        else if (tokens[ACTION] == "moveabs") {
+            result = regWrite(BoardTest::MOTOR_CONTROL,
+                                                 BoardTestMotor::MOVE_ABSOLUTE);
+            if (result == BoardTest::OKAY) {
+                uint32 v;
+                result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                if (v != LibMotor::OKAY) {
+                    res = "motor comm status: " + commStatus[v];
                 }
-                isParsingError = false;
             }
-            else if (tokens[ARGUMENT] == "reverse") {
-                result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::DIRECTION_REVERSE
-                                                          | BoardTestMotor::MOVE_ABSOLUTE);
-                if (result == BoardTest::OKAY) {
-                    uint32 v;
-                    result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
-                    if (v != LibMotor::OKAY) {
-                        res = "motor comm status: " + commStatus[v];
-                    }
-                }
-                isParsingError = false;
-            }
+            isParsingError = false;
         }
         else if (tokens[ACTION] == "moverel" && tokens.size() > ARGUMENT) {
             if (tokens[ARGUMENT] == "forward") {
@@ -1007,6 +995,10 @@ bool BoardTestConsoleApp::parseMotorCommand(std::vector<std::string>& tokens,
                 }
                 isParsingError = false;
             }
+        }
+        else if (tokens[ACTION] == "cycle") {
+            result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::CYCLE);
+            isParsingError = false;
         }
         else if (tokens[ACTION] == "reset") {
             result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::RESET);
@@ -1036,6 +1028,17 @@ bool BoardTestConsoleApp::parseMotorCommand(std::vector<std::string>& tokens,
         }
         else if (tokens[ACTION] == "energize") {
             result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::ENERGIZE);
+            if (result == BoardTest::OKAY) {
+                uint32 v;
+                result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);
+                if (v != LibMotor::OKAY) {
+                    res = "motor comm status: " + commStatus[v];
+                }
+            }
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "stop") {
+            result = regWrite(BoardTest::MOTOR_CONTROL, BoardTestMotor::STOP);
             if (result == BoardTest::OKAY) {
                 uint32 v;
                 result = regRead(BoardTest::MOTOR_COMMUNICATION_STATUS, v);

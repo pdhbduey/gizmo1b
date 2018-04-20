@@ -227,17 +227,14 @@ int LibMotor::move(int command, uint32 steps)
     return result;
 }
 
-int LibMotor::moveToPosition(int direction, sint32 position)
+int LibMotor::moveToPosition(sint32 position)
 {
-    if (!isValidDir(direction)) {
-        return ERROR_INVALID_DIRECTION;
-    }
     if (!isValidPosition(position)) {
         return ERROR_STEPS_COUNT;
     }
     uint32 steps  = *reinterpret_cast<uint32*>(&position);
            steps &= 0x003fffff;
-    return move(GOTO_DIR | direction, steps);
+    return move(GOTO, steps);
 }
 
 int LibMotor::moveRelative(int direction, uint32 steps)
