@@ -31,7 +31,7 @@ namespace DeviceManager.ViewModel
         public ThermistorViewModel(IThermistorModel thermistorModel)
         {
             this.thermistorModel = thermistorModel;
-            InitialUpdate();
+            //InitialUpdate();
 
             // Update Thermistor status values.
             StartUpdateTask();
