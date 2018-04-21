@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" 
              d:DesignWidth="300"
-             Background="WhiteSmoke">
+             Background="GhostWhite">
     <Grid>
         <StackPanel Margin="2" Orientation="Vertical">
             <Label Content="{Binding ChannelZeroValueText}"></Label>

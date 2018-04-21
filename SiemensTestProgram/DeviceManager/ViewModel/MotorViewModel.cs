@@ -32,33 +32,33 @@ namespace DeviceManager.ViewModel
         {
             this.motorModel = motorModel;
 
-            // initial values
-            StepSizes = MotorDefaults.StepSizes;
-            selectedStepSize = StepSizes[0];
+            //// initial values
+            //StepSizes = MotorDefaults.StepSizes;
+            //selectedStepSize = StepSizes[0];
 
             Directions = MotorDefaults.Directions;
-            selectedDirection = Directions[0];
+            //selectedDirection = Directions[0];
 
             RegisterAddresses = MotorDefaults.RegisterAddresses;
             selectedRegisterAddress = RegisterAddresses[0];
 
-            registerWriteValue = "00000000";
-            absoluteMoveValue = 0;
-            relativeMoveValue = 0;
+            //registerWriteValue = "00000000";
+            //absoluteMoveValue = 0;
+            //relativeMoveValue = 0;
 
-            // Initial Update
+            //// Initial Update
             InitialUpdate();
 
-            SetConfigurationCommand = new RelayCommand(param => SetConfiguration());
+            //SetConfigurationCommand = new RelayCommand(param => SetConfiguration());
             HomeCommand = new RelayCommand(param => Home());
             ResetCommand = new RelayCommand(param => Reset());
             LimpCommand = new RelayCommand(param => Limp());
-            InitializeCommand = new RelayCommand(param => Initialize());
-            MoveAbsoluteCommand = new RelayCommand(param => MoveToAbsolutePosition());
-            MoveRelativeCommand = new RelayCommand(param => MoveToRelativePosition());
-            EnergizeCommand = new RelayCommand(param => Energize());
+            //InitializeCommand = new RelayCommand(param => Initialize());
+            //MoveAbsoluteCommand = new RelayCommand(param => MoveToAbsolutePosition());
+            //MoveRelativeCommand = new RelayCommand(param => MoveToRelativePosition());
+            //EnergizeCommand = new RelayCommand(param => Energize());
 
-            StartUpdateTask();
+            //StartUpdateTask();
         }
 
         public RelayCommand EnergizeCommand { get; set; }
@@ -173,8 +173,13 @@ namespace DeviceManager.ViewModel
 
         private void InitialUpdate()
         {
-            motorPosition = "MOTOR ADD";
-            registerReadValue = "REGISTER ADD";
+            motorModel.InitialSet();
+            selectedDirection = Directions[0];
+
+            //MotorPosition = motorModel.;
+
+            motorModel.SetRegisterAddress(selectedRegisterAddress).Wait();
+            RegisterReadValue = Helper.GetFloatFromBigEndian(motorModel.ReadRegisterValue().Result).ToString();
         }
 
         private async void Energize()
@@ -189,12 +194,12 @@ namespace DeviceManager.ViewModel
 
         private async void MoveToRelativePosition()
         {
-            await motorModel.MoveAbsolute(RelativeMoveValue);
+            await motorModel.MoveRelative();
         }
 
         private async void MoveToAbsolutePosition()
         {
-            await motorModel.MoveAbsolute(AbsoluteMoveValue);
+            await motorModel.MoveAbsolute();
         }
 
         private async void SetSelectedRegisterAddress()

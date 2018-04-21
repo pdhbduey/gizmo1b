@@ -30,7 +30,7 @@
                 "TEC"
             };
 
-            selectedTestView = TestViews[3];
+            selectedTestView = TestViews[5];
 
             SetContent();
         }

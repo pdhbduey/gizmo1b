@@ -62,9 +62,9 @@ namespace DeviceManager.Model
             return response;
         }
 
-        public Task<byte[]> Energize()
+        public Task<byte[]> Reset()
         {
-            var requestArray = MotorDefaults.SetEnergizeCommand();
+            var requestArray = MotorDefaults.SetResetCommand();
             communication.WriteData(requestArray);
             var response = communication.ReadData();
             return response;
@@ -78,12 +78,19 @@ namespace DeviceManager.Model
             return response;
         }
 
-        public Task<byte[]> Reset()
+        public Task<byte[]> Energize()
         {
-            var requestArray = MotorDefaults.SetResetCommand();
+            var requestArray = MotorDefaults.SetEnergizeCommand();
             communication.WriteData(requestArray);
             var response = communication.ReadData();
             return response;
+        }
+
+        public void InitialSet()
+        {
+            var requestArray = MotorDefaults.SetInitialSetCommand();
+            communication.WriteData(requestArray);
+            communication.ReadData().Wait();
         }
 
         public Task<byte[]> Initialize()
@@ -94,28 +101,43 @@ namespace DeviceManager.Model
             return response;
         }
 
-        public Task<byte[]> MoveRelative(int relativeMoveValue)
+        public void SetRelativeMovePosition(int relativePosition)
         {
-            var requestArray = MotorDefaults.SetRelativePositionCommand(relativeMoveValue);
+            var requestArray = MotorDefaults.SetMoveRelativePositionCommand(relativePosition);
+            communication.WriteData(requestArray);
+            communication.ReadData().Wait();
+        }
+
+        public void SetAbsoluteMovePosition(int absolutePosition)
+        {
+            var requestArray = MotorDefaults.SetMoveAbsolutePositionCommand(absolutePosition);
+            communication.WriteData(requestArray);
+            communication.ReadData().Wait();
+        }
+
+        public Task<byte[]> MoveRelative()
+        {
+            var requestArray = MotorDefaults.SetMoveRelativeCommand();
             communication.WriteData(requestArray);
             var response = communication.ReadData();
-
-            requestArray = MotorDefaults.SetMoveRelativeCommand();
-            communication.WriteData(requestArray);
-            response = communication.ReadData();
 
             return response;
         }
 
-        public Task<byte[]> MoveAbsolute(int absoluteMoveValue)
+        public Task<byte[]> MoveAbsolute()
         {
-            var requestArray = MotorDefaults.SetAbsolutePositionCommand(absoluteMoveValue);
+            var requestArray = MotorDefaults.SetMoveAbsoluteCommand();
             communication.WriteData(requestArray);
             var response = communication.ReadData();
 
-            requestArray = MotorDefaults.SetMoveAbsoluteCommand();
+            return response;
+        }
+
+        public Task<byte[]> GetMotorPosition()
+        {
+            var requestArray = MotorDefaults.ReadPositionCommand();
             communication.WriteData(requestArray);
-            response = communication.ReadData();
+            var response = communication.ReadData();
 
             return response;
         }

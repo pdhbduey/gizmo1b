@@ -5,40 +5,114 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DeviceManager.View"
              mc:Ignorable="d" 
-             Background="WhiteSmoke">
+             Background="GhostWhite">
     <!-- Layouts Display for Motor tests -->
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Reset, Limp and Initialize -->
+        <GroupBox Grid.Row="0" Grid.Column="0">
+            <GroupBox.Header>
+                <TextBlock Text="State" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <StackPanel VerticalAlignment="Center">
+                <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Reset" Command="{Binding ResetCommand}"></Button>
+                <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Limp" Command="{Binding LimpCommand}"></Button>
+                <Button Margin="1" Height="25" Width="100" HorizontalAlignment="Left" Content="Home" Command="{Binding HomeCommand}"></Button>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="0" Grid.Column="1">
+            <GroupBox.Header>
+                <TextBlock Text="Status" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <StackPanel>
+                
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Grid.Column="0">
+            <GroupBox.Header>
+                <TextBlock Text="Register" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <StackPanel>
+                <!-- Addresses -->
+                <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding RegisterAddresses}" SelectedItem="{Binding SelectedRegisterAddress}"></ComboBox>
+                
+                <!-- Register Set -->
+                <!--<Button Height="25" Width="100" HorizontalAlignment="Right" Margin="2" Content="Set" Command="{Binding SetRegisterValueCommand}"></Button>
+                <Label Width="100" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{Binding RegisterReadValue}"></Label>-->
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Grid.Column="1">
+            <GroupBox.Header>
+                <TextBlock Text="Move" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <StackPanel>
+                <!-- Direction -->
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <Label Width="105"></Label>
+                    <ComboBox Height="25" Width="100" HorizontalAlignment="Left" ItemsSource="{Binding Directions}" SelectedItem="{Binding SelectedDirection}"></ComboBox>
+                </StackPanel>
+                
+                <!-- Relative -->
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <Label Width="105" Content="Relative Move:"></Label>
+                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=RelativeMoveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                </StackPanel>
+                
+                <!-- Absolute -->
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <Label Width="105" Content="Absolute Move:"></Label>
+                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=RelativeMoveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                </StackPanel>
+                
+                <!-- Home -->
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <Label Width="105"></Label>
+                    
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <!--<Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Initialize and Setup Commands -->
+        --><!-- Initialize and Setup Commands --><!--
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Motor Setup -->
+            --><!-- Motor Setup --><!--
             <StackPanel Grid.Column="0">
                 <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding StepSizes}" SelectedItem="{Binding SelectedStepSize}"></ComboBox>
                 <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding Directions}" SelectedItem="{Binding SelectedDirection}"></ComboBox>
                 <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Set" Command="{Binding SetConfigurationCommand}"></Button>
             </StackPanel>
 
-            <!-- Register Setup -->
+            --><!-- Register Setup --><!--
             <StackPanel Grid.Column="1">
                 <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Reset" Command="{Binding ResetCommand}"></Button>
                 <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Limp" Command="{Binding LimpCommand}"></Button>
                 <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Initialize" Command="{Binding InitializeCommand}"></Button>
-                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Energize" Command="{Binding EnergizeCommand}"></Button>
                 <Button Height="25" Width="100" HorizontalAlignment="Left" Margin="2" Content="Home" Command="{Binding HomeCommand}"></Button>
             </StackPanel>
         </Grid>
         
-        <!-- Move Commands -->
+        --><!-- Move Commands --><!--
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -75,10 +149,10 @@
             </StackPanel>
         </Grid>
         
-        <!-- Status -->
+        --><!-- Status --><!--
         <Grid Grid.Row="2">
             
-        </Grid>
+        </Grid>-->
         
     </Grid>
 </UserControl>

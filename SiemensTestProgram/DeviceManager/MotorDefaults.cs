@@ -46,6 +46,22 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] SetInitialSetCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                MotorControlAddress[0],
+                MotorControlAddress[1],
+                MotorControlAddress[2],
+                MotorControlAddress[3],
+                0x00,
+                0x00,
+                0x04,
+                0x20
+            };
+        }
+
         public static byte[] SetStepModeCommand(string stepSize)
         {
             var value = StepSizeValues[stepSize];
@@ -130,6 +146,40 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] SetMoveAbsolutePositionCommand(int absolutePosition)
+        {
+            var value = Helper.ConvertIntToByteArray(absolutePosition);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x03,
+                value[0],
+                value[1],
+                value[2],
+                value[3]
+            };
+        }
+
+        public static byte[] SetMoveRelativePositionCommand(int relativePosition)
+        {
+            var value = Helper.ConvertIntToByteArray(relativePosition);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x02,
+                value[0],
+                value[1],
+                value[2],
+                value[3]
+            };
+        }
+
         public static byte[] SetMoveRelativeCommand()
         {
             return new byte[]
@@ -189,7 +239,7 @@ namespace DeviceManager
                 MotorControlAddress[3],
                 0x00,
                 0x00,
-                0x10,
+                0x20,
                 0x00
             };
         }
@@ -206,7 +256,7 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x00,
-                0x20
+                0x0A
             };
         }
 
@@ -314,7 +364,7 @@ namespace DeviceManager
 
         public static Dictionary<string, byte> DirectionValues = new Dictionary<string, byte>()
         {
-            { Directions[0], 0x10},
+            { Directions[0], 0x40},
             { Directions[1], 0x20}
         };
 

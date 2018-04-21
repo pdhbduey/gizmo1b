@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DeviceManager.View"
         mc:Ignorable="d"
-        Background="WhiteSmoke">
+        Background="GhostWhite">
     <Grid>
         <StackPanel Margin="10">
             <StackPanel Orientation="Horizontal">

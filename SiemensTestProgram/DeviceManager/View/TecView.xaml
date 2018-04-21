@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:DeviceManager.View"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             Background="WhiteSmoke">
+             Background="GhostWhite">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

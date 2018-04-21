@@ -42,7 +42,7 @@ namespace DeviceManager.ViewModel
             statusMessage = "";
 
             // Update statuses
-            InitialUpdate();
+            //InitialUpdate();
             StartUpdateTask();
         }
 
@@ -171,7 +171,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"Sensor1 R.P.M: {sensorOneRpm.ToString("0.##")}";
+                return $"Sensor1 R.P.M: {sensorOneRpm}";
             }
         }
 
@@ -179,7 +179,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"Sensor2 R.P.M: {sensorTwoRpm.ToString("0.##")}";
+                return $"Sensor2 R.P.M: {sensorTwoRpm}";
             }
         }
 
@@ -260,10 +260,11 @@ namespace DeviceManager.ViewModel
                     // Update
                     var sensorOneValue = await fanModel.GetFanSensorRpm(sensor: 1);
                     SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue);
+                    Thread.Sleep(100);
 
                     var sensorTwoValue = await fanModel.GetFanSensorRpm(sensor: 2);
                     SensorOneRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
-
+                    Thread.Sleep(100);
                     var status = await fanModel.GetFanStatus();
                     ProcessStatus(status);
 

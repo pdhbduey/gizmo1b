@@ -26,8 +26,16 @@ namespace DeviceManager.Model
 
         Task<byte[]> Limp();
 
-        Task<byte[]> MoveRelative(int relativeMoveValue);
+        void SetRelativeMovePosition(int relativePosition);
 
-        Task<byte[]> MoveAbsolute(int absoluteMoveValue);
+        void SetAbsoluteMovePosition(int absolutePosition);
+
+        Task<byte[]> MoveRelative();
+
+        Task<byte[]> MoveAbsolute();
+
+        Task<byte[]> GetMotorPosition();
+
+        void InitialSet();
     }
 }
