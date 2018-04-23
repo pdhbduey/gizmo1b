@@ -6,9 +6,12 @@ namespace DeviceManager.Model
 {
     public interface IMotorModel
     {
-        Task<byte[]> SetStepMode(string selectedMode);
+        Task<byte[]> Cycle();
 
-        Task<byte[]> SetDirection(string selectedDirection);
+        Task<byte[]> Stop();
+
+        //Task<byte[]> SetDirection(string selectedDirection);
+        Task<byte[]>  MotorControlMove(string selectedDirection, string selectedStepSize, string move);
 
         Task<byte[]> SetRegisterValue(byte[] selectedDirection);
 
@@ -30,12 +33,11 @@ namespace DeviceManager.Model
 
         void SetAbsoluteMovePosition(int absolutePosition);
 
-        Task<byte[]> MoveRelative();
+        //Task<byte[]> MoveRelative();
 
-        Task<byte[]> MoveAbsolute();
+        //Task<byte[]> MoveAbsolute();
 
         Task<byte[]> GetMotorPosition();
 
-        void InitialSet();
     }
 }

@@ -38,21 +38,21 @@ namespace DeviceManager.Model
             return response;
         }
 
-        public Task<byte[]> SetStepMode(string selectedMode)
-        {
-            var requestArray = MotorDefaults.SetStepModeCommand(selectedMode);
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
-        }
+        //public Task<byte[]> SetStepMode(string selectedMode)
+        //{
+        //    var requestArray = MotorDefaults.SetStepModeCommand(selectedMode);
+        //    communication.WriteData(requestArray);
+        //    var response = communication.ReadData();
+        //    return response;
+        //}
 
-        public Task<byte[]> SetDirection(string selectedDirection)
-        {
-            var requestArray = MotorDefaults.SetDirectionCommand(selectedDirection);
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
-        }
+        //public Task<byte[]> SetDirection(string selectedDirection)
+        //{
+        //    var requestArray = MotorDefaults.SetDirectionCommand(selectedDirection);
+        //    communication.WriteData(requestArray);
+        //    var response = communication.ReadData();
+        //    return response;
+        //}
 
         public Task<byte[]> Home()
         {
@@ -86,12 +86,6 @@ namespace DeviceManager.Model
             return response;
         }
 
-        public void InitialSet()
-        {
-            var requestArray = MotorDefaults.SetInitialSetCommand();
-            communication.WriteData(requestArray);
-            communication.ReadData().Wait();
-        }
 
         public Task<byte[]> Initialize()
         {
@@ -115,23 +109,47 @@ namespace DeviceManager.Model
             communication.ReadData().Wait();
         }
 
-        public Task<byte[]> MoveRelative()
+        public Task<byte[]> MotorControlMove(string selectedDirection, string selectedStepSize, string move)
         {
-            var requestArray = MotorDefaults.SetMoveRelativeCommand();
+            var requestArray = MotorDefaults.SetControlMoveCommand(selectedDirection, selectedStepSize, move);
             communication.WriteData(requestArray);
             var response = communication.ReadData();
-
             return response;
         }
 
-        public Task<byte[]> MoveAbsolute()
+        public Task<byte[]> Cycle()
         {
-            var requestArray = MotorDefaults.SetMoveAbsoluteCommand();
+            var requestArray = MotorDefaults.CycleCommand();
             communication.WriteData(requestArray);
             var response = communication.ReadData();
-
             return response;
         }
+
+        public Task<byte[]> Stop()
+        {
+            var requestArray = MotorDefaults.StopCommand();
+            communication.WriteData(requestArray);
+            var response = communication.ReadData();
+            return response;
+        }
+
+        //public Task<byte[]> MoveRelative()
+        //{
+        //    var requestArray = MotorDefaults.SetMoveRelativeCommand();
+        //    communication.WriteData(requestArray);
+        //    var response = communication.ReadData();
+
+        //    return response;
+        //}
+
+        //public Task<byte[]> MoveAbsolute()
+        //{
+        //    var requestArray = MotorDefaults.SetMoveAbsoluteCommand();
+        //    communication.WriteData(requestArray);
+        //    var response = communication.ReadData();
+
+        //    return response;
+        //}
 
         public Task<byte[]> GetMotorPosition()
         {
