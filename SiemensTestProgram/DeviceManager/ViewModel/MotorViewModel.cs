@@ -34,17 +34,17 @@ namespace DeviceManager.ViewModel
 
             //// initial values
             StepSizes = MotorDefaults.StepSizes;
-            
+            SelectedStepSize = StepSizes[0];
 
             Directions = MotorDefaults.Directions;
-            //selectedDirection = Directions[0];
+            SelectedDirection = Directions[0];
 
             RegisterAddresses = MotorDefaults.RegisterAddresses;
-            selectedRegisterAddress = RegisterAddresses[0];
+            SelectedRegisterAddress = RegisterAddresses[0];
 
-            //registerWriteValue = "00000000";
-            //absoluteMoveValue = 0;
-            //relativeMoveValue = 0;
+            registerWriteValue = "00000000";
+            absoluteMoveValue = 0;
+            relativeMoveValue = 0;
 
             //// Initial Update
             InitialUpdate();
@@ -62,15 +62,7 @@ namespace DeviceManager.ViewModel
             StartUpdateTask();
         }
 
-        private async void Cycle()
-        {
-            motorModel.Cycle();
-        }
 
-        private async void Stop()
-        {
-            motorModel.Stop();
-        }
 
         public RelayCommand CycleRelativeCommand { get; set; }
 
@@ -136,7 +128,6 @@ namespace DeviceManager.ViewModel
             {
                 selectedStepSize = value;
                 OnPropertyChanged(nameof(SelectedStepSize));
-                //SetStepMode();
             }
         }
 
@@ -150,8 +141,6 @@ namespace DeviceManager.ViewModel
             {
                 selectedDirection = value;
                 OnPropertyChanged(nameof(SelectedDirection));
-
-                //SetDirectionMode();
             }
         }
 
@@ -293,6 +282,16 @@ namespace DeviceManager.ViewModel
             await motorModel.Home();
         }
 
+        private async void Cycle()
+        {
+            await motorModel.Cycle();
+        }
+
+        private async void Stop()
+        {
+            await motorModel.Stop();
+        }
+
         private void StartUpdateTask()
         {
             cts = new CancellationTokenSource();
@@ -316,6 +315,9 @@ namespace DeviceManager.ViewModel
                 try
                 {
                     // Read register address
+                    var registerValue = await motorModel.ReadRegisterValue();
+                    RegisterReadValue = Helper.GetIntFromBigEndian(registerValue).ToString();
+
                     // Read motor position
                     var position = await motorModel.GetMotorPosition();
                     MotorPosition = Helper.GetIntFromBigEndian(position).ToString();

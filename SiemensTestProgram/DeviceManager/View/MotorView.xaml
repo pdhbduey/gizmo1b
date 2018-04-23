@@ -36,7 +36,13 @@
                 <TextBlock Text="Status" FontWeight="Bold"/>
             </GroupBox.Header>
             <StackPanel>
-                
+                <StackPanel>
+                    <Label Content="Bridge in Hiz: "></Label>
+                    <Label Content="Busy: "></Label>
+                    <Label Content="Direction: "></Label>
+                    <Label Content="Acceleration: "></Label>
+                    <Label Content="Error: "></Label>
+                </StackPanel>
             </StackPanel>
         </GroupBox>
 
@@ -95,76 +101,5 @@
                 <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding MotorPosition}"></Label>
             </StackPanel>
         </GroupBox>
-        <!--<Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
-        --><!-- Initialize and Setup Commands --><!--
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            --><!-- Motor Setup --><!--
-            <StackPanel Grid.Column="0">
-                <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding StepSizes}" SelectedItem="{Binding SelectedStepSize}"></ComboBox>
-                <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding Directions}" SelectedItem="{Binding SelectedDirection}"></ComboBox>
-                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Set" Command="{Binding SetConfigurationCommand}"></Button>
-            </StackPanel>
-
-            --><!-- Register Setup --><!--
-            <StackPanel Grid.Column="1">
-                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Reset" Command="{Binding ResetCommand}"></Button>
-                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Limp" Command="{Binding LimpCommand}"></Button>
-                <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Initialize" Command="{Binding InitializeCommand}"></Button>
-                <Button Height="25" Width="100" HorizontalAlignment="Left" Margin="2" Content="Home" Command="{Binding HomeCommand}"></Button>
-            </StackPanel>
-        </Grid>
-        
-        --><!-- Move Commands --><!--
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Row="0" Grid.Column="0">
-                <ComboBox Height="25" Width="100" HorizontalAlignment="Left" Margin="2" ItemsSource="{Binding RegisterAddresses}" SelectedItem="{Binding SelectedRegisterAddress}"></ComboBox>
-                <StackPanel Orientation="Horizontal">
-                    <Label Width="100" Content="Register Value:"></Label>
-                    <TextBox Name="registerTextbox" MaxLength="8" Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding RegisterWriteValue}" TextChanged="TextBox_TextChanged"></TextBox>
-                </StackPanel>
-                <Label Width="100" HorizontalAlignment="Right" Content="{Binding RegisterReadValue}"></Label>
-                <Button Height="25" Width="100" HorizontalAlignment="Right" Margin="2" Content="Set" Command="{Binding SetRegisterValueCommand}"></Button>
-            </StackPanel>
-
-            <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left">
-                <StackPanel Orientation="Horizontal">
-                    <Label Width="105" Content="Absolute Position:"></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1"  HorizontalAlignment="Left" Text="{Binding Path=AbsoluteMoveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                    <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Move" Command="{Binding MoveAbsoluteCommand}"></Button>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Label Width="105" Content="Relative Position:"></Label>
-                    <TextBox Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=RelativeMoveValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                    <Button Margin="2" Width="100" Height="25" HorizontalAlignment="Left" Content="Move" Command="{Binding MoveRelativeCommand}"></Button>
-                </StackPanel>
-                <Label Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="{Binding MotorPosition}"></Label>
-            </StackPanel>
-        </Grid>
-        
-        --><!-- Status --><!--
-        <Grid Grid.Row="2">
-            
-        </Grid>-->
-        
     </Grid>
 </UserControl>
