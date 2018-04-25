@@ -95,6 +95,13 @@ namespace DeviceManager.Model
             return response;
         }
 
+        public byte[] GetMotorStatus()
+        {
+            var requestArray = MotorDefaults.GetMotorStatusCommand();
+            communication.WriteData(requestArray);
+            return communication.ReadData().Result;
+        }
+
         public void SetRelativeMovePosition(int relativePosition)
         {
             var requestArray = MotorDefaults.SetMoveRelativePositionCommand(relativePosition);

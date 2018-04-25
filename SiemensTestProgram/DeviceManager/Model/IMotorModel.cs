@@ -39,5 +39,6 @@ namespace DeviceManager.Model
 
         Task<byte[]> GetMotorPosition();
 
+        byte[] GetMotorStatus();
     }
 }

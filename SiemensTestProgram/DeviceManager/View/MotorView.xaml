@@ -31,17 +31,16 @@
             </StackPanel>
         </GroupBox>
 
+        <!-- Motor Statuses -->
         <GroupBox Grid.Row="0" Grid.Column="1">
             <GroupBox.Header>
                 <TextBlock Text="Status" FontWeight="Bold"/>
             </GroupBox.Header>
             <StackPanel>
                 <StackPanel>
-                    <Label Content="Bridge in Hiz: "></Label>
-                    <Label Content="Busy: "></Label>
-                    <Label Content="Direction: "></Label>
-                    <Label Content="Acceleration: "></Label>
-                    <Label Content="Error: "></Label>
+                    <Label Content="{Binding BridgeInHiz}"></Label>
+                    <Label Content="{Binding BusyStatus}"></Label>
+                    <Label Content="{Binding ErrorStatus}"></Label>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
@@ -88,7 +87,7 @@
                 <!-- Relative -->
                 <StackPanel Orientation="Horizontal" Margin="1">
                     <Label Width="105" Content="Relative Move:"></Label>
-                    <TextBox Margin="1" Height="25" Width="100" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding Path=RelativeMoveValue, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"></TextBox>
+                    <TextBox Margin="1" Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=RelativeMoveValue, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"></TextBox>
                     <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Move" Command="{Binding MoveRelativeCommand}"></Button>
                 </StackPanel>
 

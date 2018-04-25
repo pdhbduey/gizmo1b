@@ -106,11 +106,27 @@ namespace DeviceManager
         {
             return new byte[]
             {
-                DataHelper.REGISTER_WRITE,
+                DataHelper.REGISTER_READ,
                 0x00,
                 0x00,
                 0x06,
                 0x07,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] GetMotorStatusCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x06,
+                0x08,
                 0x00,
                 0x00,
                 0x00,
@@ -252,7 +268,7 @@ namespace DeviceManager
         {
             return new byte[]
             {
-                DataHelper.REGISTER_WRITE,
+                DataHelper.REGISTER_READ,
                 0x00,
                 0x00,
                 0x06,
