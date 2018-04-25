@@ -1,12 +1,11 @@
-﻿using DeviceManager.DeviceCommunication;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
 namespace DeviceManager.Model
 {
+    using System.Threading.Tasks;
+
+    using DeviceCommunication;
+
     public class DioModel : IDioModel
     {
         private IComCommunication communication;

@@ -1,4 +1,5 @@
-﻿
+﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
+
 namespace DeviceManager.ViewModel
 {
     using Common.Bindings;

@@ -180,6 +180,18 @@ namespace DeviceManager
             };
         }
 
+        /// <summary>
+        ///  Sets the data context for fault view.
+        /// </summary>
+        /// <returns> Motor view. </returns>
+        public FaultView GetFaultView()
+        {
+            return new FaultView()
+            {
+                DataContext = new FaultViewModel(GetFaultModel())
+            };
+        }
+
         private LedModel GetLedModel(IComCommunication communication)
         {
             return new LedModel(communication);
@@ -188,6 +200,11 @@ namespace DeviceManager
         private IDioModel GetDioModel()
         {
             return new DioModel(serialCommunication);
+        }
+
+        private IFaultModel GetFaultModel()
+        {
+            return new FaultModel(serialCommunication);
         }
 
         private IDacModel GetDacModel(IComCommunication communication)

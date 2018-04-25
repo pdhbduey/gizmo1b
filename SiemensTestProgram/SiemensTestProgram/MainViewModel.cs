@@ -24,13 +24,14 @@
                 "DAC",
                 "DIO",
                 "Fan",
+                "Fault",
                 "LED",
                 "Motor",
                 "Thermistor",
                 "TEC"
             };
 
-            selectedTestView = TestViews[4];
+            selectedTestView = TestViews[5];
 
             SetContent();
         }
@@ -139,6 +140,9 @@
                     break;
                 case "Fan":
                     Content = DeviceManager.Factory.Instance.GetFanView();
+                    break;
+                case "Fault":
+                    Content = DeviceManager.Factory.Instance.GetFaultView();
                     break;
                 case "Thermistor":
                     Content = DeviceManager.Factory.Instance.GetThermistorView();
