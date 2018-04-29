@@ -48,7 +48,7 @@ bool LibAdc::isChannelCorrect(int channel)
 // Pulse Width tCNVH                       Max 10 ns
 // CNV MUST BE HIGH PRIOR TO THE END OF CONVERSION (EOC) TO AVOID THE BUSY INDICATOR
 // CNV high transitions SDO to High-Z so CNV must be held low during the transfer
-bool LibAdc::readDataDuringConversion(uint16 cfg, uint16& data)
+int LibAdc::readDataDuringConversion(uint16 cfg, uint16& data)
 {
     int result = OKAY;
     m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true); // start conversion DATA(n-1), SDO to High-Z
