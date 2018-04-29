@@ -73,6 +73,7 @@
     <Compile Include="DeviceCommunication\IComCommunication.cs" />
     <Compile Include="DioDefaults.cs" />
     <Compile Include="FanDefaults.cs" />
+    <Compile Include="FaultDefaults.cs" />
     <Compile Include="LedDefaults.cs" />
     <Compile Include="Model\AdcModel.cs" />
     <Compile Include="Model\CommunicationConfigurationModel.cs" />
