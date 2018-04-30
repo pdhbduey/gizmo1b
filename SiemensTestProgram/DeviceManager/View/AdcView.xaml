@@ -9,14 +9,19 @@
              d:DesignWidth="300"
              Background="GhostWhite">
     <Grid>
-        <StackPanel Margin="2" Orientation="Vertical">
-            <Label Content="{Binding ChannelZeroValueText}"></Label>
-            <Label Content="{Binding ChannelOneValueText}"></Label>
-            <Label Content="{Binding ChannelTwoValueText}"></Label>
-            <Label Content="{Binding ChannelThreeValueText}"></Label>
-            <Label Content="{Binding ChannelFourValueText}"></Label>
-            <Label Content="{Binding ChannelFiveValueText}"></Label>
-            <Label Content="{Binding StatusMessage}"></Label>
-        </StackPanel>
+        <GroupBox>
+            <GroupBox.Header>
+                <TextBlock Text="Status" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <StackPanel Margin="2" Orientation="Vertical">
+                <Label Content="{Binding ChannelZeroValueText}"></Label>
+                <Label Content="{Binding ChannelOneValueText}"></Label>
+                <Label Content="{Binding ChannelTwoValueText}"></Label>
+                <Label Content="{Binding ChannelThreeValueText}"></Label>
+                <Label Content="{Binding ChannelFourValueText}"></Label>
+                <Label Content="{Binding ChannelFiveValueText}"></Label>
+                <Label Content="{Binding StatusMessage}"></Label>
+            </StackPanel>
+        </GroupBox>
     </Grid>
 </UserControl>
