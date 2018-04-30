@@ -71,6 +71,13 @@ namespace Common
             return BitConverter.ToInt32(bytes, 0);
         }
 
+        public static int GetIntFromLittleEndian(byte[] bytes)
+        {
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(bytes); // We have to reverse
+            return BitConverter.ToInt32(bytes, 0);
+        }
+
         public static byte[] ConvertIntToByteArray(int value)
         {
             byte[] bytes = BitConverter.GetBytes(value);

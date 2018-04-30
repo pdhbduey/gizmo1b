@@ -102,9 +102,9 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] SetFanPeriodCommand(int channel, int period)
+        public static byte[] SetFanPeriodCommand(int channel, float period)
         {
-            var periodValue = Helper.ConvertIntToByteArray(period);
+            var periodValue = Helper.GetBigEndian(period);
             byte channelByte;
 
             channelByte = 0x03;

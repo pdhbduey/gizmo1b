@@ -26,12 +26,13 @@ namespace DeviceManager.ViewModel
         private Task updateTask;
         CancellationTokenSource cts;
         CancellationToken token;
-        private int updateDelay = 1500;
+        private int updateDelay = 500;
+        private int delayBetweenRequests = 50;
 
         public ThermistorViewModel(IThermistorModel thermistorModel)
         {
             this.thermistorModel = thermistorModel;
-            //InitialUpdate();
+            InitialUpdate();
 
             // Update Thermistor status values.
             StartUpdateTask();
@@ -227,36 +228,46 @@ namespace DeviceManager.ViewModel
         {
             var ainAData = await thermistorModel.ReadAinA();
             AinA = Helper.GetFloatFromBigEndian(ainAData);
+            Thread.Sleep(delayBetweenRequests);
 
             var ainBData = await thermistorModel.ReadAinB();
             AinB = Helper.GetFloatFromBigEndian(ainBData);
+            Thread.Sleep(delayBetweenRequests);
 
             var ainCData = await thermistorModel.ReadAinC();
             AinC = Helper.GetFloatFromBigEndian(ainCData);
+            Thread.Sleep(delayBetweenRequests);
 
             var ainDData = await thermistorModel.ReadAinD();
             AinD = Helper.GetFloatFromBigEndian(ainDData);
+            Thread.Sleep(delayBetweenRequests);
 
             var status = await thermistorModel.ReadStatus();
             ProcessStatus(status);
+            Thread.Sleep(updateDelay);
         }
 
         private void InitialUpdate()
         {
             var ainAData = thermistorModel.ReadAinA().Result;
             AinA = Helper.GetFloatFromBigEndian(ainAData);
+            Thread.Sleep(50);
 
             var ainBData = thermistorModel.ReadAinB().Result;
             AinB = Helper.GetFloatFromBigEndian(ainBData);
+            Thread.Sleep(50);
 
             var ainCData = thermistorModel.ReadAinC().Result;
             AinC = Helper.GetFloatFromBigEndian(ainCData);
+            Thread.Sleep(50);
 
             var ainDData = thermistorModel.ReadAinD().Result;
             AinD = Helper.GetFloatFromBigEndian(ainDData);
+            Thread.Sleep(50);
 
             var status = thermistorModel.ReadStatus().Result;
             ProcessStatus(status);
+            Thread.Sleep(50);
         }
 
         /// <summary>
