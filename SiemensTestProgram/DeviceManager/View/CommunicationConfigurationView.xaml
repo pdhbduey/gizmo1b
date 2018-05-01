@@ -14,9 +14,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <GroupBox HorizontalAlignment="Left" BorderBrush="DarkGray">
+            <GroupBox>
                 <GroupBox.Header>
-                    Configuration
+                    <TextBlock Text="Configuration" FontWeight="Bold"/>
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
@@ -29,9 +29,9 @@
                     <ComboBox Margin="1" ItemsSource="{Binding StopBits}" SelectedItem="{Binding SelectedStopBits}"></ComboBox>
                 </StackPanel>
             </GroupBox>
-            <GroupBox HorizontalAlignment="Left" BorderBrush="DarkGray">
+            <GroupBox>
                 <GroupBox.Header>
-                    Serial Port Settings
+                    <TextBlock Text="Serial Port Settings" FontWeight="Bold"/>
                 </GroupBox.Header>
                 <StackPanel>
                     <Label Content="{Binding Name}"></Label>

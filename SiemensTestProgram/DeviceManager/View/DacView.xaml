@@ -7,24 +7,36 @@
         mc:Ignorable="d"
         Background="GhostWhite">
     <Grid>
-        <StackPanel Margin="10">
-            <StackPanel Orientation="Horizontal">
-                <Slider
-                    Width="250" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Left" 
-                    Minimum="0" 
-                    Maximum="500" 
-                    Value="{Binding SliderVoltageValue}">
-                </Slider>
-                <TextBox Text="{Binding Path=VoltageValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2, Delay=500}" HorizontalAlignment="Left" MaxLength="5" Width="40"></TextBox>
-                <Button Content="Set" Margin="1" Height="25" Width="100" Command="{Binding SendDacValueCommand}"></Button>
-            </StackPanel>
-        </StackPanel>
+        <GroupBox Grid.Row="0" Grid.Column="0">
+            <GroupBox.Header>
+                <TextBlock Text="Setup" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                
+                <StackPanel Grid.Row="0" Margin="10">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider
+                        Width="250" 
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Left" 
+                        Minimum="0" 
+                        Maximum="500" 
+                        Value="{Binding SliderVoltageValue}">
+                        </Slider>
+                        <TextBox Text="{Binding Path=VoltageValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2, Delay=500}" HorizontalAlignment="Left" MaxLength="5" Width="40"></TextBox>
+                        <Button Content="Set" Margin="1" Height="25" Width="100" Command="{Binding SendDacValueCommand}"></Button>
+                    </StackPanel>
+                </StackPanel>
 
-        <!-- Status message -->
-        <StackPanel Grid.Row="1"  HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding DacStatus}"></Label>
-        </StackPanel>
+                <!-- Status message -->
+                <StackPanel Grid.Row="1"  HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding DacStatus}"></Label>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
     </Grid>
 </UserControl>
