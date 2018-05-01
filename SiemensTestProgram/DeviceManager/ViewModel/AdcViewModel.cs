@@ -25,7 +25,7 @@ namespace DeviceManager.ViewModel
         private Task updateTask;
         CancellationTokenSource cts;
         CancellationToken token;
-        private int updateDelay = 50;
+        private int updateDelay = 200;
 
         public AdcViewModel(IAdcModel adcModel)
         {

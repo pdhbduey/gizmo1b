@@ -33,7 +33,7 @@
                     VerticalAlignment="Center"
                     Minimum="0" 
                     Maximum="100" 
-                    Value="{Binding DutyCycleOne, Delay=100}">
+                    Value="{Binding DutyCycleOne, Delay=15}">
                     </Slider>
                     <Label Margin="5,0,0,0" Content="{Binding DutyCycleOne}"></Label>
                     <Label Content="%"></Label>
@@ -61,7 +61,7 @@
                     VerticalAlignment="Center"
                     Minimum="0" 
                     Maximum="100" 
-                    Value="{Binding DutyCycleTwo}">
+                    Value="{Binding DutyCycleTwo, Delay=15}">
                     </Slider>
                     <Label VerticalAlignment="Center" Margin="5,0,0,0" Content="{Binding DutyCycleTwo}"></Label>
                     <Label Content="%"></Label>
