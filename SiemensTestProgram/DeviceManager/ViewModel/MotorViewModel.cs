@@ -21,10 +21,7 @@ namespace DeviceManager.ViewModel
         private string registerReadValue;
         private string bridgeInHiz;
         private string busyStatus;
-        private string directionStatus;
-        private string accelerationStatus;
         private string errorStatus;
-
         private int absoluteMoveValue;
         private int relativeMoveValue;
         private byte[] registerValue;
@@ -408,9 +405,9 @@ namespace DeviceManager.ViewModel
                     // Update motor status
                     Thread.Sleep(updateDelay);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    //StatusMessage = e.Message;
+                   
                 }
             }
         }

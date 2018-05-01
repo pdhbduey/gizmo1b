@@ -733,7 +733,22 @@ namespace DeviceManager.ViewModel
 
                 try
                 {
-                    Update();
+                    var iRefData = await tecModel.ReadIref();
+                    IRef = Helper.GetFloatFromBigEndian(iRefData);
+                    Thread.Sleep(50);
+
+                    var iSenseData = await tecModel.ReadIsense();
+                    ISense = Helper.GetFloatFromBigEndian(iSenseData);
+                    Thread.Sleep(50);
+
+                    var vSenseData = await tecModel.ReadVsense();
+                    VSense = Helper.GetFloatFromBigEndian(vSenseData);
+                    Thread.Sleep(50);
+
+                    var status = await tecModel.ReadStatus();
+                    Thread.Sleep(50);
+
+                    ProcessStatus(status);
                     Thread.Sleep(updateDelay);
                 }
                 catch (Exception e)
@@ -741,26 +756,6 @@ namespace DeviceManager.ViewModel
                     StatusMessage = e.Message;
                 }
             }
-        }
-
-        private async void Update()
-        {
-            var iRefData = await tecModel.ReadIref();
-            IRef = Helper.GetFloatFromBigEndian(iRefData);
-            Thread.Sleep(50);
-
-            var iSenseData = await tecModel.ReadIsense();
-            ISense = Helper.GetFloatFromBigEndian(iSenseData);
-            Thread.Sleep(50);
-
-            var vSenseData = await tecModel.ReadVsense();
-            VSense = Helper.GetFloatFromBigEndian(vSenseData);
-            Thread.Sleep(50);
-
-            var status = await tecModel.ReadStatus();
-            Thread.Sleep(50);
-
-            ProcessStatus(status);
         }
 
         private void InitialUpdate()

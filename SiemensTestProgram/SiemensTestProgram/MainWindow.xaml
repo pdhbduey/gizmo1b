@@ -51,12 +51,8 @@
             <RowDefinition Height="8*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Margin="10" Grid.Row="0" Visibility="{Binding ReturnVisibility}">
-            <Button Height="25" Width="100" HorizontalAlignment="Left" Margin="1" Content="Return" Command="{Binding ExitCommand}"></Button>
-        </StackPanel>
-        <StackPanel Grid.Row="0" Visibility="{Binding CommunicationVisibility}" Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
             <ComboBox Height="25" Width="100" Margin="1" ItemsSource="{Binding TestViews}" SelectedItem="{Binding SelectedTestView}"></ComboBox>
-            <Button Height="25" Width="100" Margin="1" Content="Configure" Command="{Binding ConfigureComCommand}"></Button>
         </StackPanel>
         
         <ContentControl Grid.Row="1" Content="{Binding Content}"></ContentControl>

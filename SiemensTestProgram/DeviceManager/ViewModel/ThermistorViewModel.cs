@@ -199,7 +199,24 @@ namespace DeviceManager.ViewModel
 
                 try
                 {
-                    UpdateStatus();
+                    var ainAData = await thermistorModel.ReadAinA();
+                    AinA = Helper.GetFloatFromBigEndian(ainAData);
+                    Thread.Sleep(delayBetweenRequests);
+
+                    var ainBData = await thermistorModel.ReadAinB();
+                    AinB = Helper.GetFloatFromBigEndian(ainBData);
+                    Thread.Sleep(delayBetweenRequests);
+
+                    var ainCData = await thermistorModel.ReadAinC();
+                    AinC = Helper.GetFloatFromBigEndian(ainCData);
+                    Thread.Sleep(delayBetweenRequests);
+
+                    var ainDData = await thermistorModel.ReadAinD();
+                    AinD = Helper.GetFloatFromBigEndian(ainDData);
+                    Thread.Sleep(delayBetweenRequests);
+
+                    var status = await thermistorModel.ReadStatus();
+                    ProcessStatus(status);
                     Thread.Sleep(updateDelay);
                 }
                 catch (Exception e)
@@ -222,29 +239,6 @@ namespace DeviceManager.ViewModel
             }
 
             StatusMessage = GetErrorMessage(status[4]);
-        }
-
-        private async void UpdateStatus()
-        {
-            var ainAData = await thermistorModel.ReadAinA();
-            AinA = Helper.GetFloatFromBigEndian(ainAData);
-            Thread.Sleep(delayBetweenRequests);
-
-            var ainBData = await thermistorModel.ReadAinB();
-            AinB = Helper.GetFloatFromBigEndian(ainBData);
-            Thread.Sleep(delayBetweenRequests);
-
-            var ainCData = await thermistorModel.ReadAinC();
-            AinC = Helper.GetFloatFromBigEndian(ainCData);
-            Thread.Sleep(delayBetweenRequests);
-
-            var ainDData = await thermistorModel.ReadAinD();
-            AinD = Helper.GetFloatFromBigEndian(ainDData);
-            Thread.Sleep(delayBetweenRequests);
-
-            var status = await thermistorModel.ReadStatus();
-            ProcessStatus(status);
-            Thread.Sleep(updateDelay);
         }
 
         private void InitialUpdate()
