@@ -7,23 +7,28 @@
              mc:Ignorable="d" 
              Background="GhostWhite">
     <!-- Layouts Display for LED tests -->
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <GroupBox >
+        <GroupBox.Header>
+            <TextBlock Text="Status" FontWeight="Bold"/>
+        </GroupBox.Header>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- LED buttons -->
-        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
-            <StackPanel Orientation="Horizontal">
-                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding GreenLedStatus}" HorizontalAlignment="Left" Command="{Binding ToggleLedGreenCommand}"></ToggleButton>
-                <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding RedLedStatus}" HorizontalAlignment="Left" Command="{Binding ToggleLedRedCommand}"></ToggleButton>
+            <!-- LED buttons -->
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
+                <StackPanel>
+                    <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding GreenLedStatus}" HorizontalAlignment="Left" Command="{Binding ToggleLedGreenCommand}"></ToggleButton>
+                    <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding RedLedStatus}" HorizontalAlignment="Left" Command="{Binding ToggleLedRedCommand}"></ToggleButton>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
 
-        <!-- Response message -->
-        <StackPanel Grid.Row="1"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
-            <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding LedStatus}"></Label>
-        </StackPanel>
-    </Grid>
+            <!-- Response message -->
+            <StackPanel Grid.Row="1"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
+                <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding LedStatus}"></Label>
+            </StackPanel>
+        </Grid>
+    </GroupBox>
 </UserControl>

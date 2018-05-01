@@ -48,7 +48,7 @@
                 </StackPanel>
                 
                 <StackPanel Grid.Row="0" Grid.Column="1">
-                    <Label Margin="1" Height="25" Width="100"></Label>
+                    <Label Margin="1,10,1,10" Height="25" Width="100"></Label>
 
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Fill="{Binding NtcOneColour}" Width="10" Height="10" />
