@@ -25,7 +25,7 @@ namespace DeviceManager.ViewModel
         private int numberOfSamples;
         private float irefCurrentValue;
         private int sliderIrefValue;
-        private int irefGain;
+        //private int irefGain;
         private int tecPeriod;
         private int counter;
         private int waveformCycles;
@@ -51,6 +51,8 @@ namespace DeviceManager.ViewModel
             this.tecModel = tecModel;
 
             // Initial values
+            saving = false;
+            updating = false;
             counter = 0;
             progressMaximum = 100;
             tecPeriod = TecDefaults.PeriodMinimum;
