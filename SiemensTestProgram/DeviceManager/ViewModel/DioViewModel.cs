@@ -31,7 +31,7 @@ namespace DeviceManager.ViewModel
         private string doutSixStatus;
         private string doutSevenStatus;
 
-        private int updateDelay = 1500;
+        private int updateDelay = 500;
         private Task updateTask;
 
         public DioViewModel(IDioModel dioModel)

@@ -25,7 +25,7 @@ namespace DeviceManager.ViewModel
         private Task updateTask;
         CancellationTokenSource cts;
         CancellationToken token;
-        private int updateDelay = 500;
+        private int updateDelay = 50;
 
         public AdcViewModel(IAdcModel adcModel)
         {
@@ -272,7 +272,9 @@ namespace DeviceManager.ViewModel
                 {
                     // Channel Zero
                     await adcModel.ControlAdcChannel(0);
+                    Thread.Sleep(updateDelay);
                     var statusChannelZero = await adcModel.ReadStatus();
+                    Thread.Sleep(updateDelay);
                     if (ProcessStatus(statusChannelZero, 0))
                     {
                         var channelZeroResult = await adcModel.ReadAdcResult();
@@ -283,7 +285,9 @@ namespace DeviceManager.ViewModel
 
                     //// Channel One
                     await adcModel.ControlAdcChannel(1);
+                    Thread.Sleep(updateDelay);
                     var statusChannelOne = await adcModel.ReadStatus();
+                    Thread.Sleep(updateDelay);
                     if (ProcessStatus(statusChannelOne, 1))
                     {
                         var channelOneResult = await adcModel.ReadAdcResult();
@@ -294,7 +298,9 @@ namespace DeviceManager.ViewModel
 
                     // Channel Two
                     await adcModel.ControlAdcChannel(2);
+                    Thread.Sleep(updateDelay);
                     var statusChannelTwo = await adcModel.ReadStatus();
+                    Thread.Sleep(updateDelay);
                     if (ProcessStatus(statusChannelTwo, 2))
                     {
                         var channelTwoResult = await adcModel.ReadAdcResult();
@@ -305,7 +311,9 @@ namespace DeviceManager.ViewModel
 
                     // Channel Three
                     await adcModel.ControlAdcChannel(3);
+                    Thread.Sleep(updateDelay);
                     var statusChannelThree = await adcModel.ReadStatus();
+                    Thread.Sleep(updateDelay);
                     if (ProcessStatus(statusChannelThree, 3))
                     {
                         var channelThreeResult = await adcModel.ReadAdcResult();
@@ -316,7 +324,9 @@ namespace DeviceManager.ViewModel
 
                     // Channel Four
                     await adcModel.ControlAdcChannel(4);
+                    Thread.Sleep(updateDelay);
                     var statusChannelFour = await adcModel.ReadStatus();
+                    Thread.Sleep(updateDelay);
                     if (ProcessStatus(statusChannelFour, 4))
                     {
                         var channelFourResult = await adcModel.ReadAdcResult();
@@ -327,7 +337,9 @@ namespace DeviceManager.ViewModel
 
                     // Channel Five
                     await adcModel.ControlAdcChannel(5);
+                    Thread.Sleep(updateDelay);
                     var statusChannelFive = await adcModel.ReadStatus();
+                    Thread.Sleep(updateDelay);
                     if (ProcessStatus(statusChannelFive, 5))
                     {
                         var channelFiveResult = await adcModel.ReadAdcResult();
