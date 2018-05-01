@@ -6,14 +6,20 @@
              xmlns:local="clr-namespace:DeviceManager.View"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             Background="WhiteSmoke">
+             Background="GhostWhite">
     <Grid>
-        <StackPanel Margin="2" Orientation="Vertical">
-            <Label Content="{Binding AinAText}"></Label>
-            <Label Content="{Binding AinBText}"></Label>
-            <Label Content="{Binding AinCText}"></Label>
-            <Label Content="{Binding AinDText}"></Label>
-            <Label Content="{Binding StatusMessage}"></Label>
-        </StackPanel>
+        <GroupBox>
+            <GroupBox.Header>
+                <TextBlock Text="Status" FontWeight="Bold"/>
+            </GroupBox.Header>
+
+            <StackPanel Margin="2" Orientation="Vertical">
+                <Label Content="{Binding AinAText}"></Label>
+                <Label Content="{Binding AinBText}"></Label>
+                <Label Content="{Binding AinCText}"></Label>
+                <Label Content="{Binding AinDText}"></Label>
+                <Label Content="{Binding StatusMessage}"></Label>
+            </StackPanel>
+        </GroupBox>
     </Grid>
 </UserControl>

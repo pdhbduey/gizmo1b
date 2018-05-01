@@ -18,15 +18,16 @@ namespace DeviceManager.ViewModel
         private IFanModel fanModel;
         private int dutyCycleOne;
         private int dutyCycleTwo;
-        private int periodOne;
-        private int periodTwo;
+        private float periodOne;
+        private float periodTwo;
         public float sensorOneRpm;
         public float sensorTwoRpm;
         private string statusMessage;
 
         // Update task variables
         private Task updateTask;
-        private int updateDelay = 1500;
+        private int updateDelay = 750;
+        private int delayBetweenRequests = 100;
 
         /// <summary>
         /// Creates a new instance of the FanViewModel class.
@@ -37,8 +38,6 @@ namespace DeviceManager.ViewModel
             this.fanModel = fanModel;
             dutyCycleOne = FanDefaults.MinimumDutyCycle;
             dutyCycleTwo = FanDefaults.MinimumDutyCycle;
-            periodOne = FanDefaults.DefaultPeriod;
-            periodTwo = FanDefaults.DefaultPeriod;
             statusMessage = "";
 
             // Update statuses
@@ -100,7 +99,7 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public int PeriodOne
+        public float PeriodOne
         {
             get
             {
@@ -127,7 +126,7 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public int PeriodTwo
+        public float PeriodTwo
         {
             get
             {
@@ -171,7 +170,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"Sensor1 R.P.M: {sensorOneRpm.ToString("0.##")}";
+                return $"Sensor1 R.P.M: {sensorOneRpm}";
             }
         }
 
@@ -179,7 +178,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"Sensor2 R.P.M: {sensorTwoRpm.ToString("0.##")}";
+                return $"Sensor2 R.P.M: {sensorTwoRpm}";
             }
         }
 
@@ -227,25 +226,38 @@ namespace DeviceManager.ViewModel
         /// </summary>
         private void InitialUpdate()
         {
+            var initialDelay = 50;
+
             // Read duty cycle/period
             var cycleOneValue = fanModel.GetFanPwmDutyCycle(channel: 1).Result;
             DutyCycleOne = Helper.GetIntFromBigEndian(cycleOneValue);
+            Thread.Sleep(initialDelay);
+
             var cycleTwoValue = fanModel.GetFanPwmDutyCycle(channel: 2).Result;
             DutyCycleTwo = Helper.GetIntFromBigEndian(cycleTwoValue);
+            Thread.Sleep(initialDelay);
+
             var periodOneValue = fanModel.GetFanPwmPeriod(channel: 1).Result;
-            PeriodOne = Helper.GetIntFromBigEndian(periodOneValue);
+
+            PeriodOne = Helper.GetFloatFromBigEndian(periodOneValue);
+            Thread.Sleep(initialDelay);
+
             var periodTwoValue = fanModel.GetFanPwmPeriod(channel: 2).Result;
-            PeriodTwo = Helper.GetIntFromBigEndian(periodTwoValue);
+            PeriodTwo = Helper.GetFloatFromBigEndian(periodTwoValue);
+            Thread.Sleep(initialDelay);
 
             // Sensor updates
             var sensorOneValue = fanModel.GetFanSensorRpm(sensor: 1).Result;
             SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue);
+            Thread.Sleep(initialDelay);
 
             var sensorTwoValue = fanModel.GetFanSensorRpm(sensor: 2).Result;
-            SensorOneRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
+            SensorTwoRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
+            Thread.Sleep(initialDelay);
 
             var status = fanModel.GetFanStatus().Result;
             ProcessStatus(status);
+            Thread.Sleep(initialDelay);
         }
 
         /// <summary>
@@ -260,10 +272,11 @@ namespace DeviceManager.ViewModel
                     // Update
                     var sensorOneValue = await fanModel.GetFanSensorRpm(sensor: 1);
                     SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue);
+                    Thread.Sleep(delayBetweenRequests);
 
                     var sensorTwoValue = await fanModel.GetFanSensorRpm(sensor: 2);
-                    SensorOneRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
-
+                    SensorTwoRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
+                    Thread.Sleep(delayBetweenRequests);
                     var status = await fanModel.GetFanStatus();
                     ProcessStatus(status);
 

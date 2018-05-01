@@ -9,22 +9,20 @@
     {
         private object content;
         private string selectedTestView;
-        private bool configuring;
 
         public MainViewModel()
         {
             // Default settings
-            configuring = false;
-            ConfigureComCommand = new RelayCommand(param => ConfigureCommunication());
-            ExitCommand = new RelayCommand(param => ReturnToSelectedView());
-
             TestViews = new ObservableCollection<string>()
             {
-                "LED/Switch",
+                "Configure",
                 "ADC",
                 "DAC",
-                "Motor",
+                "DIO",
                 "Fan",
+                "Fault",
+                "LED",
+                "Motor",
                 "Thermistor",
                 "TEC"
             };
@@ -35,52 +33,10 @@
         }
 
         /// <summary>
-        /// Changes to COM configuration menu.
-        /// </summary>
-        public RelayCommand ConfigureComCommand { get; set; }
-
-        /// <summary>
-        /// Command to return to currently set view.
-        /// </summary>
-        public RelayCommand ExitCommand { get; set; }
-
-        /// <summary>
         /// Collection of all the available views.
         /// </summary>
         public ObservableCollection<string> TestViews { get; set; }
-
-        /// <summary>
-        /// Visibility of communication configuration.
-        /// </summary>
-        public Visibility CommunicationVisibility
-        {
-            get
-            {
-                if (configuring == true)
-                {
-                    return Visibility.Collapsed;
-                }
-
-                return Visibility.Visible;
-            }
-        }
-
-        /// <summary>
-        /// Visibility of return/configuration button.
-        /// </summary>
-        public Visibility ReturnVisibility
-        {
-            get
-            {
-                if (configuring == false)
-                {
-                    return Visibility.Collapsed;
-                }
-
-                return Visibility.Visible;
-            }
-        }
-
+        
         /// <summary>
         /// The selected test view.
         /// </summary>
@@ -121,11 +77,17 @@
         {
             switch (selectedTestView)
             {
-                case "LED/Switch":
+                case "Configure":
+                    Content = DeviceManager.Factory.Instance.GetCommunicationConfigurationView();
+                    break;
+                case "LED":
                     Content = DeviceManager.Factory.Instance.GetLedView();
                     break;
                 case "DAC":
                     Content = DeviceManager.Factory.Instance.GetDacView();
+                    break;
+                case "DIO":
+                    Content = DeviceManager.Factory.Instance.GetDioView();
                     break;
                 case "ADC":
                     Content = DeviceManager.Factory.Instance.GetAdcView();
@@ -136,6 +98,9 @@
                 case "Fan":
                     Content = DeviceManager.Factory.Instance.GetFanView();
                     break;
+                case "Fault":
+                    Content = DeviceManager.Factory.Instance.GetFaultView();
+                    break;
                 case "Thermistor":
                     Content = DeviceManager.Factory.Instance.GetThermistorView();
                     break;
@@ -145,35 +110,6 @@
                 default:
                     return;
             }
-        }
-
-        /// <summary>
-        /// Returns to currently set view from configuration view.
-        /// </summary>
-        private void ReturnToSelectedView()
-        {
-            UpdatingConfiguration(false);
-            SetContent();
-        }
-
-        /// <summary>
-        /// Sets the content to the COM configuration view.
-        /// </summary>
-        private void ConfigureCommunication()
-        {
-            UpdatingConfiguration(true);
-            Content = DeviceManager.Factory.Instance.GetCommunicationConfigurationView();
-        }
-
-        /// <summary>
-        /// Sets visibility parameters of layout based on whether configuration active.
-        /// </summary>
-        /// <param name="enabled"> Enable/Disables COM configuration. </param>
-        private void UpdatingConfiguration(bool enabled)
-        {
-            configuring = enabled;
-            OnPropertyChanged(nameof(CommunicationVisibility));
-            OnPropertyChanged(nameof(ReturnVisibility));
         }
     }
 }

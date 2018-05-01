@@ -27,14 +27,14 @@ namespace DeviceManager.View
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string item = registerTextbox.Text;
-            int n = 0;
-            if (!int.TryParse(item, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out n) &&
-              item != String.Empty)
-            {
-                registerTextbox.Text = item.Remove(item.Length - 1, 1);
-                registerTextbox.SelectionStart = registerTextbox.Text.Length;
-            }
+            //string item = registerTextbox.Text;
+            //int n = 0;
+            //if (!int.TryParse(item, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out n) &&
+            //  item != String.Empty)
+            //{
+            //    registerTextbox.Text = item.Remove(item.Length - 1, 1);
+            //    registerTextbox.SelectionStart = registerTextbox.Text.Length;
+            //}
         }
     }
 }

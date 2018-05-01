@@ -19,11 +19,14 @@ namespace DeviceManager.ViewModel
         private string registerWriteValue;
         private string motorPosition;
         private string registerReadValue;
-        public int absoluteMoveValue;
-        public int relativeMoveValue;
+        private string bridgeInHiz;
+        private string busyStatus;
+        private string errorStatus;
+        private int absoluteMoveValue;
+        private int relativeMoveValue;
         private byte[] registerValue;
 
-        private const int updateDelay = 300;
+        private const int updateDelay = 400;
         private CancellationTokenSource cts;
         private CancellationToken token;
         private Task updateTask;
@@ -32,33 +35,42 @@ namespace DeviceManager.ViewModel
         {
             this.motorModel = motorModel;
 
-            // initial values
+            //// initial values
             StepSizes = MotorDefaults.StepSizes;
-            selectedStepSize = StepSizes[0];
+            SelectedStepSize = StepSizes[0];
 
             Directions = MotorDefaults.Directions;
-            selectedDirection = Directions[0];
+            SelectedDirection = Directions[0];
 
             RegisterAddresses = MotorDefaults.RegisterAddresses;
-            selectedRegisterAddress = RegisterAddresses[0];
+            SelectedRegisterAddress = RegisterAddresses[0];
 
             registerWriteValue = "00000000";
-            absoluteMoveValue = 0;
-            relativeMoveValue = 0;
+            AbsoluteMoveValue = 0;
+            RelativeMoveValue = 0;
 
-            motorPosition = "MOTOR ADD";
-            registerReadValue = "REGISTER ADD";
+            //// Initial Update
+            InitialUpdate();
 
-            SetConfigurationCommand = new RelayCommand(param => SetConfiguration());
+            //SetConfigurationCommand = new RelayCommand(param => SetConfiguration());
             HomeCommand = new RelayCommand(param => Home());
             ResetCommand = new RelayCommand(param => Reset());
             LimpCommand = new RelayCommand(param => Limp());
-            InitializeCommand = new RelayCommand(param => Initialize());
             MoveAbsoluteCommand = new RelayCommand(param => MoveToAbsolutePosition());
             MoveRelativeCommand = new RelayCommand(param => MoveToRelativePosition());
+            InitializeCommand = new RelayCommand(param => Initialize());
+            CycleRelativeCommand = new RelayCommand(param => Cycle());
+            StopCommand = new RelayCommand(param => Stop());
+            SetRegisterValueCommand = new RelayCommand(param => SetRegister());
 
             StartUpdateTask();
         }
+
+        public RelayCommand SetRegisterValueCommand { get; set; }
+
+        public RelayCommand CycleRelativeCommand { get; set; }
+
+        public RelayCommand StopCommand { get; set; }
 
         public RelayCommand MoveRelativeCommand { get; set; }
 
@@ -145,7 +157,7 @@ namespace DeviceManager.ViewModel
 
             set
             {
-                motorPosition = value;
+                motorPosition = $"Position: {value}";
                 OnPropertyChanged(nameof(MotorPosition));
             }
         }
@@ -159,14 +171,125 @@ namespace DeviceManager.ViewModel
 
             set
             {
-                registerReadValue = value;
+                registerReadValue = $"Register Value: {value}";
                 OnPropertyChanged(nameof(RegisterReadValue));
             }
         }
 
-        public int AbsoluteMoveValue { get; set; }
+        public int AbsoluteMoveValue {
+            get
+            {
+                return absoluteMoveValue;
+            }
+            set
+            {
+                absoluteMoveValue = value;
+                OnPropertyChanged(nameof(AbsoluteMoveValue));
+                SetAbsoluteMovePosition();
+            }
+        }
 
-        public int RelativeMoveValue { get; set; }
+        public int RelativeMoveValue {
+            get
+            {
+                return relativeMoveValue;
+            }
+            set
+            {
+                relativeMoveValue = value;
+                OnPropertyChanged(nameof(RelativeMoveValue));
+                SetRelativeMovePosition();
+            }
+        }
+
+        public string BridgeInHiz
+        {
+            get
+            {
+                return bridgeInHiz;
+            }
+            set
+            {
+                bridgeInHiz = $"Bridge in Hiz: {value}";
+                OnPropertyChanged(nameof(BridgeInHiz));
+            }
+        }
+
+        public string BusyStatus
+        {
+            get
+            {
+                return busyStatus;
+            }
+            set
+            {
+                busyStatus = $"Busy: {value}";
+                OnPropertyChanged(nameof(BusyStatus));
+            }
+        }
+
+        public string ErrorStatus
+        {
+            get
+            {
+                return errorStatus;
+            }
+            set
+            {
+                errorStatus = $"Error: {value}";
+                OnPropertyChanged(nameof(ErrorStatus));
+            }
+        }
+
+        private void InitialUpdate()
+        {
+            //motorModel.InitialSet();
+            SelectedDirection = Directions[0];
+            SelectedStepSize = StepSizes[0];
+
+            var position = motorModel.GetMotorPosition().Result;
+            MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
+
+            //motorModel.SetRegisterAddress(selectedRegisterAddress).Wait();
+            //RegisterReadValue = Helper.GetFloatFromBigEndian(motorModel.ReadRegisterValue().Result).ToString();
+            var status = motorModel.GetMotorStatus();
+            ProcessMotorStatus(status);
+        }
+
+        private void ProcessMotorStatus(byte[] status)
+        {
+            if (Helper.IsBitSet(status[0], 0))
+            {
+                BridgeInHiz = "Yes";
+            }
+            else
+            {
+                BridgeInHiz = "No";
+            }
+
+            if (Helper.IsBitSet(status[0], 1))
+            {
+                BusyStatus = "Yes";
+            }
+            else
+            {
+                BusyStatus = "No";
+            }
+
+            if (Helper.IsBitSet(status[1], 0))
+            {
+                ErrorStatus = "Yes";
+            }
+            else
+            {
+                ErrorStatus = "No";
+            }
+        }
+
+        private async void Energize()
+        {
+            await motorModel.Energize();
+        }
 
         private async void SetRegister()
         {
@@ -175,12 +298,22 @@ namespace DeviceManager.ViewModel
 
         private async void MoveToRelativePosition()
         {
-            await motorModel.MoveAbsolute(RelativeMoveValue);
+            await motorModel.MotorControlMove(selectedDirection, selectedStepSize, "relative");
         }
 
         private async void MoveToAbsolutePosition()
         {
-            await motorModel.MoveAbsolute(AbsoluteMoveValue);
+            await motorModel.MotorControlMove(selectedDirection, selectedStepSize, "absolute");
+        }
+
+        private void SetRelativeMovePosition()
+        {
+            motorModel.SetRelativeMovePosition(relativeMoveValue);
+        }
+
+        private void SetAbsoluteMovePosition()
+        {
+            motorModel.SetAbsoluteMovePosition(absoluteMoveValue);
         }
 
         private async void SetSelectedRegisterAddress()
@@ -188,11 +321,21 @@ namespace DeviceManager.ViewModel
             await motorModel.SetRegisterAddress(selectedRegisterAddress);
         }
 
-        private async void SetConfiguration()
-        {
-            await motorModel.SetDirection(selectedDirection);
-            await motorModel.SetStepMode(selectedStepSize);
-        }
+        //private async void SetConfiguration()
+        //{
+        //    await motorModel.SetDirection(selectedDirection);
+        //    await motorModel.SetStepMode(selectedStepSize);
+        //}
+
+        //private void SetStepMode()
+        //{
+        //    motorModel.SetStepMode(selectedStepSize).Wait();
+        //}
+
+        //private void SetDirectionMode()
+        //{
+        //    motorModel.SetDirection(selectedDirection).Wait();
+        //}
 
         private async void Initialize()
         {
@@ -212,6 +355,18 @@ namespace DeviceManager.ViewModel
         private async void Home()
         {
             await motorModel.Home();
+
+            //motorModel.GetMotorPosition();
+        }
+
+        private async void Cycle()
+        {
+            await motorModel.Cycle();
+        }
+
+        private async void Stop()
+        {
+            await motorModel.Stop();
         }
 
         private void StartUpdateTask()
@@ -237,13 +392,22 @@ namespace DeviceManager.ViewModel
                 try
                 {
                     // Read register address
+                    var regValue = await motorModel.ReadRegisterValue();
+                    RegisterReadValue = Helper.GetIntFromBigEndian(regValue).ToString();
+                    Thread.Sleep(50);
+
                     // Read motor position
+                    var position = await motorModel.GetMotorPosition();
+                    MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
+                    Thread.Sleep(50);
+
+
                     // Update motor status
                     Thread.Sleep(updateDelay);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    //StatusMessage = e.Message;
+                   
                 }
             }
         }

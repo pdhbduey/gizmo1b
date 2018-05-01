@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="DeviceManager.View.FaultView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DeviceManager.View"
+             mc:Ignorable="d"
+             Background="GhostWhite"
+             d:DesignHeight="300" 
+             d:DesignWidth="300">
+    <Grid>
+        <GroupBox>
+            <GroupBox.Header>
+                <TextBlock Text="Status" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <Button Margin="1,10,1,10" Height="25" Width="100" HorizontalAlignment="Left" Content="Reset" Command="{Binding ResetCommand}"></Button>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding TecOcdPosColour}" Width="10" Height="10" />
+                        <Label Content="TEC OCD Pos"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding TecOcdNegColour}" Width="10" Height="10" />
+                        <Label Content="TEC OCD Neg"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding OvertempOneColour}" Width="10" Height="10" />
+                        <Label Content="Overtemp 1"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding OvertempTwoColour}" Width="10" Height="10" />
+                        <Label Content="Overtemp 2"></Label>
+                    </StackPanel>
+                </StackPanel>
+                
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <Label Margin="1,10,1,10" Height="25" Width="100"></Label>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding NtcOneColour}" Width="10" Height="10" />
+                        <Label Content="NTC1 Present"></Label>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding NtcTwoColour}" Width="10" Height="10" />
+                        <Label Content="NTC2 Present"></Label>
+                    </StackPanel>
+
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

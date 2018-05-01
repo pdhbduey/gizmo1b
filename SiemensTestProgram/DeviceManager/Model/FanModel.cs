@@ -63,7 +63,7 @@ namespace DeviceManager.Model
         /// <summary>
         /// Sets pwm period.
         /// </summary>
-        public Task<byte[]> SetFanPwmPeriod(int pwmChannel, int period)
+        public Task<byte[]> SetFanPwmPeriod(int pwmChannel, float period)
         {
             var requestArray = FanDefaults.SetFanPeriodCommand(pwmChannel, period);
             communication.WriteData(requestArray);

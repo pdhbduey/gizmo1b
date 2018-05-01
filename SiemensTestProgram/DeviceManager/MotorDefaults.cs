@@ -46,58 +46,95 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] SetStepModeCommand(string stepSize)
+        public static byte[] SetControlMoveCommand(string direction, string stepMode, string move)
         {
-            var value = StepSizeValues[stepSize];
-            return new byte[]
-            {
-                DataHelper.REGISTER_WRITE,
-                MotorControlAddress[0],
-                MotorControlAddress[1],
-                MotorControlAddress[2],
-                MotorControlAddress[3],
-                0x00,
-                0x00,
-                value[0],
-                value[1]
-            };
-        }
-
-        public static byte[] SetDirectionCommand(string direction)
-        {
-            var value = DirectionValues[direction];
-            return new byte[]
-            {
-                DataHelper.REGISTER_WRITE,
-                MotorControlAddress[0],
-                MotorControlAddress[1],
-                MotorControlAddress[2],
-                MotorControlAddress[3],
-                0x00,
-                0x00,
-                value,
-                0x00
-            };
-        }
-
-        public static byte[] SetRelativePositionCommand(int relativePosition)
-        {
-            var value = Helper.ConvertIntToByteArray(relativePosition);
+            var directionValue = DirectionValues[direction];
+            var stepModeValue = StepSizeValues[stepMode];
+            var moveValue = MoveValues[move];
+            var value = Helper.ConvertIntToByteArray(directionValue + stepModeValue + moveValue);
             return new byte[]
             {
                 DataHelper.REGISTER_WRITE,
                 0x00,
                 0x00,
                 0x06,
-                0x02,
-                value[3],
-                value[2],
+                0x00,
+                value[0],
                 value[1],
-                value[0]
+                value[2],
+                value[3]
             };
         }
 
-        public static byte[] SetAbsolutePositionCommand(int absolutePosition)
+        public static byte[] CycleCommand()
+        {
+            var moveValue = MoveValues["cycle"];
+            var value = Helper.ConvertIntToByteArray(moveValue);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x00,
+                value[0],
+                value[1],
+                value[2],
+                value[3]
+            };
+        }
+
+        public static byte[] StopCommand()
+        {
+            var moveValue = MoveValues["stop"];
+            var value = Helper.ConvertIntToByteArray(moveValue);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x06,
+                0x00,
+                value[0],
+                value[1],
+                value[2],
+                value[3]
+            };
+        }
+
+        public static byte[] ReadPositionCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x06,
+                0x07,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] GetMotorStatusCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x06,
+                0x08,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] SetMoveAbsolutePositionCommand(int absolutePosition)
         {
             var value = Helper.ConvertIntToByteArray(absolutePosition);
             return new byte[]
@@ -107,26 +144,27 @@ namespace DeviceManager
                 0x00,
                 0x06,
                 0x03,
-                value[3],
-                value[2],
+                value[0],
                 value[1],
-                value[0]
+                value[2],
+                value[3]
             };
         }
 
-        public static byte[] ReadPositionCommand()
+        public static byte[] SetMoveRelativePositionCommand(int relativePosition)
         {
+            var value = Helper.ConvertIntToByteArray(relativePosition);
             return new byte[]
             {
                 DataHelper.REGISTER_WRITE,
                 0x00,
                 0x00,
                 0x06,
-                0x07,
-                0x00,
-                0x00,
-                0x00,
-                0x00
+                0x02,
+                value[0],
+                value[1],
+                value[2],
+                value[3]
             };
         }
 
@@ -189,7 +227,7 @@ namespace DeviceManager
                 MotorControlAddress[3],
                 0x00,
                 0x00,
-                0x40,
+                0x20,
                 0x00
             };
         }
@@ -230,7 +268,7 @@ namespace DeviceManager
         {
             return new byte[]
             {
-                DataHelper.REGISTER_WRITE,
+                DataHelper.REGISTER_READ,
                 0x00,
                 0x00,
                 0x06,
@@ -312,22 +350,30 @@ namespace DeviceManager
             "STATUS"
         };
 
-        public static Dictionary<string, byte> DirectionValues = new Dictionary<string, byte>()
+        public static Dictionary<string, int> DirectionValues = new Dictionary<string, int>()
         {
-            { Directions[0], 0x08},
-            { Directions[1], 0x04}
+            { Directions[0], 1024},
+            { Directions[1], 512}
         };
 
-        public static Dictionary<string, byte[]> StepSizeValues = new Dictionary<string, byte[]>()
+        public static Dictionary<string, int> MoveValues = new Dictionary<string, int>()
         {
-            { StepSizes[0], GetStepModeValue(1)},
-            { StepSizes[1], GetStepModeValue(2)},
-            { StepSizes[2], GetStepModeValue(3)},
-            { StepSizes[3], GetStepModeValue(4)},
-            { StepSizes[4], GetStepModeValue(5)},
-            { StepSizes[5], GetStepModeValue(6)},
-            { StepSizes[6], GetStepModeValue(7)},
-            { StepSizes[7], GetStepModeValue(8)}
+            { "relative", 2},
+            { "absolute", 4},
+            { "cycle", 6},
+            { "stop", 12}
+        };
+
+        public static Dictionary<string, int> StepSizeValues = new Dictionary<string, int>()
+        {
+            { StepSizes[0], 32},
+            { StepSizes[1], 64},
+            { StepSizes[2], 96},
+            { StepSizes[3], 128},
+            { StepSizes[4], 160},
+            { StepSizes[5], 192},
+            { StepSizes[6], 224},
+            { StepSizes[7], 256}
         };
 
         public static Dictionary<string, byte> RegisterAddressValues = new Dictionary<string, byte>()

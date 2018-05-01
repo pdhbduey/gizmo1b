@@ -21,7 +21,7 @@ namespace DeviceManager.Model
         /// <summary>
         /// Sets pwm period.
         /// </summary>
-        Task<byte[]> SetFanPwmPeriod(int pwmChannel, int period);
+        Task<byte[]> SetFanPwmPeriod(int pwmChannel, float period);
 
         /// <summary>
         /// Gets pwm period.

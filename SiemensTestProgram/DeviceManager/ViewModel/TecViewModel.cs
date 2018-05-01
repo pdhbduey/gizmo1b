@@ -25,7 +25,7 @@ namespace DeviceManager.ViewModel
         private int numberOfSamples;
         private float irefCurrentValue;
         private int sliderIrefValue;
-        private int irefGain;
+        //private int irefGain;
         private int tecPeriod;
         private int counter;
         private int waveformCycles;
@@ -51,6 +51,8 @@ namespace DeviceManager.ViewModel
             this.tecModel = tecModel;
 
             // Initial values
+            saving = false;
+            updating = false;
             counter = 0;
             progressMaximum = 100;
             tecPeriod = TecDefaults.PeriodMinimum;
@@ -733,7 +735,22 @@ namespace DeviceManager.ViewModel
 
                 try
                 {
-                    Update();
+                    var iRefData = await tecModel.ReadIref();
+                    IRef = Helper.GetFloatFromBigEndian(iRefData);
+                    Thread.Sleep(50);
+
+                    var iSenseData = await tecModel.ReadIsense();
+                    ISense = Helper.GetFloatFromBigEndian(iSenseData);
+                    Thread.Sleep(50);
+
+                    var vSenseData = await tecModel.ReadVsense();
+                    VSense = Helper.GetFloatFromBigEndian(vSenseData);
+                    Thread.Sleep(50);
+
+                    var status = await tecModel.ReadStatus();
+                    Thread.Sleep(50);
+
+                    ProcessStatus(status);
                     Thread.Sleep(updateDelay);
                 }
                 catch (Exception e)
@@ -741,21 +758,6 @@ namespace DeviceManager.ViewModel
                     StatusMessage = e.Message;
                 }
             }
-        }
-
-        private async void Update()
-        {
-            var iRefData = await tecModel.ReadIref();
-            IRef = Helper.GetFloatFromBigEndian(iRefData);
-
-            var iSenseData = await tecModel.ReadIsense();
-            ISense = Helper.GetFloatFromBigEndian(iSenseData);
-
-            var vSenseData = await tecModel.ReadVsense();
-            VSense = Helper.GetFloatFromBigEndian(vSenseData);
-
-            var status = await tecModel.ReadStatus();
-            ProcessStatus(status);
         }
 
         private void InitialUpdate()

@@ -42,7 +42,7 @@ namespace Common
         public static bool IsBitSet(byte dataByte, int position, int value = 1)
         {
             return ((dataByte >> position) & value) != 0;
-        }
+        } 
 
         public static byte IntegerToByte(int num)
         {
@@ -67,6 +67,13 @@ namespace Common
         public static int GetIntFromBigEndian(byte[] bytes)
         {
             if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes); // We have to reverse
+            return BitConverter.ToInt32(bytes, 0);
+        }
+
+        public static int GetIntFromLittleEndian(byte[] bytes)
+        {
+            if (!BitConverter.IsLittleEndian)
                 Array.Reverse(bytes); // We have to reverse
             return BitConverter.ToInt32(bytes, 0);
         }

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:DeviceManager.View"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             Background="WhiteSmoke">
+             Background="GhostWhite">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -91,7 +91,7 @@
                         HorizontalAlignment="Left" 
                         Minimum="-1500" 
                         Maximum="1500" 
-                        Value="{Binding SliderIrefValue}">
+                        Value="{Binding SliderIrefValue, Delay=15}">
                     </Slider>
                     <Label Content="iRef: "></Label>
                     <TextBox Text="{Binding Path=IrefCurrentValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2, Delay=500}" HorizontalAlignment="Left" MaxLength="5" Width="40"></TextBox>
@@ -109,7 +109,7 @@
         </StackPanel>
         
         <!--Save and Progress -->
-        <Grid Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+        <!--<Grid Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -119,6 +119,6 @@
                 <TextBlock Text="{Binding SaveProgress}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <Button Grid.Column="1" Margin="2" Width="100" Height="25" Content="Save" Command="{Binding SaveDataCommand}"></Button>
-        </Grid>
+        </Grid>-->
     </Grid>
 </UserControl>
