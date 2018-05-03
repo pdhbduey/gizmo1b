@@ -186,7 +186,7 @@ void BoardTestFastPidApp::sciNotification(sciBASE_t* sci, uint32 flags)
                         if (value & BoardTestTec::DISABLE) {
                             s_isTecEnabled = false;
                             s_isClosedLoopInitialized = false;
-                            gioSetBit(mibspiPORT1, PIN_CS0, 0);  // ERROR_RED_LED <- 1
+                            gioSetBit(mibspiPORT1, PIN_CS0, 1);  // ERROR_RED_LED <- 1
                         }
                         if (value & BoardTestTec::ENABLE) {
                             s_isTecEnabled = true;
