@@ -186,17 +186,21 @@ void BoardTestFastPidApp::sciNotification(sciBASE_t* sci, uint32 flags)
                         if (value & BoardTestTec::DISABLE) {
                             s_isTecEnabled = false;
                             s_isClosedLoopInitialized = false;
+                            gioSetBit(mibspiPORT1, PIN_CS0, 0);  // ERROR_RED_LED <- 1
                         }
                         if (value & BoardTestTec::ENABLE) {
                             s_isTecEnabled = true;
                             s_isClosedLoopInitialized = false;
+                            gioSetBit(mibspiPORT1, PIN_CS0, 0);  // ERROR_RED_LED <- 0
                         }
                         if (value & BoardTestTec::START_WAVEFORM) {
                             s_isWaveFormStarted = true;
                             s_waveFormTimeInUs = 0;
+                            gioSetBit(mibspiPORT1, PIN_ENA, 0);  // DEBUG_GREEN_LED <- 0
                         }
                         if (value & BoardTestTec::STOP_WAVEFORM) {
                             s_isWaveFormStarted = false;
+                            gioSetBit(mibspiPORT1, PIN_ENA, 1);  // DEBUG_GREEN_LED <- 1
                         }
                         break;
                     }
@@ -282,6 +286,8 @@ void BoardTestFastPidApp::boardTestFastPidApp()
     _enable_IRQ();
     gioSetBit(mibspiPORT5, PIN_SIMO, 0); // Disable TEC
     gioSetBit(mibspiPORT5, PIN_ENA, 0);  // DRV_ERR_CLR <- 0
+    gioSetBit(mibspiPORT1, PIN_ENA, s_isWaveFormStarted ? 0 : 1); // 96:MIBSPI1NENA:DEBUG_GREEN_LED
+    gioSetBit(mibspiPORT1, PIN_CS0, s_isTecEnabled      ? 0 : 1); // 105:MIBSPI1NCS[0]:ERROR_RED_LED
     //
     // Set DAC output to 2.5
     //
