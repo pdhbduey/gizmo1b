@@ -70,7 +70,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "USAGE:\n\r";
     help += "dac set [0,5](V)\n\r";
     help += "dac get\n\r";
-    help += "adc get 0..5\n\r";
+    help += "adc get 0..5|all\n\r";
     help += "led set green|red on|off\n\r";
     help += "led get green|red\n\r";
     help += "fault reset\n\r";
@@ -95,7 +95,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec set customiref [-15,15](A)\n\r";
     help += "tec set customcycles 0..4,294,967,296\n\r";
     help += "tec get customindex|customtime|customiref|customcycles\n\r";
-    help += "thermistor get a|b|c|d\n\r";
+    help += "thermistor get a|b|c|d|all\n\r";
     help += "motor reset|initialize|limp|energize|stop\n\r";
     help += "motor get regaddress|regvalue|step|abspos|relpos|pos|status\n\r";
     help += "motor set regaddress|regvalue 0x<hex>\n\r";
@@ -109,7 +109,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "fan set duty1|duty2 0..100\n\r";
     help += "fan set per1|per2 [10.0,1000000.0](us)\n\r";
     help += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
-    help += "dio get 0..9\n\r";
+    help += "dio get 0..9|all\n\r";
     help += "dio set|clear 0..7\n\r";
 }
 
@@ -132,7 +132,11 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
     status.push_back("ERROR_RO");
     status.push_back("ERROR_WO");
     int result;
+    if (msg.size() == 0) {
+        msg = m_prevMsg;
+    }
     if (msg.size()) {
+        m_prevMsg = msg;
         size_t pos = 0;
         std::string token;
         std::vector<std::string> tokens;
@@ -641,6 +645,23 @@ bool BoardTestConsoleApp::parseThermistorCommand(std::vector<std::string>& token
                 res = t;
                 isParsingError = false;
             }
+            else if (tokens[ARGUMENT] == "all") {
+                std::map<int, std::string> thermNames;
+                thermNames[BoardTest::THERMISTOR_RESULT_AIN_A] = "[a]:";
+                thermNames[BoardTest::THERMISTOR_RESULT_AIN_B] = "[b]:";
+                thermNames[BoardTest::THERMISTOR_RESULT_AIN_C] = "[c]:";
+                thermNames[BoardTest::THERMISTOR_RESULT_AIN_D] = "[d]:";
+                for (std::map<int, std::string>::iterator it = thermNames.begin();
+                                                 it != thermNames.end(); it++) {
+                    uint32 temp;
+                    result = regRead(it->first, temp);
+                    float f = *reinterpret_cast<float*>(&temp);
+                    char t[16];
+                    sprintf(t, "%s%.2fC ", it->second.c_str(), f);
+                    res += t;
+                }
+                isParsingError = false;
+            }
         }
     }
     return isParsingError;
@@ -740,28 +761,54 @@ bool BoardTestConsoleApp::parseAdcCommand(std::vector<std::string>& tokens,
     adcStatus.push_back("ERROR_TIME_OUT");
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
-            int adcChannel;
-            if (sscanf(tokens[ARGUMENT].c_str(), "%d", &adcChannel) == 1
-            && (adcChannel & BoardTestAdc::ADC_CHANNEL_MASK) == adcChannel) {
-                uint32 v = (adcChannel & BoardTestAdc::ADC_CHANNEL_MASK)
-                                  << BoardTestAdc::ADC_CHANNEL_SHIFT
-                         |  BoardTestAdc::ADC_START_MASK
-                                  << BoardTestAdc::ADC_START_MASK_SHIFT;
-                result = regWrite(BoardTest::ADC_CONTROL, v);
-                if (result == BoardTest::OKAY) {
-                    result = regRead(BoardTest::ADC_STATUS, v);
-                    if (v != LibAdc::OKAY) {
-                        res = "adc status: " + adcStatus[v];
-                    }
-                    else {
-                        result = regRead(BoardTest::ADC_RESULT, v);
-                        float f = *reinterpret_cast<float*>(&v);
-                        char t[16];
-                        sprintf(t, "%.2fV", f);
-                        res = t;
+            if (tokens[ARGUMENT] == "all") {
+                for (int i = 0; i < 5; i++) {
+                    uint32 v = (i & BoardTestAdc::ADC_CHANNEL_MASK)
+                                      << BoardTestAdc::ADC_CHANNEL_SHIFT
+                             |  BoardTestAdc::ADC_START_MASK
+                                      << BoardTestAdc::ADC_START_MASK_SHIFT;
+                    result = regWrite(BoardTest::ADC_CONTROL, v);
+                    if (result == BoardTest::OKAY) {
+                        result = regRead(BoardTest::ADC_STATUS, v);
+                        if (v != LibAdc::OKAY) {
+                            res = "adc status: " + adcStatus[v];
+                            break;
+                        }
+                        else {
+                            result = regRead(BoardTest::ADC_RESULT, v);
+                            float f = *reinterpret_cast<float*>(&v);
+                            char t[16];
+                            sprintf(t, "[%d]:%.2fV ", i, f);
+                            res += t;
+                        }
                     }
                 }
                 isParsingError = false;
+            }
+            else {
+                int adcChannel;
+                if (sscanf(tokens[ARGUMENT].c_str(), "%d", &adcChannel) == 1
+                && (adcChannel & BoardTestAdc::ADC_CHANNEL_MASK) == adcChannel) {
+                    uint32 v = (adcChannel & BoardTestAdc::ADC_CHANNEL_MASK)
+                                      << BoardTestAdc::ADC_CHANNEL_SHIFT
+                             |  BoardTestAdc::ADC_START_MASK
+                                      << BoardTestAdc::ADC_START_MASK_SHIFT;
+                    result = regWrite(BoardTest::ADC_CONTROL, v);
+                    if (result == BoardTest::OKAY) {
+                        result = regRead(BoardTest::ADC_STATUS, v);
+                        if (v != LibAdc::OKAY) {
+                            res = "adc status: " + adcStatus[v];
+                        }
+                        else {
+                            result = regRead(BoardTest::ADC_RESULT, v);
+                            float f = *reinterpret_cast<float*>(&v);
+                            char t[16];
+                            sprintf(t, "%.2fV", f);
+                            res = t;
+                        }
+                    }
+                    isParsingError = false;
+                }
             }
         }
     }
@@ -1219,7 +1266,19 @@ bool BoardTestConsoleApp::parseDioCommand(std::vector<std::string>& tokens,
             pinsMap[7] = BoardTestDio::DIN_7_STATE;
             pinsMap[8] = BoardTestDio::DIN_8_STATE;
             pinsMap[9] = BoardTestDio::DIN_9_STATE;
-            if (sscanf(tokens[ARGUMENT].c_str(), "%d", &pin) == 1
+            if (tokens[ARGUMENT] == "all") {
+                uint32 value;
+                result = regRead(BoardTest::DIO_IN, value);
+                for (std::map<int, int>::iterator it = pinsMap.begin();
+                                                    it != pinsMap.end(); it++) {
+                    char t[16];
+                    sprintf(t, "[%d]:%d ", it->first,
+                                            value & pinsMap[it->first] ? 1 : 0);
+                    res += t;
+                }
+                isParsingError = false;
+            }
+            else if (sscanf(tokens[ARGUMENT].c_str(), "%d", &pin) == 1
              && pinsMap.find(pin) != pinsMap.end()) {
                 uint32 value;
                 result = regRead(BoardTest::DIO_IN, value);
