@@ -105,9 +105,11 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TEC_CONTROL:
         if (value & DISABLE) {
             m_libTec.enable(false);
+            m_libLed.set(LibLed::RED, true);
         }
         if (value & ENABLE) {
             m_libTec.enable(true);
+            m_libLed.set(LibLed::RED, false);
         }
         if (value & START_WAVEFORM) {
             uint32 status = LibTec::OKAY;
@@ -118,10 +120,12 @@ int BoardTestTec::set(uint32 address, uint32 value)
             }
             if (status == LibTec::OKAY) {
                 m_libTec.waveformStart();
+                m_libLed.set(LibLed::GREEN, false);
             }
         }
         if (value & STOP_WAVEFORM) {
             m_libTec.waveformStop();
+            m_libLed.set(LibLed::GREEN, true);
         }
         if (value & CLOSED_LOOP_DISABLE) {
             m_libTec.closedLoopDisable();

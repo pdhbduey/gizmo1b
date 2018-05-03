@@ -2,6 +2,7 @@
 #define _BOARD_TEST_TEC_H_
 
 #include "boardTest.h"
+#include "libLed.h"
 #include "libTec.h"
 
 class BoardTestTec: public BoardTest
@@ -29,6 +30,7 @@ private:
     std::vector<struct LibTec::IrefSample> m_customWaveform;
     struct LibTec::IrefSample m_irefSample;
     uint32 m_customeWaveformCycles;
+    LibLed m_libLed;
 };
 
 #endif // _BOARD_TEST_TEC_H_
