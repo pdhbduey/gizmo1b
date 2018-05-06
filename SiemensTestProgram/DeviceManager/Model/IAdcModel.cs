@@ -6,10 +6,10 @@ namespace DeviceManager.Model
 
     public interface IAdcModel
     {
-        Task<byte[]> ReadStatus();
+        bool ReadStatus(ref byte[] response);
 
-        Task<byte[]> ControlAdcChannel(int channelNumber);
+        bool ControlAdcChannel(int channelNumber, ref byte[] response);
 
-        Task<byte[]> ReadAdcResult();
+        bool ReadAdcResult(ref byte[] response);
     }
 }

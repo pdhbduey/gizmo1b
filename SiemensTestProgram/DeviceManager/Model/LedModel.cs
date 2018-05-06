@@ -27,12 +27,11 @@ namespace DeviceManager.Model
         /// </summary>
         /// <param name="request"> LED toggle status. </param>
         /// <returns> Task which will return LED register response. </returns>
-        public Task<byte[]> SetLedCommand(string ledRequest)
+        public bool SetLedCommand(string ledRequest, ref byte[] response)
         {
             var requestArray = LedDefaults.GetLedWriteCommand(ledRequest);
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
     }
 }

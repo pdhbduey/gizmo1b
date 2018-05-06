@@ -91,8 +91,15 @@ namespace DeviceManager.ViewModel
         {
             var state = redLedStatus;
             RedLedStatus = redLedStatus == LedDefaults.redLedOn ? LedDefaults.redLedOff : LedDefaults.redLedOn;
-            var status = await ledModel.SetLedCommand(state);
-            ProcessStatus(status);
+            var status = new byte[5];
+            if (ledModel.SetLedCommand(state, ref status))
+            {
+                ProcessStatus(status);
+            }
+            else
+            {
+                LedStatus = "Communication Error";
+            }
         }
 
         /// <summary>
@@ -102,8 +109,15 @@ namespace DeviceManager.ViewModel
         {
             var state = greenLedStatus;
             GreenLedStatus = greenLedStatus == LedDefaults.greenLedOn ? LedDefaults.greenLedOff : LedDefaults.greenLedOn;
-            var status = await ledModel.SetLedCommand(state);
-            ProcessStatus(status);
+            var status = new byte[5];
+            if (ledModel.SetLedCommand(state, ref status))
+            {
+                ProcessStatus(status);
+            }
+            else
+            {
+                LedStatus = "Communication Error";
+            }
         }
 
         /// <summary>
@@ -114,7 +128,7 @@ namespace DeviceManager.ViewModel
         {
             if (status.Length < 4)
             {
-                ledStatus = "Communication Error";
+                LedStatus = "Communication Error";
                 return;
             }
 

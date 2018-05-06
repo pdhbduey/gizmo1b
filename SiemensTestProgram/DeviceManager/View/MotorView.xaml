@@ -24,7 +24,6 @@
                 <TextBlock Text="State" FontWeight="Bold"/>
             </GroupBox.Header>
             <StackPanel VerticalAlignment="Center">
-                <Button Margin="1" Height="25" Width="100" HorizontalAlignment="Left" Content="Home" Command="{Binding HomeCommand}"></Button>
                 <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Reset" Command="{Binding ResetCommand}"></Button>
                 <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Limp" Command="{Binding LimpCommand}"></Button>
                 <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Initialize" Command="{Binding InitializeCommand}"></Button>
@@ -38,9 +37,10 @@
             </GroupBox.Header>
             <StackPanel>
                 <StackPanel>
-                    <Label Content="{Binding BridgeInHiz}"></Label>
-                    <Label Content="{Binding BusyStatus}"></Label>
-                    <Label Content="{Binding ErrorStatus}"></Label>
+                    <Label Margin="1" Content="{Binding BridgeInHiz}"></Label>
+                    <Label Margin="1" Content="{Binding BusyStatus}"></Label>
+                    <Label Margin="1" Content="{Binding ErrorStatus}"></Label>
+                    <Button Margin="1" Height="25" Width="100" HorizontalAlignment="Left" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
@@ -61,7 +61,11 @@
                 </StackPanel>
 
                 <!-- Read Value -->
-                <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding RegisterReadValue}"></Label>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <Label Width="100" Margin="1"/>
+                    <Label Width="105" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding RegisterReadValue}"></Label>
+                    <Button Height="25" Width="100" HorizontalAlignment="Right" Margin="1" Content="Read" Command="{Binding ReadRegisterValueCommand}"></Button>
+                </StackPanel>
             </StackPanel>
         </GroupBox>
 
@@ -97,7 +101,12 @@
                     <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopCommand}"></Button>
                     <Button Margin="1" Height="25" Width="100" HorizontalAlignment="Left" Content="Cycle" Command="{Binding CycleRelativeCommand}"></Button>
                 </StackPanel>
-                <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding MotorPosition}"></Label>
+
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="208" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding MotorPosition}"></Label>
+                    <Button Margin="1" Height="25" Width="100" HorizontalAlignment="Left" Content="Get Position" Command="{Binding RefreshPositionCommand}"></Button>
+                </StackPanel>
+                
             </StackPanel>
         </GroupBox>
     </Grid>

@@ -34,10 +34,10 @@ namespace DeviceManager
             return new byte[]
             {
                 DataHelper.REGISTER_READ,
-                DacValueAddress[0],
-                DacValueAddress[1],
-                DacValueAddress[2],
-                DacValueAddress[3],
+                0x00,
+                0x00,
+                0x02,
+                0x01,
                 0x00,
                 0x00,
                 0x00,

@@ -8,8 +8,8 @@ namespace DeviceManager.Model
 {
     public interface IDioModel
     {
-        Task<byte[]> SetDout(int channel, bool set);
+        bool SetDout(int channel, bool set, ref byte[] response);
 
-        Task<byte[]> ReadDin();
+        bool ReadDin(ref byte[] response);
     }
 }

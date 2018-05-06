@@ -19,6 +19,7 @@ namespace DeviceManager.ViewModel
         private string status;
         private string name;
         private string pnpDeviceId;
+        private string configurationStatus;
 
         public CommunicationConfigurationViewModel(ICommunicationConfigurationModel communicationConfigurationModel)
         {
@@ -30,10 +31,24 @@ namespace DeviceManager.ViewModel
             Parities = ComPortDefaults.Parities;
             BaudRates = ComPortDefaults.BaudRates;
             StopBits = ComPortDefaults.StopBits;
+            configurationStatus = "Not Configured";
             communicationConfigurationModel.GetDefaultSettings(ref selectedComPort, ref selectedBaudRate, ref dataBits, ref selectedParity, ref selectedStopBits);
             GetDetailsForPort();
 
             ConfigureCommunicationCommand = new RelayCommand(param => ConfigureComCommunication());
+        }
+
+        public string ConfigurationStatus
+        {
+            get
+            {
+                return configurationStatus;
+            }
+            set
+            {
+                configurationStatus = value;
+                OnPropertyChanged(nameof(ConfigurationStatus));
+            }
         }
 
         public string SelectedComPort
@@ -113,7 +128,7 @@ namespace DeviceManager.ViewModel
 
         private void ConfigureComCommunication()
         {
-            communicationConfigurationModel.ReconfigureComCommunication(selectedComPort, selectedBaudRate, dataBits, selectedParity, selectedStopBits);
+            ConfigurationStatus = communicationConfigurationModel.ReconfigureComCommunication(selectedComPort, selectedBaudRate, dataBits, selectedParity, selectedStopBits);
         }
 
         public string Description

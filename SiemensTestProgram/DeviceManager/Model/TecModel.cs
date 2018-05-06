@@ -14,108 +14,102 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public Task<byte[]> SetIrefCommand(float value)
+        public bool SetIrefCommand(float value, ref byte[] response)
         {
             var requestArray = TecDefaults.SetIrefCommand(value);
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> Reset()
+        public bool Reset(ref byte[] response)
         {
             var requestArray = TecDefaults.GetResetCommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ReadIsense()
+        public bool ReadIsense(ref byte[] response)
         {
             var requestArray = TecDefaults.GetIsenseCommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ReadVsense()
+        public bool ReadVsense(ref byte[] response)
         {
             var requestArray = TecDefaults.GetVsenseCommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ReadIref()
+        public bool ReadIref(ref byte[] response)
         {
             var requestArray = TecDefaults.GetIrefCommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ReadStatus()
+        public bool ReadStatus(ref byte[] response)
         {
             var requestArray = TecDefaults.GetStatusCommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ControlCommand(string request)
+        public bool ControlCommand(string request, ref byte[] response)
         {
             var requestArray = TecDefaults.GetControlCommand(request);
-            communication.WriteData(requestArray);
-            return communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> SetWaveformCommand(string waveform)
+        public bool SetWaveformCommand(string waveform, ref byte[] response)
         {
             var requestArray = TecDefaults.GetWaveformTypeCommand(waveform);
-            communication.WriteData(requestArray);
-            return communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> SetSampleTimeCommand(int sampleTime)
+        public bool SetSampleTimeCommand(int sampleTime, ref byte[] response)
         {
             var requestArray = TecDefaults.GetSampleTimeCommand(sampleTime);
-            communication.WriteData(requestArray);
-            return communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> SetWaveformCyclesCommand(int cycles)
+        public bool SetWaveformCyclesCommand(int cycles, ref byte[] response)
         {
             var requestArray = TecDefaults.GetWaveNumberOfCyclesCommand(cycles);
-            communication.WriteData(requestArray);
-            return communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> SetPeriodCommand(int period)
+        public bool SetPeriodCommand(int period, ref byte[] response)
         {
             var requestArray = TecDefaults.GetWaveformPeriodCommand(period);
-            communication.WriteData(requestArray);
-            return communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> SetDerivativeGainCommand(int derivateGain)
+        public bool SetDerivativeGainCommand(int derivateGain, ref byte[] response)
         {
             var requestArray = TecDefaults.GetDerivateGainCommand(derivateGain);
-            communication.WriteData(requestArray);
-            return communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> SetIntegralGainCommand(int integralGain)
+        public bool SetIntegralGainCommand(int integralGain, ref byte[] response)
         {
             var requestArray = TecDefaults.GetIntegralGainCommand(integralGain);
-            communication.WriteData(requestArray);
-            return communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> SetProportionalGainCommand(float proportionalGain)
+        public bool SetProportionalGainCommand(float proportionalGain, ref byte[] response)
         {
             var requestArray = TecDefaults.GetProportionalGainCommand(proportionalGain);
-            communication.WriteData(requestArray);
-            return communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
         //public Task<byte[]> SetIrefGainCommand(int irefGain)

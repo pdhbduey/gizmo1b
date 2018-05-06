@@ -6,39 +6,42 @@ namespace DeviceManager.Model
 {
     public interface IMotorModel
     {
-        Task<byte[]> Cycle();
+        bool Cycle(ref byte[] response);
 
-        Task<byte[]> Stop();
+        bool Stop(ref byte[] response);
 
         //Task<byte[]> SetDirection(string selectedDirection);
-        Task<byte[]>  MotorControlMove(string selectedDirection, string selectedStepSize, string move);
+        bool MotorControlMove(string selectedDirection, string selectedStepSize, string move, ref byte[] response);
 
-        Task<byte[]> SetRegisterValue(byte[] selectedDirection);
+        bool SetRegisterValue(byte[] selectedDirection, ref byte[] response);
 
-        Task<byte[]> SetRegisterAddress(string address);
+        bool SetRegisterAddress(string address, ref byte[] response);
 
-        Task<byte[]> ReadRegisterValue();
+        bool ReadRegisterValue(ref byte[] response);
 
-        Task<byte[]> Home();
+        bool Home(ref byte[] response);
 
-        Task<byte[]> Initialize();
+        bool Initialize(ref byte[] response);
 
-        Task<byte[]> Energize();
+        bool Energize(ref byte[] response);
 
-        Task<byte[]> Reset();
+        bool Reset(ref byte[] response);
 
-        Task<byte[]> Limp();
+        bool Limp(ref byte[] response);
 
-        void SetRelativeMovePosition(int relativePosition);
 
-        void SetAbsoluteMovePosition(int absolutePosition);
+        void SetRelativeMovePosition(int relativePosition, ref byte[] response);
+
+        void SetAbsoluteMovePosition(int absolutePosition, ref byte[] response);
+
+
 
         //Task<byte[]> MoveRelative();
 
         //Task<byte[]> MoveAbsolute();
 
-        Task<byte[]> GetMotorPosition();
+        bool GetMotorPosition(ref byte[] response);
 
-        byte[] GetMotorStatus();
+        bool GetMotorStatus(ref byte[] response);
     }
 }

@@ -16,27 +16,24 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public Task<byte[]> ReadStatus()
+        public bool ReadStatus(ref byte[] response)
         {
             var requestArray = AdcDefaults.GetStatusCommand();
-            communication.WriteData(requestArray);
-            var status = communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
             return status;
         }
 
-        public Task<byte[]> ControlAdcChannel(int channelNumber)
+        public bool ControlAdcChannel(int channelNumber, ref byte[] response)
         {           
             var requestArray = AdcDefaults.GetControlAdcCommand(channelNumber);
-            communication.WriteData(requestArray);
-            var status = communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
             return status;
         }
 
-        public Task<byte[]> ReadAdcResult()
+        public bool ReadAdcResult(ref byte[] response)
         {
             var requestArray = AdcDefaults.GetReadAdcCommand();
-            communication.WriteData(requestArray);
-            var status = communication.ReadData();
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
             return status;
         }
     }

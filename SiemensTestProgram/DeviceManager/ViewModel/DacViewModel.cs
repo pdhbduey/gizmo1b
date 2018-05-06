@@ -33,13 +33,31 @@ namespace DeviceManager.ViewModel
             dacStatus = string.Empty;
 
             // Check DAC status
-            StartUpdateTask();
+            //StartUpdateTask();
+            Update();
+            RefreshCommand = new RelayCommand(param => Update());
         }
 
         /// <summary>
         /// Command to set the DAC.
         /// </summary>
         public RelayCommand SendDacValueCommand { get; set; }
+
+        public RelayCommand RefreshCommand { get; set; }
+
+        private void Update()
+        {
+            var status = new byte[5];
+
+            if (dacModel.ReadDacStatusCommand(ref status))
+            {
+                ProcessStatus(status);
+            }
+            else
+            {
+                DacStatus = "Communication Error";
+            }
+        }
 
         /// <summary>
         /// The DAC status.
@@ -115,7 +133,8 @@ namespace DeviceManager.ViewModel
         /// </summary>
         private async void SendDacValue()
         {
-            var response = await dacModel.SetDacCommand(VoltageValue);
+            var response = new byte[5];
+            dacModel.SetDacCommand(VoltageValue, ref response);
         }
 
         /// <summary>
@@ -146,9 +165,17 @@ namespace DeviceManager.ViewModel
 
                 try
                 {
+                    var status = new byte[5];
 
-                    var status = await dacModel.ReadDacStatusCommand();
-                    ProcessStatus(status);
+                    if (dacModel.ReadDacStatusCommand(ref status))
+                    {
+                        ProcessStatus(status);
+                    }
+                    else
+                    {
+                        DacStatus = "Communication Error";
+                    }
+                    
                     Thread.Sleep(updateDelay);
                 }
                 catch (Exception e)

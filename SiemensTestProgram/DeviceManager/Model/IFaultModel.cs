@@ -6,10 +6,10 @@ namespace DeviceManager.Model
 {
     public interface IFaultModel
     {
-        Task<byte[]> Reset();
+        bool Reset(ref byte[] response);
 
-        byte[] GetState();
+        bool GetState(ref byte[] response);
 
-        byte[] GetNtcStatus();
+        bool GetNtcStatus(ref byte[] response);
     }
 }

@@ -14,6 +14,6 @@ namespace DeviceManager.Model
         /// </summary>
         /// <param name="request"> LED toggle status. </param>
         /// <returns> Task which will return LED register response. </returns>
-        Task<byte[]> SetLedCommand(string ledRequest);
+        bool SetLedCommand(string ledRequest, ref byte[] response);
     }
 }
