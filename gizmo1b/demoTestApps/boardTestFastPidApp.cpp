@@ -308,52 +308,36 @@ void BoardTestFastPidApp::boardTestFastPidApp()
     // Setup ADC for Isense read
     //
     uint16 adcData;
-    uint16 adcCfg = 0;
-    adcCfg |= OVERWRITE_CFG << CFG_SHIFT;
+    uint16 adcCfg;
+    adcCfg  = 0;
+    adcCfg |= OVERWRITE_CFG       << CFG_SHIFT;
     adcCfg |= UNIPOLAR_REF_TO_GND << IN_CH_CFG_SHIFT;
-    adcCfg |= ISENSE << IN_CH_SEL_SHIFT;
-    adcCfg |= FULL_BW << FULL_BW_SEL_SHIFT;
-    adcCfg |= EXT_REF << REF_SEL_SHIFT;
-    adcCfg |= DISABLE_SEQ << SEQ_EN_SHIFT;
-    adcCfg |= READ_BACK_DISABLE << READ_BACK_SHIFT;
-    adcCfg <<= 2;
+    adcCfg |= ISENSE              << IN_CH_SEL_SHIFT;
+    adcCfg |= FULL_BW             << FULL_BW_SEL_SHIFT;
+    adcCfg |= EXT_REF             << REF_SEL_SHIFT;
+    adcCfg |= DISABLE_SEQ         << SEQ_EN_SHIFT;
+    adcCfg |= READ_BACK_DISABLE   << READ_BACK_SHIFT;
+    adcCfg  = adcCfg              << 2;
     gioSetBit(mibspiPORT3, PIN_ENA, 0); //mibspi1 somi select spi A
-    //
-    // conv DATA(n-1), clock out CFG(n), clock in DATA(n-2)
-    //
-    gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1 : start conversion, SDO to High-Z
-    gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0 : MSB DATA to SDO
     mibspiSetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcCfg);
+    gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0
+    mibspiTransfer(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC);
+    while (!mibspiIsTransferComplete(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC));
+    gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1
+    usDelay1(CONV_TIME_IN_US); // allow conv and acq to complete
+    adcCfg  = 0;
+    mibspiSetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcCfg);
+    gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0
     mibspiTransfer(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC); // clock out CFG, clock in DATA
     while (!mibspiIsTransferComplete(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC));
-    gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1 : disable NO BUSY, SDO to High-Z
-    mibspiGetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcData); // DATA available
+    gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1
     usDelay1(CONV_TIME_IN_US); // allow conv and acq to complete
-    gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0
-    //
-    // conv DATA(n), clock out CFG(n+1), clock in DATA(n-1)
-    //
-    gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1 : start conversion, SDO to High-Z
-    gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0 : MSB DATA to SDO
     mibspiSetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcCfg);
-    mibspiTransfer(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC); // clock out CFG, clock in DATA
-    while (!mibspiIsTransferComplete(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC));
-    gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1 : disable NO BUSY, SDO to High-Z
-    mibspiGetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcData); // DATA available
-    usDelay1(CONV_TIME_IN_US); // allow conv and acq to complete
     gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0
-    //
-    // conv DATA(n+1), clock out CFG(n+2), clock in DATA(n)
-    //
-    gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1 : start conversion, SDO to High-Z
-    gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0 : MSB DATA to SDO
-    mibspiSetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcCfg);
-    mibspiTransfer(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC); // clock out CFG, clock in DATA
+    mibspiTransfer(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC);
     while (!mibspiIsTransferComplete(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC));
-    gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1 : disable NO BUSY, SDO to High-Z
-    mibspiGetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcData); // DATA available
+    gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1
     usDelay1(CONV_TIME_IN_US); // allow conv and acq to complete
-    gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0
     //
     // Clear TEC errors
     //
@@ -371,7 +355,7 @@ void BoardTestFastPidApp::boardTestFastPidApp()
     //
     // debug pin
     //
-    gioSetBit(hetPORT1, PIN_HET_12, 0);  // 124:HET1_12:DIG_OUT_A0
+    gioSetBit(hetPORT1, PIN_HET_12, 1);  // 124:HET1_12:DIG_OUT_A0
     while (true) {
         //
         // Clear TEC errors (2.2us)
@@ -394,18 +378,16 @@ void BoardTestFastPidApp::boardTestFastPidApp()
             s_waveFormTimeInUs += s_loopTimeInUs;
         }
         //
-        // Read Isense (11.4us)
+        // Read Isense (10.9us)
         //
-        gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1 : start conversion, SDO to High-Z
-        gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0 : MSB DATA to SDO
         mibspiSetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcCfg);
-        mibspiTransfer(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC); // clock out CFG, clock in DATA
-        while (!mibspiIsTransferComplete(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC));
-        gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1 : disable NO BUSY, SDO to High-Z
-        mibspiGetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcData); // DATA available
-        usDelay1(CONV_TIME_IN_US); // allow conv and acq to complete
         gioSetBit(mibspiPORT5, PIN_SOMI, 0); // ADC_CNV <- 0
-        float adcVoltage =  adcData * (5.0 / 65535) * 2;
+        mibspiTransfer(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC);
+        while (!mibspiIsTransferComplete(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC));
+        gioSetBit(mibspiPORT5, PIN_SOMI, 1); // ADC_CNV <- 1
+        mibspiGetData(mibspiREG1, AD7689ACPZ_8CH_16BIT_ADC, &adcData);
+        usDelay1(CONV_TIME_IN_US); // allow conv and acq to complete
+        float adcVoltage =  adcData * (5.0 / 65535);
         float iSense     = (adcVoltage * 9.05 / 6.04 - 2.5) / (20.0 * 0.008);
         float iRef       =  s_iRef;
         s_iSense         =  iSense;
