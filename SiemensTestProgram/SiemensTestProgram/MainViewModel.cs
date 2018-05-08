@@ -15,7 +15,7 @@
             // Default settings
             TestViews = new ObservableCollection<string>()
             {
-                "Configure",
+                "COM Port",
                 "ADC",
                 "DAC",
                 "DIO",
@@ -77,7 +77,7 @@
         {
             switch (selectedTestView)
             {
-                case "Configure":
+                case "COM Port":
                     Content = DeviceManager.Factory.Instance.GetCommunicationConfigurationView();
                     break;
                 case "LED":

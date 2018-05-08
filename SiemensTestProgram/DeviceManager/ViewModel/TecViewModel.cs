@@ -69,7 +69,7 @@ namespace DeviceManager.ViewModel
             closedLoopButtonState = TecDefaults.EnableClosedLoopText;
             numberOfSamples = 0;
 
-            InitialUpdate();
+            
             //SliderIrefValue = 0;
 
             // Set commands
@@ -82,9 +82,13 @@ namespace DeviceManager.ViewModel
             ResetCustomWaveformCommand = new RelayCommand(param => Reset());
             UpdateIrefCommand = new RelayCommand(param => UpdateIrefForWaveform());
             IncrementCommand = new RelayCommand(param => IncrementCounter());
+            RefreshCommand = new RelayCommand(param => InitialUpdate());
 
-            StartUpdateTask();
+            InitialUpdate();
+            //StartUpdateTask();
         }
+
+        public RelayCommand RefreshCommand { get; set; }
 
         public RelayCommand SaveDataCommand { get; set; }
 
@@ -591,41 +595,49 @@ namespace DeviceManager.ViewModel
             // uncomment later StartUpdateTask();
         }
 
-        private async void EnableToggle()
+        private void EnableToggle()
         {
             var state = enableButtonState;
             EnableButtonState = enableButtonState == TecDefaults.EnableText ? TecDefaults.DisableText : TecDefaults.EnableText;
-            var status = await tecModel.ControlCommand(state);
+
+            var response = new byte[5];
+            tecModel.ControlCommand(state, ref response);
         }
 
-        private async void UpdatePeriod()
+        private void UpdatePeriod()
         {
-            var status = await tecModel.SetPeriodCommand(tecPeriod);
+            var response = new byte[5];
+            tecModel.SetPeriodCommand(tecPeriod, ref response);
         }
 
-        private async void UpdateProportionalGain()
+        private void UpdateProportionalGain()
         {
-            var status = await tecModel.SetProportionalGainCommand(proportionalGain);
+            var response = new byte[5];
+            tecModel.SetProportionalGainCommand(proportionalGain, ref response);
         }
 
-        private async void UpdateIntegralGain()
+        private void UpdateIntegralGain()
         {
-            var status = await tecModel.SetIntegralGainCommand(integralGain);
+            var response = new byte[5];
+            tecModel.SetIntegralGainCommand(integralGain, ref response);
         }
 
-        private async void UpdateDerivativeGain()
+        private void UpdateDerivativeGain()
         {
-            var status = await tecModel.SetDerivativeGainCommand(derivativeGain);
+            var response = new byte[5];
+            tecModel.SetDerivativeGainCommand(derivativeGain, ref response);
         }
 
-        private async void UpdateIrefForWaveform()
+        private void UpdateIrefForWaveform()
         {
-            var status = await tecModel.SetIrefCommand(irefCurrentValue);
+            var response = new byte[5];
+            tecModel.SetIrefCommand(irefCurrentValue, ref response);
         }
 
-        private async void UpdateWaveform()
+        private void UpdateWaveform()
         {
-            var status = await tecModel.SetWaveformCommand(selectedWaveForm);
+            var response = new byte[5];
+            tecModel.SetWaveformCommand(selectedWaveForm, ref response);
         }
 
         private void CaptureToggle()
@@ -633,82 +645,109 @@ namespace DeviceManager.ViewModel
             CaptureButtonState = captureButtonState == TecDefaults.StartCaptureText ? TecDefaults.StopCaptureText : TecDefaults.StartCaptureText;
         }
 
-        private async void WaveformToggle()
+        private void WaveformToggle()
         {
             var state = waveformButtonState;
             WaveformButtonState = waveformButtonState == TecDefaults.StartWaveformText ? TecDefaults.StopWaveformText : TecDefaults.StartWaveformText;
-            var status = await tecModel.ControlCommand(state);
+
+            var response = new byte[5];
+            tecModel.ControlCommand(state, ref response);
         }
 
-        private async void ClosedLoopToggle()
+        private void ClosedLoopToggle()
         {
             var state = closedLoopButtonState;
             ClosedLoopButtonState = closedLoopButtonState == TecDefaults.EnableClosedLoopText ? TecDefaults.DisableClosedLoopText : TecDefaults.EnableClosedLoopText;
-            var status = await tecModel.ControlCommand(state);
+
+            var response = new byte[5];
+            tecModel.ControlCommand(state, ref response);
         }
 
-        private async void ResetTec()
+        private void ResetTec()
         {
-            await tecModel.Reset();
+            var response = new byte[5];
+            tecModel.Reset(ref response);
         }
 
-        private async void UpdateIref()
+        private void UpdateIref()
         {
-            var data = await tecModel.ReadIref();
-            IRef = Helper.GetFloatFromBigEndian(data);
+            var data = new byte[5];
+            if (tecModel.ReadIref(ref data))
+            {
+                IRef = Helper.GetFloatFromBigEndian(data);
+            }
         }
 
-        private async void UpdateISense()
+        private void UpdateISense()
         {
-            var data = await tecModel.ReadIsense();
-            ISense = Helper.GetFloatFromBigEndian(data);
+            var data = new byte[5];
+            if (tecModel.ReadIsense(ref data))
+            {
+                ISense = Helper.GetFloatFromBigEndian(data);
+            }
         }
 
-        private async void UpdateVSense()
+        private void UpdateVSense()
         {
-            var data = await tecModel.ReadVsense();
-            VSense = Helper.GetFloatFromBigEndian(data); 
+            var data = new byte[5];
+            if (tecModel.ReadVsense(ref data))
+            {
+                VSense = Helper.GetFloatFromBigEndian(data);
+            }
+            
         }
 
-        private async void UpdateStatus()
+        private void UpdateStatus()
         {
-            var status = await tecModel.ReadStatus();
-            ProcessStatus(status);
+            var status = new byte[5];
+            if (tecModel.ReadStatus(ref status))
+            {
+                ProcessStatus(status);
+            }
+            else
+            {
+                StatusMessage = "Communication Error";
+            }
         }
 
         private void ProcessStatus(byte[] status)
         {
             if (status.Length < 4)
             {
-                statusMessage = "Communication Error";
+                StatusMessage = "Communication Error";
                 return;
             }
 
             StatusMessage = GetErrorMessage(status[4]);
         }
 
-        private async void SetWaveformCycles()
+        private void SetWaveformCycles()
         {
-            await tecModel.SetWaveformCyclesCommand(waveformCycles);
+            var response = new byte[5];
+            tecModel.SetWaveformCyclesCommand(waveformCycles, ref response);
         }
 
-        private async void SetSampleTime()
+        private void SetSampleTime()
         {
-            await tecModel.SetSampleTimeCommand(sampleTime);
+            var response = new byte[5];
+            tecModel.SetSampleTimeCommand(sampleTime, ref response);
         }
 
-        private async void IncrementCounter()
+        private void IncrementCounter()
         {
             Counter += 1;
-            await tecModel.ControlCommand(TecDefaults.IncrementTecWaveform);
+
+            var response = new byte[5];
+            tecModel.ControlCommand(TecDefaults.IncrementTecWaveform, ref response);
         }
 
-        private async void Reset()
+        private void Reset()
         {
             Counter = 0;
 
             // Reset
-            await tecModel.ControlCommand(TecDefaults.ResetTecWaveform);
+            var response = new byte[5];
+            tecModel.ControlCommand(TecDefaults.ResetTecWaveform, ref response);
         }
 
         private void StartUpdateTask()
@@ -723,7 +762,7 @@ namespace DeviceManager.ViewModel
             }, token);
         }
 
-        private async void UpdateAllStatuses()
+        private void UpdateAllStatuses()
         {
             while (true)
             {
@@ -735,22 +774,18 @@ namespace DeviceManager.ViewModel
 
                 try
                 {
-                    var iRefData = await tecModel.ReadIref();
-                    IRef = Helper.GetFloatFromBigEndian(iRefData);
+                    UpdateIref();
                     Thread.Sleep(50);
 
-                    var iSenseData = await tecModel.ReadIsense();
-                    ISense = Helper.GetFloatFromBigEndian(iSenseData);
+                    UpdateISense();
                     Thread.Sleep(50);
 
-                    var vSenseData = await tecModel.ReadVsense();
-                    VSense = Helper.GetFloatFromBigEndian(vSenseData);
+                    UpdateVSense();
                     Thread.Sleep(50);
 
-                    var status = await tecModel.ReadStatus();
+                    UpdateStatus();
                     Thread.Sleep(50);
 
-                    ProcessStatus(status);
                     Thread.Sleep(updateDelay);
                 }
                 catch (Exception e)
@@ -762,17 +797,10 @@ namespace DeviceManager.ViewModel
 
         private void InitialUpdate()
         {
-            var iRefData = tecModel.ReadIref().Result;
-            IRef = Helper.GetFloatFromBigEndian(iRefData);
-
-            var iSenseData = tecModel.ReadIsense().Result;
-            ISense = Helper.GetFloatFromBigEndian(iSenseData);
-
-            var vSenseData = tecModel.ReadVsense().Result;
-            VSense = Helper.GetFloatFromBigEndian(vSenseData);
-
-            var status = tecModel.ReadStatus().Result;
-            ProcessStatus(status);
+            UpdateIref();
+            UpdateISense();
+            UpdateVSense();
+            UpdateStatus();
         }
 
         private string FormatSaveProgress()

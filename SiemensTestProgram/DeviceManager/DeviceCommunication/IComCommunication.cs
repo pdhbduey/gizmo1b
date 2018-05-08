@@ -7,13 +7,7 @@ namespace DeviceManager.DeviceCommunication
 {
     public interface IComCommunication
     {
-        /// <summary>
-        /// Sends data via the com port
-        /// </summary>
-        /// <param name="message"> Data to send. </param>
-        void WriteData(byte[] request);
-
-        Task<byte[]> ReadData();
+        bool ProcessCommunicationRequest(byte[] request, ref byte[] response);
 
         /// <summary>
         /// Updates configuration for serial communication to gizmo 1b device.
@@ -23,7 +17,7 @@ namespace DeviceManager.DeviceCommunication
         /// <param name="dataBits"> Data bits </param>
         /// <param name="parity"> Parity </param>
         /// <param name="stopBits"> Stop bits</param>
-        void UpdateCommunication(string comPort, int baudRate, int dataBits, System.IO.Ports.Parity parity, System.IO.Ports.StopBits stopBits);
+        bool UpdateCommunication(string comPort, int baudRate, int dataBits, System.IO.Ports.Parity parity, System.IO.Ports.StopBits stopBits);
 
         List<string> GetPorts();
 

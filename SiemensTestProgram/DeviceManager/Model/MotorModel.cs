@@ -2,6 +2,7 @@
 
 namespace DeviceManager.Model
 {
+    using Common;
     using DeviceCommunication;
     using System.Threading.Tasks;
 
@@ -14,28 +15,25 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public Task<byte[]> SetRegisterValue(byte[] value)
+        public bool SetRegisterValue(byte[] value, ref byte[] response)
         {
             var requestArray = MotorDefaults.SetRegisterValueCommand(value);
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> SetRegisterAddress(string address)
+        public bool SetRegisterAddress(string address, ref byte[] response)
         {
             var requestArray = MotorDefaults.SetRegisterAddressCommand(address);
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ReadRegisterValue()
+        public bool ReadRegisterValue(ref byte[] response)
         {
             var requestArray = MotorDefaults.ReadRegisterValueCommand();
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
         //public Task<byte[]> SetStepMode(string selectedMode)
@@ -54,90 +52,81 @@ namespace DeviceManager.Model
         //    return response;
         //}
 
-        public Task<byte[]> Home()
+        public bool Home(ref byte[] response)
         {
             var requestArray = MotorDefaults.SetHomeCommand();
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> Reset()
+        public bool Reset(ref byte[] response)
         {
             var requestArray = MotorDefaults.SetResetCommand();
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> Limp()
+        public bool Limp(ref byte[] response)
         {
             var requestArray = MotorDefaults.SetLimpCommand();
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> Energize()
+        public bool Energize(ref byte[] response)
         {
             var requestArray = MotorDefaults.SetEnergizeCommand();
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
 
-        public Task<byte[]> Initialize()
+        public bool Initialize(ref byte[] response)
         {
             var requestArray = MotorDefaults.SetInitializeCommand();
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public byte[] GetMotorStatus()
+        public bool GetMotorStatus(ref byte[] response)
         {
             var requestArray = MotorDefaults.GetMotorStatusCommand();
-            communication.WriteData(requestArray);
-            return communication.ReadData().Result;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public void SetRelativeMovePosition(int relativePosition)
+
+        public void SetRelativeMovePosition(int relativePosition, ref byte[] response)
         {
             var requestArray = MotorDefaults.SetMoveRelativePositionCommand(relativePosition);
-            communication.WriteData(requestArray);
-            communication.ReadData().Wait();
+            communication.ProcessCommunicationRequest(requestArray, ref response);
         }
 
-        public void SetAbsoluteMovePosition(int absolutePosition)
+        public void SetAbsoluteMovePosition(int absolutePosition, ref byte[] response)
         {
             var requestArray = MotorDefaults.SetMoveAbsolutePositionCommand(absolutePosition);
-            communication.WriteData(requestArray);
-            communication.ReadData().Wait();
+            communication.ProcessCommunicationRequest(requestArray, ref response);
         }
 
-        public Task<byte[]> MotorControlMove(string selectedDirection, string selectedStepSize, string move)
+        public bool MotorControlMove(string selectedDirection, string selectedStepSize, string move, ref byte[] response)
         {
             var requestArray = MotorDefaults.SetControlMoveCommand(selectedDirection, selectedStepSize, move);
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> Cycle()
+        public bool Cycle(ref byte[] response)
         {
             var requestArray = MotorDefaults.CycleCommand();
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> Stop()
+        public bool Stop(ref byte[] response)
         {
             var requestArray = MotorDefaults.StopCommand();
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
         //public Task<byte[]> MoveRelative()
@@ -158,13 +147,11 @@ namespace DeviceManager.Model
         //    return response;
         //}
 
-        public Task<byte[]> GetMotorPosition()
+        public bool GetMotorPosition(ref byte[] response)
         {
             var requestArray = MotorDefaults.ReadPositionCommand();
-            communication.WriteData(requestArray);
-            var response = communication.ReadData();
-
-            return response;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
     }
 }

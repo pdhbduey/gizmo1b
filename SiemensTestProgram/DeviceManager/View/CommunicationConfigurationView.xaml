@@ -29,7 +29,7 @@
                     <ComboBox Margin="1" ItemsSource="{Binding StopBits}" SelectedItem="{Binding SelectedStopBits}"></ComboBox>
                 </StackPanel>
             </GroupBox>
-            <GroupBox>
+            <!--<GroupBox>
                 <GroupBox.Header>
                     <TextBlock Text="Serial Port Settings" FontWeight="Bold"/>
                 </GroupBox.Header>
@@ -39,11 +39,12 @@
                     <Label Content="{Binding Status}"></Label>
                     <Label Content="{Binding PnpDeviceId}"></Label>
                 </StackPanel>
-            </GroupBox>
+            </GroupBox>-->
         </StackPanel>
-        <StackPanel Grid.Row="1" Margin="10" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="1" Margin="10" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
             <!--<Button Margin="1" Width="100" Height="25" Command="{Binding ExitConfigurationCommand}" Content="Exit"></Button>-->
-            <Button Margin="1" Width="100" Height="25" Command="{Binding ConfigureCommunicationCommand}" Content="Update"></Button>
+            <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Right" Command="{Binding ConfigureCommunicationCommand}" Content="Update"></Button>
+            <Label HorizontalAlignment="Right" Content="{Binding ConfigurationStatus}"></Label>
         </StackPanel>
     </Grid>
 </UserControl>

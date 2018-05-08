@@ -62,9 +62,18 @@ namespace DeviceManager.ViewModel
             CycleRelativeCommand = new RelayCommand(param => Cycle());
             StopCommand = new RelayCommand(param => Stop());
             SetRegisterValueCommand = new RelayCommand(param => SetRegister());
+            ReadRegisterValueCommand = new RelayCommand(param => ReadRegister());
+            RefreshCommand = new RelayCommand(param => RefreshMotorStatus());
+            RefreshPositionCommand = new RelayCommand(param => RefreshPosition());
 
-            StartUpdateTask();
+            //StartUpdateTask();
         }
+
+        public RelayCommand RefreshCommand { get; set; }
+
+        public RelayCommand RefreshPositionCommand { get; set; }
+
+        public RelayCommand ReadRegisterValueCommand { get; set; }
 
         public RelayCommand SetRegisterValueCommand { get; set; }
 
@@ -243,17 +252,37 @@ namespace DeviceManager.ViewModel
 
         private void InitialUpdate()
         {
-            //motorModel.InitialSet();
-            SelectedDirection = Directions[0];
-            SelectedStepSize = StepSizes[0];
+            var position = new byte[5];
+            if (motorModel.GetMotorPosition(ref position))
+            {
+                MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
+            }
 
-            var position = motorModel.GetMotorPosition().Result;
-            MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
+            var status = new byte[5];
 
-            //motorModel.SetRegisterAddress(selectedRegisterAddress).Wait();
-            //RegisterReadValue = Helper.GetFloatFromBigEndian(motorModel.ReadRegisterValue().Result).ToString();
-            var status = motorModel.GetMotorStatus();
-            ProcessMotorStatus(status);
+            if (motorModel.GetMotorStatus(ref status))
+            {
+                ProcessMotorStatus(status);
+            }
+        }
+
+        private void RefreshPosition()
+        {
+            var position = new byte[5];
+            if (motorModel.GetMotorPosition(ref position))
+            {
+                MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
+            }
+        }
+
+        private void RefreshMotorStatus()
+        {
+            var status = new byte[5];
+
+            if (motorModel.GetMotorStatus(ref status))
+            {
+                ProcessMotorStatus(status);
+            }
         }
 
         private void ProcessMotorStatus(byte[] status)
@@ -286,39 +315,46 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private async void Energize()
+        private void Energize()
         {
-            await motorModel.Energize();
+            var response = new byte[5];
+            motorModel.Energize(ref response);
         }
 
         private async void SetRegister()
         {
-            await motorModel.SetRegisterValue(registerValue);
+            var response = new byte[5];
+            motorModel.SetRegisterValue(registerValue, ref response);
         }
 
         private async void MoveToRelativePosition()
         {
-            await motorModel.MotorControlMove(selectedDirection, selectedStepSize, "relative");
+            var response = new byte[5];
+            motorModel.MotorControlMove(selectedDirection, selectedStepSize, "relative", ref response);
         }
 
         private async void MoveToAbsolutePosition()
         {
-            await motorModel.MotorControlMove(selectedDirection, selectedStepSize, "absolute");
+            var response = new byte[5];
+            motorModel.MotorControlMove(selectedDirection, selectedStepSize, "absolute", ref response);
         }
 
         private void SetRelativeMovePosition()
         {
-            motorModel.SetRelativeMovePosition(relativeMoveValue);
+            var response = new byte[5];
+            motorModel.SetRelativeMovePosition(relativeMoveValue, ref response);
         }
 
         private void SetAbsoluteMovePosition()
         {
-            motorModel.SetAbsoluteMovePosition(absoluteMoveValue);
+            var response = new byte[5];
+            motorModel.SetAbsoluteMovePosition(absoluteMoveValue, ref response);
         }
 
         private async void SetSelectedRegisterAddress()
         {
-            await motorModel.SetRegisterAddress(selectedRegisterAddress);
+            var response = new byte[5];
+            motorModel.SetRegisterAddress(selectedRegisterAddress, ref response);
         }
 
         //private async void SetConfiguration()
@@ -337,36 +373,52 @@ namespace DeviceManager.ViewModel
         //    motorModel.SetDirection(selectedDirection).Wait();
         //}
 
+        private async void ReadRegister()
+        {
+            // Read register address
+            var regValue = new byte[5];
+            if (motorModel.ReadRegisterValue(ref regValue))
+            {
+                RegisterReadValue = Helper.GetIntFromBigEndian(regValue).ToString();
+            }
+        }
+
         private async void Initialize()
         {
-            await motorModel.Initialize();
+            var response = new byte[5];
+            motorModel.Initialize(ref response);
         }
 
         private async void Limp()
         {
-            await motorModel.Limp();
+            var response = new byte[5];
+            motorModel.Limp(ref response);
         }
 
         private async void Reset()
         {
-            await motorModel.Reset();
+            var response = new byte[5];
+            motorModel.Reset(ref response);
         }
 
-        private async void Home()
+        private void Home()
         {
-            await motorModel.Home();
+            var response = new byte[5];
+            motorModel.Home(ref response);
 
             //motorModel.GetMotorPosition();
         }
 
-        private async void Cycle()
+        private void Cycle()
         {
-            await motorModel.Cycle();
+            var response = new byte[5];
+            motorModel.Cycle(ref response);
         }
 
         private async void Stop()
         {
-            await motorModel.Stop();
+            var response = new byte[5];
+            motorModel.Stop(ref response);
         }
 
         private void StartUpdateTask()
@@ -391,19 +443,17 @@ namespace DeviceManager.ViewModel
 
                 try
                 {
-                    // Read register address
-                    var regValue = await motorModel.ReadRegisterValue();
-                    RegisterReadValue = Helper.GetIntFromBigEndian(regValue).ToString();
-                    Thread.Sleep(50);
-
                     // Read motor position
-                    var position = await motorModel.GetMotorPosition();
-                    MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
+                    var position = new byte[5];
+                    if (motorModel.GetMotorPosition(ref position))
+                    {
+                        MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
+                    }
+                    
                     Thread.Sleep(50);
-
 
                     // Update motor status
-                    Thread.Sleep(updateDelay);
+                    InitialUpdate();
                 }
                 catch (Exception)
                 {

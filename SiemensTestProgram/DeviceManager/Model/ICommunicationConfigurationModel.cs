@@ -16,7 +16,7 @@ namespace DeviceManager.Model
         /// <param name="dataBits"> Data bits </param>
         /// <param name="parity"> Parity </param>
         /// <param name="stopBits"> Stop bits </param>
-        void ReconfigureComCommunication(string comPort, int baudRate, int dataBits, System.IO.Ports.Parity parity, System.IO.Ports.StopBits stopBits);
+        string ReconfigureComCommunication(string comPort, int baudRate, int dataBits, System.IO.Ports.Parity parity, System.IO.Ports.StopBits stopBits);
 
         /// <summary>
         /// Gets the comp ports available.

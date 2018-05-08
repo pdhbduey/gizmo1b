@@ -6,32 +6,32 @@ namespace DeviceManager.Model
 
     public interface ITecModel
     {
-        Task<byte[]> ReadIsense();
+        bool ReadIsense(ref byte[] response);
 
-        Task<byte[]> ReadVsense();
+        bool ReadVsense(ref byte[] response);
 
-        Task<byte[]> ReadIref();
+        bool ReadIref(ref byte[] response);
 
-        Task<byte[]> ReadStatus();
+        bool ReadStatus(ref byte[] response);
 
-        Task<byte[]> ControlCommand(string request);
+        bool ControlCommand(string request, ref byte[] response);
 
-        Task<byte[]> SetWaveformCommand(string waveform);
+        bool SetWaveformCommand(string waveform, ref byte[] response);
 
-        Task<byte[]> SetWaveformCyclesCommand(int cycles);
+        bool SetWaveformCyclesCommand(int cycles, ref byte[] response);
 
-        Task<byte[]> SetSampleTimeCommand(int sampleTime);
+        bool SetSampleTimeCommand(int sampleTime, ref byte[] response);
 
-        Task<byte[]> SetPeriodCommand(int period);
+        bool SetPeriodCommand(int period, ref byte[] response);
 
-        Task<byte[]> SetDerivativeGainCommand(int derivateGain);
+        bool SetDerivativeGainCommand(int derivateGain, ref byte[] response);
 
-        Task<byte[]> SetIntegralGainCommand(int integralGain);
+        bool SetIntegralGainCommand(int integralGain, ref byte[] response);
 
-        Task<byte[]> SetProportionalGainCommand(float proportionalGain);
+        bool SetProportionalGainCommand(float proportionalGain, ref byte[] response);
 
-        Task<byte[]> SetIrefCommand(float irefGain);
+        bool SetIrefCommand(float irefGain, ref byte[] response);
 
-        Task<byte[]> Reset();
+        bool Reset(ref byte[] response);
     }
 }

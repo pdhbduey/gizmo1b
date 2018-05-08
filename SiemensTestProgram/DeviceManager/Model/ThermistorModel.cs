@@ -15,44 +15,39 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public Task<byte[]> ReadStatus()
+        public bool ReadStatus(ref byte[] response)
         {
             var requestArray = ThermistorDefaults.GetStatusCommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ReadAinA()
+        public bool ReadAinA(ref byte[] response)
         {
             var requestArray = ThermistorDefaults.GetReadAinACommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ReadAinB()
+        public bool ReadAinB(ref byte[] response)
         {
             var requestArray = ThermistorDefaults.GetReadAinBCommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ReadAinC()
+        public bool ReadAinC(ref byte[] response)
         {
             var requestArray = ThermistorDefaults.GetReadAinCCommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
 
-        public Task<byte[]> ReadAinD()
+        public bool ReadAinD(ref byte[] response)
         {
             var requestArray = ThermistorDefaults.GetReadAinDCommand();
-            communication.WriteData(requestArray);
-            var data = communication.ReadData();
-            return data;
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
         }
     }
 }

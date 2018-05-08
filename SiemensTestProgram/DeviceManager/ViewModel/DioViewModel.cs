@@ -49,20 +49,22 @@ namespace DeviceManager.ViewModel
             SetDioFiveCommand = new RelayCommand(param => SetDoutCommand(channel: 5, status: doutFiveStatus));
             SetDioSixCommand = new RelayCommand(param => SetDoutCommand(channel: 6, status: doutSixStatus));
             SetDioSevenCommand = new RelayCommand(param => SetDoutCommand(channel: 7, status: doutSevenStatus));
-            
+
             // Update Din values.
-            StartUpdateTask();
+            //StartUpdateTask();
+            RefreshCommand = new RelayCommand(param => InitialUpdate());
         }
 
         private async void SetDoutCommand(int channel, string status)
         {
+            var response = new byte[5];
             if (status.Contains("Set"))
             {
-                await dioModel.SetDout(channel, set: true);
+                dioModel.SetDout(channel, set: true, response: ref response);
             }
             else
             {
-                await dioModel.SetDout(channel, set: false);
+                dioModel.SetDout(channel, set: false, response: ref response);
             }
 
             UpdateChannelDout(channel);
@@ -104,6 +106,8 @@ namespace DeviceManager.ViewModel
             var statusValue = status.Contains("Set") ? status.Replace("Set", "Clear") : status.Replace("Clear", "Set");
             return statusValue;
         }
+
+        public RelayCommand RefreshCommand { get; set; }
 
         public RelayCommand SetDioZeroCommand { get; set; }
 
@@ -365,16 +369,16 @@ namespace DeviceManager.ViewModel
 
         private void InitialUpdate()
         {
-            dinZeroColour = "Green";
-            dinOneColour = "Green";
-            dinTwoColour = "Green";
-            dinThreeColour = "Green";
-            dinFourColour = "Green";
-            dinFiveColour = "Green";
-            dinSixColour = "Green";
-            dinSevenColour = "Green";
-            dinEightColour = "Green";
-            dinNineColour = "Red";
+            dinZeroColour = DioDefaults.notSetColour;
+            dinOneColour = DioDefaults.notSetColour;
+            dinTwoColour = DioDefaults.notSetColour;
+            dinThreeColour = DioDefaults.notSetColour;
+            dinFourColour = DioDefaults.notSetColour;
+            dinFiveColour = DioDefaults.notSetColour;
+            dinSixColour = DioDefaults.notSetColour;
+            dinSevenColour = DioDefaults.notSetColour;
+            dinEightColour = DioDefaults.notSetColour;
+            dinNineColour = DioDefaults.notSetColour;
 
             doutZeroStatus = "Set Dout 0";
             doutOneStatus = "Set Dout 1";
@@ -384,6 +388,28 @@ namespace DeviceManager.ViewModel
             doutFiveStatus = "Set Dout 5";
             doutSixStatus = "Set Dout 6";
             doutSevenStatus = "Set Dout 7";
+
+            var din = new byte[5];
+            if (dioModel.ReadDin(ref din))
+            {
+                var zeroSet = DioDefaults.IsDinSet(din, 0);
+                var oneSet = DioDefaults.IsDinSet(din, 1);
+                var twoSet = DioDefaults.IsDinSet(din, 2);
+                var threeSet = DioDefaults.IsDinSet(din, 3);
+                var fourSet = DioDefaults.IsDinSet(din, 4);
+                var fiveSet = DioDefaults.IsDinSet(din, 5);
+                var sixSet = DioDefaults.IsDinSet(din, 6);
+                var sevenSet = DioDefaults.IsDinSet(din, 7);
+
+                updateDinStatus(0, zeroSet);
+                updateDinStatus(1, oneSet);
+                updateDinStatus(2, twoSet);
+                updateDinStatus(3, threeSet);
+                updateDinStatus(4, fourSet);
+                updateDinStatus(5, fiveSet);
+                updateDinStatus(6, sixSet);
+                updateDinStatus(7, sevenSet);
+            }
         }
 
         private async void DinUpdate()
@@ -392,27 +418,29 @@ namespace DeviceManager.ViewModel
             {
                 try
                 {
-                    var din = await dioModel.ReadDin();
+                    var din = new byte[5];
+                    if (dioModel.ReadDin(ref din))
+                    {
+                        var zeroSet = DioDefaults.IsDinSet(din, 0);
+                        var oneSet = DioDefaults.IsDinSet(din, 1);
+                        var twoSet = DioDefaults.IsDinSet(din, 2);
+                        var threeSet = DioDefaults.IsDinSet(din, 3);
+                        var fourSet = DioDefaults.IsDinSet(din, 4);
+                        var fiveSet = DioDefaults.IsDinSet(din, 5);
+                        var sixSet = DioDefaults.IsDinSet(din, 6);
+                        var sevenSet = DioDefaults.IsDinSet(din, 7);
 
-                    var zeroSet = DioDefaults.IsDinSet(din, 0, true);
-                    var oneSet = DioDefaults.IsDinSet(din, 1, true);
-                    var twoSet = DioDefaults.IsDinSet(din, 2, true);
-                    var threeSet = DioDefaults.IsDinSet(din, 3, true);
-                    var fourSet = DioDefaults.IsDinSet(din, 4, true);
-                    var fiveSet = DioDefaults.IsDinSet(din, 5, true);
-                    var sixSet = DioDefaults.IsDinSet(din, 6, true);
-                    var sevenSet = DioDefaults.IsDinSet(din, 7, true);
+                        updateDinStatus(0, zeroSet);
+                        updateDinStatus(1, oneSet);
+                        updateDinStatus(2, twoSet);
+                        updateDinStatus(3, threeSet);
+                        updateDinStatus(4, fourSet);
+                        updateDinStatus(5, fiveSet);
+                        updateDinStatus(6, sixSet);
+                        updateDinStatus(7, sevenSet);
+                    }
 
-                    updateDinStatus(0, zeroSet);
-                    updateDinStatus(1, oneSet);
-                    updateDinStatus(2, twoSet);
-                    updateDinStatus(3, threeSet);
-                    updateDinStatus(4, fourSet);
-                    updateDinStatus(5, fiveSet);
-                    updateDinStatus(6, sixSet);
-                    updateDinStatus(7, sevenSet);
-
-                    Thread.Sleep(updateDelay);
+                    //Thread.Sleep(updateDelay);
                 }
                 catch
                 {
@@ -428,92 +456,92 @@ namespace DeviceManager.ViewModel
                 case 0:
                     if (isSet)
                     {
-                        DinZeroColour = "Green";
+                        DinZeroColour = DioDefaults.setColour; 
                         break;
                     }
 
-                    DinZeroColour = "Red";
+                    DinZeroColour = DioDefaults.notSetColour;
                     break;
                 case 1:
                     if (isSet)
                     {
-                        DinOneColour = "Green";
+                        DinOneColour = DioDefaults.setColour;
                         break;
                     }
 
-                    DinOneColour = "Red";
+                    DinOneColour = DioDefaults.notSetColour; 
                     break;
                 case 2:
                     if (isSet)
                     {
-                        DinTwoColour = "Green";
+                        DinTwoColour = DioDefaults.setColour;
                         break;
                     }
 
-                    DinTwoColour = "Red";
+                    DinTwoColour = DioDefaults.notSetColour; 
                     break;
                 case 3:
                     if (isSet)
                     {
-                        DinThreeColour = "Green";
+                        DinThreeColour = DioDefaults.setColour;
                         break;
                     }
 
-                    DinThreeColour = "Red";
+                    DinThreeColour = DioDefaults.notSetColour; 
                     break;
                 case 4:
                     if (isSet)
                     {
-                        DinFourColour = "Green";
+                        DinFourColour = DioDefaults.setColour;
                         break;
                     }
 
-                    DinFourColour = "Red";
+                    DinFourColour = DioDefaults.notSetColour; 
                     break;
                 case 5:
                     if (isSet)
                     {
-                        DinFiveColour = "Green";
+                        DinFiveColour = DioDefaults.setColour;
                         break;
                     }
 
-                    DinFiveColour = "Red";
+                    DinFiveColour = DioDefaults.notSetColour; 
                     break;
                 case 6:
                     if (isSet)
                     {
-                        DinSixColour = "Green";
+                        DinSixColour = DioDefaults.setColour;
                         break;
                     }
 
-                    DinSixColour = "Red";
+                    DinSixColour = DioDefaults.notSetColour; 
                     break;
                 case 7:
                     if (isSet)
                     {
-                        DinSevenColour = "Green";
+                        DinSevenColour = DioDefaults.setColour;
                         break;
                     }
 
-                    DinSevenColour = "Red";
+                    DinSevenColour = DioDefaults.notSetColour; 
                     break;
                 case 8:
                     if (isSet)
                     {
-                        DinEightColour = "Green";
+                        DinEightColour = DioDefaults.setColour;
                         break;
                     }
 
-                    DinEightColour = "Red";
+                    DinEightColour = DioDefaults.notSetColour;
                     break;
                 case 9:
                     if (isSet)
                     {
-                        DinNineColour = "Green";
+                        DinNineColour = DioDefaults.setColour; 
                         break;
                     }
 
-                    DinNineColour = "Red";
+                    DinNineColour = DioDefaults.notSetColour; 
                     break;
             }
         }

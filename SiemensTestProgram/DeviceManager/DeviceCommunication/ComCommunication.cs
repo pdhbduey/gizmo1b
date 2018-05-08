@@ -1,11 +1,14 @@
 ﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
+using DeviceManager.View;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DeviceManager.DeviceCommunication
 {
@@ -15,14 +18,14 @@ namespace DeviceManager.DeviceCommunication
     public class ComCommunication : IComCommunication, IDisposable
     {
         // Synchronization
-        private volatile object mutex = new object();
+        private volatile object mutex;
         private SemaphoreSlim requestSemaphore;
         //private SemaphoreSlim readSemaphore;
 
         // Default configuration
-        private const int timeout = 10000;
-        private const int byteThreshold = 5;
-        private string comPort = "COM9";
+        private const int readTimeout = 100;
+        private const int readBufferSize = 5;
+        private string comPort;
         private int baudRate = 115200;
         private int dataBits = 8;
         private Parity parity = System.IO.Ports.Parity.None;
@@ -33,9 +36,8 @@ namespace DeviceManager.DeviceCommunication
         public ComCommunication() 
         {
             isConfigured = false;
+            mutex = new object();
             requestSemaphore = new SemaphoreSlim(1);
-            //readSemaphore = new SemaphoreSlim(1);
-            CreateSerialPort();
         }
 
         public int BaudRate => baudRate;
@@ -50,58 +52,50 @@ namespace DeviceManager.DeviceCommunication
 
         public bool IsConfigured => isConfigured;
 
-        /// <summary>
-        /// Sends data via the com port
-        /// </summary>
-        /// <param name="message"> Data to send. </param>
-        public void WriteData(byte[] request)
+        public bool ProcessCommunicationRequest(byte[] request, ref byte[] response)
         {
             try
             {
-                if (serialPort.IsOpen)
+                if (!serialPort.IsOpen)
                 {
-                    requestSemaphore.Wait(1);
+                    CreateSerialPort();
+                }
+
+                lock (mutex)
+                {
+                    // Write to serial port
+                    receivedData = false;
                     serialPort.DiscardOutBuffer();
                     serialPort.Write(request, 0, request.Length);
-                }
-            }
-            catch
-            {
-                serialPort.DiscardInBuffer();
-                serialPort.DiscardOutBuffer();
-            }
-        }
+                    var timer = new Stopwatch();
+                    timer.Start();
 
-        public Task<byte[]> ReadData()
-        {
-            return Task.Factory.StartNew(() =>
-            {
-                var time = 0;
-                var data = new byte[5];
-                try
-                {
-                    if (serialPort.IsOpen)
+                    // Read from serial port
+                    do
                     {
-                        do
+                        if (timer.Elapsed >= TimeSpan.FromMilliseconds(readTimeout))
                         {
-                            time += 10;
-                            if (time > timeout) return data;
-                            Thread.Sleep(10);
-                        } while (serialPort.BytesToRead < 5);
+                            throw new Exception($"Read operation exceeded timeout of {readTimeout} ms");
+                        }
+                    } while (!receivedData);
 
-                        serialPort.Read(data, 0, data.Length);
-                        requestSemaphore.Release(1);
-                    }
+                    response = dataBuffer;
                 }
-                catch 
+            }
+            catch (Exception e)
+            {
+                if (serialPort.IsOpen)
                 {
-                   return new byte[0];
+                    serialPort.Close();
                 }
-                    
-                return data;
-            });
-            
+               
+                CreateSerialPort();
+                return false;
+            }
+
+            return true;
         }
+
 
         /// <summary>
         /// Updates configuration for serial communication to gizmo 1b device.
@@ -111,7 +105,7 @@ namespace DeviceManager.DeviceCommunication
         /// <param name="dataBits"> Data bits </param>
         /// <param name="parity"> Parity </param>
         /// <param name="stopBits"> Stop bits</param>
-        public void UpdateCommunication(string comPort, int baudRate, int dataBits, System.IO.Ports.Parity parity, System.IO.Ports.StopBits stopBits)
+        public bool UpdateCommunication(string comPort, int baudRate, int dataBits, System.IO.Ports.Parity parity, System.IO.Ports.StopBits stopBits)
         {
             this.comPort = comPort;
             this.baudRate = baudRate;
@@ -124,7 +118,7 @@ namespace DeviceManager.DeviceCommunication
                 serialPort.Close();
             }
 
-            CreateSerialPort();
+            return CreateSerialPort();
         }
 
         public List<string> GetPorts()
@@ -171,19 +165,41 @@ namespace DeviceManager.DeviceCommunication
             }
         }
 
-        private void CreateSerialPort()
+        private bool receivedData;
+        private byte[] dataBuffer;
+
+        private void HandleDataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            if (serialPort.BytesToRead >= readBufferSize)
+            {
+                var buffer = new byte[5];
+                serialPort.Read(buffer, 0, readBufferSize);
+                dataBuffer = buffer;
+                receivedData = true;
+            }
+        }
+
+        private bool CreateSerialPort()
         {
             try
             {
                 serialPort = new SerialPort(comPort, baudRate, parity, dataBits, stopBits);
+                serialPort.ReadTimeout = readTimeout;
+                serialPort.ReceivedBytesThreshold = readBufferSize;
+                serialPort.DataReceived += HandleDataReceived;
                 serialPort.Open();
-                serialPort.ReadTimeout = timeout;
-                serialPort.ReceivedBytesThreshold = byteThreshold;
             }
-            catch
+            catch (Exception e)
             {
+                var errorDisplay = new ErrorWindow();
+                errorDisplay.Topmost = true;
+                errorDisplay.errorMsg.Content = e.Message;
+                errorDisplay.Show();
 
+                return false;
             }
+
+            return true;
         }
     }
 }

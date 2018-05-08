@@ -10,34 +10,34 @@ namespace DeviceManager.Model
         /// Gets the status of the fan.
         /// </summary>
         /// <returns> Task that returns fan status </returns>
-        Task<byte[]> GetFanStatus();
+        bool GetFanStatus(ref byte[] response);
 
         /// <summary>
         /// Sets pwm duty cycle.
         /// </summary>
-        Task<byte[]> SetFanPwmDutyCycle(int pwmChannel, int dutyCycle);
+        bool SetFanPwmDutyCycle(int pwmChannel, int dutyCycle, ref byte[] response);
 
 
         /// <summary>
         /// Sets pwm period.
         /// </summary>
-        Task<byte[]> SetFanPwmPeriod(int pwmChannel, float period);
+        bool SetFanPwmPeriod(int pwmChannel, float period, ref byte[] response);
 
         /// <summary>
         /// Gets pwm period.
         /// </summary>
-        Task<byte[]> GetFanPwmPeriod(int channel);
+        bool GetFanPwmPeriod(int channel, ref byte[] response);
 
         /// <summary>
         /// Gets pwm duty cycle.
         /// </summary>
-        Task<byte[]> GetFanPwmDutyCycle(int channel);
+        bool GetFanPwmDutyCycle(int channel, ref byte[] response);
 
 
         /// <summary>
         /// Gets sensor rpm.
         /// </summary>
         /// <returns> Value of sensor. </returns>
-        Task<byte[]> GetFanSensorRpm(int sensor);
+        bool GetFanSensorRpm(int sensor, ref byte[] response);
     }
 }

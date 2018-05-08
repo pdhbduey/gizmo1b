@@ -22,9 +22,16 @@ namespace DeviceManager.Model
         /// <param name="dataBits"> Data bits </param>
         /// <param name="parity"> Parity </param>
         /// <param name="stopBits"> Stop bits </param>
-        public void ReconfigureComCommunication(string comPort, int baudRate, int dataBits, System.IO.Ports.Parity parity, System.IO.Ports.StopBits stopBits)
+        public string ReconfigureComCommunication(string comPort, int baudRate, int dataBits, System.IO.Ports.Parity parity, System.IO.Ports.StopBits stopBits)
         {
-            communication.UpdateCommunication(comPort, baudRate, dataBits, parity, stopBits);
+            var configured = communication.UpdateCommunication(comPort, baudRate, dataBits, parity, stopBits);
+
+            if (configured)
+            {
+                return "COM Port succesfully opened.";
+            }
+
+            return "Error configuring COM Port";
         }
 
         /// <summary>

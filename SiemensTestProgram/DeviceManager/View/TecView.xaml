@@ -106,6 +106,7 @@
             <Label Content="{Binding ISenseText}"></Label>
             <Label Content="{Binding VSenseText}"></Label>
             <Label Content="{Binding StatusMessage}"></Label>
+            <Button Margin="1,10,1,10" Height="25" Width="100" HorizontalAlignment="Left" VerticalAlignment="Bottom" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
         </StackPanel>
         
         <!--Save and Progress -->

@@ -6,14 +6,14 @@ namespace DeviceManager.Model
 
     public interface IThermistorModel
     {
-        Task<byte[]> ReadAinA();
+        bool ReadAinA(ref byte[] response);
 
-        Task<byte[]> ReadAinB();
+        bool ReadAinB(ref byte[] response);
 
-        Task<byte[]> ReadAinC();
+        bool ReadAinC(ref byte[] response);
 
-        Task<byte[]> ReadAinD();
+        bool ReadAinD(ref byte[] response);
 
-        Task<byte[]> ReadStatus();
+        bool ReadStatus(ref byte[] response);
     }
 }

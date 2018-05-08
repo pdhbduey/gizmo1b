@@ -33,10 +33,19 @@ namespace DeviceManager.ViewModel
             ntcTwoColour = notSetColour;
 
             ResetCommand = new RelayCommand(param => Reset());
+            RefreshCommand = new RelayCommand(param => Update());
 
             GetNtc();
             GetState();
-            StartUpdateTask();
+            //StartUpdateTask();
+        }
+
+        public RelayCommand RefreshCommand { get; set; }
+
+        private void Update()
+        {
+            GetNtc();
+            GetState();
         }
 
         private void StartUpdateTask()
@@ -146,62 +155,69 @@ namespace DeviceManager.ViewModel
 
         private async void Reset()
         {
-            await faultModel.Reset();
+            var response = new byte[5];
+            faultModel.Reset(ref response);
         }
 
         private void GetNtc()
         {
-            var ntcState = faultModel.GetNtcStatus();
-            ntcOneColour = notSetColour;
-            ntcTwoColour = notSetColour;
-
-            if (Helper.IsBitSet(ntcState[3], 0))
+            var ntcState = new byte[5];
+            if (faultModel.GetNtcStatus(ref ntcState))
             {
-                ntcOneColour = setColour;
-            }
+                ntcOneColour = notSetColour;
+                ntcTwoColour = notSetColour;
 
-            if (Helper.IsBitSet(ntcState[3], 1))
-            {
-                ntcTwoColour = setColour;
-            }
+                if (Helper.IsBitSet(ntcState[3], 0))
+                {
+                    ntcOneColour = setColour;
+                }
 
-            OnPropertyChanged(nameof(NtcOneColour));
-            OnPropertyChanged(nameof(NtcTwoColour));
+                if (Helper.IsBitSet(ntcState[3], 1))
+                {
+                    ntcTwoColour = setColour;
+                }
+
+                OnPropertyChanged(nameof(NtcOneColour));
+                OnPropertyChanged(nameof(NtcTwoColour));
+            }
         }
 
         private void GetState()
         {
-            var state = faultModel.GetState();
-            overtempOneColour = notSetColour;
-            overtempTwoColour = notSetColour;
-            tecOcdPosColour = notSetColour;
-            tecOcdNegColour = notSetColour;
-
-
-            if (Helper.IsBitSet(state[3], 0))
+            var state = new byte[5];
+            if (faultModel.GetState(ref state))
             {
-                tecOcdNegColour = setColour;
-            }
+                overtempOneColour = notSetColour;
+                overtempTwoColour = notSetColour;
+                tecOcdPosColour = notSetColour;
+                tecOcdNegColour = notSetColour;
 
-            if (Helper.IsBitSet(state[3], 1))
-            {
-                tecOcdPosColour = setColour;
-            }
 
-            if (Helper.IsBitSet(state[3], 2))
-            {
-                overtempOneColour = setColour;
-            }
+                if (Helper.IsBitSet(state[3], 0))
+                {
+                    tecOcdNegColour = setColour;
+                }
 
-            if (Helper.IsBitSet(state[3], 3))
-            {
-                overtempTwoColour = setColour;
-            }
+                if (Helper.IsBitSet(state[3], 1))
+                {
+                    tecOcdPosColour = setColour;
+                }
 
-            OnPropertyChanged(nameof(OvertempOneColour));
-            OnPropertyChanged(nameof(OvertempTwoColour));
-            OnPropertyChanged(nameof(TecOcdPosColour));
-            OnPropertyChanged(nameof(TecOcdNegColour));
+                if (Helper.IsBitSet(state[3], 2))
+                {
+                    overtempOneColour = setColour;
+                }
+
+                if (Helper.IsBitSet(state[3], 3))
+                {
+                    overtempTwoColour = setColour;
+                }
+
+                OnPropertyChanged(nameof(OvertempOneColour));
+                OnPropertyChanged(nameof(OvertempTwoColour));
+                OnPropertyChanged(nameof(TecOcdPosColour));
+                OnPropertyChanged(nameof(TecOcdNegColour));
+            }
         }
     }
 }

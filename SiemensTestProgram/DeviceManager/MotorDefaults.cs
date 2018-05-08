@@ -313,6 +313,8 @@ namespace DeviceManager
             };
         }
 
+        
+
         public static byte[] MotorControlAddress = new byte[]
         {
             0x00,

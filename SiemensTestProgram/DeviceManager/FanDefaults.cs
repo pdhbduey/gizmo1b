@@ -9,9 +9,8 @@ namespace DeviceManager
     {
         public const int MinimumDutyCycle = 0;
         public const int MaximumDutyCycle = 100;
-        public const int MinimumPeriod = 100;
+        public const int MinimumPeriod = 10;
         public const int MaximumPeriod = 1000000;
-        public const int DefaultPeriod = 1000;
 
         public static byte[] GetStatusCommand()
         {

@@ -11,12 +11,12 @@ namespace DeviceManager.Model
         /// </summary>
         /// <param name="voltage"> Voltage value. </param>
         /// <returns> Returns the value from DAC set request. </returns>
-        Task<byte[]> SetDacCommand(float voltage);
+        bool SetDacCommand(float voltage, ref byte[] response);
 
         /// <summary>
         /// Read DAC status.
         /// </summary>
         /// <returns> Returns the DAC status. </returns>
-        Task<byte[]> ReadDacStatusCommand();
+        bool ReadDacStatusCommand(ref byte[] response);
     }
 }

@@ -108,10 +108,10 @@ namespace DeviceManager
         /// <returns> Thermistor view </returns>
         public ThermistorView GetThermistorView()
         {
-            var thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
+            //var thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
             var thermistorView = new ThermistorView()
             {
-                DataContext = thermistorViewModel
+                DataContext = new ThermistorViewModel(GetThermistorModel())
             };
 
             return thermistorView;
