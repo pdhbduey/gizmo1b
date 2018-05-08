@@ -73,7 +73,9 @@ private:
     };
 private:
     bool isChannelCorrect(int channel);
-    int readDataDuringConversion(uint16 cfg, uint16& data);
+    int set(int channel);
+    int convert();
+    int get(uint16& data);
 private:
     LibWrapMibSpi1 m_libWrapMibSpi1;
     LibWrapGioPort::Port m_adcCnv;
