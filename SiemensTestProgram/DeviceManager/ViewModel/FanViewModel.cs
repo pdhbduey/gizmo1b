@@ -330,7 +330,7 @@ namespace DeviceManager.ViewModel
         /// <summary>
         /// Updates Fan values.
         /// </summary>
-        private async void UpdateAllStatuses()
+        private void UpdateAllStatuses()
         {
             while (true)
             {

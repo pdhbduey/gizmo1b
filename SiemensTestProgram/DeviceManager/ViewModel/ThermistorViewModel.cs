@@ -23,22 +23,12 @@ namespace DeviceManager.ViewModel
         private float ainD;
         private string statusMessage;
 
-        private Task updateTask;
-        CancellationTokenSource cts;
-        CancellationToken token;
-        private int updateDelay = 500;
-        private int delayBetweenRequests = 50;
-
         public ThermistorViewModel(IThermistorModel thermistorModel)
         {
             this.thermistorModel = thermistorModel;
             RefreshCommand = new RelayCommand(param => InitialUpdate());
 
             InitialUpdate();
-
-            // Update Thermistor status values.
-            //StartUpdateTask();
-
         }
 
         public RelayCommand RefreshCommand { get; set; }
@@ -177,37 +167,6 @@ namespace DeviceManager.ViewModel
         }
 
         /// <summary>
-        /// Task that reads and updates text for responses for thermistor outputs.
-        /// </summary>
-        private void StartUpdateTask()
-        {
-            
-            updateTask = Task.Factory.StartNew(() =>
-            {
-                UpdateAllStatuses();
-            }, token);
-        }
-
-        /// <summary>
-        /// Updates Thermistor values.
-        /// </summary>
-        private async void UpdateAllStatuses()
-        {
-            while (true)
-            {
-                try
-                {
-                    //InitialUpdate(delayBetweenRequests);
-                    Thread.Sleep(updateDelay);
-                }
-                catch (Exception e)
-                {
-                    StatusMessage = e.Message;
-                }
-            }
-        }
-
-        /// <summary>
         /// Processes read response for thermistor.
         /// </summary>
         /// <param name="status"> Register response. </param>
@@ -229,40 +188,30 @@ namespace DeviceManager.ViewModel
             {
                 AinA = Helper.GetFloatFromBigEndian(ainAData);
             }
-            
-            //Thread.Sleep(delay);
 
             var ainBData = new byte[5];
             if (thermistorModel.ReadAinB(ref ainBData))
             {
                 AinB = Helper.GetFloatFromBigEndian(ainBData);
             }
-            
-            //Thread.Sleep(delay);
 
             var ainCData = new byte[5];
             if (thermistorModel.ReadAinC(ref ainCData))
             {
                 AinC = Helper.GetFloatFromBigEndian(ainCData);
             }
-            
-            //Thread.Sleep(delay);
 
             var ainDData = new byte[5];
             if (thermistorModel.ReadAinD(ref ainDData))
             {
                 AinD = Helper.GetFloatFromBigEndian(ainDData);
             }
-            
-            //Thread.Sleep(delay);
 
             var status = new byte[5];
             if (thermistorModel.ReadStatus(ref status))
             {
                 ProcessStatus(status);
             }
-            
-            //Thread.Sleep(delay);
         }
 
         /// <summary>

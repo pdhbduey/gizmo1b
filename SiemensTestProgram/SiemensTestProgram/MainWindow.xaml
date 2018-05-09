@@ -16,35 +16,6 @@
         Width="800"
         Background="GhostWhite">
 
-    <Window.Resources>
-        <DataTemplate x:Name="LedViewName" DataType="{x:Type viewmodels:LedViewModel}">
-            <views:LedView DataContext="{Binding}"></views:LedView>
-        </DataTemplate>
-        <DataTemplate x:Name="DacViewName" DataType="{x:Type viewmodels:DacViewModel}">
-            <views:DacView DataContext="{Binding}"></views:DacView>
-        </DataTemplate>
-        <DataTemplate x:Name="TecViewName" DataType="{x:Type viewmodels:TecViewModel}">
-            <views:TecView DataContext="{Binding}"></views:TecView>
-        </DataTemplate>
-        <DataTemplate x:Name="ThermistorViewName" DataType="{x:Type viewmodels:ThermistorViewModel}">
-            <views:ThermistorView DataContext="{Binding}"></views:ThermistorView>
-        </DataTemplate>
-        <DataTemplate x:Name="AdcViewName" DataType="{x:Type viewmodels:AdcViewModel}">
-            <views:AdcView DataContext="{Binding}"></views:AdcView>
-        </DataTemplate>
-        <DataTemplate x:Name="MotorViewName" DataType="{x:Type viewmodels:MotorViewModel}">
-            <views:MotorView DataContext="{Binding}"></views:MotorView>
-        </DataTemplate>
-        <DataTemplate x:Name="FanViewName" DataType="{x:Type viewmodels:FanViewModel}">
-            <views:FanView DataContext="{Binding}"></views:FanView>
-        </DataTemplate>
-        <DataTemplate x:Name="DioViewName" DataType="{x:Type viewmodels:DioViewModel}">
-            <views:DioView DataContext="{Binding}"></views:DioView>
-        </DataTemplate>
-        <DataTemplate x:Name="FaultViewName" DataType="{x:Type viewmodels:FaultViewModel}">
-            <views:FaultView DataContext="{Binding}"></views:FaultView>
-        </DataTemplate>
-    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>

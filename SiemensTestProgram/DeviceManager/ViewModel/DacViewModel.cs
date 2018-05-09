@@ -131,7 +131,7 @@ namespace DeviceManager.ViewModel
         /// <summary>
         /// Sends the voltage value set.
         /// </summary>
-        private async void SendDacValue()
+        private void SendDacValue()
         {
             var response = new byte[5];
             dacModel.SetDacCommand(VoltageValue, ref response);
@@ -154,7 +154,7 @@ namespace DeviceManager.ViewModel
         /// <summary>
         /// Checks the DAC status.
         /// </summary>
-        private async void CheckDacStatus()
+        private void CheckDacStatus()
         {
             while (true)
             {

@@ -30,10 +30,7 @@ namespace DeviceManager.ViewModel
         public AdcViewModel(IAdcModel adcModel)
         {
             this.adcModel = adcModel;
-            updatedEvents += updateEvent;
-            //AdcUiThread = SynchronizationContext.Current;
             InitialUpdate(10);
-            //StartUpdateTask();
 
             RefreshCommand = new RelayCommand(param => InitialUpdate(10));
         }
@@ -322,8 +319,6 @@ namespace DeviceManager.ViewModel
 
             Thread.Sleep(delay);
         }
-
-        public event EventHandler updatedEvents;
 
         private void updateEvent(object sender, EventArgs e)
         {
