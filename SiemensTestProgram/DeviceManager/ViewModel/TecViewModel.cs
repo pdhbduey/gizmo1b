@@ -38,21 +38,13 @@ namespace DeviceManager.ViewModel
         private int integralGain;
         private int derivativeGain;
         private string statusMessage;
-
         private const int updateDelay = 300;
-        private bool saving;
-        private bool updating;
-
-        CancellationTokenSource cts;
-        CancellationToken token;
 
         public TecViewModel(ITecModel tecModel)
         {
             this.tecModel = tecModel;
 
             // Initial values
-            saving = false;
-            updating = false;
             counter = 0;
             progressMaximum = 100;
             tecPeriod = TecDefaults.PeriodMinimum;
@@ -73,7 +65,6 @@ namespace DeviceManager.ViewModel
             //SliderIrefValue = 0;
 
             // Set commands
-            SaveDataCommand = new RelayCommand(param => SaveData());
             EnableCommand = new RelayCommand(param => EnableToggle());
             CaptureStartStopCommand = new RelayCommand(param => CaptureToggle());
             StartStopWaveformCommand = new RelayCommand(param => WaveformToggle());
@@ -89,8 +80,6 @@ namespace DeviceManager.ViewModel
         }
 
         public RelayCommand RefreshCommand { get; set; }
-
-        public RelayCommand SaveDataCommand { get; set; }
 
         public RelayCommand EnableCommand { get; set; }
 
@@ -580,21 +569,6 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private void SaveData()
-        {
-            saving = true;
-            cts.Cancel();
-
-            // Wait to finish update
-            updateTask.Wait();
-            StatusMessage = "Saving";
-
-            SaveProgressValue += 10;
-            SaveProgress = FormatSaveProgress();
-            saving = false;
-            // uncomment later StartUpdateTask();
-        }
-
         private void EnableToggle()
         {
             var state = enableButtonState;
@@ -752,26 +726,16 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            cts = new CancellationTokenSource();
-            token = cts.Token;
-
             updateTask = Task.Factory.StartNew(() =>
             {
-                updating = true;
                 UpdateAllStatuses();
-            }, token);
+            });
         }
 
         private void UpdateAllStatuses()
         {
             while (true)
             {
-                if (token.IsCancellationRequested == true)
-                {
-                    updating = false;
-                    break;
-                }
-
                 try
                 {
                     UpdateIref();

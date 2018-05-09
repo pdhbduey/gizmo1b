@@ -87,7 +87,7 @@ namespace DeviceManager.ViewModel
         /// <summary>
         /// Toggles the red LED.
         /// </summary>
-        private async void ToggleLedRed()
+        private void ToggleLedRed()
         {
             var state = redLedStatus;
             RedLedStatus = redLedStatus == LedDefaults.redLedOn ? LedDefaults.redLedOff : LedDefaults.redLedOn;
@@ -105,7 +105,7 @@ namespace DeviceManager.ViewModel
         /// <summary>
         /// Toggles the green LED.
         /// </summary>
-        private async void ToggleLedGreen()
+        private void ToggleLedGreen()
         {
             var state = greenLedStatus;
             GreenLedStatus = greenLedStatus == LedDefaults.greenLedOn ? LedDefaults.greenLedOff : LedDefaults.greenLedOn;

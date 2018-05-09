@@ -31,9 +31,6 @@ namespace DeviceManager.ViewModel
         private string doutSixStatus;
         private string doutSevenStatus;
 
-        private int updateDelay = 500;
-        private Task updateTask;
-
         public DioViewModel(IDioModel dioModel)
         {
             this.dioModel = dioModel;
@@ -55,7 +52,7 @@ namespace DeviceManager.ViewModel
             RefreshCommand = new RelayCommand(param => InitialUpdate());
         }
 
-        private async void SetDoutCommand(int channel, string status)
+        private void SetDoutCommand(int channel, string status)
         {
             var response = new byte[5];
             if (status.Contains("Set"))
@@ -412,7 +409,7 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private async void DinUpdate()
+        private void DinUpdate()
         {
             while (true)
             {
@@ -544,17 +541,6 @@ namespace DeviceManager.ViewModel
                     DinNineColour = DioDefaults.notSetColour; 
                     break;
             }
-        }
-
-        /// <summary>
-        /// Task that reads and updates colours for Din values.
-        /// </summary>
-        private void StartUpdateTask()
-        {
-            updateTask = Task.Factory.StartNew(() =>
-            {
-                DinUpdate();
-            });
         }
     }
 }

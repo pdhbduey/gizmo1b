@@ -20,6 +20,7 @@ namespace DeviceManager.DeviceCommunication
         // Synchronization
         private volatile object mutex;
         private SemaphoreSlim requestSemaphore;
+        private ErrorWindow errorDisplay;
         //private SemaphoreSlim readSemaphore;
 
         // Default configuration
@@ -82,13 +83,13 @@ namespace DeviceManager.DeviceCommunication
                     response = dataBuffer;
                 }
             }
-            catch (Exception e)
+            catch
             {
-                if (serialPort.IsOpen)
+                if (serialPort != null && serialPort.IsOpen)
                 {
                     serialPort.Close();
                 }
-               
+
                 CreateSerialPort();
                 return false;
             }
@@ -188,14 +189,19 @@ namespace DeviceManager.DeviceCommunication
                 serialPort.ReceivedBytesThreshold = readBufferSize;
                 serialPort.DataReceived += HandleDataReceived;
                 serialPort.Open();
+                isConfigured = true;
             }
-            catch (Exception e)
+            catch
             {
-                var errorDisplay = new ErrorWindow();
-                errorDisplay.Topmost = true;
-                errorDisplay.errorMsg.Content = e.Message;
-                errorDisplay.Show();
-
+                if (errorDisplay == null)
+                {
+                    errorDisplay = new ErrorWindow();
+                    errorDisplay.Topmost = true;
+                    errorDisplay.errorMsg.Content = "Error connecting to serial port.";
+                    errorDisplay.Show();
+                }
+                
+                isConfigured = false;
                 return false;
             }
 

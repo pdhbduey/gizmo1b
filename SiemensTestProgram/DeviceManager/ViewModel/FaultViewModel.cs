@@ -153,7 +153,7 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private async void Reset()
+        private void Reset()
         {
             var response = new byte[5];
             faultModel.Reset(ref response);

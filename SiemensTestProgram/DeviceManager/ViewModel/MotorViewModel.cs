@@ -321,19 +321,19 @@ namespace DeviceManager.ViewModel
             motorModel.Energize(ref response);
         }
 
-        private async void SetRegister()
+        private void SetRegister()
         {
             var response = new byte[5];
             motorModel.SetRegisterValue(registerValue, ref response);
         }
 
-        private async void MoveToRelativePosition()
+        private void MoveToRelativePosition()
         {
             var response = new byte[5];
             motorModel.MotorControlMove(selectedDirection, selectedStepSize, "relative", ref response);
         }
 
-        private async void MoveToAbsolutePosition()
+        private void MoveToAbsolutePosition()
         {
             var response = new byte[5];
             motorModel.MotorControlMove(selectedDirection, selectedStepSize, "absolute", ref response);
@@ -351,7 +351,7 @@ namespace DeviceManager.ViewModel
             motorModel.SetAbsoluteMovePosition(absoluteMoveValue, ref response);
         }
 
-        private async void SetSelectedRegisterAddress()
+        private void SetSelectedRegisterAddress()
         {
             var response = new byte[5];
             motorModel.SetRegisterAddress(selectedRegisterAddress, ref response);
@@ -373,7 +373,7 @@ namespace DeviceManager.ViewModel
         //    motorModel.SetDirection(selectedDirection).Wait();
         //}
 
-        private async void ReadRegister()
+        private void ReadRegister()
         {
             // Read register address
             var regValue = new byte[5];
@@ -383,19 +383,19 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private async void Initialize()
+        private void Initialize()
         {
             var response = new byte[5];
             motorModel.Initialize(ref response);
         }
 
-        private async void Limp()
+        private void Limp()
         {
             var response = new byte[5];
             motorModel.Limp(ref response);
         }
 
-        private async void Reset()
+        private void Reset()
         {
             var response = new byte[5];
             motorModel.Reset(ref response);
@@ -415,7 +415,7 @@ namespace DeviceManager.ViewModel
             motorModel.Cycle(ref response);
         }
 
-        private async void Stop()
+        private void Stop()
         {
             var response = new byte[5];
             motorModel.Stop(ref response);
@@ -432,7 +432,7 @@ namespace DeviceManager.ViewModel
             }, token);
         }
 
-        private async void UpdateAllStatuses()
+        private void UpdateAllStatuses()
         {
             while (true)
             {
