@@ -56,6 +56,8 @@ float LibFan::getPwm2PeriodInUs()
 float LibFan::getRpmFromPerid(float periodInUs)
 {
     float rpm = periodInUs != 0 ? 30.0 / (periodInUs * 1e-6) : 0; // AUB0812VH-SP00
+    rpm = rpm < 0      ? 0 :
+          rpm > 100000 ? 0 : rpm;
     return rpm;
 }
 
