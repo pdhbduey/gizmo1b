@@ -46,10 +46,11 @@ namespace DeviceManager
         
         public static List<string> Waveforms = new List<string>
         {
-            "Continuous",
+            "Constant",
             "Sine",
+            "Triangle",
             "Square",
-            "Triangle"
+            "Custom"
         };
 
         public static byte[] GetControlCommand(string command) 
@@ -337,10 +338,11 @@ namespace DeviceManager
 
         public static Dictionary<string, byte> WaveFormByteValues = new Dictionary<string, byte>()
         {
-            { "Continuous", 0x00 },
-            { "Sine", 0x01 },
-            { "Square", 0x02 },
-            { "Triangle", 0x03 }
+            { Waveforms[0], 0x00 },
+            { Waveforms[1], 0x01 },
+            { Waveforms[2], 0x02 },
+            { Waveforms[3], 0x03 },
+            { Waveforms[4], 0x04 }
         };
 
         public static Dictionary<string, byte> TecControlByteValues = new Dictionary<string, byte>()
