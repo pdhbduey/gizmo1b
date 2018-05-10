@@ -288,16 +288,6 @@ void LibTec::waveformStart()
         }
         break;
     case WAVEFORM_TYPE_SQUARE:
-        for (int i = 0; i < 500; i++) {
-            float ticks = ticksStep * i;
-            m_waveform[i].m_ticks = ticks;
-            m_waveform[i].m_iref = 1;
-        }
-        for (int i = 500; i < 1000; i++) {
-            float ticks = ticksStep * i;
-            m_waveform[i].m_ticks = ticks;
-            m_waveform[i].m_iref = -1;
-        }
         break;
     case WAVEFORM_TYPE_CUSTOM:
         if (!isCustomWaveformEmpty(m_customWaveform) || m_customWaveform.size() > 1) {
@@ -453,6 +443,17 @@ float LibTec::getWaveformSample(TickType_t tick)
     float value = m_refCurrent;
     if (m_isWaveformRunning) {
         TickType_t ticks = tick - m_ticks;
+        if (m_waveformType == WAVEFORM_TYPE_SQUARE)  {
+            float ticksPeriod = pdMS_TO_TICKS(m_waveformPeriod);
+            if (ticks > ticksPeriod) {
+                m_ticks = xTaskGetTickCount();
+                m_refCurrent = -m_refCurrent;
+            }
+            else if (ticks < ticksPeriod / 2 && ticks + 1 >= ticksPeriod / 2) {
+                m_refCurrent = -m_refCurrent;
+            }
+            return m_refCurrent;
+        }
         if (m_waveform[999].m_ticks < ticks) {
             m_ticks = xTaskGetTickCount();
             ticks   = 0;
@@ -479,33 +480,33 @@ void LibTec::run()
     while (true) {
         vTaskDelay(1);
         TickType_t tick = xTaskGetTickCount();
-        float error = getWaveformSample(tick);
+        float pidError = getWaveformSample(tick);
         float iSense = 0;
         if (m_isClosedLoopEnabled && getISense(iSense) == OKAY) {
-            error -= iSense;
+            pidError -= iSense;
         }
-        error = filter(error);
+        pidError = filter(pidError);
         if (!m_isClosedLoopInitialized || !m_isEnabled) {
-            m_prevError = error;
+            m_prevError = pidError;
             m_accError = 0;
             if (!m_isClosedLoopInitialized) {
                 m_isClosedLoopInitialized = true;
             }
         }
         if (m_pidDerivativeGain == 0) {
-            m_prevError = error;
+            m_prevError = pidError;
         }
         if (m_pidIntegralGain == 0) {
             m_accError = 0;
         }
-        float control =  error * m_pidProportionalGain
-                      +  m_accError * m_pidIntegralGain
-                      + (error - m_prevError) * m_pidDerivativeGain;
-        control *= 2.5 / 15;
+        float control = m_pidProportionalGain *  pidError
+                      + m_pidIntegralGain     *  m_accError
+                      + m_pidDerivativeGain   * (pidError - m_prevError);
+        m_prevError   = pidError;
+        m_accError   += pidError;
+        control      *= 2.5 / 15;
         if (m_isEnabled) {
             driveControl(control);
         }
-        m_prevError  = error;
-        m_accError  += error;
     }
 }
