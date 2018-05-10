@@ -44,19 +44,11 @@
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Fill="{Binding BridgeStatus}" Width="10" Height="10" />
-                        <Label Content="Bridge"></Label>
+                        <Label Content="Bridge in HIZ"></Label>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Fill="{Binding BusyStatus}" Width="10" Height="10" />
                         <Label Content="Busy"></Label>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Fill="{Binding SwitchClosedStatus}" Width="10" Height="10" />
-                        <Label Content="Switch Closed"></Label>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Fill="{Binding SwitchOpenStatus}" Width="10" Height="10" />
-                        <Label Content="Switch Open"></Label>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Fill="{Binding DirectionForwardStatus}" Width="10" Height="10" />
@@ -66,13 +58,13 @@
                         <Ellipse Fill="{Binding DirectionReverseStatus}" Width="10" Height="10" />
                         <Label Content="Direction Reverse"></Label>
                     </StackPanel>
-                </StackPanel>
-
-                <StackPanel Grid.Column="1">
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Fill="{Binding StoppedStatus}" Width="10" Height="10" />
                         <Label Content="Stopped"></Label>
                     </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Fill="{Binding AcceleratingStatus}" Width="10" Height="10" />
                         <Label Content="Accelerating"></Label>

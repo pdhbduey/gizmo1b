@@ -44,9 +44,20 @@ namespace DeviceManager.ViewModel
             doutSixStatus = "Set Dout 6";
             doutSevenStatus = "Set Dout 7";
 
+            dinZeroColour = DioDefaults.notSetColour;
+            dinOneColour = DioDefaults.notSetColour;
+            dinTwoColour = DioDefaults.notSetColour;
+            dinThreeColour = DioDefaults.notSetColour;
+            dinFourColour = DioDefaults.notSetColour;
+            dinFiveColour = DioDefaults.notSetColour;
+            dinSixColour = DioDefaults.notSetColour;
+            dinSevenColour = DioDefaults.notSetColour;
+            dinEightColour = DioDefaults.notSetColour;
+            dinNineColour = DioDefaults.notSetColour;
+
             // Initial updates and bindings
-            InitialUpdate();
-            
+            Update();
+
             SetDioZeroCommand = new RelayCommand(param => SetDoutCommand(channel: 0, status: doutZeroStatus));
             SetDioOneCommand = new RelayCommand(param => SetDoutCommand(channel: 1, status: doutOneStatus));
             SetDioTwoCommand = new RelayCommand(param => SetDoutCommand(channel: 2, status: doutTwoStatus));
@@ -58,7 +69,7 @@ namespace DeviceManager.ViewModel
 
             // Update Din values.
             //StartUpdateTask();
-            RefreshCommand = new RelayCommand(param => InitialUpdate());
+            RefreshCommand = new RelayCommand(param => Update());
         }
 
         private void SetDoutCommand(int channel, string status)
@@ -74,6 +85,7 @@ namespace DeviceManager.ViewModel
             }
 
             UpdateChannelDout(channel);
+            Update();
         }
 
         private void UpdateChannelDout(int channel)
@@ -373,19 +385,8 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private void InitialUpdate()
+        private void Update()
         {
-            dinZeroColour = DioDefaults.notSetColour;
-            dinOneColour = DioDefaults.notSetColour;
-            dinTwoColour = DioDefaults.notSetColour;
-            dinThreeColour = DioDefaults.notSetColour;
-            dinFourColour = DioDefaults.notSetColour;
-            dinFiveColour = DioDefaults.notSetColour;
-            dinSixColour = DioDefaults.notSetColour;
-            dinSevenColour = DioDefaults.notSetColour;
-            dinEightColour = DioDefaults.notSetColour;
-            dinNineColour = DioDefaults.notSetColour;
-
             var din = new byte[5];
             if (dioModel.ReadDin(ref din))
             {
@@ -441,7 +442,7 @@ namespace DeviceManager.ViewModel
                 }
                 catch
                 {
-                    
+
                 }
             }
         }
@@ -453,7 +454,7 @@ namespace DeviceManager.ViewModel
                 case 0:
                     if (isSet)
                     {
-                        DinZeroColour = DioDefaults.setColour; 
+                        DinZeroColour = DioDefaults.setColour;
                         break;
                     }
 
@@ -466,7 +467,7 @@ namespace DeviceManager.ViewModel
                         break;
                     }
 
-                    DinOneColour = DioDefaults.notSetColour; 
+                    DinOneColour = DioDefaults.notSetColour;
                     break;
                 case 2:
                     if (isSet)
@@ -475,7 +476,7 @@ namespace DeviceManager.ViewModel
                         break;
                     }
 
-                    DinTwoColour = DioDefaults.notSetColour; 
+                    DinTwoColour = DioDefaults.notSetColour;
                     break;
                 case 3:
                     if (isSet)
@@ -484,7 +485,7 @@ namespace DeviceManager.ViewModel
                         break;
                     }
 
-                    DinThreeColour = DioDefaults.notSetColour; 
+                    DinThreeColour = DioDefaults.notSetColour;
                     break;
                 case 4:
                     if (isSet)
@@ -493,7 +494,7 @@ namespace DeviceManager.ViewModel
                         break;
                     }
 
-                    DinFourColour = DioDefaults.notSetColour; 
+                    DinFourColour = DioDefaults.notSetColour;
                     break;
                 case 5:
                     if (isSet)
@@ -502,7 +503,7 @@ namespace DeviceManager.ViewModel
                         break;
                     }
 
-                    DinFiveColour = DioDefaults.notSetColour; 
+                    DinFiveColour = DioDefaults.notSetColour;
                     break;
                 case 6:
                     if (isSet)
@@ -511,7 +512,7 @@ namespace DeviceManager.ViewModel
                         break;
                     }
 
-                    DinSixColour = DioDefaults.notSetColour; 
+                    DinSixColour = DioDefaults.notSetColour;
                     break;
                 case 7:
                     if (isSet)
@@ -520,7 +521,7 @@ namespace DeviceManager.ViewModel
                         break;
                     }
 
-                    DinSevenColour = DioDefaults.notSetColour; 
+                    DinSevenColour = DioDefaults.notSetColour;
                     break;
                 case 8:
                     if (isSet)
@@ -534,11 +535,11 @@ namespace DeviceManager.ViewModel
                 case 9:
                     if (isSet)
                     {
-                        DinNineColour = DioDefaults.setColour; 
+                        DinNineColour = DioDefaults.setColour;
                         break;
                     }
 
-                    DinNineColour = DioDefaults.notSetColour; 
+                    DinNineColour = DioDefaults.notSetColour;
                     break;
             }
         }
