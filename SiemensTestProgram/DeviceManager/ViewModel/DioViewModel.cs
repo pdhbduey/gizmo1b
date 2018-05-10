@@ -35,6 +35,15 @@ namespace DeviceManager.ViewModel
         {
             this.dioModel = dioModel;
 
+            doutZeroStatus = "Set Dout 0";
+            doutOneStatus = "Set Dout 1";
+            doutTwoStatus = "Set Dout 2";
+            doutThreeStatus = "Set Dout 3";
+            doutFourStatus = "Set Dout 4";
+            doutFiveStatus = "Set Dout 5";
+            doutSixStatus = "Set Dout 6";
+            doutSevenStatus = "Set Dout 7";
+
             // Initial updates and bindings
             InitialUpdate();
             
@@ -376,15 +385,6 @@ namespace DeviceManager.ViewModel
             dinSevenColour = DioDefaults.notSetColour;
             dinEightColour = DioDefaults.notSetColour;
             dinNineColour = DioDefaults.notSetColour;
-
-            doutZeroStatus = "Set Dout 0";
-            doutOneStatus = "Set Dout 1";
-            doutTwoStatus = "Set Dout 2";
-            doutThreeStatus = "Set Dout 3";
-            doutFourStatus = "Set Dout 4";
-            doutFiveStatus = "Set Dout 5";
-            doutSixStatus = "Set Dout 6";
-            doutSevenStatus = "Set Dout 7";
 
             var din = new byte[5];
             if (dioModel.ReadDin(ref din))
