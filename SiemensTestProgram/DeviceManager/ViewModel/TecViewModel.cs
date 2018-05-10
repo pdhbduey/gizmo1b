@@ -205,18 +205,7 @@ namespace DeviceManager.ViewModel
             }
             set
             {
-                if (value < TecDefaults.ProportionalGainMinimum)
-                {
-                    proportionalGain = TecDefaults.ProportionalGainMinimum;
-                }
-                else if (value > TecDefaults.ProportionalGainMaximum)
-                {
-                    proportionalGain = TecDefaults.ProportionalGainMaximum;
-                }
-                else
-                {
-                    proportionalGain = value;
-                }
+                proportionalGain = value;
 
                 OnPropertyChanged(nameof(ProportionalGain));
                 //UpdateProportionalGain();
@@ -231,18 +220,7 @@ namespace DeviceManager.ViewModel
             }
             set
             {
-                if (value < TecDefaults.IntegralGainMinimum)
-                {
-                    integralGain = TecDefaults.IntegralGainMinimum;
-                }
-                else if (value > TecDefaults.IntegralGainMaximum)
-                {
-                    integralGain = TecDefaults.IntegralGainMaximum;
-                }
-                else
-                {
-                    integralGain = value;
-                }
+                integralGain = value;
 
                 OnPropertyChanged(nameof(IntegralGain));
                 //UpdateIntegralGain();
@@ -257,18 +235,7 @@ namespace DeviceManager.ViewModel
             }
             set
             {
-                if (value < TecDefaults.DerivativeGainMinimum)
-                {
-                    derivativeGain = TecDefaults.DerivativeGainMinimum;
-                }
-                else if (value > TecDefaults.DerivativeGainMaximum)
-                {
-                    derivativeGain = TecDefaults.DerivativeGainMaximum;
-                }
-                else
-                {
-                    derivativeGain = value;
-                }
+                derivativeGain = value;
 
                 OnPropertyChanged(nameof(DerivativeGain));
                 //UpdateDerivativeGain();
@@ -284,18 +251,8 @@ namespace DeviceManager.ViewModel
 
             set
             {
-                if (value < TecDefaults.WaveformCyclesMinimum)
-                {
-                    waveformCycles = TecDefaults.WaveformCyclesMinimum;
-                }
-                else if (value > TecDefaults.WaveformCyclesMaximum)
-                {
-                    waveformCycles = TecDefaults.WaveformCyclesMaximum;
-                }
-                else
-                {
-                    waveformCycles = value;
-                }
+                waveformCycles = value;
+                
                 OnPropertyChanged(nameof(WaveformCycles));
 
                 //SetWaveformCycles();
@@ -311,18 +268,8 @@ namespace DeviceManager.ViewModel
 
             set
             {
-                if (value < TecDefaults.SampleTimeMinimum)
-                {
-                    sampleTime = TecDefaults.SampleTimeMinimum;
-                }
-                else if (value > TecDefaults.SampleTimeMaximum)
-                {
-                    sampleTime = TecDefaults.SampleTimeMaximum;
-                }
-                else
-                {
-                    sampleTime = value;
-                }
+                sampleTime = value;
+                
                 OnPropertyChanged(nameof(SampleTime));
 
                 //SetSampleTime();
@@ -337,18 +284,7 @@ namespace DeviceManager.ViewModel
             }
             set
             {
-                if (value < TecDefaults.PeriodMinimum)
-                {
-                    tecPeriod = TecDefaults.PeriodMinimum;
-                }
-                else if (value > TecDefaults.PeriodMaximum)
-                {
-                    tecPeriod = TecDefaults.PeriodMaximum;
-                }
-                else
-                {
-                    tecPeriod = value;
-                }
+                tecPeriod = value;
 
                 OnPropertyChanged(nameof(TecPeriod));
                 //UpdatePeriod();
@@ -363,18 +299,7 @@ namespace DeviceManager.ViewModel
             }
             set
             {
-                if (value < -15.0f)
-                {
-                    irefValue = -15.0f;
-                }
-                else if (value > 15.0f)
-                {
-                    irefValue = 15.0f;
-                }
-                else
-                {
-                    irefValue = value;
-                }
+                irefValue = value;
                 
                 OnPropertyChanged(nameof(IrefValue));
                 //SetIref();
@@ -579,24 +504,60 @@ namespace DeviceManager.ViewModel
 
         private void UpdatePeriod()
         {
+            if (tecPeriod < TecDefaults.PeriodMinimum)
+            {
+                TecPeriod = TecDefaults.PeriodMinimum;
+            }
+            else if (tecPeriod > TecDefaults.PeriodMaximum)
+            {
+                TecPeriod = TecDefaults.PeriodMaximum;
+            }
+
             var response = new byte[5];
             tecModel.SetPeriodCommand(tecPeriod, ref response);
         }
 
         private void UpdateProportionalGain()
         {
+            if (proportionalGain < TecDefaults.ProportionalGainMinimum)
+            {
+                ProportionalGain = TecDefaults.ProportionalGainMinimum;
+            }
+            else if (proportionalGain > TecDefaults.ProportionalGainMaximum)
+            {
+                ProportionalGain = TecDefaults.ProportionalGainMaximum;
+            }
+
             var response = new byte[5];
             tecModel.SetProportionalGainCommand(proportionalGain, ref response);
         }
 
         private void UpdateIntegralGain()
         {
+            if (integralGain < TecDefaults.IntegralGainMinimum)
+            {
+                IntegralGain = TecDefaults.IntegralGainMinimum;
+            }
+            else if (integralGain > TecDefaults.IntegralGainMaximum)
+            {
+                IntegralGain = TecDefaults.IntegralGainMaximum;
+            }
+
             var response = new byte[5];
             tecModel.SetIntegralGainCommand(integralGain, ref response);
         }
 
         private void UpdateDerivativeGain()
         {
+            if (derivativeGain < TecDefaults.DerivativeGainMinimum)
+            {
+                DerivativeGain = TecDefaults.DerivativeGainMinimum;
+            }
+            else if (derivativeGain > TecDefaults.DerivativeGainMaximum)
+            {
+                DerivativeGain = TecDefaults.DerivativeGainMaximum;
+            }
+
             var response = new byte[5];
             tecModel.SetDerivativeGainCommand(derivativeGain, ref response);
         }
@@ -604,13 +565,22 @@ namespace DeviceManager.ViewModel
         private void UpdateIrefForWaveform()
         {
             var response = new byte[5];
-            tecModel.SetWaveformIrefCommand(IrefCustomValue, ref response);
+            tecModel.SetWaveformIrefCommand(irefCustomValue, ref response);
         }
 
         private void SetIref()
         {
+            if (irefValue < -15.0f)
+            {
+                IrefValue = -15.0f;
+            }
+            else if (irefValue > 15.0f)
+            {
+                IrefValue = 15.0f;
+            }
+
             var response = new byte[5];
-            tecModel.SetIrefCommand(IrefValue, ref response);
+            tecModel.SetIrefCommand(irefValue, ref response);
         }
 
         private void UpdateWaveform()
@@ -702,12 +672,30 @@ namespace DeviceManager.ViewModel
 
         private void SetWaveformCycles()
         {
+            if (waveformCycles < TecDefaults.WaveformCyclesMinimum)
+            {
+                WaveformCycles = TecDefaults.WaveformCyclesMinimum;
+            }
+            else if (waveformCycles > TecDefaults.WaveformCyclesMaximum)
+            {
+                WaveformCycles = TecDefaults.WaveformCyclesMaximum;
+            }
+
             var response = new byte[5];
             tecModel.SetWaveformCyclesCommand(waveformCycles, ref response);
         }
 
         private void SetSampleTime()
         {
+            if (sampleTime < TecDefaults.SampleTimeMinimum)
+            {
+                SampleTime = TecDefaults.SampleTimeMinimum;
+            }
+            else if (sampleTime > TecDefaults.SampleTimeMaximum)
+            {
+                SampleTime = TecDefaults.SampleTimeMaximum;
+            }
+
             var response = new byte[5];
             tecModel.SetSampleTimeCommand(sampleTime, ref response);
         }

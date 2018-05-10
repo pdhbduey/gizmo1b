@@ -19,13 +19,30 @@ namespace DeviceManager.ViewModel
         private string registerWriteValue;
         private string motorPosition;
         private string registerReadValue;
-        private string bridgeInHiz;
+        private string bridgeStatus;
         private string busyStatus;
-        private string errorStatus;
+        private string switchClosedStatus;
+        private string switchOpenStatus;
+        private string directionForwardStatus;
+        private string directionReverseStatus;
+        private string stoppedStatus;
+        private string acceleratingStatus;
+        private string deceleratingStatus;
+        private string runAtConstantSpeedStatus;
+        private string thermalWarningStatus;
+        private string thermalShutdownStatus;
+        private string overcurrentStatus;
+        private string bridgeAStatus;
+        private string bridgeBStatus;
+
         private int absoluteMoveValue;
         private int relativeMoveValue;
         private byte[] registerValue;
 
+        private const string errorColour = "Red";
+        private const string noErrorColour = "Green";
+        private const string statusYesColour = "Green";
+        private const string statusNoColour = "Red";
         private const int updateDelay = 400;
         private CancellationTokenSource cts;
         private CancellationToken token;
@@ -211,16 +228,16 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public string BridgeInHiz
+        public string BridgeStatus
         {
             get
             {
-                return bridgeInHiz;
+                return bridgeStatus;
             }
             set
             {
-                bridgeInHiz = $"Bridge in Hiz: {value}";
-                OnPropertyChanged(nameof(BridgeInHiz));
+                bridgeStatus = value;
+                OnPropertyChanged(nameof(BridgeStatus));
             }
         }
 
@@ -232,21 +249,168 @@ namespace DeviceManager.ViewModel
             }
             set
             {
-                busyStatus = $"Busy: {value}";
+                busyStatus = value;
                 OnPropertyChanged(nameof(BusyStatus));
             }
         }
 
-        public string ErrorStatus
+        public string SwitchClosedStatus
         {
             get
             {
-                return errorStatus;
+                return switchClosedStatus;
             }
             set
             {
-                errorStatus = $"Error: {value}";
-                OnPropertyChanged(nameof(ErrorStatus));
+                switchClosedStatus = value;
+                OnPropertyChanged(nameof(SwitchClosedStatus));
+            }
+        }
+        public string SwitchOpenStatus
+        {
+            get
+            {
+                return switchOpenStatus;
+            }
+            set
+            {
+                switchOpenStatus = value;
+                OnPropertyChanged(nameof(SwitchOpenStatus));
+            }
+        }
+        public string DirectionForwardStatus
+        {
+            get
+            {
+                return directionForwardStatus;
+            }
+            set
+            {
+                directionForwardStatus = value;
+                OnPropertyChanged(nameof(DirectionForwardStatus));
+            }
+        }
+        public string DirectionReverseStatus
+        {
+            get
+            {
+                return directionReverseStatus;
+            }
+            set
+            {
+                directionReverseStatus = value;
+                OnPropertyChanged(nameof(DirectionReverseStatus));
+            }
+        }
+        public string StoppedStatus
+        {
+            get
+            {
+                return stoppedStatus;
+            }
+            set
+            {
+                stoppedStatus = value;
+                OnPropertyChanged(nameof(StoppedStatus));
+            }
+        }
+        public string AcceleratingStatus
+        {
+            get
+            {
+                return acceleratingStatus;
+            }
+            set
+            {
+                acceleratingStatus = value;
+                OnPropertyChanged(nameof(AcceleratingStatus));
+            }
+        }
+        public string DeceleratingStatus
+        {
+            get
+            {
+                return deceleratingStatus;
+            }
+            set
+            {
+                deceleratingStatus = value;
+                OnPropertyChanged(nameof(DeceleratingStatus));
+            }
+        }
+        public string RunAtConstantSpeedStatus
+        {
+            get
+            {
+                return runAtConstantSpeedStatus;
+            }
+            set
+            {
+                runAtConstantSpeedStatus = value;
+                OnPropertyChanged(nameof(RunAtConstantSpeedStatus));
+            }
+        }
+        public string ThermalWarningStatus
+        {
+            get
+            {
+                return thermalWarningStatus;
+            }
+            set
+            {
+                thermalWarningStatus = value;
+                OnPropertyChanged(nameof(ThermalWarningStatus));
+            }
+        }
+        public string ThermalShutdownStatus
+        {
+            get
+            {
+                return thermalShutdownStatus;
+            }
+            set
+            {
+                thermalShutdownStatus = value;
+                OnPropertyChanged(nameof(ThermalShutdownStatus));
+            }
+        }
+
+        public string OvercurrentStatus
+        {
+            get
+            {
+                return overcurrentStatus;
+            }
+            set
+            {
+                overcurrentStatus = value;
+                OnPropertyChanged(nameof(OvercurrentStatus));
+            }
+        }
+
+        public string BridgeAStatus
+        {
+            get
+            {
+                return bridgeAStatus;
+            }
+            set
+            {
+                bridgeAStatus = value;
+                OnPropertyChanged(nameof(BridgeAStatus));
+            }
+        }
+
+        public string BridgeBStatus
+        {
+            get
+            {
+                return bridgeBStatus;
+            }
+            set
+            {
+                bridgeBStatus = value;
+                OnPropertyChanged(nameof(BridgeBStatus));
             }
         }
 
@@ -287,31 +451,139 @@ namespace DeviceManager.ViewModel
 
         private void ProcessMotorStatus(byte[] status)
         {
-            if (Helper.IsBitSet(status[0], 0))
+            if (Helper.IsBitSet(status[4], 0))
             {
-                BridgeInHiz = "Yes";
+                BridgeStatus = statusYesColour;
             }
             else
             {
-                BridgeInHiz = "No";
+                BridgeStatus = statusNoColour;
             }
 
-            if (Helper.IsBitSet(status[0], 1))
+            if (Helper.IsBitSet(status[4], 1))
             {
-                BusyStatus = "Yes";
+                BusyStatus = errorColour;
             }
             else
             {
-                BusyStatus = "No";
+                BusyStatus = noErrorColour;
             }
 
-            if (Helper.IsBitSet(status[1], 0))
+            if (Helper.IsBitSet(status[4], 2))
             {
-                ErrorStatus = "Yes";
+                SwitchClosedStatus = statusYesColour;
             }
             else
             {
-                ErrorStatus = "No";
+                SwitchClosedStatus = statusNoColour;
+            }
+
+            if (Helper.IsBitSet(status[4], 3))
+            {
+                SwitchOpenStatus = statusYesColour;
+            }
+            else
+            {
+                SwitchOpenStatus = statusNoColour;
+            }
+
+            if (Helper.IsBitSet(status[4], 4))
+            {
+                DirectionForwardStatus = statusYesColour;
+            }
+            else
+            {
+                DirectionForwardStatus = statusNoColour;
+            }
+
+            if (Helper.IsBitSet(status[4], 5))
+            {
+                DirectionReverseStatus = statusYesColour;
+            }
+            else
+            {
+                DirectionReverseStatus = statusNoColour;
+            }
+
+            if (Helper.IsBitSet(status[4], 6))
+            {
+                StoppedStatus = statusYesColour;
+            }
+            else
+            {
+                StoppedStatus = statusNoColour;
+            }
+
+            if (Helper.IsBitSet(status[4], 7))
+            {
+                AcceleratingStatus = statusYesColour;
+            }
+            else
+            {
+                AcceleratingStatus = statusNoColour;
+            }
+
+            if (Helper.IsBitSet(status[3], 0))
+            {
+                DeceleratingStatus = statusYesColour;
+            }
+            else
+            {
+                DeceleratingStatus = statusNoColour;
+            }
+
+            if (Helper.IsBitSet(status[3], 1))
+            {
+                RunAtConstantSpeedStatus = statusYesColour;
+            }
+            else
+            {
+                RunAtConstantSpeedStatus = statusNoColour;
+            }
+
+            if (Helper.IsBitSet(status[3], 2))
+            {
+                ThermalWarningStatus = errorColour;
+            }
+            else
+            {
+                ThermalWarningStatus = noErrorColour;
+            }
+
+            if (Helper.IsBitSet(status[3], 3))
+            {
+                ThermalShutdownStatus = errorColour;
+            }
+            else
+            {
+                ThermalShutdownStatus = noErrorColour;
+            }
+
+            if (Helper.IsBitSet(status[3], 4))
+            {
+                OvercurrentStatus = errorColour;
+            }
+            else
+            {
+                OvercurrentStatus = noErrorColour;
+            }
+
+            if (Helper.IsBitSet(status[3], 5))
+            {
+                BridgeAStatus = errorColour;
+            }
+            else
+            {
+                BridgeAStatus = noErrorColour;
+            }
+
+            if (Helper.IsBitSet(status[3], 6))
+            {
+                BridgeBStatus = errorColour;
+            }
+            else
+            {
+                BridgeBStatus = noErrorColour;
             }
         }
 

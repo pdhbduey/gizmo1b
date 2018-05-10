@@ -35,14 +35,83 @@
             <GroupBox.Header>
                 <TextBlock Text="Status" FontWeight="Bold"/>
             </GroupBox.Header>
-            <StackPanel>
-                <StackPanel>
-                    <Label Margin="1" Content="{Binding BridgeInHiz}"></Label>
-                    <Label Margin="1" Content="{Binding BusyStatus}"></Label>
-                    <Label Margin="1" Content="{Binding ErrorStatus}"></Label>
-                    <Button Margin="1" Height="25" Width="100" HorizontalAlignment="Left" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding BridgeStatus}" Width="10" Height="10" />
+                        <Label Content="Bridge"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding BusyStatus}" Width="10" Height="10" />
+                        <Label Content="Busy"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding SwitchClosedStatus}" Width="10" Height="10" />
+                        <Label Content="Switch Closed"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding SwitchOpenStatus}" Width="10" Height="10" />
+                        <Label Content="Switch Open"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DirectionForwardStatus}" Width="10" Height="10" />
+                        <Label Content="Direction Forward"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DirectionReverseStatus}" Width="10" Height="10" />
+                        <Label Content="Direction Reverse"></Label>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding StoppedStatus}" Width="10" Height="10" />
+                        <Label Content="Stopped"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding AcceleratingStatus}" Width="10" Height="10" />
+                        <Label Content="Accelerating"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding DeceleratingStatus}" Width="10" Height="10" />
+                        <Label Content="Decelerating"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding RunAtConstantSpeedStatus}" Width="10" Height="10" />
+                        <Label Content="Constant Speed"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding ThermalWarningStatus}" Width="10" Height="10" />
+                        <Label Content="Thermal Warning"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding ThermalShutdownStatus}" Width="10" Height="10" />
+                        <Label Content="Thermal Shutdown"></Label>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding OvercurrentStatus}" Width="10" Height="10" />
+                        <Label Content="Overcurrent"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding BridgeAStatus}" Width="10" Height="10" />
+                        <Label Content="Bridge A Stall"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="{Binding BridgeBStatus}" Width="10" Height="10" />
+                        <Label Content="Bridge B Stall"></Label>
+                    </StackPanel>
+
+                    <Button Margin="1,50,0,0" Height="25" Width="100" HorizontalAlignment="Center" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
+                </StackPanel>
+            </Grid>
         </GroupBox>
 
         <GroupBox Grid.Row="1" Grid.Column="0">
