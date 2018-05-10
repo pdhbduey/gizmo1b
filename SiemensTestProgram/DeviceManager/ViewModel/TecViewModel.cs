@@ -23,11 +23,12 @@ namespace DeviceManager.ViewModel
         private string closedLoopButtonState;
         private int saveProgressValue;
         private int numberOfSamples;
-        private float irefCurrentValue;
+        private float irefCustomValue;
+        private float irefValue;
         private int sliderIrefValue;
         //private int irefGain;
         private int tecPeriod;
-        private int counter;
+        private int customIndex;
         private int waveformCycles;
         private int sampleTime;
 
@@ -35,8 +36,8 @@ namespace DeviceManager.ViewModel
         private float iSense;
         private float iRef;
         private float proportionalGain;
-        private int integralGain;
-        private int derivativeGain;
+        private float integralGain;
+        private float derivativeGain;
         private string statusMessage;
         private const int updateDelay = 300;
 
@@ -45,8 +46,8 @@ namespace DeviceManager.ViewModel
             this.tecModel = tecModel;
 
             // Initial values
-            counter = 0;
             progressMaximum = 100;
+            proportionalGain = 1.0f;
             tecPeriod = TecDefaults.PeriodMinimum;
             waveformCycles = TecDefaults.WaveformCyclesMinimum;
             sampleTime = TecDefaults.SampleTimeMinimum;
@@ -75,9 +76,27 @@ namespace DeviceManager.ViewModel
             IncrementCommand = new RelayCommand(param => IncrementCounter());
             RefreshCommand = new RelayCommand(param => InitialUpdate());
 
+            SetTecPeriodCommand = new RelayCommand(param => UpdatePeriod());
+            SendIrefCommand = new RelayCommand(param => SetIref());
+            SetIntegralGainCommand = new RelayCommand(param => UpdateIntegralGain());
+            SetProportionalGainCommand = new RelayCommand(param => UpdateProportionalGain());
+            SetDerivativeGainCommand = new RelayCommand(param => UpdateDerivativeGain());
+            SetWaveformIrefCommand = new RelayCommand(param => UpdateIrefForWaveform());
+            SetWaveformTimeCommand = new RelayCommand(param => SetSampleTime());
+            SetWaveformCyclesCommand = new RelayCommand(param => SetWaveformCycles());
+
             InitialUpdate();
             //StartUpdateTask();
         }
+
+        public RelayCommand SetTecPeriodCommand { get; set; }
+        public RelayCommand SendIrefCommand { get; set; }
+        public RelayCommand SetIntegralGainCommand { get; set; }
+        public RelayCommand SetProportionalGainCommand { get; set; }
+        public RelayCommand SetDerivativeGainCommand { get; set; }
+        public RelayCommand SetWaveformIrefCommand { get; set; }
+        public RelayCommand SetWaveformTimeCommand { get; set; }
+        public RelayCommand SetWaveformCyclesCommand { get; set; }
 
         public RelayCommand RefreshCommand { get; set; }
 
@@ -113,17 +132,17 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public int Counter
+        public int CustomIndex
         {
             get
             {
-                return counter;
+                return customIndex;
             }
 
             set
             {
-                counter = value;
-                OnPropertyChanged(nameof(Counter));
+                customIndex = value;
+                OnPropertyChanged(nameof(CustomIndex));
             }
         }
 
@@ -200,11 +219,11 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(ProportionalGain));
-                UpdateProportionalGain();
+                //UpdateProportionalGain();
             }
         }
 
-        public int IntegralGain
+        public float IntegralGain
         {
             get
             {
@@ -226,11 +245,11 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(IntegralGain));
-                UpdateIntegralGain();
+                //UpdateIntegralGain();
             }
         }
 
-        public int DerivativeGain
+        public float DerivativeGain
         {
             get
             {
@@ -252,7 +271,7 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(DerivativeGain));
-                UpdateDerivativeGain();
+                //UpdateDerivativeGain();
             }
         }
 
@@ -279,7 +298,7 @@ namespace DeviceManager.ViewModel
                 }
                 OnPropertyChanged(nameof(WaveformCycles));
 
-                SetWaveformCycles();
+                //SetWaveformCycles();
             }
         }
 
@@ -306,7 +325,7 @@ namespace DeviceManager.ViewModel
                 }
                 OnPropertyChanged(nameof(SampleTime));
 
-                SetSampleTime();
+                //SetSampleTime();
             }
         }
 
@@ -332,35 +351,35 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(TecPeriod));
-                UpdatePeriod();
+                //UpdatePeriod();
             }
         }
 
-        //public int IRefGain
-        //{
-        //    get
-        //    {
-        //        return irefGain;
-        //    }
-        //    set
-        //    {
-        //        if (value < TecDefaults.IrefGainMinimum)
-        //        {
-        //            irefGain = TecDefaults.IrefGainMinimum;
-        //        }
-        //        else if (value > TecDefaults.IrefGainMaximum)
-        //        {
-        //            irefGain = TecDefaults.IrefGainMaximum;
-        //        }
-        //        else
-        //        {
-        //            irefGain = value;
-        //        }
-
-        //        OnPropertyChanged(nameof(IRefGain));
-        //        UpdateIrefGain();
-        //    }
-        //}
+        public float IrefValue
+        {
+            get
+            {
+                return irefValue;
+            }
+            set
+            {
+                if (value < -15.0f)
+                {
+                    irefValue = -15.0f;
+                }
+                else if (value > 15.0f)
+                {
+                    irefValue = 15.0f;
+                }
+                else
+                {
+                    irefValue = value;
+                }
+                
+                OnPropertyChanged(nameof(IrefValue));
+                //SetIref();
+            }
+        }
 
         public int NumberOfSamples
         {
@@ -444,20 +463,17 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public float IrefCurrentValue
+        public float IrefCustomValue
         {
             get
             {
-                return irefCurrentValue;
+                return irefCustomValue;
             }
 
             set
             {
-                irefCurrentValue = value; 
-                OnPropertyChanged(nameof(IrefCurrentValue));
-
-                sliderIrefValue = (int)irefCurrentValue * 100;
-                OnPropertyChanged(nameof(SliderIrefValue));
+                irefCustomValue = value; 
+                OnPropertyChanged(nameof(IrefCustomValue));
             }
         }
 
@@ -552,23 +568,6 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public int SliderIrefValue
-        {
-            get
-            {
-                return sliderIrefValue;
-            }
-            set
-            {
-                sliderIrefValue = value;
-                IrefCurrentValue = (float)sliderIrefValue / 100;
-                OnPropertyChanged(nameof(SliderIrefValue));
-
-                // Send Iref command
-                UpdateIrefForWaveform();
-            }
-        }
-
         private void EnableToggle()
         {
             var state = enableButtonState;
@@ -605,7 +604,13 @@ namespace DeviceManager.ViewModel
         private void UpdateIrefForWaveform()
         {
             var response = new byte[5];
-            tecModel.SetIrefCommand(irefCurrentValue, ref response);
+            tecModel.SetWaveformIrefCommand(IrefCustomValue, ref response);
+        }
+
+        private void SetIref()
+        {
+            var response = new byte[5];
+            tecModel.SetIrefCommand(IrefValue, ref response);
         }
 
         private void UpdateWaveform()
@@ -709,19 +714,21 @@ namespace DeviceManager.ViewModel
 
         private void IncrementCounter()
         {
-            Counter += 1;
+            //Counter += 1;
 
             var response = new byte[5];
             tecModel.ControlCommand(TecDefaults.IncrementTecWaveform, ref response);
+            ReadCustomWaveformIndex();
         }
 
         private void Reset()
         {
-            Counter = 0;
+            //Counter = 0;
 
             // Reset
             var response = new byte[5];
             tecModel.ControlCommand(TecDefaults.ResetTecWaveform, ref response);
+            ReadCustomWaveformIndex();
         }
 
         private void StartUpdateTask()
@@ -761,10 +768,22 @@ namespace DeviceManager.ViewModel
 
         private void InitialUpdate()
         {
+            ReadCustomWaveformIndex();
             UpdateIref();
             UpdateISense();
             UpdateVSense();
             UpdateStatus();
+        }
+
+        private void ReadCustomWaveformIndex()
+        {
+            var index = new byte[5];
+            var indexByteArray = tecModel.ReadWaveformIndex(ref index);
+
+            if (indexByteArray)
+            {
+                CustomIndex = Helper.GetIntFromBigEndian(index);
+            }
         }
 
         private string FormatSaveProgress()
