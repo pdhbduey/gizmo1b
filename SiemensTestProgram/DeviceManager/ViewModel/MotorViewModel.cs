@@ -39,10 +39,9 @@ namespace DeviceManager.ViewModel
         private int relativeMoveValue;
         private byte[] registerValue;
 
+        private const string notActiveColour = "Gray";
         private const string errorColour = "Red";
-        private const string noErrorColour = "Green";
         private const string statusYesColour = "Green";
-        private const string statusNoColour = "Red";
         private const int updateDelay = 400;
         private CancellationTokenSource cts;
         private CancellationToken token;
@@ -457,16 +456,16 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                BridgeStatus = statusNoColour;
+                BridgeStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[4], 1))
             {
-                BusyStatus = errorColour;
+                BusyStatus = statusYesColour;
             }
             else
             {
-                BusyStatus = noErrorColour;
+                BusyStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[4], 2))
@@ -475,7 +474,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                SwitchClosedStatus = statusNoColour;
+                SwitchClosedStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[4], 3))
@@ -484,7 +483,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                SwitchOpenStatus = statusNoColour;
+                SwitchOpenStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[4], 4))
@@ -493,7 +492,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                DirectionForwardStatus = statusNoColour;
+                DirectionForwardStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[4], 5))
@@ -502,7 +501,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                DirectionReverseStatus = statusNoColour;
+                DirectionReverseStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[4], 6))
@@ -511,7 +510,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                StoppedStatus = statusNoColour;
+                StoppedStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[4], 7))
@@ -520,7 +519,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                AcceleratingStatus = statusNoColour;
+                AcceleratingStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[3], 0))
@@ -529,7 +528,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                DeceleratingStatus = statusNoColour;
+                DeceleratingStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[3], 1))
@@ -538,7 +537,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                RunAtConstantSpeedStatus = statusNoColour;
+                RunAtConstantSpeedStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[3], 2))
@@ -547,7 +546,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                ThermalWarningStatus = noErrorColour;
+                ThermalWarningStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[3], 3))
@@ -556,7 +555,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                ThermalShutdownStatus = noErrorColour;
+                ThermalShutdownStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[3], 4))
@@ -565,7 +564,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                OvercurrentStatus = noErrorColour;
+                OvercurrentStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[3], 5))
@@ -574,7 +573,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                BridgeAStatus = noErrorColour;
+                BridgeAStatus = notActiveColour;
             }
 
             if (Helper.IsBitSet(status[3], 6))
@@ -583,7 +582,7 @@ namespace DeviceManager.ViewModel
             }
             else
             {
-                BridgeBStatus = noErrorColour;
+                BridgeBStatus = notActiveColour;
             }
         }
 
