@@ -69,7 +69,23 @@ namespace DeviceManager
             }; 
         }
 
-        public static byte[] SetIrefCommand(float value)
+        public static byte[] ReadWaveformIndex()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x0B,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] SetWaveformIrefCommand(float value)
         {
             var iref = Helper.GetBigEndian(value);
             return new byte[]
@@ -79,6 +95,23 @@ namespace DeviceManager
                 0x00,
                 0x07,
                 0x0D,
+                iref[0],
+                iref[1],
+                iref[2],
+                iref[3]
+            };
+        }
+
+        public static byte[] SetIrefCommand(float value)
+        {
+            var iref = Helper.GetBigEndian(value);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x01,
                 iref[0],
                 iref[1],
                 iref[2],
@@ -234,9 +267,9 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] GetDerivateGainCommand(int derivateGain)
+        public static byte[] GetDerivateGainCommand(float derivateGain)
         {
-            var derivateGainArray = Helper.ConvertIntToByteArray(derivateGain);
+            var derivateGainArray = Helper.GetBigEndian(derivateGain);
             return new byte[]
             {
                 DataHelper.REGISTER_WRITE,
@@ -251,9 +284,9 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] GetIntegralGainCommand(int integralGain)
+        public static byte[] GetIntegralGainCommand(float integralGain)
         {
-            var integralGainArray = Helper.ConvertIntToByteArray(integralGain);
+            var integralGainArray = Helper.GetBigEndian(integralGain);
             return new byte[]
             {
                 DataHelper.REGISTER_WRITE,

@@ -24,13 +24,17 @@ namespace DeviceManager.Model
 
         bool SetPeriodCommand(int period, ref byte[] response);
 
-        bool SetDerivativeGainCommand(int derivateGain, ref byte[] response);
+        bool SetDerivativeGainCommand(float derivateGain, ref byte[] response);
 
-        bool SetIntegralGainCommand(int integralGain, ref byte[] response);
+        bool SetIntegralGainCommand(float integralGain, ref byte[] response);
 
         bool SetProportionalGainCommand(float proportionalGain, ref byte[] response);
 
+        bool SetWaveformIrefCommand(float irefGain, ref byte[] response);
+
         bool SetIrefCommand(float irefGain, ref byte[] response);
+
+        bool ReadWaveformIndex(ref byte[] response);
 
         bool Reset(ref byte[] response);
     }

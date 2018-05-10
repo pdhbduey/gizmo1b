@@ -20,7 +20,7 @@
                 <Label Content="{Binding ChannelThreeValueText}"></Label>
                 <Label Content="{Binding ChannelFourValueText}"></Label>
                 <Label Content="{Binding ChannelFiveValueText}"></Label>
-                <Label Content="{Binding StatusMessage}"></Label>
+                <!--<Label Content="{Binding StatusMessage}"></Label>-->
                 <Button Margin="1,10,1,10" Height="25" Width="100" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
             </StackPanel>
         </GroupBox>

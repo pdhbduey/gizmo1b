@@ -14,9 +14,23 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
+        public bool SetWaveformIrefCommand(float value, ref byte[] response)
+        {
+            var requestArray = TecDefaults.SetWaveformIrefCommand(value);
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
+        }
+
         public bool SetIrefCommand(float value, ref byte[] response)
         {
             var requestArray = TecDefaults.SetIrefCommand(value);
+            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            return status;
+        }
+
+        public bool ReadWaveformIndex(ref byte[] response)
+        {
+            var requestArray = TecDefaults.ReadWaveformIndex();
             var status = communication.ProcessCommunicationRequest(requestArray, ref response);
             return status;
         }
@@ -91,14 +105,14 @@ namespace DeviceManager.Model
             return status;
         }
 
-        public bool SetDerivativeGainCommand(int derivateGain, ref byte[] response)
+        public bool SetDerivativeGainCommand(float derivateGain, ref byte[] response)
         {
             var requestArray = TecDefaults.GetDerivateGainCommand(derivateGain);
             var status = communication.ProcessCommunicationRequest(requestArray, ref response);
             return status;
         }
 
-        public bool SetIntegralGainCommand(int integralGain, ref byte[] response)
+        public bool SetIntegralGainCommand(float integralGain, ref byte[] response)
         {
             var requestArray = TecDefaults.GetIntegralGainCommand(integralGain);
             var status = communication.ProcessCommunicationRequest(requestArray, ref response);
