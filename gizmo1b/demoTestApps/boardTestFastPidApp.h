@@ -158,6 +158,7 @@ private:
     static float s_intGain;
     static float s_diffGain;
     static bool  s_isClosedLoopInitialized;
+    static bool  s_isClosedLoopEnabled;
     static bool  s_isTecEnabled;
     static bool  s_isWaveFormStarted;
     static float s_iSense;

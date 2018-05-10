@@ -8,10 +8,11 @@
 #include "boardTestFastPidApp.h"
 
 float BoardTestFastPidApp::s_iRef         = 0.0;
-float BoardTestFastPidApp::s_propGain     = 1.5;
-float BoardTestFastPidApp::s_intGain      = 0.2;
-float BoardTestFastPidApp::s_diffGain     = 2.0;
+float BoardTestFastPidApp::s_propGain     = 1.0;
+float BoardTestFastPidApp::s_intGain      = 0.0;
+float BoardTestFastPidApp::s_diffGain     = 0.0;
 bool  BoardTestFastPidApp::s_isTecEnabled = true;
+bool  BoardTestFastPidApp::s_isClosedLoopEnabled;
 bool  BoardTestFastPidApp::s_isWaveFormStarted;
 float BoardTestFastPidApp::s_iSense;
 uint32 BoardTestFastPidApp::s_status;
@@ -187,11 +188,13 @@ void BoardTestFastPidApp::sciNotification(sciBASE_t* sci, uint32 flags)
                             s_isTecEnabled = false;
                             s_isClosedLoopInitialized = false;
                             gioSetBit(mibspiPORT1, PIN_CS0, 1);  // ERROR_RED_LED <- 1
+                            gioSetBit(mibspiPORT5, PIN_SIMO, s_isTecEnabled); // Enable TEC
                         }
                         if (value & BoardTestTec::ENABLE) {
                             s_isTecEnabled = true;
                             s_isClosedLoopInitialized = false;
                             gioSetBit(mibspiPORT1, PIN_CS0, 0);  // ERROR_RED_LED <- 0
+                            gioSetBit(mibspiPORT5, PIN_SIMO, s_isTecEnabled); // Enable TEC
                         }
                         if (value & BoardTestTec::START_WAVEFORM) {
                             s_isWaveFormStarted = true;
@@ -201,6 +204,14 @@ void BoardTestFastPidApp::sciNotification(sciBASE_t* sci, uint32 flags)
                         if (value & BoardTestTec::STOP_WAVEFORM) {
                             s_isWaveFormStarted = false;
                             gioSetBit(mibspiPORT1, PIN_ENA, 1);  // DEBUG_GREEN_LED <- 1
+                        }
+                        if (value & BoardTestTec::CLOSED_LOOP_ENABLE) {
+                            s_isClosedLoopEnabled     = true;
+                            s_isClosedLoopInitialized = false;
+                        }
+                        if (value & BoardTestTec::CLOSED_LOOP_DISABLE) {
+                            s_isClosedLoopEnabled     = false;
+                            s_isClosedLoopInitialized = false;
                         }
                         break;
                     }
@@ -225,9 +236,10 @@ void BoardTestFastPidApp::sciNotification(sciBASE_t* sci, uint32 flags)
                         value = *reinterpret_cast<uint32*>(&s_iRef);
                         break;
                     case BoardTest::TEC_CONTROL:
-                        value  = BoardTestTec::CLOSED_LOOP_ENABLE;
-                        value |= s_isTecEnabled      ? BoardTestTec::ENABLE         : BoardTestTec::DISABLE;
-                        value |= s_isWaveFormStarted ? BoardTestTec::START_WAVEFORM : BoardTestTec::STOP_WAVEFORM;
+                        value  = 0;
+                        value |= s_isClosedLoopEnabled ? BoardTestTec::CLOSED_LOOP_ENABLE : BoardTestTec::CLOSED_LOOP_DISABLE;
+                        value |= s_isTecEnabled        ? BoardTestTec::ENABLE             : BoardTestTec::DISABLE;
+                        value |= s_isWaveFormStarted   ? BoardTestTec::START_WAVEFORM     : BoardTestTec::STOP_WAVEFORM;
                         break;
                     case BoardTest::TEC_ISENSE_VALUE:
                         value = *reinterpret_cast<uint32*>(&s_iSense);
@@ -394,15 +406,19 @@ void BoardTestFastPidApp::boardTestFastPidApp()
         //
         // Apply PID (1us)
         //
-        float pidError = iRef - iSense;
-        if (!s_isClosedLoopInitialized) {
+        float pidError = iRef;
+        if (s_isClosedLoopEnabled) {
+            pidError -= iSense;
+        }
+        if (!s_isClosedLoopInitialized || !s_isTecEnabled) {
             pidPropGain  = s_propGain;
             pidIntGain   = s_intGain;
             pidDiffGain  = s_diffGain;
             pidPrevError = pidError;
             pidAccError  = 0;
-            gioSetBit(mibspiPORT5, PIN_SIMO, s_isTecEnabled); // Enable TEC
-            s_isClosedLoopInitialized = true;
+            if (!s_isClosedLoopInitialized) {
+                s_isClosedLoopInitialized = true;
+            }
         }
         if (pidDiffGain == 0) {
             pidPrevError = pidError;
@@ -415,19 +431,21 @@ void BoardTestFastPidApp::boardTestFastPidApp()
                       + pidDiffGain * (pidError - pidPrevError);
         pidPrevError  = pidError;
         pidAccError  += pidError;
-        //
-        // Set DAC output (5us)
-        //
-        dacVoltage = control / 15 * 2.5 + 2.5;
-        dacVoltage = dacVoltage > 5 ? 5 : dacVoltage < 0 ? 0 : dacVoltage; // limit to [0V,5V]
-        uint16 dacData = dacVoltage * (65535 / 5.0);
-        // Write to DAC-A input register and update DAC-A
-        dacBuffer[1] = dacData >> 8;
-        dacBuffer[2] = dacData;
-        gioSetBit(gioPORTA, 6, 0); // SYNC <- 0
-        mibspiSetData(mibspiREG1, DAC8563SDGST_16_BIT_DAC, dacBuffer);
-        mibspiTransfer(mibspiREG1, DAC8563SDGST_16_BIT_DAC);
-        while (!mibspiIsTransferComplete(mibspiREG1, DAC8563SDGST_16_BIT_DAC));
-        gioSetBit(gioPORTA, 6, 1); // SYNC <- 1
+        if (s_isTecEnabled) {
+            //
+            // Set DAC output (5us)
+            //
+            dacVoltage = control / 15 * 2.5 + 2.5;
+            dacVoltage = dacVoltage > 5 ? 5 : dacVoltage < 0 ? 0 : dacVoltage; // limit to [0V,5V]
+            uint16 dacData = dacVoltage * (65535 / 5.0);
+            // Write to DAC-A input register and update DAC-A
+            dacBuffer[1] = dacData >> 8;
+            dacBuffer[2] = dacData;
+            gioSetBit(gioPORTA, 6, 0); // SYNC <- 0
+            mibspiSetData(mibspiREG1, DAC8563SDGST_16_BIT_DAC, dacBuffer);
+            mibspiTransfer(mibspiREG1, DAC8563SDGST_16_BIT_DAC);
+            while (!mibspiIsTransferComplete(mibspiREG1, DAC8563SDGST_16_BIT_DAC));
+            gioSetBit(gioPORTA, 6, 1); // SYNC <- 1
+        }
     }
 }
