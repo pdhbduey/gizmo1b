@@ -46,9 +46,8 @@
                         <Label Content="Overtemp 2"></Label>
                     </StackPanel>
                 </StackPanel>
-                
+
                 <StackPanel Grid.Row="0" Grid.Column="1">
-                    <Button Margin="1,10,1,10" Height="25" Width="100" HorizontalAlignment="Left"  Content="Refresh" Command="{Binding RefreshCommand}"></Button>
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Fill="{Binding NtcOneColour}" Width="10" Height="10" />
                         <Label Content="NTC1 Present"></Label>

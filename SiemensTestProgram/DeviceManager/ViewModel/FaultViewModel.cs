@@ -19,6 +19,7 @@ namespace DeviceManager.ViewModel
         private string tecOcdNegColour;
         private string overtempOneColour;
         private string overtempTwoColour;
+        private const int updateDelay = 300;
         private IFaultModel faultModel;
 
         public FaultViewModel(IFaultModel faultModel)
@@ -37,7 +38,7 @@ namespace DeviceManager.ViewModel
 
             GetNtc();
             GetState();
-            //StartUpdateTask();
+            StartUpdateTask();
         }
 
         public RelayCommand RefreshCommand { get; set; }
@@ -56,14 +57,69 @@ namespace DeviceManager.ViewModel
             });
         }
 
-        private void UpdateAllStatuses()
+        private async void UpdateAllStatuses()
         {
             while (true)
             {
-                GetState();
-                Thread.Sleep(300);
-                GetNtc();
-                Thread.Sleep(300);
+                //var state = await faultModel.GetState();
+                //if (state.succesfulResponse)
+                //{
+                //    overtempOneColour = notSetColour;
+                //    overtempTwoColour = notSetColour;
+                //    tecOcdPosColour = notSetColour;
+                //    tecOcdNegColour = notSetColour;
+
+
+                //    if (Helper.IsBitSet(state.response[3], 0))
+                //    {
+                //        tecOcdNegColour = setColour;
+                //    }
+
+                //    if (Helper.IsBitSet(state.response[3], 1))
+                //    {
+                //        tecOcdPosColour = setColour;
+                //    }
+
+                //    if (Helper.IsBitSet(state.response[3], 2))
+                //    {
+                //        overtempOneColour = setColour;
+                //    }
+
+                //    if (Helper.IsBitSet(state.response[3], 3))
+                //    {
+                //        overtempTwoColour = setColour;
+                //    }
+
+                //    OnPropertyChanged(nameof(OvertempOneColour));
+                //    OnPropertyChanged(nameof(OvertempTwoColour));
+                //    OnPropertyChanged(nameof(TecOcdPosColour));
+                //    OnPropertyChanged(nameof(TecOcdNegColour));
+                //}
+                //Thread.Sleep(updateDelay);
+
+                var ntcState = await faultModel.GetNtcStatus();
+                if (ntcState.succesfulResponse)
+                {
+                    if (Helper.IsBitSet(ntcState.response[3], 0))
+                    {
+                        NtcOneColour = setColour;
+                    }
+                    else
+                    {
+                        NtcOneColour = notSetColour;
+                    }
+
+                    if (Helper.IsBitSet(ntcState.response[3], 1))
+                    {
+                        NtcTwoColour = setColour;
+                    }
+                    else
+                    {
+                        NtcTwoColour = notSetColour;
+                    }
+                }
+
+                Thread.Sleep(updateDelay);
             }
         }
 
