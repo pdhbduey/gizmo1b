@@ -47,21 +47,26 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::MOTOR_STATUS]               = boardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_REGISTER_ADDRESS]     = boardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_REGISTER_VALUE]       = boardTestMotor;
-    BoardTest* boardTestTec                              = new BoardTestTec;
-    m_boardTestMap[BoardTest::TEC_CONTROL]               = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_IREF_VALUE]            = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_ISENSE_VALUE]          = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_VSENSE_VALUE]          = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_STATUS]                = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_WAVEFORM_TYPE]         = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_WAVEFORM_PERIOD]       = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_PROPORTIONAL_GAIN]     = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_INTEGRAL_GAIN]         = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_DERIVATIVE_GAIN]       = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_INDEX] = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_TIME]  = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_IREF]  = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_WAVEFORM_CYCLES]       = boardTestTec;
+    BoardTest* boardTestTec                               = new BoardTestTec;
+    m_boardTestMap[BoardTest::TEC_CONTROL]                   = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_IREF_VALUE]                = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_ISENSE_VALUE]              = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_VSENSE_VALUE]              = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_STATUS]                    = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_WAVEFORM_TYPE]             = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_WAVEFORM_PERIOD]           = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_PROPORTIONAL_GAIN]         = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_INTEGRAL_GAIN]             = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_DERIVATIVE_GAIN]           = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_INDEX]     = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_TIME]      = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_IREF]      = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_WAVEFORM_CYCLES]           = boardTestTec;
+    m_boardTestMap[BoardTest::SNAPSHOT_CONTROL]              = boardTestTec;
+    m_boardTestMap[BoardTest::SNAPSHOT_STATUS]               = boardTestTec;
+    m_boardTestMap[BoardTest::SNAPSHOT_RESOLUTION]           = boardTestTec;
+    m_boardTestMap[BoardTest::SNAPSHOT_NUMBER_OF_SAMPLES]    = boardTestTec;
+    m_boardTestMap[BoardTest::SNAPSHOT_TEC_SAMPLES_RANGE]        = boardTestTec;
     BoardTest* boardTestThermistor                     = new BoardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_STATUS]       = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A] = boardTestThermistor;
@@ -160,24 +165,48 @@ void BoardTestApp::decodeMessage(std::vector<uint8>& message,
     }
 }
 
+bool BoardTestApp::isAddressValidTecSnapshotRange(uint32 address)
+{
+    return (address >= BoardTest::SNAPSHOT_SAMPLES_VSENSE
+        &&  address <= BoardTest::SNAPSHOT_SAMPLES_VSENSE_MAX)
+        || (address >= BoardTest::SNAPSHOT_SAMPLES_ISENSE
+        &&  address <= BoardTest::SNAPSHOT_SAMPLES_ISENSE_MAX)
+        || (address >= BoardTest::SNAPSHOT_SAMPLES_IREF
+        &&  address <= BoardTest::SNAPSHOT_SAMPLES_IREF_MAX)
+        || (address >= BoardTest::SNAPSHOT_SAMPLES_TEMPERATURE1
+        &&  address <= BoardTest::SNAPSHOT_SAMPLES_TEMPERATURE1_MAX)
+        || (address >= BoardTest::SNAPSHOT_SAMPLES_TEMPERATURE2
+        &&  address <= BoardTest::SNAPSHOT_SAMPLES_TEMPERATURE2_MAX)
+        || (address >= BoardTest::SNAPSHOT_SAMPLES_TEMPERATURE3
+        &&  address <= BoardTest::SNAPSHOT_SAMPLES_TEMPERATURE3_MAX)
+        || (address >= BoardTest::SNAPSHOT_SAMPLES_TEMPERATURE4
+        &&  address <= BoardTest::SNAPSHOT_SAMPLES_TEMPERATURE4_MAX);
+}
+
 bool BoardTestApp::isAddressValid(uint32 address)
 {
-    return m_boardTestMap.find(address) != m_boardTestMap.end()
-        && m_boardTestMap[address];
+    return (m_boardTestMap.find(address) != m_boardTestMap.end()
+        && m_boardTestMap[address]);
 }
 
 int BoardTestApp::regRead(uint32 address, uint32& value)
 {
-    if (!isAddressValid(address)) {
-        return BoardTest::ERROR_ADDR;
+    if (isAddressValid(address)) {
+        return m_boardTestMap[address]->get(address, value);
     }
-    return m_boardTestMap[address]->get(address, value);
+    else if (isAddressValidTecSnapshotRange(address)) {
+        return m_boardTestMap[BoardTest::SNAPSHOT_TEC_SAMPLES_RANGE]->get(address, value);
+    }
+    return BoardTest::ERROR_ADDR;
 }
 
 int BoardTestApp::regWrite(uint32 address, uint32 value)
 {
-    if (!isAddressValid(address)) {
-        return BoardTest::ERROR_ADDR;
+    if (isAddressValid(address)) {
+        return m_boardTestMap[address]->set(address, value);
     }
-    return m_boardTestMap[address]->set(address, value);
+    else if (isAddressValidTecSnapshotRange(address)) {
+        return m_boardTestMap[BoardTest::SNAPSHOT_TEC_SAMPLES_RANGE]->set(address, value);
+    }
+    return BoardTest::ERROR_ADDR;
 }

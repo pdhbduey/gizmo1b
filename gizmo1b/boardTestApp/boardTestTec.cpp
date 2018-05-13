@@ -18,7 +18,62 @@ int BoardTestTec::get(uint32 address, uint32& value)
 {
     switch (address) {
     default:
-        return ERROR_ADDR;
+        // large ranges:
+        if (address >= SNAPSHOT_SAMPLES_VSENSE
+         && address <= SNAPSHOT_SAMPLES_VSENSE_MAX) {
+            int sample = address - SNAPSHOT_SAMPLES_VSENSE;
+            float f = m_libTec.getSnapshotVsense(sample, f);
+            value = *reinterpret_cast<uint32*>(&f);
+            break;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_ISENSE
+              && address <= SNAPSHOT_SAMPLES_ISENSE_MAX) {
+            int sample = address - SNAPSHOT_SAMPLES_ISENSE;
+            float f = m_libTec.getSnapshotIsense(sample, f);
+            value = *reinterpret_cast<uint32*>(&f);
+            break;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_IREF
+              && address <= SNAPSHOT_SAMPLES_IREF_MAX) {
+            int sample = address - SNAPSHOT_SAMPLES_IREF;
+            float f = m_libTec.getSnapshotIref(sample, f);
+            value = *reinterpret_cast<uint32*>(&f);
+            break;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE1
+              && address <= SNAPSHOT_SAMPLES_TEMPERATURE1_MAX) {
+            int sample = address - SNAPSHOT_SAMPLES_TEMPERATURE1;
+            float f = m_libTec.getSnapshotT1(sample, f);
+            value = *reinterpret_cast<uint32*>(&f);
+            break;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE2
+              && address <= SNAPSHOT_SAMPLES_TEMPERATURE2_MAX) {
+            int sample = address - SNAPSHOT_SAMPLES_TEMPERATURE2;
+            float f = m_libTec.getSnapshotT2(sample, f);
+            value = *reinterpret_cast<uint32*>(&f);
+            break;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE3
+              && address <= SNAPSHOT_SAMPLES_TEMPERATURE3_MAX) {
+            int sample = address - SNAPSHOT_SAMPLES_TEMPERATURE3;
+            float f = m_libTec.getSnapshotT3(sample, f);
+            value = *reinterpret_cast<uint32*>(&f);
+            break;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE4
+              && address <= SNAPSHOT_SAMPLES_TEMPERATURE4_MAX) {
+            int sample = address - SNAPSHOT_SAMPLES_TEMPERATURE4;
+            float f = m_libTec.getSnapshotT4(sample, f);
+            value = *reinterpret_cast<uint32*>(&f);
+            break;
+        }
+        // errors
+        else {
+            return ERROR_ADDR;
+        }
+    case SNAPSHOT_CONTROL:
+        return ERROR_WO;
     case TEC_CONTROL:
         value = 0;
         value |= m_libTec.isEnabled() ? ENABLE : DISABLE;
@@ -88,6 +143,21 @@ int BoardTestTec::get(uint32 address, uint32& value)
     case TEC_WAVEFORM_CYCLES:
         value = m_customeWaveformCycles;
         break;
+    case SNAPSHOT_STATUS:
+        if (m_libTec.isSnapshotRunning()) {
+            m_snapshotStatus |=  LibTec::SNAPSHOT_IN_PROGRESS;
+        }
+        else {
+            m_snapshotStatus &= ~LibTec::SNAPSHOT_IN_PROGRESS;
+        }
+        value = m_snapshotStatus;
+        break;
+    case SNAPSHOT_RESOLUTION:
+        value = m_libTec.getSnapshotResolution();
+        break;
+    case SNAPSHOT_NUMBER_OF_SAMPLES:
+        value = m_libTec.getSnapshotNumberOfSamples();
+        break;
     }
     return OKAY;
 }
@@ -96,11 +166,43 @@ int BoardTestTec::set(uint32 address, uint32 value)
 {
     switch (address) {
     default:
-        return ERROR_ADDR;
+        // large ranges and errors
+        if (address >= SNAPSHOT_SAMPLES_VSENSE
+         && address <= SNAPSHOT_SAMPLES_VSENSE_MAX) {
+            return ERROR_RO;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_ISENSE
+              && address <= SNAPSHOT_SAMPLES_ISENSE_MAX) {
+            return ERROR_RO;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_IREF
+              && address <= SNAPSHOT_SAMPLES_IREF_MAX) {
+            return ERROR_RO;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE1
+              && address <= SNAPSHOT_SAMPLES_TEMPERATURE1_MAX) {
+            return ERROR_RO;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE2
+              && address <= SNAPSHOT_SAMPLES_TEMPERATURE2_MAX) {
+            return ERROR_RO;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE3
+              && address <= SNAPSHOT_SAMPLES_TEMPERATURE3_MAX) {
+            return ERROR_RO;
+        }
+        else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE4
+              && address <= SNAPSHOT_SAMPLES_TEMPERATURE4_MAX) {
+            return ERROR_RO;
+        }
+        else {
+            return ERROR_ADDR;
+        }
     case TEC_ISENSE_VALUE:
     case TEC_VSENSE_VALUE:
     case TEC_STATUS:
     case TEC_WAVEFORM_SAMPLE_INDEX:
+    case SNAPSHOT_STATUS:
         return ERROR_RO;
     case TEC_CONTROL:
         if (value & DISABLE) {
@@ -181,30 +283,20 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TEC_WAVEFORM_CYCLES:
         m_customeWaveformCycles = value;
         break;
+    case SNAPSHOT_CONTROL:
+        if (value & SNAPSHOT_START) {
+            m_libTec.startSnaphot();
+        }
+        if (value & SNAPSHOT_STOP) {
+            m_libTec.stopSnapshot();
+        }
+        break;
+    case SNAPSHOT_RESOLUTION:
+        m_snapshotStatus = m_libTec.setSnapshotResolution(value);
+        break;
+    case SNAPSHOT_NUMBER_OF_SAMPLES:
+        m_snapshotStatus = m_libTec.setSnapshotNumberOfSamples(value);
+        break;
     }
     return OKAY;
-}
-
-void BoardTestTec::test()
-{
-    LibTec libTec;
-    LibFault libFault;
-    LibDac libDac;
-    libTec.enable(false);
-    libFault.reset();
-    libDac.set(2.5);
-    libTec.enable(true);
-    while (true) {
-        // Square wave
-//        libDac.set(5.0);
-//        LibDelay::us(1000);
-//        libDac.set(2.5);
-//        LibDelay::us(1000);
-        // Sine wave
-        for (int i = 0; i < 360; i++) {
-            float v = 2.5 + 1.5 * sin(i * 2 * 3.141 / 360);
-            libDac.set(v);
-            LibDelay::us(5400);
-        }
-    }
 }

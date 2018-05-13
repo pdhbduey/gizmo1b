@@ -9,6 +9,7 @@
 #include "libAdc.h"
 #include "libDac.h"
 #include "libTask.h"
+#include "libThermistor.h"
 
 // Make sure to start LibTech thread after creating LibTec object by calling LibTask::start() method.
 class LibTec : public LibTask
@@ -41,6 +42,17 @@ public:
         WAVEFORM_TYPE_SQUARE,
         WAVEFORM_TYPE_CUSTOM,
     };
+    enum SnapshotStatus {
+        SNAPSHOT_IN_PROGRESS                          = 1 << 0,
+        ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE            = 1 << 1,
+        ERROR_SNAPSHOT_RESOLUTION_OUT_OF_RANGE        = 1 << 2,
+        ERROR_SNAPSHOT_NUMBER_OF_SAMPLES_OUT_OF_RANGE = 1 << 3,
+    };
+    enum SnapshotRes {
+        SNAPSHOT_RES_10,
+        SNAPSHOT_RES_100,
+        SNAPSHOT_RES_1000,
+    };
 public:
     LibTec(const char* name = "LibTec");
     virtual ~LibTec();
@@ -68,6 +80,20 @@ public:
     int setDerivativeGain(float gain); // 0-100
     float getDerivativeGain();
     bool isClosedLoopEnabled();
+    void startSnaphot();
+    void stopSnapshot();
+    int setSnapshotNumberOfSamples(int nsamples);
+    int getSnapshotNumberOfSamples();
+    int setSnapshotResolution(int res);
+    int getSnapshotResolution();
+    bool isSnapshotRunning();
+    int getSnapshotVsense(int sample, float& value);
+    int getSnapshotIsense(int sample, float& value);
+    int getSnapshotIref(int sample, float& value);
+    int getSnapshotT1(int sample, float& value);
+    int getSnapshotT2(int sample, float& value);
+    int getSnapshotT3(int sample, float& value);
+    int getSnapshotT4(int sample, float& value);
 private:
     enum adcChannels {
         ISENSE = LibAdc::CHANNEL_1,
@@ -89,10 +115,12 @@ private:
     bool isCustomWaveformTimeRising(std::vector<struct IrefSample>& waveform);
     bool isCustomWaveformEmpty(std::vector<struct IrefSample>& waveform);
     bool isCustomWaveformStartTimeZero(std::vector<struct IrefSample>& waveform);
+    bool isSnapshotSampleInRange(int sample);
 private:
     LibWrapGioPort::Port m_tecEnable;
     LibAdc m_libAdc;
     LibDac m_libDac;
+    LibThermistor m_libThermistor;
     static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
     uint32 m_waveformType;
@@ -113,6 +141,17 @@ private:
     std::vector<float> m_filterTaps;
     std::vector<struct IrefSample> m_customWaveform;
     uint32 m_cycles;
+    static float* s_snapshotVsense;
+    static float* s_snapshotIsense;
+    static float* s_snapshotIref;
+    static float* s_snapshotT1;
+    static float* s_snapshotT2;
+    static float* s_snapshotT3;
+    static float* s_snapshotT4;
+    bool m_isSnapshotRunning;
+    int m_snapshotNumSamples;
+    int m_snapshotRes;
+    int m_snapShotSample;
 };
 
 #endif // _LIB_TEC_H_

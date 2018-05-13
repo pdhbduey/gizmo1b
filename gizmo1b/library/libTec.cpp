@@ -7,6 +7,13 @@
 
 SemaphoreHandle_t LibTec::s_mutex;
 bool LibTec::s_isInitialized;
+float* LibTec::s_snapshotVsense;
+float* LibTec::s_snapshotIsense;
+float* LibTec::s_snapshotIref;
+float* LibTec::s_snapshotT1;
+float* LibTec::s_snapshotT2;
+float* LibTec::s_snapshotT3;
+float* LibTec::s_snapshotT4;
 
 void LibTec::IrefSample::clear()
 {
@@ -18,11 +25,20 @@ LibTec::LibTec(const char* name) :
     LibTask(name, configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 1),
     m_tecEnable(new LibWrapMibSpi5, PIN_SIMO), // 99:MIBSPI5SIMO[0]:TEC_EN
     m_waveformPeriod(1000),
-    m_pidProportionalGain(1)
+    m_pidProportionalGain(1),
+    m_snapshotNumSamples(10),
+    m_snapshotRes(SNAPSHOT_RES_10)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
         m_tecEnable.m_libWrapGioPort->setPin(m_tecEnable.m_pin, false);
+        s_snapshotVsense = new float[1000];
+        s_snapshotIsense = new float[1000];
+        s_snapshotIref   = new float[1000];
+        s_snapshotT1     = new float[1000];
+        s_snapshotT2     = new float[1000];
+        s_snapshotT3     = new float[1000];
+        s_snapshotT4     = new float[1000];
         s_isInitialized = true;
     }
     // LP FIR filter taps are created in Matlab with the following command:
@@ -480,8 +496,9 @@ void LibTec::run()
     while (true) {
         vTaskDelay(1);
         TickType_t tick = xTaskGetTickCount();
-        float pidError = getWaveformSample(tick);
-        float iSense = 0;
+        float iRef      = getWaveformSample(tick);
+        float pidError  = iRef;
+        float iSense    = 0;
         if (m_isClosedLoopEnabled && getISense(iSense) == OKAY) {
             pidError -= iSense;
         }
@@ -508,5 +525,178 @@ void LibTec::run()
         if (m_isEnabled) {
             driveControl(control);
         }
+        if (m_isSnapshotRunning) {
+            int res[3] = { [SNAPSHOT_RES_10  ] = 100,
+                           [SNAPSHOT_RES_100 ] =  10,
+                           [SNAPSHOT_RES_1000] =   1, };
+            if (tick % res[m_snapshotRes]) {
+                continue;
+            }
+            if (m_snapShotSample < m_snapshotNumSamples) {
+                getVSense(s_snapshotVsense[m_snapShotSample]);
+                s_snapshotIsense[m_snapShotSample] = iSense;
+                s_snapshotIref  [m_snapShotSample] = iRef;
+                m_libThermistor.readTemp(LibThermistor::AIN_A, s_snapshotT1[m_snapShotSample]);
+                m_libThermistor.readTemp(LibThermistor::AIN_B, s_snapshotT2[m_snapShotSample]);
+                m_libThermistor.readTemp(LibThermistor::AIN_C, s_snapshotT3[m_snapShotSample]);
+                m_libThermistor.readTemp(LibThermistor::AIN_D, s_snapshotT4[m_snapShotSample]);
+                m_snapShotSample++;
+            }
+            else {
+                m_isSnapshotRunning = false;
+            }
+        }
     }
 }
+
+void LibTec::startSnaphot()
+{
+    LibMutex libMutex(s_mutex);
+    if (!m_isSnapshotRunning) {
+        m_snapShotSample    = 0;
+        m_isSnapshotRunning = true;
+    }
+}
+
+void LibTec::stopSnapshot()
+{
+    LibMutex libMutex(s_mutex);
+    if (m_isSnapshotRunning) {
+        m_isSnapshotRunning = false;
+    }
+}
+
+int LibTec::setSnapshotNumberOfSamples(int nsamples)
+{
+    LibMutex libMutex(s_mutex);
+    int result = OKAY;
+    if (10 <= nsamples && nsamples <= 1000) {
+        m_snapshotNumSamples = nsamples;
+    }
+    else {
+        result = ERROR_SNAPSHOT_NUMBER_OF_SAMPLES_OUT_OF_RANGE;
+    }
+    return result;
+}
+
+int LibTec::getSnapshotNumberOfSamples()
+{
+    return m_snapshotNumSamples;
+}
+
+int LibTec::setSnapshotResolution(int res)
+{
+    LibMutex libMutex(s_mutex);
+    int result = OKAY;
+    switch (res) {
+    default:
+        result = ERROR_SNAPSHOT_RESOLUTION_OUT_OF_RANGE;
+        break;
+    case SNAPSHOT_RES_10:
+    case SNAPSHOT_RES_100:
+    case SNAPSHOT_RES_1000:
+        m_snapshotRes = res;
+        break;
+    }
+    return result;
+}
+
+int LibTec::getSnapshotResolution()
+{
+    return m_snapshotRes;
+}
+
+bool LibTec::isSnapshotRunning()
+{
+    return m_isSnapshotRunning;
+}
+
+bool LibTec::isSnapshotSampleInRange(int sample)
+{
+    return (0 <= sample && sample <= 999);
+}
+
+int LibTec::getSnapshotVsense(int sample, float& value)
+{
+    int result = OKAY;
+    if (isSnapshotSampleInRange(sample)) {
+        value = s_snapshotVsense[sample];
+    }
+    else {
+        result = ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE;
+    }
+    return result;
+}
+
+int LibTec::getSnapshotIsense(int sample, float& value)
+{
+    int result = OKAY;
+    if (isSnapshotSampleInRange(sample)) {
+        value = s_snapshotIsense[sample];
+    }
+    else {
+        result = ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE;
+    }
+    return result;
+}
+
+int LibTec::getSnapshotIref(int sample, float& value)
+{
+    int result = OKAY;
+    if (isSnapshotSampleInRange(sample)) {
+        value = s_snapshotIref[sample];
+    }
+    else {
+        result = ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE;
+    }
+    return result;
+}
+
+int LibTec::getSnapshotT1(int sample, float& value)
+{
+    int result = OKAY;
+    if (isSnapshotSampleInRange(sample)) {
+        value = s_snapshotT1[sample];
+    }
+    else {
+        result = ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE;
+    }
+    return result;
+}
+
+int LibTec::getSnapshotT2(int sample, float& value)
+{
+    int result = OKAY;
+    if (isSnapshotSampleInRange(sample)) {
+        value = s_snapshotT2[sample];
+    }
+    else {
+        result = ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE;
+    }
+    return result;
+}
+
+int LibTec::getSnapshotT3(int sample, float& value)
+{
+    int result = OKAY;
+    if (isSnapshotSampleInRange(sample)) {
+        value = s_snapshotT3[sample];
+    }
+    else {
+        result = ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE;
+    }
+    return result;
+}
+
+int LibTec::getSnapshotT4(int sample, float& value)
+{
+    int result = OKAY;
+    if (isSnapshotSampleInRange(sample)) {
+        value = s_snapshotT4[sample];
+    }
+    else {
+        result = ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE;
+    }
+    return result;
+}
+
