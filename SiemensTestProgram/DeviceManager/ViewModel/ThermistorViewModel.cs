@@ -22,6 +22,7 @@ namespace DeviceManager.ViewModel
         private float ainC;
         private float ainD;
         private string statusMessage;
+        private const int updateDelay = 200;
 
         public ThermistorViewModel(IThermistorModel thermistorModel)
         {
@@ -29,6 +30,7 @@ namespace DeviceManager.ViewModel
             RefreshCommand = new RelayCommand(param => InitialUpdate());
 
             InitialUpdate();
+            StartUpdateTask();
         }
 
         public RelayCommand RefreshCommand { get; set; }
@@ -163,6 +165,60 @@ namespace DeviceManager.ViewModel
             {
                 statusMessage = value;
                 OnPropertyChanged(nameof(StatusMessage));
+            }
+        }
+
+        private void StartUpdateTask()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                UpdateAllStatuses();
+            });
+        }
+
+        private async void UpdateAllStatuses()
+        {
+            while (true)
+            {
+                var ainAData = await thermistorModel.ReadAinA();
+                if (ainAData.succesfulResponse)
+                {
+                    AinA = Helper.GetFloatFromBigEndian(ainAData.response);
+                }
+
+                Thread.Sleep(updateDelay);
+
+                var ainBData = await thermistorModel.ReadAinB();
+                if (ainBData.succesfulResponse)
+                {
+                    AinB = Helper.GetFloatFromBigEndian(ainBData.response);
+                }
+
+                Thread.Sleep(updateDelay);
+
+                var ainCData = await thermistorModel.ReadAinC();
+                if (ainCData.succesfulResponse)
+                {
+                    AinC = Helper.GetFloatFromBigEndian(ainCData.response);
+                }
+
+                Thread.Sleep(updateDelay);
+
+                var ainDData = await thermistorModel.ReadAinD();
+                if (ainDData.succesfulResponse)
+                {
+                    AinD = Helper.GetFloatFromBigEndian(ainDData.response);
+                }
+
+                Thread.Sleep(updateDelay);
+
+                var status = await thermistorModel.ReadStatus();
+                if (status.succesfulResponse)
+                {
+                    ProcessStatus(status.response);
+                }
+
+                Thread.Sleep(updateDelay);
             }
         }
 

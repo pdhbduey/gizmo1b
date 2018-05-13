@@ -153,5 +153,18 @@ namespace DeviceManager.Model
             var status = communication.ProcessCommunicationRequest(requestArray, ref response);
             return status;
         }
+
+        public Task<CommunicationData> GetMotorPosition()
+        {
+            var requestArray = MotorDefaults.ReadPositionCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+        public Task<CommunicationData> GetMotorStatus()
+        {
+            var requestArray = MotorDefaults.GetMotorStatusCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
     }
 }

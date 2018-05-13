@@ -43,9 +43,6 @@ namespace DeviceManager.ViewModel
         private const string errorColour = "Red";
         private const string statusYesColour = "Green";
         private const int updateDelay = 400;
-        private CancellationTokenSource cts;
-        private CancellationToken token;
-        private Task updateTask;
 
         public MotorViewModel(IMotorModel motorModel)
         {
@@ -82,7 +79,7 @@ namespace DeviceManager.ViewModel
             RefreshCommand = new RelayCommand(param => RefreshMotorStatus());
             RefreshPositionCommand = new RelayCommand(param => RefreshPosition());
 
-            //StartUpdateTask();
+            StartUpdateTask();
         }
 
         public RelayCommand RefreshCommand { get; set; }
@@ -694,42 +691,29 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            cts = new CancellationTokenSource();
-            token = cts.Token;
-
-            updateTask = Task.Factory.StartNew(() =>
+            Task.Factory.StartNew(() =>
             {
                 UpdateAllStatuses();
-            }, token);
+            });
         }
 
-        private void UpdateAllStatuses()
+        private async void UpdateAllStatuses()
         {
             while (true)
             {
-                if (token.IsCancellationRequested == true)
+                var position = await motorModel.GetMotorPosition();
+                if (position.succesfulResponse)
                 {
-                    break;
+                    MotorPosition = Helper.GetIntFromBigEndian(position.response).ToString();
                 }
+                Thread.Sleep(updateDelay);
 
-                try
+                var status = await motorModel.GetMotorStatus();
+                if (status.succesfulResponse)
                 {
-                    // Read motor position
-                    var position = new byte[5];
-                    if (motorModel.GetMotorPosition(ref position))
-                    {
-                        MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
-                    }
-                    
-                    Thread.Sleep(50);
-
-                    // Update motor status
-                    InitialUpdate();
+                    ProcessMotorStatus(status.response);
                 }
-                catch (Exception)
-                {
-                   
-                }
+                Thread.Sleep(updateDelay);
             }
         }
     }

@@ -68,8 +68,44 @@ namespace DeviceManager.ViewModel
             SetDioSevenCommand = new RelayCommand(param => SetDoutCommand(channel: 7, status: doutSevenStatus));
 
             // Update Din values.
-            //StartUpdateTask();
+            StartUpdateTask();
             RefreshCommand = new RelayCommand(param => Update());
+        }
+
+        private void StartUpdateTask()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                UpdateAllStatuses();
+            });
+        }
+
+        private async void UpdateAllStatuses()
+        {
+            while (true)
+            {
+                var din = await dioModel.ReadDin();
+                if (din.succesfulResponse)
+                {
+                    var zeroSet = DioDefaults.IsDinSet(din.response, 0);
+                    var oneSet = DioDefaults.IsDinSet(din.response, 1);
+                    var twoSet = DioDefaults.IsDinSet(din.response, 2);
+                    var threeSet = DioDefaults.IsDinSet(din.response, 3);
+                    var fourSet = DioDefaults.IsDinSet(din.response, 4);
+                    var fiveSet = DioDefaults.IsDinSet(din.response, 5);
+                    var sixSet = DioDefaults.IsDinSet(din.response, 6);
+                    var sevenSet = DioDefaults.IsDinSet(din.response, 7);
+
+                    updateDinStatus(0, zeroSet);
+                    updateDinStatus(1, oneSet);
+                    updateDinStatus(2, twoSet);
+                    updateDinStatus(3, threeSet);
+                    updateDinStatus(4, fourSet);
+                    updateDinStatus(5, fiveSet);
+                    updateDinStatus(6, sixSet);
+                    updateDinStatus(7, sevenSet);
+                }
+            }
         }
 
         private void SetDoutCommand(int channel, string status)

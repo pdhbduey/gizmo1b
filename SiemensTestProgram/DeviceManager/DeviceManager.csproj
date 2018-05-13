@@ -69,6 +69,7 @@
     <Compile Include="DacDefaults.cs" />
     <Compile Include="DataHelper.cs" />
     <Compile Include="DeviceCommunication\ComCommunication.cs" />
+    <Compile Include="DeviceCommunication\CommunicationData.cs" />
     <Compile Include="DeviceCommunication\ComPortDefaults.cs" />
     <Compile Include="DeviceCommunication\IComCommunication.cs" />
     <Compile Include="DioDefaults.cs" />

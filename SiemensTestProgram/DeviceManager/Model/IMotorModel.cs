@@ -1,5 +1,6 @@
 ﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
+using DeviceManager.DeviceCommunication;
 using System.Threading.Tasks;
 
 namespace DeviceManager.Model
@@ -34,11 +35,8 @@ namespace DeviceManager.Model
 
         void SetAbsoluteMovePosition(int absolutePosition, ref byte[] response);
 
-
-
-        //Task<byte[]> MoveRelative();
-
-        //Task<byte[]> MoveAbsolute();
+        Task<CommunicationData> GetMotorPosition();
+        Task<CommunicationData> GetMotorStatus();
 
         bool GetMotorPosition(ref byte[] response);
 

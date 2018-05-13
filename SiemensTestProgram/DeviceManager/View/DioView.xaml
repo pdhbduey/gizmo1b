@@ -69,8 +69,6 @@
                         <Ellipse Fill="{Binding DinNineColour}" Width="10" Height="10" />
                         <Label Content="DIN9"></Label>
                     </StackPanel>
-
-                    <Button Margin="1,10,1,10" Height="25" Width="100" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
