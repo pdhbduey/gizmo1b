@@ -93,6 +93,18 @@ namespace DeviceManager
         }
 
         /// <summary>
+        ///  Sets the data context for snapshot view.
+        /// </summary>
+        /// <returns> Snapshot view </returns>
+        public SnapshotView GetSnapshotView()
+        {
+            return new SnapshotView()
+            {
+                DataContext = new SnapshotViewModel(GetSnapshotModel())
+            };
+        }
+
+        /// <summary>
         ///  Sets the data context for TEC view.
         /// </summary>
         /// <returns> TEC view </returns>
@@ -241,6 +253,11 @@ namespace DeviceManager
         private ITecModel GetTecModel(IComCommunication communication)
         {
             return new TecModel(communication);
+        }
+
+        private ISnapshotModel GetSnapshotModel()
+        {
+            return new SnapshotModel(serialCommunication);
         }
 
         private IThermistorModel GetThermistorModel()
