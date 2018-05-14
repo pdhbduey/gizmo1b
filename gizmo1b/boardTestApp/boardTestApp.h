@@ -64,6 +64,7 @@ private:
     void decodeMessage(std::vector<uint8>& message,
                                                   std::vector<uint8>& response);
     bool isAddressValid(uint32 address);
+    bool isAddressValidTecSnapshotRange(uint32 address);
 protected:
     std::map<int, BoardTest*> m_boardTestMap;
 private:

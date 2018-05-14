@@ -18,12 +18,15 @@ public:
         CUSTOM_WAVEFORM_RESET_INDEX = (uint32)((uint32) 1U << 6U),
         CUSTOM_WAVEFORM_INC_INDEX   = (uint32)((uint32) 1U << 7U),
     };
+    enum SnaphotControl {
+        SNAPSHOT_START = (uint32)((uint32) 1U << 0U),
+        SNAPSHOT_STOP  = (uint32)((uint32) 1U << 1U),
+    };
 public:
     BoardTestTec();
     virtual ~BoardTestTec();
     virtual int get(uint32 address, uint32& value);
     virtual int set(uint32 address, uint32 value);
-    static void test();
 private:
     LibTec m_libTec;
     int m_status;
@@ -31,6 +34,7 @@ private:
     struct LibTec::IrefSample m_irefSample;
     uint32 m_customeWaveformCycles;
     LibLed m_libLed;
+    int m_snapshotStatus;
 };
 
 #endif // _BOARD_TEST_TEC_H_
