@@ -9,6 +9,7 @@ namespace DeviceManager.ViewModel
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
 
     public class MotorViewModel : BindableBase
     {
@@ -691,10 +692,13 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            Task.Factory.StartNew(() =>
+            var thread = new Thread(() =>
             {
                 UpdateAllStatuses();
             });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private async void UpdateAllStatuses()
@@ -704,14 +708,22 @@ namespace DeviceManager.ViewModel
                 var position = await motorModel.GetMotorPosition();
                 if (position.succesfulResponse)
                 {
-                    MotorPosition = Helper.GetIntFromBigEndian(position.response).ToString();
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        MotorPosition = Helper.GetIntFromBigEndian(position.response).ToString();
+                    }));
+                    
                 }
                 Thread.Sleep(updateDelay);
 
                 var status = await motorModel.GetMotorStatus();
                 if (status.succesfulResponse)
                 {
-                    ProcessMotorStatus(status.response);
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        ProcessMotorStatus(status.response);
+                    }));
+                    
                 }
                 Thread.Sleep(updateDelay);
             }

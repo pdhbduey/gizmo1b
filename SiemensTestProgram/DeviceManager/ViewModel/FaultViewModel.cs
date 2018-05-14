@@ -5,9 +5,11 @@ namespace DeviceManager.ViewModel
     using Common;
     using Common.Bindings;
     using Model;
+    using System;
     using System.Drawing;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
 
     public class FaultViewModel : BindableBase
     {
@@ -36,8 +38,8 @@ namespace DeviceManager.ViewModel
             ResetCommand = new RelayCommand(param => Reset());
             RefreshCommand = new RelayCommand(param => Update());
 
-            GetNtc();
-            GetState();
+            //GetNtc();
+            //GetState();
             StartUpdateTask();
         }
 
@@ -51,71 +53,125 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            Task.Factory.StartNew(() =>
+            var thread = new Thread(() =>
             {
                 UpdateAllStatuses();
             });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private async void UpdateAllStatuses()
         {
             while (true)
             {
-                //var state = await faultModel.GetState();
-                //if (state.succesfulResponse)
-                //{
-                //    overtempOneColour = notSetColour;
-                //    overtempTwoColour = notSetColour;
-                //    tecOcdPosColour = notSetColour;
-                //    tecOcdNegColour = notSetColour;
+                var state = await faultModel.GetState();
+                if (state.succesfulResponse)
+                {
+                    if (Helper.IsBitSet(state.response[3], 0))
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            TecOcdNegColour = setColour;
+                        }));
+                        
+                    }
+                    else
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            TecOcdNegColour = notSetColour;
+                        }));
+                        
+                    }
 
+                    if (Helper.IsBitSet(state.response[3], 1))
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            TecOcdPosColour = setColour;
+                        }));
+                        
+                    }
+                    else
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            TecOcdPosColour = notSetColour;
+                        }));
+                        
+                    }
 
-                //    if (Helper.IsBitSet(state.response[3], 0))
-                //    {
-                //        tecOcdNegColour = setColour;
-                //    }
+                    if (Helper.IsBitSet(state.response[3], 2))
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            OvertempOneColour = setColour;
+                        }));
+                        
+                    }
+                    else
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            OvertempOneColour = notSetColour;
+                        }));
+                        
+                    }
 
-                //    if (Helper.IsBitSet(state.response[3], 1))
-                //    {
-                //        tecOcdPosColour = setColour;
-                //    }
-
-                //    if (Helper.IsBitSet(state.response[3], 2))
-                //    {
-                //        overtempOneColour = setColour;
-                //    }
-
-                //    if (Helper.IsBitSet(state.response[3], 3))
-                //    {
-                //        overtempTwoColour = setColour;
-                //    }
-
-                //    OnPropertyChanged(nameof(OvertempOneColour));
-                //    OnPropertyChanged(nameof(OvertempTwoColour));
-                //    OnPropertyChanged(nameof(TecOcdPosColour));
-                //    OnPropertyChanged(nameof(TecOcdNegColour));
-                //}
-                //Thread.Sleep(updateDelay);
+                    if (Helper.IsBitSet(state.response[3], 3))
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            OvertempTwoColour = setColour;
+                        }));
+                        
+                    }
+                    else
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            OvertempTwoColour = notSetColour;
+                        }));
+                        
+                    }
+                }
+                Thread.Sleep(updateDelay);
 
                 var ntcState = await faultModel.GetNtcStatus();
                 if (ntcState.succesfulResponse)
                 {
                     if (Helper.IsBitSet(ntcState.response[3], 0))
                     {
-                        NtcOneColour = setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            NtcOneColour = setColour;
+                        }));
                     }
                     else
                     {
-                        NtcOneColour = notSetColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            NtcOneColour = notSetColour;
+                        }));
                     }
 
                     if (Helper.IsBitSet(ntcState.response[3], 1))
                     {
-                        NtcTwoColour = setColour;
+                        
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            NtcTwoColour = setColour;
+                        }));
                     }
                     else
                     {
-                        NtcTwoColour = notSetColour;
+                        
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            NtcTwoColour = notSetColour;
+                        }));
                     }
                 }
 

@@ -170,10 +170,13 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            Task.Factory.StartNew(() =>
+            var thread = new Thread(() =>
             {
                 UpdateAllStatuses();
             });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private async void UpdateAllStatuses()
@@ -183,7 +186,11 @@ namespace DeviceManager.ViewModel
                 var ainAData = await thermistorModel.ReadAinA();
                 if (ainAData.succesfulResponse)
                 {
-                    AinA = Helper.GetFloatFromBigEndian(ainAData.response);
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        AinA = Helper.GetFloatFromBigEndian(ainAData.response);
+                    }));
+                    
                 }
 
                 Thread.Sleep(updateDelay);
@@ -191,7 +198,11 @@ namespace DeviceManager.ViewModel
                 var ainBData = await thermistorModel.ReadAinB();
                 if (ainBData.succesfulResponse)
                 {
-                    AinB = Helper.GetFloatFromBigEndian(ainBData.response);
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        AinB = Helper.GetFloatFromBigEndian(ainBData.response);
+                    }));
+                    
                 }
 
                 Thread.Sleep(updateDelay);
@@ -199,7 +210,11 @@ namespace DeviceManager.ViewModel
                 var ainCData = await thermistorModel.ReadAinC();
                 if (ainCData.succesfulResponse)
                 {
-                    AinC = Helper.GetFloatFromBigEndian(ainCData.response);
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        AinC = Helper.GetFloatFromBigEndian(ainCData.response);
+                    }));
+                    
                 }
 
                 Thread.Sleep(updateDelay);
@@ -207,7 +222,11 @@ namespace DeviceManager.ViewModel
                 var ainDData = await thermistorModel.ReadAinD();
                 if (ainDData.succesfulResponse)
                 {
-                    AinD = Helper.GetFloatFromBigEndian(ainDData.response);
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        AinD = Helper.GetFloatFromBigEndian(ainDData.response);
+                    }));
+                    
                 }
 
                 Thread.Sleep(updateDelay);
@@ -215,7 +234,11 @@ namespace DeviceManager.ViewModel
                 var status = await thermistorModel.ReadStatus();
                 if (status.succesfulResponse)
                 {
-                    ProcessStatus(status.response);
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        ProcessStatus(status.response);
+                    }));
+                    
                 }
 
                 Thread.Sleep(updateDelay);

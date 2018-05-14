@@ -8,6 +8,8 @@ namespace DeviceManager.DeviceCommunication
         public static List<int> BaudRates = new List<int>()
         {
             19200,
+            38400,
+            57600,
             115200,
             128000
         };

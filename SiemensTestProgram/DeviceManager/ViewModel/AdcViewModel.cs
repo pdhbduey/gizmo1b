@@ -186,10 +186,13 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            Task.Factory.StartNew(() =>
+            var thread = new Thread(() =>
             {
                 UpdateAllStatuses();
             });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private void InitialUpdate(int delay)
@@ -339,7 +342,10 @@ namespace DeviceManager.ViewModel
                             if (readResultChannelZero.succesfulResponse)
                             {
                                 var channelZeroResult = readResultChannelZero.response;
-                                ChannelZeroValue = Helper.GetFloatFromBigEndian(channelZeroResult);
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelZeroValue = Helper.GetFloatFromBigEndian(channelZeroResult);
+                                }));
                             }
                         }
                     }
@@ -361,7 +367,10 @@ namespace DeviceManager.ViewModel
                             if (readResultChannelOne.succesfulResponse)
                             {
                                 var channelOneResult = readResultChannelOne.response;
-                                ChannelOneValue = Helper.GetFloatFromBigEndian(channelOneResult);
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelOneValue = Helper.GetFloatFromBigEndian(channelOneResult);
+                                }));
                             }
                         }
                     }
@@ -383,7 +392,10 @@ namespace DeviceManager.ViewModel
                             if (readResultChannelTwo.succesfulResponse)
                             {
                                 var channelTwoResult = readResultChannelTwo.response;
-                                ChannelTwoValue = Helper.GetFloatFromBigEndian(channelTwoResult);
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelTwoValue = Helper.GetFloatFromBigEndian(channelTwoResult);
+                                }));
                             }
                         }
                     }
@@ -405,7 +417,12 @@ namespace DeviceManager.ViewModel
                             if (readResultChannelThree.succesfulResponse)
                             {
                                 var channelThreeResult = readResultChannelThree.response;
-                                ChannelThreeValue = Helper.GetFloatFromBigEndian(channelThreeResult);
+
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelThreeValue = Helper.GetFloatFromBigEndian(channelThreeResult);
+                                }));
+                                
                             }
                         }
                     }
@@ -427,7 +444,12 @@ namespace DeviceManager.ViewModel
                             if (readResultChannelFour.succesfulResponse)
                             {
                                 var channelFourResult = readResultChannelFour.response;
-                                ChannelFourValue = Helper.GetFloatFromBigEndian(channelFourResult);
+
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelFourValue = Helper.GetFloatFromBigEndian(channelFourResult);
+                                }));
+                                
                             }
                         }
                     }
@@ -449,7 +471,12 @@ namespace DeviceManager.ViewModel
                             if (readResultChannelFive.succesfulResponse)
                             {
                                 var channelFiveResult = readResultChannelFive.response;
-                                ChannelFiveValue = Helper.GetFloatFromBigEndian(channelFiveResult);
+
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelFiveValue = Helper.GetFloatFromBigEndian(channelFiveResult);
+                                }));
+                                
                             }
                         }
                     }

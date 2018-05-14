@@ -4,8 +4,10 @@ namespace DeviceManager.ViewModel
 {
     using Common.Bindings;
     using DeviceManager.Model;
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
 
     public class DioViewModel : BindableBase
     {
@@ -121,7 +123,7 @@ namespace DeviceManager.ViewModel
             }
 
             UpdateChannelDout(channel);
-            Update();
+            //Update();
         }
 
         private void UpdateChannelDout(int channel)
@@ -446,136 +448,181 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private void DinUpdate()
-        {
-            while (true)
-            {
-                try
-                {
-                    var din = new byte[5];
-                    if (dioModel.ReadDin(ref din))
-                    {
-                        var zeroSet = DioDefaults.IsDinSet(din, 0);
-                        var oneSet = DioDefaults.IsDinSet(din, 1);
-                        var twoSet = DioDefaults.IsDinSet(din, 2);
-                        var threeSet = DioDefaults.IsDinSet(din, 3);
-                        var fourSet = DioDefaults.IsDinSet(din, 4);
-                        var fiveSet = DioDefaults.IsDinSet(din, 5);
-                        var sixSet = DioDefaults.IsDinSet(din, 6);
-                        var sevenSet = DioDefaults.IsDinSet(din, 7);
+       
 
-                        updateDinStatus(0, zeroSet);
-                        updateDinStatus(1, oneSet);
-                        updateDinStatus(2, twoSet);
-                        updateDinStatus(3, threeSet);
-                        updateDinStatus(4, fourSet);
-                        updateDinStatus(5, fiveSet);
-                        updateDinStatus(6, sixSet);
-                        updateDinStatus(7, sevenSet);
-                    }
-
-                    //Thread.Sleep(updateDelay);
-                }
-                catch
-                {
-
-                }
-            }
-        }
-
-        private void updateDinStatus(int channel, bool isSet)
+        private async void updateDinStatus(int channel, bool isSet)
         {
             switch (channel)
             {
                 case 0:
                     if (isSet)
                     {
-                        DinZeroColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinZeroColour = DioDefaults.setColour;
+                        }));
+                        
                         break;
                     }
 
-                    DinZeroColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinZeroColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
                 case 1:
                     if (isSet)
                     {
-                        DinOneColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinOneColour = DioDefaults.setColour;
+                        }));
+                        
                         break;
                     }
 
-                    DinOneColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinOneColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
                 case 2:
                     if (isSet)
                     {
-                        DinTwoColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinTwoColour = DioDefaults.setColour;
+                        }));
+                        
                         break;
                     }
 
-                    DinTwoColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinTwoColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
                 case 3:
                     if (isSet)
                     {
-                        DinThreeColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinThreeColour = DioDefaults.setColour;
+                        }));
+                       
                         break;
                     }
 
-                    DinThreeColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinThreeColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
                 case 4:
                     if (isSet)
                     {
-                        DinFourColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinFourColour = DioDefaults.setColour;
+                        }));
+                        
                         break;
                     }
 
-                    DinFourColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinFourColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
                 case 5:
                     if (isSet)
                     {
-                        DinFiveColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinFiveColour = DioDefaults.setColour;
+                        }));
+                        
                         break;
                     }
 
-                    DinFiveColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinFiveColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
                 case 6:
                     if (isSet)
                     {
-                        DinSixColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinSixColour = DioDefaults.setColour;
+                        }));
+                        
                         break;
                     }
 
-                    DinSixColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinSixColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
                 case 7:
                     if (isSet)
                     {
-                        DinSevenColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinSevenColour = DioDefaults.setColour;
+                        }));
+                        
                         break;
                     }
 
-                    DinSevenColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinSevenColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
                 case 8:
                     if (isSet)
                     {
-                        DinEightColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinEightColour = DioDefaults.setColour;
+                        }));
+                        
                         break;
                     }
 
-                    DinEightColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinEightColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
                 case 9:
                     if (isSet)
                     {
-                        DinNineColour = DioDefaults.setColour;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DinNineColour = DioDefaults.setColour;
+                        }));
+                        
                         break;
                     }
 
-                    DinNineColour = DioDefaults.notSetColour;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DinNineColour = DioDefaults.notSetColour;
+                    }));
+                    
                     break;
             }
         }
