@@ -13,11 +13,19 @@ namespace DeviceManager
         private IComCommunication serialCommunication;
 
         // Singleton Views
+        private AdcView adcView;
+        private MotorView motorView;
+        private ThermistorView thermistorView;
+        private FaultView faultView;
         private DacView dacView;
         private TecView tecView;
         private LedView ledView;
 
         // Singleton View Models
+        private AdcViewModel adcViewModel;
+        private MotorViewModel motorViewModel;
+        private ThermistorViewModel thermistorViewModel;
+        private FaultViewModel faultViewModel;
         private DacViewModel dacViewModel;
         private TecViewModel tecViewModel;
         private LedViewModel ledViewModel;
@@ -85,6 +93,18 @@ namespace DeviceManager
         }
 
         /// <summary>
+        ///  Sets the data context for snapshot view.
+        /// </summary>
+        /// <returns> Snapshot view </returns>
+        public SnapshotView GetSnapshotView()
+        {
+            return new SnapshotView()
+            {
+                DataContext = new SnapshotViewModel(GetSnapshotModel())
+            };
+        }
+
+        /// <summary>
         ///  Sets the data context for TEC view.
         /// </summary>
         /// <returns> TEC view </returns>
@@ -108,11 +128,14 @@ namespace DeviceManager
         /// <returns> Thermistor view </returns>
         public ThermistorView GetThermistorView()
         {
-            //var thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
-            var thermistorView = new ThermistorView()
+            if (thermistorViewModel == null)
             {
-                DataContext = new ThermistorViewModel(GetThermistorModel())
-            };
+                thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
+                thermistorView = new ThermistorView()
+                {
+                    DataContext = thermistorViewModel
+                };
+            }
 
             return thermistorView;
         }
@@ -123,12 +146,15 @@ namespace DeviceManager
         /// <returns> ADC view </returns>
         public AdcView GetAdcView()
         {
-            var adcViewModel = new AdcViewModel(GetAdcModel());
-            var adcView = new AdcView()
+            if (adcViewModel == null)
             {
-                DataContext = adcViewModel
-            };
-            
+                adcViewModel = new AdcViewModel(GetAdcModel());
+                adcView = new AdcView()
+                {
+                    DataContext = adcViewModel
+                };
+            }
+
             return adcView;
         }
 
@@ -174,10 +200,16 @@ namespace DeviceManager
         /// <returns> Motor view. </returns>
         public MotorView GetMotorView()
         {
-            return new MotorView()
+            if (motorViewModel == null)
             {
-                DataContext = new MotorViewModel(GetMotorModel(serialCommunication))
-            };
+                motorViewModel = new MotorViewModel(GetMotorModel(serialCommunication));
+                motorView = new MotorView()
+                {
+                    DataContext = motorViewModel
+                };
+            }
+
+            return motorView;
         }
 
         /// <summary>
@@ -186,10 +218,16 @@ namespace DeviceManager
         /// <returns> Motor view. </returns>
         public FaultView GetFaultView()
         {
-            return new FaultView()
+            if (faultViewModel == null)
             {
-                DataContext = new FaultViewModel(GetFaultModel())
-            };
+                faultViewModel = new FaultViewModel(GetFaultModel());
+                faultView = new FaultView()
+                {
+                    DataContext = faultViewModel
+                };
+            }
+
+            return faultView;
         }
 
         private LedModel GetLedModel(IComCommunication communication)
@@ -215,6 +253,11 @@ namespace DeviceManager
         private ITecModel GetTecModel(IComCommunication communication)
         {
             return new TecModel(communication);
+        }
+
+        private ISnapshotModel GetSnapshotModel()
+        {
+            return new SnapshotModel(serialCommunication);
         }
 
         private IThermistorModel GetThermistorModel()

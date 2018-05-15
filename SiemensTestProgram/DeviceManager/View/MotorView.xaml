@@ -100,8 +100,6 @@
                         <Ellipse Fill="{Binding BridgeBStatus}" Width="10" Height="10" />
                         <Label Content="Bridge B Stall"></Label>
                     </StackPanel>
-
-                    <Button Margin="1,50,0,0" Height="25" Width="100" HorizontalAlignment="Center" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
                 </StackPanel>
             </Grid>
         </GroupBox>

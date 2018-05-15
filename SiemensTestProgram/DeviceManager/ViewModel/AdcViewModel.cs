@@ -32,7 +32,8 @@ namespace DeviceManager.ViewModel
             this.adcModel = adcModel;
             InitialUpdate(10);
 
-            RefreshCommand = new RelayCommand(param => InitialUpdate(10));
+            StartUpdateTask();
+            //RefreshCommand = new RelayCommand(param => InitialUpdate(10));
         }
 
         public RelayCommand RefreshCommand { get; set; }
@@ -183,13 +184,16 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        //private void StartUpdateTask()
-        //{
-        //    updateTask = Task.Factory.StartNew(() =>
-        //    {
-        //        UpdateAllStatuses();
-        //    });
-        //}
+        private void StartUpdateTask()
+        {
+            var thread = new Thread(() =>
+            {
+                UpdateAllStatuses();
+            });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+        }
 
         private void InitialUpdate(int delay)
         {
@@ -320,51 +324,165 @@ namespace DeviceManager.ViewModel
             Thread.Sleep(delay);
         }
 
-        private void updateEvent(object sender, EventArgs e)
+        private async void UpdateAllStatuses()
         {
-            Application.Current.Dispatcher.BeginInvoke((Action)delegate
-            {
-                InitialUpdate(10);
-
-
-            });
-        }
-
-        private void UpdateAllStatuses()
-        {
-            var completedPreviousUpdate = true;
-
             while (true)
             {
-                if (!completedPreviousUpdate)
+                
+                var commandZeroSuccesful = await adcModel.ControlAdcChannel(0);
+                if (commandZeroSuccesful.succesfulResponse)
                 {
-                    Thread.Sleep(updateDelay);
-                }
-                else
-                {
-                    completedPreviousUpdate = false;
-                    try
+                    var result = await adcModel.ReadStatus();
+                    if (result.succesfulResponse)
                     {
-
-
-
-                        ////new Func<int>(() => { System.Threading.Thread.Sleep(5000); return 1; })
-                        Application.Current.Dispatcher.InvokeAsync((Action)delegate
+                        var statusChannelZero = result.response;
+                        if (ProcessStatus(statusChannelZero, 0))
                         {
-                            InitialUpdate(10);
-                            Thread.Sleep(updateDelay);
-                            completedPreviousUpdate = true;
-                        });
-                        //updatedEvents.Invoke(null, null);
-                        //InitialUpdate(delayBetweenRequests);
-                    }
-                    catch (Exception e)
-                    {
-                        StatusMessage = e.Message;
-                        completedPreviousUpdate = true;
+                            var readResultChannelZero = await adcModel.ReadAdcResult();
+                            if (readResultChannelZero.succesfulResponse)
+                            {
+                                var channelZeroResult = readResultChannelZero.response;
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelZeroValue = Helper.GetFloatFromBigEndian(channelZeroResult);
+                                }));
+                            }
+                        }
                     }
                 }
 
+                Thread.Sleep(updateDelay);
+
+                //// Channel One
+                var commandOneSuccesful = await adcModel.ControlAdcChannel(1);
+                if (commandOneSuccesful.succesfulResponse)
+                {
+                    var result = await adcModel.ReadStatus();
+                    if (result.succesfulResponse)
+                    {
+                        var statusChannelOne = result.response;
+                        if (ProcessStatus(statusChannelOne, 1))
+                        {
+                            var readResultChannelOne = await adcModel.ReadAdcResult();
+                            if (readResultChannelOne.succesfulResponse)
+                            {
+                                var channelOneResult = readResultChannelOne.response;
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelOneValue = Helper.GetFloatFromBigEndian(channelOneResult);
+                                }));
+                            }
+                        }
+                    }
+                }
+
+                Thread.Sleep(updateDelay);
+
+                // Channel Two
+                var commandTwoSuccesful = await adcModel.ControlAdcChannel(2);
+                if (commandTwoSuccesful.succesfulResponse)
+                {
+                    var result = await adcModel.ReadStatus();
+                    if (result.succesfulResponse)
+                    {
+                        var statusChannelTwo = result.response;
+                        if (ProcessStatus(statusChannelTwo, 2))
+                        {
+                            var readResultChannelTwo = await adcModel.ReadAdcResult();
+                            if (readResultChannelTwo.succesfulResponse)
+                            {
+                                var channelTwoResult = readResultChannelTwo.response;
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelTwoValue = Helper.GetFloatFromBigEndian(channelTwoResult);
+                                }));
+                            }
+                        }
+                    }
+                }
+
+                Thread.Sleep(updateDelay);
+
+                // Channel Three
+                var commandThreeSuccesful = await adcModel.ControlAdcChannel(3);
+                if (commandThreeSuccesful.succesfulResponse)
+                {
+                    var result = await adcModel.ReadStatus();
+                    if (result.succesfulResponse)
+                    {
+                        var statusChannelThree = result.response;
+                        if (ProcessStatus(statusChannelThree, 3))
+                        {
+                            var readResultChannelThree = await adcModel.ReadAdcResult();
+                            if (readResultChannelThree.succesfulResponse)
+                            {
+                                var channelThreeResult = readResultChannelThree.response;
+
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelThreeValue = Helper.GetFloatFromBigEndian(channelThreeResult);
+                                }));
+                                
+                            }
+                        }
+                    }
+                }
+
+                Thread.Sleep(updateDelay);
+
+                // Channel Four
+                var commandFourSuccesful = await adcModel.ControlAdcChannel(4);
+                if (commandFourSuccesful.succesfulResponse)
+                {
+                    var result = await adcModel.ReadStatus();
+                    if (result.succesfulResponse)
+                    {
+                        var statusChannelFour = result.response;
+                        if (ProcessStatus(statusChannelFour, 4))
+                        {
+                            var readResultChannelFour = await adcModel.ReadAdcResult();
+                            if (readResultChannelFour.succesfulResponse)
+                            {
+                                var channelFourResult = readResultChannelFour.response;
+
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelFourValue = Helper.GetFloatFromBigEndian(channelFourResult);
+                                }));
+                                
+                            }
+                        }
+                    }
+                }
+
+                Thread.Sleep(updateDelay);
+
+                // Channel Five
+                var commandFiveSuccesful = await adcModel.ControlAdcChannel(5);
+                if (commandFiveSuccesful.succesfulResponse)
+                {
+                    var result = await adcModel.ReadStatus();
+                    if (result.succesfulResponse)
+                    {
+                        var statusChannelFive = result.response;
+                        if (ProcessStatus(statusChannelFive, 5))
+                        {
+                            var readResultChannelFive = await adcModel.ReadAdcResult();
+                            if (readResultChannelFive.succesfulResponse)
+                            {
+                                var channelFiveResult = readResultChannelFive.response;
+
+                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    ChannelFiveValue = Helper.GetFloatFromBigEndian(channelFiveResult);
+                                }));
+                                
+                            }
+                        }
+                    }
+                }
+
+                Thread.Sleep(updateDelay);
             }
         }
 

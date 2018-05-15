@@ -53,17 +53,21 @@ namespace DeviceManager.DeviceCommunication
 
         public bool IsConfigured => isConfigured;
 
-        public bool ProcessCommunicationRequest(byte[] request, ref byte[] response)
-        {
-            try
-            {
-                if (!serialPort.IsOpen)
-                {
-                    CreateSerialPort();
-                }
+        private int testCounter = 0;
 
-                lock (mutex)
+        public Task<CommunicationData> ProcessCommunicationRequest(byte[] request)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                try
                 {
+                    requestSemaphore.Wait();
+                    Console.WriteLine($"{testCounter}");
+                    if (!serialPort.IsOpen)
+                    {
+                        CreateSerialPort();
+                    }
+
                     // Write to serial port
                     receivedData = false;
                     serialPort.DiscardOutBuffer();
@@ -78,10 +82,55 @@ namespace DeviceManager.DeviceCommunication
                         {
                             throw new Exception($"Read operation exceeded timeout of {readTimeout} ms");
                         }
-                    } while (!receivedData);
-
-                    response = dataBuffer;
+                    } while (!receivedData); 
                 }
+                catch
+                {
+                    if (serialPort != null && serialPort.IsOpen)
+                    {
+                        serialPort.Close();
+                    }
+
+                    CreateSerialPort();
+                    
+                    var falseData = new CommunicationData(false, new byte[0]);
+                    requestSemaphore.Release();
+                    return falseData;
+                }
+
+                var comData = new CommunicationData(true, dataBuffer);
+                requestSemaphore.Release();
+                return comData;
+            });
+            
+        }
+
+        public bool ProcessCommunicationRequest(byte[] request, ref byte[] response)
+        {
+            try
+            {
+                requestSemaphore.Wait();
+                if (!serialPort.IsOpen)
+                {
+                    CreateSerialPort();
+                }
+
+                
+                // Write to serial port
+                receivedData = false;
+                    serialPort.DiscardOutBuffer();
+                    serialPort.Write(request, 0, request.Length);
+                    var timer = new Stopwatch();
+                    timer.Start();
+
+                    // Read from serial port
+                    do
+                    {
+                        if (timer.Elapsed >= TimeSpan.FromMilliseconds(readTimeout))
+                        {
+                            throw new Exception($"Read operation exceeded timeout of {readTimeout} ms");
+                        }
+                    } while (!receivedData);   
             }
             catch
             {
@@ -91,9 +140,12 @@ namespace DeviceManager.DeviceCommunication
                 }
 
                 CreateSerialPort();
+                requestSemaphore.Release();
                 return false;
             }
 
+            response = dataBuffer;
+            requestSemaphore.Release();
             return true;
         }
 
@@ -195,10 +247,13 @@ namespace DeviceManager.DeviceCommunication
             {
                 if (errorDisplay == null)
                 {
-                    errorDisplay = new ErrorWindow();
-                    errorDisplay.Topmost = true;
-                    errorDisplay.errorMsg.Content = "Error connecting to serial port.";
-                    errorDisplay.Show();
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        errorDisplay = new ErrorWindow();
+                        errorDisplay.Topmost = true;
+                        errorDisplay.errorMsg.Content = "Error connecting to serial port.";
+                        errorDisplay.Show();
+                    }));
                 }
                 
                 isConfigured = false;

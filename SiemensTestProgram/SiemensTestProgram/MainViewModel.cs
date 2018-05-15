@@ -23,6 +23,7 @@
                 "Fault",
                 "LED",
                 "Motor",
+                "Snapshot",
                 "Thermistor",
                 "TEC"
             };
@@ -100,6 +101,9 @@
                     break;
                 case "Fault":
                     Content = DeviceManager.Factory.Instance.GetFaultView();
+                    break;
+                case "Snapshot":
+                    Content = DeviceManager.Factory.Instance.GetSnapshotView();
                     break;
                 case "Thermistor":
                     Content = DeviceManager.Factory.Instance.GetThermistorView();

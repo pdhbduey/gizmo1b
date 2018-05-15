@@ -9,6 +9,8 @@ namespace DeviceManager.DeviceCommunication
     {
         bool ProcessCommunicationRequest(byte[] request, ref byte[] response);
 
+        Task<CommunicationData> ProcessCommunicationRequest(byte[] request);
+
         /// <summary>
         /// Updates configuration for serial communication to gizmo 1b device.
         /// </summary>

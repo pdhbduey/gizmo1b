@@ -9,6 +9,7 @@ namespace DeviceManager.ViewModel
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
 
     public class MotorViewModel : BindableBase
     {
@@ -43,9 +44,6 @@ namespace DeviceManager.ViewModel
         private const string errorColour = "Red";
         private const string statusYesColour = "Green";
         private const int updateDelay = 400;
-        private CancellationTokenSource cts;
-        private CancellationToken token;
-        private Task updateTask;
 
         public MotorViewModel(IMotorModel motorModel)
         {
@@ -82,7 +80,7 @@ namespace DeviceManager.ViewModel
             RefreshCommand = new RelayCommand(param => RefreshMotorStatus());
             RefreshPositionCommand = new RelayCommand(param => RefreshPosition());
 
-            //StartUpdateTask();
+            StartUpdateTask();
         }
 
         public RelayCommand RefreshCommand { get; set; }
@@ -694,42 +692,40 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            cts = new CancellationTokenSource();
-            token = cts.Token;
-
-            updateTask = Task.Factory.StartNew(() =>
+            var thread = new Thread(() =>
             {
                 UpdateAllStatuses();
-            }, token);
+            });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
-        private void UpdateAllStatuses()
+        private async void UpdateAllStatuses()
         {
             while (true)
             {
-                if (token.IsCancellationRequested == true)
+                var position = await motorModel.GetMotorPosition();
+                if (position.succesfulResponse)
                 {
-                    break;
-                }
-
-                try
-                {
-                    // Read motor position
-                    var position = new byte[5];
-                    if (motorModel.GetMotorPosition(ref position))
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
-                    }
+                        MotorPosition = Helper.GetIntFromBigEndian(position.response).ToString();
+                    }));
                     
-                    Thread.Sleep(50);
+                }
+                Thread.Sleep(updateDelay);
 
-                    // Update motor status
-                    InitialUpdate();
-                }
-                catch (Exception)
+                var status = await motorModel.GetMotorStatus();
+                if (status.succesfulResponse)
                 {
-                   
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        ProcessMotorStatus(status.response);
+                    }));
+                    
                 }
+                Thread.Sleep(updateDelay);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DeviceManager.DeviceCommunication;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,9 @@ namespace DeviceManager.Model
         bool SetDout(int channel, bool set, ref byte[] response);
 
         bool ReadDin(ref byte[] response);
+
+        Task<CommunicationData> ReadDin();
+
+        Task<CommunicationData> SetDout(int channel, bool set);
     }
 }
