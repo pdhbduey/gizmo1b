@@ -31,7 +31,7 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x00,
-                0x00
+                0x01
             };
         }
 
@@ -47,7 +47,7 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x00,
-                0x01
+                0x02
             };
         }
 
@@ -67,13 +67,13 @@ namespace DeviceManager
             };
         }
 
-        public static Dictionary<string, int> StatusCodes = new Dictionary<string, int>()
+        public static Dictionary<byte, string> StatusCodes = new Dictionary<byte, string>()
         {
-            { "Done", 0x00},
-            { "In Progress", 0x01},
-            { "Sample out of range", 0x02},
-            { "Resolution out of range", 0x04},
-            { "Number of samples out of range", 0x08}
+            { 0x00, "Done" },
+            { 0x01,"In Progress of snapshotting, retry." },
+            { 0x02,"Sample out of range" },
+            { 0x04,"Resolution out of range" },
+            { 0x08,"Number of samples out of range" }
         };
 
         public static byte[] SetNumberOfSamples(int numberOfSamples)
@@ -116,7 +116,7 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x0A,
-                0x03,
+                0x02,
                 0x00,
                 0x00,
                 0x00,
