@@ -13,24 +13,24 @@ namespace DeviceManager.Model
 
         Task<CommunicationData> StopSnapshot();
 
-        Task<CommunicationData> SetResolution();
+        Task<CommunicationData> SetResolution(int resolution);
 
-        Task<CommunicationData> SetNumberOfSamples();
+        Task<CommunicationData> SetNumberOfSamples(int numberOfSamples);
 
         Task<CommunicationData> ReadStatus();
 
-        Task<CommunicationData> ReadVsenseSamples();
+        Task<CommunicationData> ReadVsenseSamples(int sampleNumber);
 
-        Task<CommunicationData> ReadIsenseSamples();
+        Task<CommunicationData> ReadIsenseSamples(int sampleNumber);
 
-        Task<CommunicationData> ReadIrefSamples();
+        Task<CommunicationData> ReadIrefSamples(int sampleNumber);
 
-        Task<CommunicationData> ReadTempOneSamples();
+        Task<CommunicationData> ReadTempOneSamples(int sampleNumber);
 
-        Task<CommunicationData> ReadTempTwoSamples();
+        Task<CommunicationData> ReadTempTwoSamples(int sampleNumber);
 
-        Task<CommunicationData> ReadTempThreeSamples();
+        Task<CommunicationData> ReadTempThreeSamples(int sampleNumber);
 
-        Task<CommunicationData> ReadTempFourSamples();
+        Task<CommunicationData> ReadTempFourSamples(int sampleNumber);
     }
 }

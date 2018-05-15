@@ -12,6 +12,13 @@ namespace DeviceManager
         public const int SampleNumberMinimum = 10;
         public const int SampleNumberMaximum = 1000;
 
+        public static List<int> Resolutions = new List<int>
+        {
+            10,
+            100,
+            1000
+        };
+
         public static byte[] StartSnapshot()
         {
             return new byte[]

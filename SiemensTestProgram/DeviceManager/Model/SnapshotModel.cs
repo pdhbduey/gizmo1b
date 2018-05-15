@@ -18,62 +18,86 @@ namespace DeviceManager.Model
 
         public Task<CommunicationData> StartSnapshot()
         {
-            
+            var requestArray = SnapshotDefaults.StartSnapshot();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
         public Task<CommunicationData> StopSnapshot()
         {
-
+            var requestArray = SnapshotDefaults.StopSnapshot();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
-        public Task<CommunicationData> SetResolution()
+        public Task<CommunicationData> SetResolution(int resolution)
         {
-
+            var requestArray = SnapshotDefaults.SetResolution(resolution);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
-        public Task<CommunicationData> SetNumberOfSamples()
+        public Task<CommunicationData> SetNumberOfSamples(int sampleNumber)
         {
-
+            var requestArray = SnapshotDefaults.SetNumberOfSamples(sampleNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
         public Task<CommunicationData> ReadStatus()
         {
-
+            var requestArray = SnapshotDefaults.ReadStatus();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
-        public Task<CommunicationData> ReadVsenseSamples()
+        public Task<CommunicationData> ReadVsenseSamples(int sampleNumber)
         {
-
+            var requestArray = SnapshotDefaults.ReadVsenseSamples(sampleNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
-        public Task<CommunicationData> ReadIsenseSamples()
+        public Task<CommunicationData> ReadIsenseSamples(int sampleNumber)
         {
-
+            var requestArray = SnapshotDefaults.ReadIsenseSamples(sampleNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
-        public Task<CommunicationData> ReadIrefSamples()
+        public Task<CommunicationData> ReadIrefSamples(int sampleNumber)
         {
-
+            var requestArray = SnapshotDefaults.ReadIrefSamples(sampleNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
-        public Task<CommunicationData> ReadTempOneSamples()
+        public Task<CommunicationData> ReadTempOneSamples(int sampleNumber)
         {
-
+            var requestArray = SnapshotDefaults.ReadTemperatureOneSamples(sampleNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
-        public Task<CommunicationData> ReadTempTwoSamples()
+        public Task<CommunicationData> ReadTempTwoSamples(int sampleNumber)
         {
-
+            var requestArray = SnapshotDefaults.ReadTemperatureTwoSamples(sampleNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
-        public Task<CommunicationData> ReadTempThreeSamples()
+        public Task<CommunicationData> ReadTempThreeSamples(int sampleNumber)
         {
-
+            var requestArray = SnapshotDefaults.ReadTemperatureThreeSamples(sampleNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
 
-        public Task<CommunicationData> ReadTempFourSamples()
+        public Task<CommunicationData> ReadTempFourSamples(int sampleNumber)
         {
-
+            var requestArray = SnapshotDefaults.ReadTemperatureFourSamples(sampleNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
         }
     }
 }
