@@ -66,9 +66,30 @@ namespace DeviceManager.ViewModel
 
         public RelayCommand CancelCommand { get; set; }
 
+        public string FilePath
+        {
+            get
+            {
+                return filePath;
+            }
+            set
+            {
+                filePath = value;
+                OnPropertyChanged(nameof(FilePath));
+            }
+        }
+
+        private string filePath;
+
         private void Browse()
         {
-
+            var browser = new System.Windows.Forms.SaveFileDialog();
+            string filePath = string.Empty;
+            browser.FileName = $"{browser.FileName}\\{FileName}";
+            if (browser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                filePath = browser.FileName;
+            }
         }
 
         private void Cancel()
@@ -281,12 +302,16 @@ namespace DeviceManager.ViewModel
                     }
 
                     // Save to csv
-                    if (File.Exists(fileName))
+                    
+                         var fileFullName = $"\\{FileName}_{DateTime.Now.ToString("MM_dd_yyyy_HH_mm")}.csv";
+                    var filePath = Directory.GetCurrentDirectory() + fileFullName;
+
+                    if (File.Exists(filePath))
                     {
-                        File.Delete(fileName);
+                        File.Delete(filePath);
                     }
                     
-                    using (FileStream file = new FileStream(fileName, FileMode.Create))
+                    using (FileStream file = new FileStream(filePath, FileMode.Create))
                     {
                         using (StreamWriter sw = new StreamWriter(file))
                         {

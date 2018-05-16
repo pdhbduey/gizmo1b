@@ -49,8 +49,8 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Column="0" Content="Label:" />
-                    <TextBox Grid.Column="1" Width="183" HorizontalAlignment="Stretch" Text="{Binding FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                    <Button Grid.Column="2" HorizontalAlignment="Right" Content="Browse" Width="75" Height="25" IsEnabled="{Binding IsNotSaving}" Command="{Binding BrowseCommand}"></Button>
+                    <TextBox Grid.Column="1" Width="150" HorizontalAlignment="Stretch" Text="{Binding FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <!--<Button Grid.Column="2" HorizontalAlignment="Right" Content="Browse" Width="75" Height="25" IsEnabled="{Binding IsNotSaving}" Command="{Binding BrowseCommand}"></Button>-->
                 </Grid>
                 
             </StackPanel>
