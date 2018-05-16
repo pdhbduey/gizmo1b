@@ -41,16 +41,29 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-                <TextBox Width="100" HorizontalAlignment="Stretch" Text="{Binding FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <!--<Label Content="{Binding FileName}" HorizontalAlignment="Stretch"></Label>-->
-                <!--<Button Content="Browse" Width="100" Height="25" IsEnabled="{Binding IsNotSaving}" Command="{Binding BrowseCommand}"></Button>-->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" Content="Label:" />
+                    <TextBox Grid.Column="1" Width="183" HorizontalAlignment="Stretch" Text="{Binding FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <Button Grid.Column="2" HorizontalAlignment="Right" Content="Browse" Width="75" Height="25" IsEnabled="{Binding IsNotSaving}" Command="{Binding BrowseCommand}"></Button>
+                </Grid>
+                
             </StackPanel>
             
             <Grid Grid.Row="1" Grid.Column="0">
                 <ProgressBar Margin="2" Grid.Column="0" HorizontalAlignment="Stretch" Minimum="0" Maximum="{Binding NumberOfSamples}" Value="{Binding SaveValue}" ></ProgressBar>
                 <TextBlock Text="{Binding ProgressText}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
-            <Button Grid.Row="1" Grid.Column="1" Margin="1" Width="100" Height="25" IsEnabled="{Binding IsNotSaving}" Content="Save" Command="{Binding SaveCommand}"></Button>
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+                <Button Margin="1" Width="100" Height="25" IsEnabled="{Binding IsSaving}" Content="Cancel" Command="{Binding CancelCommand}"></Button>
+                <Button Margin="1" Width="100" Height="25" IsEnabled="{Binding IsNotSaving}" Content="Save" Command="{Binding SaveCommand}"></Button>
+            </StackPanel>
+            
         </Grid>
     </Grid>
 </UserControl>

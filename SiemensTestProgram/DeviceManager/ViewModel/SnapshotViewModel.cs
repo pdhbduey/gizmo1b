@@ -24,6 +24,10 @@ namespace DeviceManager.ViewModel
         private bool isNotSaving;
         private const int numberOfErrorsBeforeRetry = 50;
 
+        private CancellationTokenSource cts;
+        private CancellationToken token;
+        private Task saveTask;
+
         public SnapshotViewModel(ISnapshotModel snapshotModel)
         {
             this.snapshotModel = snapshotModel;
@@ -40,6 +44,7 @@ namespace DeviceManager.ViewModel
 
             StartCommand = new RelayCommand(param => Start());
             StopCommand = new RelayCommand(param => Stop());
+            CancelCommand = new RelayCommand(param => Cancel());
             SetNumberOfSamplesCommand = new RelayCommand(param => SetNumberOfSamples());
             SaveCommand = new RelayCommand(param => SaveSamples());
             BrowseCommand = new RelayCommand(param => Browse());
@@ -59,22 +64,29 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        public RelayCommand CancelCommand { get; set; }
+
         private void Browse()
         {
 
+        }
+
+        private void Cancel()
+        {
+            cts.Cancel();
         }
 
         public RelayCommand BrowseCommand { get; set; }
 
         private void SaveSamples()
         {
-            var thread = new Thread(() =>
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            var task = Task.Factory.StartNew(() =>
             {
                 SaveSamplesThread();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }, token);
         }
 
         private async void SaveSamplesThread()
@@ -98,6 +110,18 @@ namespace DeviceManager.ViewModel
 
                     for (var sampleNumber = 0; sampleNumber < numberOfSamples; sampleNumber++)
                     {
+                        if (token.IsCancellationRequested == true)
+                        {
+                            await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                ProgressText = "Cancelled";
+                                SaveValue = 0;
+                                IsNotSaving = true;
+                            }));
+
+                            return;
+                        }
+
                         var errorCounter = 0;
 
                         CommunicationData vSense;
@@ -337,6 +361,15 @@ namespace DeviceManager.ViewModel
             {
                 isNotSaving = value;
                 OnPropertyChanged(nameof(IsNotSaving));
+                OnPropertyChanged(nameof(IsSaving));
+            }
+        }
+
+        public bool IsSaving
+        {
+            get
+            {
+                return !isNotSaving;
             }
         }
 
