@@ -17,11 +17,11 @@
             <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopCommand}"></Button>
 
             <StackPanel Margin="1,30,1,1"  Orientation="Horizontal">
-                <Label IsEnabled="{Binding IsNotSaving}" Width="70" Content="Resolution: "></Label>
+                <Label IsEnabled="{Binding IsNotSaving}" Width="105" Content="Resolution [s/sec]: "></Label>
                 <ComboBox IsEnabled="{Binding IsNotSaving}" Height="25" Width="70" HorizontalAlignment="Left" Margin="1" ItemsSource="{Binding Resolutions}" SelectedItem="{Binding SelectedResolution}"></ComboBox>
             </StackPanel>
             <StackPanel Margin="1" Orientation="Horizontal">
-                <Label IsEnabled="{Binding IsNotSaving}" Width="70" Content="Samples: "></Label>
+                <Label IsEnabled="{Binding IsNotSaving}" Width="105" Content="Samples: "></Label>
                 <TextBox IsEnabled="{Binding IsNotSaving}" Margin="1" Height="25" Width="70" Text="{Binding Path=NumberOfSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" MaxLength="4">
                     <TextBox.InputBindings>
                         <KeyBinding Command="{Binding SetNumberOfSamplesCommand}" Key="Enter"/>
@@ -49,8 +49,8 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Column="0" Content="Label:" />
-                    <TextBox Grid.Column="1" Width="183" HorizontalAlignment="Stretch" Text="{Binding FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                    <Button Grid.Column="2" HorizontalAlignment="Right" Content="Browse" Width="75" Height="25" IsEnabled="{Binding IsNotSaving}" Command="{Binding BrowseCommand}"></Button>
+                    <TextBox Grid.Column="1" Width="150" HorizontalAlignment="Stretch" Text="{Binding FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <!--<Button Grid.Column="2" HorizontalAlignment="Right" Content="Browse" Width="75" Height="25" IsEnabled="{Binding IsNotSaving}" Command="{Binding BrowseCommand}"></Button>-->
                 </Grid>
                 
             </StackPanel>

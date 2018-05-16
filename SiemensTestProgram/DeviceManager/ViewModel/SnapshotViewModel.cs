@@ -66,9 +66,30 @@ namespace DeviceManager.ViewModel
 
         public RelayCommand CancelCommand { get; set; }
 
+        public string FilePath
+        {
+            get
+            {
+                return filePath;
+            }
+            set
+            {
+                filePath = value;
+                OnPropertyChanged(nameof(FilePath));
+            }
+        }
+
+        private string filePath;
+
         private void Browse()
         {
-
+            var browser = new System.Windows.Forms.SaveFileDialog();
+            string filePath = string.Empty;
+            browser.FileName = $"{browser.FileName}\\{FileName}";
+            if (browser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                filePath = browser.FileName;
+            }
         }
 
         private void Cancel()
@@ -281,22 +302,41 @@ namespace DeviceManager.ViewModel
                     }
 
                     // Save to csv
-                    if (File.Exists(fileName))
+                    
+                    var fileFullName = $"\\{FileName}_{DateTime.Now.ToString("MM_dd_yyyy_HH-mm")}.csv";
+                    var filePath = Directory.GetCurrentDirectory() + fileFullName;
+
+                    if (File.Exists(filePath))
                     {
-                        File.Delete(fileName);
+                        File.Delete(filePath);
                     }
                     
-                    using (FileStream file = new FileStream(fileName, FileMode.Create))
+                    try
                     {
-                        using (StreamWriter sw = new StreamWriter(file))
+                        using (FileStream file = new FileStream(filePath, FileMode.Create))
                         {
-                            sw.WriteLine(string.Format("vSense, iSense, iRef, Temperature1, Temperature2, Temperature3, Temperature4"));
-
-                            for (var sampleNumber = 0; sampleNumber < numberOfSamples; sampleNumber++)
+                            using (StreamWriter sw = new StreamWriter(file))
                             {
-                                sw.WriteLine(string.Format($"{vSenseData[sampleNumber]}, {iSenseData[sampleNumber]}, {iRefData[sampleNumber]}, {temperatureOneData[sampleNumber]}, {temperatureTwoData[sampleNumber]}, {temperatureThreeData[sampleNumber]}, {temperatureFourData[sampleNumber]}"));
+                                sw.WriteLine(string.Format("vSense, iSense, iRef, Temperature1, Temperature2, Temperature3, Temperature4"));
+
+                                for (var sampleNumber = 0; sampleNumber < numberOfSamples; sampleNumber++)
+                                {
+                                    sw.WriteLine(string.Format($"{vSenseData[sampleNumber]}, {iSenseData[sampleNumber]}, {iRefData[sampleNumber]}, {temperatureOneData[sampleNumber]}, {temperatureTwoData[sampleNumber]}, {temperatureThreeData[sampleNumber]}, {temperatureFourData[sampleNumber]}"));
+                                }
                             }
                         }
+                    }
+                    catch
+                    {
+                        ProgressText = "Exception Thrown, Save incomplete.";
+                        SaveValue = 0;
+                        IsNotSaving = true;
+
+                        if (File.Exists(filePath))
+                        {
+                            File.Delete(filePath);
+                        }
+                        return;
                     }
 
                     ProgressText = "Complete";
