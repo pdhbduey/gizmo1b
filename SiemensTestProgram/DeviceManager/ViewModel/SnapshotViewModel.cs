@@ -303,7 +303,7 @@ namespace DeviceManager.ViewModel
 
                     // Save to csv
                     
-                    var fileFullName = $"\\{FileName}_{DateTime.Now.ToString("MM_dd_yyyy_HH-mm")}.csv";
+                    var fileFullName = $"\\{FileName} {DateTime.Now.ToString("MM dd yyyy HH mm ss")}.csv";
                     var filePath = Directory.GetCurrentDirectory() + fileFullName;
 
                     if (File.Exists(filePath))
