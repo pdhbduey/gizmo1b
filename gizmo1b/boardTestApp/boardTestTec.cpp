@@ -22,49 +22,56 @@ int BoardTestTec::get(uint32 address, uint32& value)
         if (address >= SNAPSHOT_SAMPLES_VSENSE
          && address <= SNAPSHOT_SAMPLES_VSENSE_MAX) {
             int sample = address - SNAPSHOT_SAMPLES_VSENSE;
-            float f = m_libTec.getSnapshotVsense(sample, f);
+            float f;
+            m_status = m_libTec.getSnapshotVsense(sample, f);
             value = *reinterpret_cast<uint32*>(&f);
             break;
         }
         else if (address >= SNAPSHOT_SAMPLES_ISENSE
               && address <= SNAPSHOT_SAMPLES_ISENSE_MAX) {
             int sample = address - SNAPSHOT_SAMPLES_ISENSE;
-            float f = m_libTec.getSnapshotIsense(sample, f);
+            float f;
+            m_status = m_libTec.getSnapshotIsense(sample, f);
             value = *reinterpret_cast<uint32*>(&f);
             break;
         }
         else if (address >= SNAPSHOT_SAMPLES_IREF
               && address <= SNAPSHOT_SAMPLES_IREF_MAX) {
             int sample = address - SNAPSHOT_SAMPLES_IREF;
-            float f = m_libTec.getSnapshotIref(sample, f);
+            float f;
+            m_status = m_libTec.getSnapshotIref(sample, f);
             value = *reinterpret_cast<uint32*>(&f);
             break;
         }
         else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE1
               && address <= SNAPSHOT_SAMPLES_TEMPERATURE1_MAX) {
             int sample = address - SNAPSHOT_SAMPLES_TEMPERATURE1;
-            float f = m_libTec.getSnapshotT1(sample, f);
+            float f;
+            m_status = m_libTec.getSnapshotT1(sample, f);
             value = *reinterpret_cast<uint32*>(&f);
             break;
         }
         else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE2
               && address <= SNAPSHOT_SAMPLES_TEMPERATURE2_MAX) {
             int sample = address - SNAPSHOT_SAMPLES_TEMPERATURE2;
-            float f = m_libTec.getSnapshotT2(sample, f);
+            float f;
+            m_status = m_libTec.getSnapshotT2(sample, f);
             value = *reinterpret_cast<uint32*>(&f);
             break;
         }
         else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE3
               && address <= SNAPSHOT_SAMPLES_TEMPERATURE3_MAX) {
             int sample = address - SNAPSHOT_SAMPLES_TEMPERATURE3;
-            float f = m_libTec.getSnapshotT3(sample, f);
+            float f;
+            m_status = m_libTec.getSnapshotT3(sample, f);
             value = *reinterpret_cast<uint32*>(&f);
             break;
         }
         else if (address >= SNAPSHOT_SAMPLES_TEMPERATURE4
               && address <= SNAPSHOT_SAMPLES_TEMPERATURE4_MAX) {
             int sample = address - SNAPSHOT_SAMPLES_TEMPERATURE4;
-            float f = m_libTec.getSnapshotT4(sample, f);
+            float f;
+            m_status = m_libTec.getSnapshotT4(sample, f);
             value = *reinterpret_cast<uint32*>(&f);
             break;
         }
@@ -76,8 +83,8 @@ int BoardTestTec::get(uint32 address, uint32& value)
         return ERROR_WO;
     case TEC_CONTROL:
         value = 0;
-        value |= m_libTec.isEnabled() ? ENABLE : DISABLE;
-        value |= m_libTec.isWaveformStarted() ? START_WAVEFORM : STOP_WAVEFORM;
+        value |= m_libTec.isEnabled()           ? ENABLE             : DISABLE;
+        value |= m_libTec.isWaveformStarted()   ? START_WAVEFORM     : STOP_WAVEFORM;
         value |= m_libTec.isClosedLoopEnabled() ? CLOSED_LOOP_ENABLE : CLOSED_LOOP_DISABLE;
         break;
     case TEC_IREF_VALUE:
