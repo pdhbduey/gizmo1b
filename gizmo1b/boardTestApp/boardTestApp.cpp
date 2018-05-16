@@ -66,7 +66,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::SNAPSHOT_STATUS]               = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_RESOLUTION]           = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_NUMBER_OF_SAMPLES]    = boardTestTec;
-    m_boardTestMap[BoardTest::SNAPSHOT_TEC_SAMPLES_RANGE]        = boardTestTec;
+    m_boardTestMap[BoardTest::SNAPSHOT_TEC_SAMPLES_RANGE]    = boardTestTec;
     BoardTest* boardTestThermistor                     = new BoardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_STATUS]       = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A] = boardTestThermistor;
