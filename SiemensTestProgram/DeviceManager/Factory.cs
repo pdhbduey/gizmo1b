@@ -104,6 +104,18 @@ namespace DeviceManager
             };
         }
 
+        ///// <summary>
+        /////  Sets the data context for Capture view.
+        ///// </summary>
+        ///// <returns> Capture view </returns>
+        //public CaptureView GetCaptureView()
+        //{
+        //    return new CaptureView()
+        //    {
+        //        DataContext = new CaptureViewModel(GetCaptureModel())
+        //    };
+        //}
+
         /// <summary>
         ///  Sets the data context for TEC view.
         /// </summary>
@@ -259,6 +271,11 @@ namespace DeviceManager
         {
             return new SnapshotModel(serialCommunication);
         }
+
+        //private ICaptureModel GetCaptureModel()
+        //{
+        //    return new CaptureModel(serialCommunication);
+        //}
 
         private IThermistorModel GetThermistorModel()
         {
