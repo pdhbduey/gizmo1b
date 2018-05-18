@@ -22,6 +22,10 @@ public:
         SNAPSHOT_START = (uint32)((uint32) 1U << 0U),
         SNAPSHOT_STOP  = (uint32)((uint32) 1U << 1U),
     };
+    enum TraceControl {
+        TRACE_START = (uint32)((uint32) 1U << 0U),
+        TRACE_STOP  = (uint32)((uint32) 1U << 1U),
+    };
 public:
     BoardTestTec();
     virtual ~BoardTestTec();
@@ -35,6 +39,7 @@ private:
     uint32 m_customeWaveformCycles;
     LibLed m_libLed;
     int m_snapshotStatus;
+    int m_traceStatus;
 };
 
 #endif // _BOARD_TEST_TEC_H_

@@ -80,6 +80,8 @@ int BoardTestTec::get(uint32 address, uint32& value)
             return ERROR_ADDR;
         }
     case SNAPSHOT_CONTROL:
+    case TRACE_CONTROL:
+    case TRACE_NUMBER_OF_READ_SAMPLES:
         return ERROR_WO;
     case TEC_CONTROL:
         value = 0;
@@ -165,6 +167,18 @@ int BoardTestTec::get(uint32 address, uint32& value)
     case SNAPSHOT_NUMBER_OF_SAMPLES:
         value = m_libTec.getSnapshotNumberOfSamples();
         break;
+    case TRACE_RESOLUTION:
+        value = m_libTec.getTraceNumberOfSamples();
+        break;
+    case TRACE_FIRST_SAMPLE:
+        value = m_libTec.getTraceFirstSample();
+        break;
+    case TRACE_NUMBER_OF_SAMPLES:
+        value = m_libTec.getTraceNumberOfSamples();
+        break;
+    case TRACE_STATUS:
+        value = m_traceStatus;
+        break;
     }
     return OKAY;
 }
@@ -210,6 +224,9 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TEC_STATUS:
     case TEC_WAVEFORM_SAMPLE_INDEX:
     case SNAPSHOT_STATUS:
+    case TRACE_STATUS:
+    case TRACE_FIRST_SAMPLE:
+    case TRACE_NUMBER_OF_SAMPLES:
         return ERROR_RO;
     case TEC_CONTROL:
         if (value & DISABLE) {
@@ -303,6 +320,20 @@ int BoardTestTec::set(uint32 address, uint32 value)
         break;
     case SNAPSHOT_NUMBER_OF_SAMPLES:
         m_snapshotStatus = m_libTec.setSnapshotNumberOfSamples(value);
+        break;
+    case TRACE_RESOLUTION:
+        m_traceStatus = m_libTec.setTraceResolution(value);
+        break;
+    case TRACE_CONTROL:
+        if (value & TRACE_START) {
+            m_libTec.startTrace();
+        }
+        if (value & TRACE_STOP) {
+            m_libTec.stopTrace();
+        }
+        break;
+    case TRACE_NUMBER_OF_READ_SAMPLES:
+        m_traceStatus = m_libTec.setTraceNumberOfReadSamples(value);
         break;
     }
     return OKAY;

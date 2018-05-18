@@ -47,7 +47,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::MOTOR_STATUS]               = boardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_REGISTER_ADDRESS]     = boardTestMotor;
     m_boardTestMap[BoardTest::MOTOR_REGISTER_VALUE]       = boardTestMotor;
-    BoardTest* boardTestTec                               = new BoardTestTec;
+    BoardTest* boardTestTec                                  = new BoardTestTec;
     m_boardTestMap[BoardTest::TEC_CONTROL]                   = boardTestTec;
     m_boardTestMap[BoardTest::TEC_IREF_VALUE]                = boardTestTec;
     m_boardTestMap[BoardTest::TEC_ISENSE_VALUE]              = boardTestTec;
@@ -67,6 +67,12 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::SNAPSHOT_RESOLUTION]           = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_NUMBER_OF_SAMPLES]    = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_TEC_SAMPLES_RANGE]    = boardTestTec;
+    m_boardTestMap[BoardTest::TRACE_CONTROL]                 = boardTestTec;
+    m_boardTestMap[BoardTest::TRACE_STATUS]                  = boardTestTec;
+    m_boardTestMap[BoardTest::TRACE_RESOLUTION]              = boardTestTec;
+    m_boardTestMap[BoardTest::TRACE_FIRST_SAMPLE]            = boardTestTec;
+    m_boardTestMap[BoardTest::TRACE_NUMBER_OF_SAMPLES]       = boardTestTec;
+    m_boardTestMap[BoardTest::TRACE_NUMBER_OF_READ_SAMPLES]  = boardTestTec;
     BoardTest* boardTestThermistor                     = new BoardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_STATUS]       = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A] = boardTestThermistor;
