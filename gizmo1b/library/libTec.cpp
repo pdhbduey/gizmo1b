@@ -14,6 +14,7 @@ float* LibTec::s_snapshotT1;
 float* LibTec::s_snapshotT2;
 float* LibTec::s_snapshotT3;
 float* LibTec::s_snapshotT4;
+SemaphoreHandle_t LibTec::s_traceMutex;
 
 void LibTec::IrefSample::clear()
 {
@@ -27,7 +28,8 @@ LibTec::LibTec(const char* name) :
     m_waveformPeriod(1000),
     m_pidProportionalGain(1),
     m_snapshotNumSamples(10),
-    m_snapshotRes(SNAPSHOT_RES_10)
+    m_snapshotRes(SNAPSHOT_RES_10),
+    m_traceCircularBuffer(1000)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
@@ -39,6 +41,7 @@ LibTec::LibTec(const char* name) :
         s_snapshotT2     = new float[1000];
         s_snapshotT3     = new float[1000];
         s_snapshotT4     = new float[1000];
+        s_traceMutex    = xSemaphoreCreateMutex();
         s_isInitialized = true;
     }
     // LP FIR filter taps are created in Matlab with the following command:
@@ -532,19 +535,36 @@ void LibTec::run()
             if (tick % res[m_snapshotRes]) {
                 continue;
             }
-            if (m_snapShotSample < m_snapshotNumSamples) {
-                getVSense(s_snapshotVsense[m_snapShotSample]);
-                s_snapshotIsense[m_snapShotSample] = iSense;
-                s_snapshotIref  [m_snapShotSample] = iRef;
-                m_libThermistor.readTemp(LibThermistor::AIN_A, s_snapshotT1[m_snapShotSample]);
-                m_libThermistor.readTemp(LibThermistor::AIN_B, s_snapshotT2[m_snapShotSample]);
-                m_libThermistor.readTemp(LibThermistor::AIN_C, s_snapshotT3[m_snapShotSample]);
-                m_libThermistor.readTemp(LibThermistor::AIN_D, s_snapshotT4[m_snapShotSample]);
-                m_snapShotSample++;
+            if (m_snapshotSample < m_snapshotNumSamples) {
+                getVSense(s_snapshotVsense[m_snapshotSample]);
+                s_snapshotIsense[m_snapshotSample] = iSense;
+                s_snapshotIref  [m_snapshotSample] = iRef;
+                m_libThermistor.readTemp(LibThermistor::AIN_A, s_snapshotT1[m_snapshotSample]);
+                m_libThermistor.readTemp(LibThermistor::AIN_B, s_snapshotT2[m_snapshotSample]);
+                m_libThermistor.readTemp(LibThermistor::AIN_C, s_snapshotT3[m_snapshotSample]);
+                m_libThermistor.readTemp(LibThermistor::AIN_D, s_snapshotT4[m_snapshotSample]);
+                m_snapshotSample++;
             }
             else {
                 m_isSnapshotRunning = false;
             }
+        }
+        else if (m_isTraceRunning) {
+            LibMutex libMutex(s_traceMutex);
+            int res[3] = { [TRACE_RES_10 ] = 100,
+                           [TRACE_RES_100] =  10, };
+            if (tick % res[m_traceRes]) {
+                continue;
+            }
+            int traceSample = m_traceCircularBuffer.back();
+            getVSense(s_snapshotVsense[traceSample]);
+            s_snapshotIsense[traceSample] = iSense;
+            s_snapshotIref  [traceSample] = iRef;
+            m_libThermistor.readTemp(LibThermistor::AIN_A, s_snapshotT1[traceSample]);
+            m_libThermistor.readTemp(LibThermistor::AIN_B, s_snapshotT2[traceSample]);
+            m_libThermistor.readTemp(LibThermistor::AIN_C, s_snapshotT3[traceSample]);
+            m_libThermistor.readTemp(LibThermistor::AIN_D, s_snapshotT4[traceSample]);
+            m_traceCircularBuffer.pushBack();
         }
     }
 }
@@ -553,7 +573,7 @@ void LibTec::startSnaphot()
 {
     LibMutex libMutex(s_mutex);
     if (!m_isSnapshotRunning) {
-        m_snapShotSample    = 0;
+        m_snapshotSample    = 0;
         m_isSnapshotRunning = true;
     }
 }
@@ -700,3 +720,65 @@ int LibTec::getSnapshotT4(int sample, float& value)
     return result;
 }
 
+void LibTec::startTrace()
+{
+    LibMutex libMutex(s_mutex);
+    if (!m_isTraceRunning) {
+        LibMutex libMutex(s_traceMutex);
+        m_traceCircularBuffer.clear();
+        m_isTraceRunning = true;
+    }
+}
+
+void LibTec::stopTrace()
+{
+    LibMutex libMutex(s_mutex);
+    if (m_isTraceRunning) {
+        m_isTraceRunning = false;
+    }
+}
+
+int LibTec::setTraceResolution(int res)
+{
+    LibMutex libMutex(s_mutex);
+    int result = OKAY;
+    switch (res) {
+    default:
+        result = ERROR_TRACE_RESOLUTION_OUT_OF_RANGE;
+        break;
+    case TRACE_RES_10:
+    case TRACE_RES_100:
+        m_traceRes = res;
+        break;
+    }
+    return result;
+}
+
+int LibTec::getTraceResolution()
+{
+    return m_traceRes;
+}
+
+int LibTec::getTraceFirstSample()
+{
+    LibMutex libMutex(s_traceMutex);
+    return m_traceCircularBuffer.front();
+}
+
+int LibTec::getTraceNumberOfSamples()
+{
+    LibMutex libMutex(s_traceMutex);
+    return m_traceCircularBuffer.size();
+}
+
+int LibTec::setTraceNumberOfReadSamples(int number)
+{
+    LibMutex libMutex(s_traceMutex);
+    if (number < 0 || number > m_traceCircularBuffer.size()) {
+        return ERROR_TRACE_NUMBER_OF_READ_SAMPLES_OUT_OF_RANGE;
+    }
+    for (int i = 0; i < number; i++) {
+        m_traceCircularBuffer.popFront();
+    }
+    return OKAY;
+}

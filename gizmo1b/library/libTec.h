@@ -10,6 +10,7 @@
 #include "libDac.h"
 #include "libTask.h"
 #include "libThermistor.h"
+#include "libCircularBuffer.h"
 
 // Make sure to start LibTech thread after creating LibTec object by calling LibTask::start() method.
 class LibTec : public LibTask
@@ -53,6 +54,14 @@ public:
         SNAPSHOT_RES_100,
         SNAPSHOT_RES_1000,
     };
+    enum TraceRes {
+        TRACE_RES_10,
+        TRACE_RES_100,
+    };
+    enum TraceStatus {
+        ERROR_TRACE_RESOLUTION_OUT_OF_RANGE             = 1 << 0,
+        ERROR_TRACE_NUMBER_OF_READ_SAMPLES_OUT_OF_RANGE = 1 << 1,
+    };
 public:
     LibTec(const char* name = "LibTec");
     virtual ~LibTec();
@@ -94,6 +103,13 @@ public:
     int getSnapshotT2(int sample, float& value);
     int getSnapshotT3(int sample, float& value);
     int getSnapshotT4(int sample, float& value);
+    void startTrace();
+    void stopTrace();
+    int setTraceResolution(int res);
+    int getTraceResolution();
+    int getTraceFirstSample();
+    int getTraceNumberOfSamples();
+    int setTraceNumberOfReadSamples(int number);
 private:
     enum adcChannels {
         ISENSE = LibAdc::CHANNEL_1,
@@ -151,7 +167,11 @@ private:
     bool m_isSnapshotRunning;
     int m_snapshotNumSamples;
     int m_snapshotRes;
-    int m_snapShotSample;
+    int m_snapshotSample;
+    LibCircularBuffer m_traceCircularBuffer;
+    static SemaphoreHandle_t s_traceMutex;
+    bool m_isTraceRunning;
+    int m_traceRes;
 };
 
 #endif // _LIB_TEC_H_
