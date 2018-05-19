@@ -104,7 +104,7 @@ void setupPLL(void)
                         |  (uint32)((uint32)0x1FU << 24U)
                         |  (uint32)0x00000000U
                         |  (uint32)((uint32)(6U - 1U)<< 16U)
-                        |  (uint32)(0x7F00U);
+                        |  (uint32)(0xBF00U);
 
     /**   - Setup pll control register 2
     *     - Setup spreading rate
@@ -128,7 +128,7 @@ void setupPLL(void)
     systemREG2->PLLCTL3 = (uint32)((uint32)(4U - 1U) << 29U)
                         | (uint32)((uint32)0x1FU << 24U)
                         | (uint32)((uint32)(6U - 1U)<< 16U)
-                        | (uint32)(0x7F00U);
+                        | (uint32)(0xBF00U);
 
     /** - Enable PLL(s) to start up or Lock */
     systemREG1->CSDIS = 0x00000000U
