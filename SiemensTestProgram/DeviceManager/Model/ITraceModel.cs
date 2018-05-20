@@ -17,5 +17,25 @@ namespace DeviceManager.Model
 
         Task<CommunicationData> SetNumberOfSamples(int numberOfSamples);
 
+        Task<CommunicationData> SetReadSamples(int numberOfReadSamples);
+
+        Task<CommunicationData> GetNumberOfAvailableSamples();
+
+        Task<CommunicationData> GetFirstAvailableSampleIndex();
+
+        Task<CommunicationData> ReadVsenseSamples(int sampleNumber);
+
+        Task<CommunicationData> ReadIsenseSamples(int sampleNumber);
+
+        Task<CommunicationData> ReadIrefSamples(int sampleNumber);
+
+        Task<CommunicationData> ReadTempOneSamples(int sampleNumber);
+
+        Task<CommunicationData> ReadTempTwoSamples(int sampleNumber);
+
+        Task<CommunicationData> ReadTempThreeSamples(int sampleNumber);
+
+        Task<CommunicationData> ReadTempFourSamples(int sampleNumber);
+
     }
 }

@@ -132,6 +132,23 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] SetReadNumberOfSamples(int samplesRead)
+        {
+            var value = Helper.ConvertIntToByteArray(samplesRead);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0A,
+                0x0A,
+                value[0],
+                value[1],
+                value[2],
+                value[3]
+            };
+        }
+
         public static byte[] GetNumberOfAvailableSamples()
         {
             return new byte[]
