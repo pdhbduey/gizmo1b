@@ -9,9 +9,11 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
             <RowDefinition Height="2*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
@@ -41,13 +43,9 @@
             
         </StackPanel>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <chartingToolkit:Chart Grid.Column="0" Title="VSense">
+        <!--<Grid Grid.Row="1">-->
+
+        <chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="VSense">
                 <chartingToolkit:LineSeries Title="VSense"
                             ItemsSource="{Binding VSenseCollection}"
                             IndependentValueBinding="{Binding Sample}"
@@ -62,7 +60,7 @@
 
             </chartingToolkit:Chart>
 
-            <chartingToolkit:Chart Grid.Column="1" Title="ISense and IRef">
+        <chartingToolkit:Chart Grid.Row="2" Grid.ColumnSpan="3" Title="ISense and IRef">
                 <chartingToolkit:Chart.Series>
                     <chartingToolkit:LineSeries Title="ISense"
                             ItemsSource="{Binding ISenseCollection}"
@@ -88,7 +86,7 @@
 
             </chartingToolkit:Chart>
 
-            <chartingToolkit:Chart Grid.Column="2" Title="Temperatures">
+        <chartingToolkit:Chart Grid.Row="3" Grid.ColumnSpan="3" Title="Temperatures">
                 <chartingToolkit:Chart.Series>
 
                     <chartingToolkit:LineSeries Title="Temperature One"
@@ -122,9 +120,9 @@
                     <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="1"/>
                 </chartingToolkit:Chart.Axes>
             </chartingToolkit:Chart>
-        </Grid>        
+        <!--</Grid>-->        
         
-        <Grid Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+        <Grid Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>

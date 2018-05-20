@@ -75,6 +75,23 @@ namespace DeviceManager
         }
 
         /// <summary>
+        ///  Sets the data context for DAC view.
+        /// </summary>
+        /// <returns> DAC view </returns>
+        public TraceView GetTraceView()
+        {
+            return new TraceView()
+            {
+                DataContext = new TraceViewModel(GetTraceModel())
+            };
+        }
+
+        public ITraceModel GetTraceModel()
+        {
+            return new TraceModel(serialCommunication);
+        }
+
+        /// <summary>
         ///  Sets the data context for led view.
         /// </summary>
         /// <returns> LED view </returns>

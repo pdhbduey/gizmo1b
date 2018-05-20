@@ -8,16 +8,14 @@
         xmlns:local="clr-namespace:SiemensTestProgram"
         mc:Ignorable="d"
         Title="Gizmo1B"
-        MinHeight="700"
+        MinHeight="800"
         MinWidth="1200"
-        MaxHeight="700"
-        MaxWidth="1200"
 
         Background="GhostWhite">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1*"/>
             <RowDefinition Height="8*"/>
         </Grid.RowDefinitions>
 

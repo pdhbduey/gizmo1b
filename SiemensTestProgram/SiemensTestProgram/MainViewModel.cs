@@ -25,7 +25,7 @@
                 "Motor",
                 "Thermistor",
                 "Snapshot",
-                "Capture",
+                "Trace",
                 "TEC"
             };
 
@@ -106,9 +106,8 @@
                 case "Snapshot":
                     Content = DeviceManager.Factory.Instance.GetSnapshotView();
                     break;
-                case "Capture":
-                    //Content = DeviceManager.Factory.Instance.GetCaptureView();
-                    Content = DeviceManager.Factory.Instance.GetSnapshotView();
+                case "Trace":
+                    Content = DeviceManager.Factory.Instance.GetTraceView();
                     break;
                 case "Thermistor":
                     Content = DeviceManager.Factory.Instance.GetThermistorView();
