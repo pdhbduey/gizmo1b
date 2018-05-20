@@ -15,5 +15,33 @@ namespace DeviceManager.Model
         {
             this.communication = communication;
         }
+
+        public Task<CommunicationData> StartTrace()
+        {
+            var requestArray = TraceDefaults.SetStartCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> StopTrace()
+        {
+            var requestArray = TraceDefaults.SetStopCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> SetResolution(int resolution)
+        {
+            var requestArray = TraceDefaults.SetResolution(resolution);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> SetNumberOfSamples(int sampleNumber)
+        {
+            var requestArray = TraceDefaults.SetNumberOfSamples(sampleNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
     }
 }

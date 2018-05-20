@@ -55,7 +55,7 @@
                 </chartingToolkit:LineSeries>
                 <chartingToolkit:Chart.Axes>
                     <chartingToolkit:LinearAxis Orientation="Y" Title="Voltage" Minimum="0" Maximum="30" Interval="5"/>
-                    <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="1"/>
+                    <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="0.1"/>
                 </chartingToolkit:Chart.Axes>
 
             </chartingToolkit:Chart>
@@ -80,7 +80,7 @@
                 
                 <chartingToolkit:Chart.Axes>
                     <chartingToolkit:LinearAxis Orientation="Y" Minimum="-15" Maximum="15" Interval="5"/>
-                    <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="1"/>
+                    <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="0.1"/>
                 </chartingToolkit:Chart.Axes>
                 
 
@@ -117,7 +117,7 @@
                 </chartingToolkit:Chart.Series>
                 <chartingToolkit:Chart.Axes>
                     <chartingToolkit:LinearAxis Title="Temperature [°C]" Orientation="Y" Minimum="0" Maximum="40" Interval="5"/>
-                    <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="1"/>
+                    <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="0.1"/>
                 </chartingToolkit:Chart.Axes>
             </chartingToolkit:Chart>
         <!--</Grid>-->        
