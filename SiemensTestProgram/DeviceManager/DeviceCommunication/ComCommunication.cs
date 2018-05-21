@@ -53,8 +53,6 @@ namespace DeviceManager.DeviceCommunication
 
         public bool IsConfigured => isConfigured;
 
-        private int testCounter = 0;
-
         public Task<CommunicationData> ProcessCommunicationRequest(byte[] request)
         {
             return Task.Factory.StartNew(() =>
