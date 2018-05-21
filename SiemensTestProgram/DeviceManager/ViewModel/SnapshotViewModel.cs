@@ -327,7 +327,7 @@ namespace DeviceManager.ViewModel
 
                         errorCounter = 0;
                         var iSenseDataValue = Helper.GetFloatFromBigEndian(iSense.response);
-                        iSenseData.Add(Helper.GetFloatFromBigEndian(iSense.response).ToString("0.##"));
+                        iSenseData.Add(iSenseDataValue.ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
                             ISenseCollection.SurpressedAdd(new DataPoint(sampledTime, iSenseDataValue), numberOfSamples);
@@ -352,7 +352,7 @@ namespace DeviceManager.ViewModel
                         } while (!temperatureOne.succesfulResponse);
 
                         var temperatureOneDataValue = Helper.GetFloatFromBigEndian(temperatureOne.response);
-                        temperatureOneData.Add(Helper.GetFloatFromBigEndian(temperatureOne.response).ToString("0.##"));
+                        temperatureOneData.Add(temperatureOneDataValue.ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
                             TemperatureOneCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureOneDataValue), numberOfSamples);
@@ -379,7 +379,7 @@ namespace DeviceManager.ViewModel
                         } while (!temperatureTwo.succesfulResponse);
 
                         var temperatureTwoDataValue = Helper.GetFloatFromBigEndian(temperatureTwo.response);
-                        temperatureTwoData.Add(Helper.GetFloatFromBigEndian(temperatureTwo.response).ToString("0.##"));
+                        temperatureTwoData.Add(temperatureTwoDataValue.ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
                             TemperatureTwoCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureTwoDataValue), numberOfSamples);
@@ -405,7 +405,7 @@ namespace DeviceManager.ViewModel
                         } while (!temperatureThree.succesfulResponse);
 
                         var temperatureThreeDataValue = Helper.GetFloatFromBigEndian(temperatureThree.response);
-                        temperatureThreeData.Add(Helper.GetFloatFromBigEndian(temperatureThree.response).ToString("0.##"));
+                        temperatureThreeData.Add(temperatureThreeDataValue.ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
                             TemperatureThreeCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureThreeDataValue), numberOfSamples);
@@ -432,7 +432,7 @@ namespace DeviceManager.ViewModel
                         } while (!temperatureFour.succesfulResponse);
 
                         var temperatureFourDataDataValue = Helper.GetFloatFromBigEndian(temperatureFour.response);
-                        temperatureFourData.Add(Helper.GetFloatFromBigEndian(temperatureFour.response).ToString("0.##"));
+                        temperatureFourData.Add(temperatureFourDataDataValue.ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
                             TemperatureFourCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureFourDataDataValue), numberOfSamples);
