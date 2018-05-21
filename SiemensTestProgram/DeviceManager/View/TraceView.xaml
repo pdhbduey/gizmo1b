@@ -16,19 +16,15 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <StackPanel Orientation="Horizontal">
-                <Label VerticalAlignment="Center" Width="105" Content="Resolution [s/sec]: "></Label>
-                <ComboBox Height="25" Width="70" HorizontalAlignment="Left" Margin="1" ItemsSource="{Binding Resolutions}" SelectedItem="{Binding SelectedResolution}"></ComboBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Start" Command="{Binding StartTraceCommand}"></Button>
-                <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopTraceCommand}"></Button>
-            </StackPanel>
+            <Label VerticalAlignment="Center" Width="105" Content="Resolution [s/sec]: "></Label>
+            <ComboBox Height="25" Width="70" HorizontalAlignment="Left" Margin="1" ItemsSource="{Binding Resolutions}" SelectedItem="{Binding SelectedResolution}"></ComboBox>
+            <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopTraceCommand}"></Button>
+            <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Start" Command="{Binding StartTraceCommand}"></Button>
         </StackPanel>
 
         <!--<Grid Grid.Row="1">-->
 
-        <chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="VSense">
+        <!--<chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="VSense">
             <chartingToolkit:LineSeries Title="VSense"
                             ItemsSource="{Binding VSenseCollection}"
                             IndependentValueBinding="{Binding Sample}"
@@ -36,8 +32,8 @@
 
             </chartingToolkit:LineSeries>
             <chartingToolkit:Chart.Axes>
-                <chartingToolkit:LinearAxis Orientation="Y" Title="Voltage" Minimum="0" Maximum="30" Interval="5"/>
-                <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="1"/>
+                <chartingToolkit:LinearAxis Orientation="Y" Title="Voltage" Interval="5"/>
+                <chartingToolkit:LinearAxis Orientation="X" Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Title="Time [s]" Interval="1"/>
             </chartingToolkit:Chart.Axes>
 
         </chartingToolkit:Chart>
@@ -61,18 +57,20 @@
             </chartingToolkit:Chart.Series>
 
             <chartingToolkit:Chart.Axes>
-                <chartingToolkit:LinearAxis Orientation="Y" Minimum="-15" Maximum="15" Interval="5"/>
-                <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="1"/>
+                <chartingToolkit:LinearAxis Orientation="Y" Interval="5"/>
+                <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="1"/>
             </chartingToolkit:Chart.Axes>
 
 
-        </chartingToolkit:Chart>
+        </chartingToolkit:Chart>-->
 
-        <chartingToolkit:Chart Grid.Row="3" Grid.ColumnSpan="3" Title="Temperatures">
+        <chartingToolkit:Chart  Grid.Row="3" Grid.ColumnSpan="3" Title="Temperatures">
             <chartingToolkit:Chart.Series>
 
-                <chartingToolkit:LineSeries Title="Temperature One"
-                            ItemsSource="{Binding TemperatureOnerCollection}"
+                <chartingToolkit:LineSeries 
+                            Name="TemperatureOneLine"
+                            Title="Temperature One"
+                            ItemsSource="{Binding TemperatureOneCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
@@ -98,8 +96,8 @@
 
             </chartingToolkit:Chart.Series>
             <chartingToolkit:Chart.Axes>
-                <chartingToolkit:LinearAxis Title="Temperature [°C]" Orientation="Y" Minimum="0" Maximum="40" Interval="5"/>
-                <chartingToolkit:LinearAxis Orientation="X" Title="Sample" Interval="1"/>
+                <chartingToolkit:LinearAxis Title="Temperature [°C]" Orientation="Y" Interval="5"/>
+                <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="0.1"/>
             </chartingToolkit:Chart.Axes>
         </chartingToolkit:Chart>
     </Grid>

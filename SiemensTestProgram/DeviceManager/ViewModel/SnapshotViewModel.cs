@@ -40,8 +40,9 @@ namespace DeviceManager.ViewModel
 
             Resolutions = SnapshotDefaults.Resolutions;
             SelectedResolution = Resolutions[0];
-
             NumberOfSamples = SnapshotDefaults.SampleNumberMinimum;
+            SampleMinimumX = 0;
+            SampleMaximumX = (double)numberOfSamples / (double)selectedResolution;
 
             StartCommand = new RelayCommand(param => Start());
             StopCommand = new RelayCommand(param => Stop());
@@ -69,6 +70,37 @@ namespace DeviceManager.ViewModel
 
             public double Value { get; set; }
             public double Sample { get; set; }
+        }
+
+        private double sampleMinimumX;
+        private double sampleMaximumX;
+
+        public double SampleMinimumX
+        {
+            get
+            {
+                return sampleMinimumX;
+            }
+
+            set
+            {
+                sampleMinimumX = value;
+                OnPropertyChanged(nameof(SampleMinimumX));
+            }
+        }
+
+        public double SampleMaximumX
+        {
+            get
+            {
+                return sampleMaximumX;
+            }
+
+            set
+            {
+                sampleMaximumX = value;
+                OnPropertyChanged(nameof(SampleMaximumX));
+            }
         }
 
         public ObservableCollection<DataPoint> VSenseCollection { get; set; }
@@ -198,7 +230,12 @@ namespace DeviceManager.ViewModel
                         }
 
                         var sampledTime = (double)sampleNumber / (double)SelectedResolution;
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            SampleMaximumX = (double)numberOfSamples / (double)selectedResolution;
+                        }));
 
+                        
                         var errorCounter = 0;
 
                         CommunicationData vSense;

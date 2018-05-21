@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls.DataVisualization.Charting;
 
 namespace DeviceManager.ViewModel
 {
@@ -18,7 +19,11 @@ namespace DeviceManager.ViewModel
         private ITraceModel traceModel;
         private int selectedResolution;
         private int numberOfSamples;
+        private const int resolutionRangeMultiplier = 3;
 
+        private double sampleMinimumX;
+        private double sampleMaximumX;
+        
         private CancellationTokenSource cts;
         private CancellationToken token;
         private Task saveTask;
@@ -26,23 +31,53 @@ namespace DeviceManager.ViewModel
         public TraceViewModel(ITraceModel traceModel)
         {
             this.traceModel = traceModel;
-
-            VSenseCollection = new ObservableCollection<DataPoint>();
-            IRefCollection = new ObservableCollection<DataPoint>();
-            ISenseCollection = new ObservableCollection<DataPoint>();
-            TemperatureOneCollection = new ObservableCollection<DataPoint>();
-            TemperatureTwoCollection = new ObservableCollection<DataPoint>();
-            TemperatureThreeCollection = new ObservableCollection<DataPoint>();
-            TemperatureFourCollection = new ObservableCollection<DataPoint>();
-
             Resolutions = TraceDefaults.Resolutions;
             SelectedResolution = Resolutions[0];
+            var updateThreshold = 10;
+
+            VSenseCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
+            IRefCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
+            ISenseCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
+            TemperatureOneCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
+            TemperatureTwoCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
+            TemperatureThreeCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
+            TemperatureFourCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
 
             NumberOfSamples = TraceDefaults.SampleNumberMinimum;
+            SampleMaximumX = 3;
+            SampleMinimumX = 0;
 
             StartTraceCommand = new RelayCommand(param => StartTrace());
             StopTraceCommand = new RelayCommand(param => StopTrace());
             SetNumberOfSamplesCommand = new RelayCommand(param => SetNumberOfSamples());
+        }
+
+        public double SampleMinimumX
+        {
+            get
+            {
+                return sampleMinimumX;
+            }
+
+            set
+            {
+                sampleMinimumX = value;
+                OnPropertyChanged(nameof(SampleMinimumX));
+            }
+        }
+
+        public double SampleMaximumX
+        {
+            get
+            {
+                return sampleMaximumX;
+            }
+
+            set
+            {
+                sampleMaximumX = value;
+                OnPropertyChanged(nameof(SampleMaximumX));
+            }
         }
 
         public List<int> Resolutions { get; set; }
@@ -80,10 +115,18 @@ namespace DeviceManager.ViewModel
         private async void SetResolution()
         {
             await traceModel.SetResolution(selectedResolution);
+            VSenseCollection.UpdateThreshold = selectedResolution / 2;
+            IRefCollection.UpdateThreshold = selectedResolution / 2;
+            ISenseCollection.UpdateThreshold = selectedResolution / 2;
+            TemperatureOneCollection.UpdateThreshold = selectedResolution / 2;
+            TemperatureTwoCollection.UpdateThreshold = selectedResolution / 2;
+            TemperatureThreeCollection.UpdateThreshold = selectedResolution / 2;
+            TemperatureFourCollection.UpdateThreshold = selectedResolution / 2;
         }
 
         private async void StartTrace()
         {
+            traceModel.StopTrace().Wait();
             traceModel.StartTrace().Wait();
             VSenseCollection.Clear();
             ISenseCollection.Clear();
@@ -104,7 +147,7 @@ namespace DeviceManager.ViewModel
 
         private async void StopTrace()
         {
-            cts.Cancel();
+            cts?.Cancel();
             traceModel.StopTrace().Wait();
         }
 
@@ -113,55 +156,65 @@ namespace DeviceManager.ViewModel
             var modValue = 1000;
             var samplesToClear = 0;
             double sampledTime = 0;
+            double sampleNumber = 0;
+            var updateRanges = 0;
+            var m = 10;
 
-            while(token.IsCancellationRequested == false)
+            while (token.IsCancellationRequested == false)
             {
                 var numberOfAvailableSamples = traceModel.GetNumberOfAvailableSamples().Result;
                 if (numberOfAvailableSamples.succesfulResponse)
                 {
-                    var availableSamples = Helper.GetIntFromLittleEndian(numberOfAvailableSamples.response);
+                    var availableSamples = Helper.GetIntFromBigEndian(numberOfAvailableSamples.response);
                     var firstAvailableSample = traceModel.GetFirstAvailableSampleIndex().Result;
                     if (firstAvailableSample.succesfulResponse)
                     {
-                        var i = Helper.GetIntFromLittleEndian(firstAvailableSample.response) % modValue;
+                        var i = Helper.GetIntFromBigEndian(firstAvailableSample.response) % modValue;
+
+                        //for (var t = 0; t < availableSamples; t+=m)
+                        //{
+                        //    if (token.IsCancellationRequested == true)
+                        //    {
+                        //        break;
+                        //    }
                         
-                        for (var j = 0; j < availableSamples; j++)
-                        {
-                            sampledTime += 0.1;
+                            for (var j = 0; j < Math.Min(m, availableSamples); j++)
+                            {
+                                sampledTime = sampleNumber / (double)selectedResolution;
 
                             // Update chart
-                            var vSense = traceModel.ReadVsenseSamples(i).Result;
-                            if (vSense.succesfulResponse)
-                            {
-                                var vSenseDataValue = Helper.GetFloatFromBigEndian(vSense.response);
+                            //var vSense = traceModel.ReadVsenseSamples(i).Result;
+                            //if (vSense.succesfulResponse)
+                            //{
+                            //    var vSenseDataValue = Helper.GetFloatFromBigEndian(vSense.response);
 
-                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    VSenseCollection.Add(new DataPoint(sampledTime, vSenseDataValue));
-                                }));
-                            }
+                            //    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            //    {
+                            //        VSenseCollection.Add(new DataPoint(sampledTime, vSenseDataValue));
+                            //    }));
+                            //}
 
-                            var iSense = traceModel.ReadIsenseSamples(i).Result;
-                            if (iSense.succesfulResponse)
-                            {
-                                var iSenseDataValue = Helper.GetFloatFromBigEndian(iSense.response);
+                            //var iSense = traceModel.ReadIsenseSamples(i).Result;
+                            //if (iSense.succesfulResponse)
+                            //{
+                            //    var iSenseDataValue = Helper.GetFloatFromBigEndian(iSense.response);
 
-                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    ISenseCollection.Add(new DataPoint(sampledTime, iSenseDataValue));
-                                }));
-                            }
+                            //    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            //    {
+                            //        ISenseCollection.Add(new DataPoint(sampledTime, iSenseDataValue));
+                            //    }));
+                            //}
 
-                            var iRef = traceModel.ReadIrefSamples(i).Result;
-                            if (iRef.succesfulResponse)
-                            {
-                                var iRefDataValue = Helper.GetFloatFromBigEndian(iRef.response);
+                            //var iRef = traceModel.ReadIrefSamples(i).Result;
+                            //if (iRef.succesfulResponse)
+                            //{
+                            //    var iRefDataValue = Helper.GetFloatFromBigEndian(iRef.response);
 
-                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    IRefCollection.Add(new DataPoint(sampledTime, iRefDataValue));
-                                }));
-                            }
+                            //    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            //    {
+                            //        IRefCollection.Add(new DataPoint(sampledTime, iRefDataValue));
+                            //    }));
+                            //}
 
                             var temperatureOne = traceModel.ReadTempOneSamples(i).Result;
                             if (temperatureOne.succesfulResponse)
@@ -170,7 +223,12 @@ namespace DeviceManager.ViewModel
 
                                 await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    TemperatureOneCollection.Add(new DataPoint(sampledTime, temperatureOneDataValue));
+                                    TemperatureOneCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureOneDataValue));
+
+                                    if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                                    {
+                                        TemperatureOneCollection.SurpressedRemoveAt(0);
+                                    }
                                 }));
                             }
 
@@ -181,7 +239,12 @@ namespace DeviceManager.ViewModel
 
                                 await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    TemperatureTwoCollection.Add(new DataPoint(sampledTime, temperatureTwoDataValue));
+                                    TemperatureTwoCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureTwoDataValue));
+
+                                    if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                                    {
+                                        TemperatureTwoCollection.SurpressedRemoveAt(0);
+                                    }
                                 }));
                             }
 
@@ -192,30 +255,53 @@ namespace DeviceManager.ViewModel
 
                                 await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    TemperatureThreeCollection.Add(new DataPoint(sampledTime, temperatureThreeDataValue));
+                                    TemperatureThreeCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureThreeDataValue));
+
+                                    if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                                    {
+                                        TemperatureThreeCollection.SurpressedRemoveAt(0);
+                                    }
                                 }));
                             }
 
                             var temperatureFour = traceModel.ReadTempFourSamples(i).Result;
-                            if (temperatureFour.succesfulResponse)
-                            {
-                                var temperatureFourDataValue = Helper.GetFloatFromBigEndian(temperatureFour.response);
+                                    if (temperatureFour.succesfulResponse)
+                                    {
+                                        var temperatureFourDataValue = Helper.GetFloatFromBigEndian(temperatureFour.response);
+                                
+                                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                        {
+                                            TemperatureFourCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureFourDataValue));
+                                            if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                                            {
+                                                TemperatureFourCollection.SurpressedRemoveAt(0);
+                                            }
+                                            
+                                        }));
+                                }
+                                // update what to read next
+                                i = (i + 1) % modValue;
+                                samplesToClear++;
+                                sampleNumber++;
+                                updateRanges++;
 
+
+                            if (updateRanges >= resolutionRangeMultiplier * selectedResolution)
+                            {
                                 await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    TemperatureFourCollection.Add(new DataPoint(sampledTime, temperatureFourDataValue));
+                                    SampleMinimumX = sampledTime - resolutionRangeMultiplier;
+                                    SampleMaximumX = sampledTime;
                                 }));
                             }
-
-                            // update what to read next
-                            i = (i + 1) % modValue;
-                            samplesToClear++;
-
-                            var removeSamples = traceModel.SetReadSamples(samplesToClear).Result;
-                            if (removeSamples.succesfulResponse)
-                            {
-                                samplesToClear = 0;
-                            }
+                            
+                            //}
+                        }
+                        
+                        var removeSamples = traceModel.SetReadSamples(samplesToClear).Result;
+                        if (removeSamples.succesfulResponse)
+                        {
+                            samplesToClear = 0;
                         }
                     }
                 }
@@ -255,19 +341,19 @@ namespace DeviceManager.ViewModel
             public double Sample { get; set; }
         }
 
-        public ObservableCollection<DataPoint> VSenseCollection { get; set; }
+        public BulkObservableCollection<DataPoint> VSenseCollection { get; set; }
 
-        public ObservableCollection<DataPoint> ISenseCollection { get; set; }
+        public BulkObservableCollection<DataPoint> ISenseCollection { get; set; }
 
-        public ObservableCollection<DataPoint> IRefCollection { get; set; }
+        public BulkObservableCollection<DataPoint> IRefCollection { get; set; }
 
-        public ObservableCollection<DataPoint> TemperatureOneCollection { get; set; }
+        public BulkObservableCollection<DataPoint> TemperatureOneCollection { get; set; }
 
-        public ObservableCollection<DataPoint> TemperatureTwoCollection { get; set; }
+        public BulkObservableCollection<DataPoint> TemperatureTwoCollection { get; set; }
 
-        public ObservableCollection<DataPoint> TemperatureThreeCollection { get; set; }
+        public BulkObservableCollection<DataPoint> TemperatureThreeCollection { get; set; }
 
-        public ObservableCollection<DataPoint> TemperatureFourCollection { get; set; }
+        public BulkObservableCollection<DataPoint> TemperatureFourCollection { get; set; }
 
     }
 }
