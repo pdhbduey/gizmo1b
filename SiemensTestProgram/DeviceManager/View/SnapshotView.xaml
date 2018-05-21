@@ -46,35 +46,56 @@
         <!--<Grid Grid.Row="1">-->
 
         <chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="VSense">
-                <chartingToolkit:LineSeries Title="VSense"
+                <chartingToolkit:LineSeries 
+                            Name="SeriesVSense"
+                    Title="VSense"
                             ItemsSource="{Binding VSenseCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
-
-                </chartingToolkit:LineSeries>
+                <chartingToolkit:LineSeries.DataPointStyle>
+                    <Style TargetType="{x:Type chartingToolkit:LineDataPoint}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Setter Property="Opacity" Value="0" />
+                        <Setter Property="Background" Value="Yellow" />
+                    </Style>
+                </chartingToolkit:LineSeries.DataPointStyle>
+            </chartingToolkit:LineSeries>
                 <chartingToolkit:Chart.Axes>
                     <chartingToolkit:LinearAxis Orientation="Y" Title="Volts" Interval="5"/>
                 <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="{Binding SampleInterval}"/>
                 </chartingToolkit:Chart.Axes>
-
+            
             </chartingToolkit:Chart>
 
         <chartingToolkit:Chart Grid.Row="2" Grid.ColumnSpan="3" Title="ISense and IRef">
-                <chartingToolkit:Chart.Series>
+            <chartingToolkit:Chart.Series> 
                     <chartingToolkit:LineSeries Title="ISense"
                             ItemsSource="{Binding ISenseCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
-
-                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries.DataPointStyle>
+                        <Style TargetType="{x:Type chartingToolkit:LineDataPoint}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Opacity" Value="0" />
+                            <Setter Property="Background" Value="Gray" />
+                        </Style>
+                    </chartingToolkit:LineSeries.DataPointStyle>
+                </chartingToolkit:LineSeries>
                     <chartingToolkit:LineSeries Title="IRef"
                             ItemsSource="{Binding IRefCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
-                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries.DataPointStyle>
+                        <Style TargetType="{x:Type chartingToolkit:LineDataPoint}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Opacity" Value="0" />
+                            <Setter Property="Background" Value="Pink" />
+                        </Style>
+                    </chartingToolkit:LineSeries.DataPointStyle>
+                </chartingToolkit:LineSeries>
 
                 </chartingToolkit:Chart.Series>
                 
@@ -94,25 +115,53 @@
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
-                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries.DataPointStyle>
+                        <Style TargetType="{x:Type chartingToolkit:LineDataPoint}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Opacity" Value="0" />
+                            <Setter Property="Background" Value="Orange" />
+                        </Style>
+                    </chartingToolkit:LineSeries.DataPointStyle>
+                </chartingToolkit:LineSeries>
                     <chartingToolkit:LineSeries Title="Temperature Two"
                             ItemsSource="{Binding TemperatureTwoCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
-                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries.DataPointStyle>
+                        <Style TargetType="{x:Type chartingToolkit:LineDataPoint}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Opacity" Value="0" />
+                            <Setter Property="Background" Value="Purple" />
+                        </Style>
+                    </chartingToolkit:LineSeries.DataPointStyle>
+                </chartingToolkit:LineSeries>
                     <chartingToolkit:LineSeries Title="Temperature Three"
                             ItemsSource="{Binding TemperatureThreeCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
-                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries.DataPointStyle>
+                        <Style TargetType="{x:Type chartingToolkit:LineDataPoint}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Opacity" Value="0" />
+                            <Setter Property="Background" Value="Blue" />
+                        </Style>
+                    </chartingToolkit:LineSeries.DataPointStyle>
+                </chartingToolkit:LineSeries>
                     <chartingToolkit:LineSeries Title="Temperature Four"
                             ItemsSource="{Binding TemperatureFourCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
-                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries.DataPointStyle>
+                        <Style TargetType="{x:Type chartingToolkit:LineDataPoint}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Opacity" Value="0" />
+                            <Setter Property="Background" Value="Red" />
+                        </Style>
+                    </chartingToolkit:LineSeries.DataPointStyle>
+                </chartingToolkit:LineSeries>
 
                 </chartingToolkit:Chart.Series>
                 <chartingToolkit:Chart.Axes>
