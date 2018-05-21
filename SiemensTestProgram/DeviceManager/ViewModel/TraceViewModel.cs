@@ -19,7 +19,7 @@ namespace DeviceManager.ViewModel
         private ITraceModel traceModel;
         private int selectedResolution;
         private int numberOfSamples;
-        private const int resolutionRangeMultiplier = 3;
+        private const int resolutionRangeMultiplier = 2;
 
         private double sampleMinimumX;
         private double sampleMaximumX;
@@ -115,13 +115,13 @@ namespace DeviceManager.ViewModel
         private async void SetResolution()
         {
             await traceModel.SetResolution(selectedResolution);
-            VSenseCollection.UpdateThreshold = selectedResolution / 2;
-            IRefCollection.UpdateThreshold = selectedResolution / 2;
-            ISenseCollection.UpdateThreshold = selectedResolution / 2;
-            TemperatureOneCollection.UpdateThreshold = selectedResolution / 2;
-            TemperatureTwoCollection.UpdateThreshold = selectedResolution / 2;
-            TemperatureThreeCollection.UpdateThreshold = selectedResolution / 2;
-            TemperatureFourCollection.UpdateThreshold = selectedResolution / 2;
+            //VSenseCollection.UpdateThreshold = selectedResolution;
+            //IRefCollection.UpdateThreshold = selectedResolution;
+            //ISenseCollection.UpdateThreshold = selectedResolution;
+            //TemperatureOneCollection.UpdateThreshold = selectedResolution;
+            //TemperatureTwoCollection.UpdateThreshold = selectedResolution;
+            //TemperatureThreeCollection.UpdateThreshold = selectedResolution;
+            //TemperatureFourCollection.UpdateThreshold = selectedResolution;
         }
 
         private async void StartTrace()
@@ -190,7 +190,12 @@ namespace DeviceManager.ViewModel
 
                             //    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                             //    {
-                            //        VSenseCollection.Add(new DataPoint(sampledTime, vSenseDataValue));
+                            //        VSenseCollection.SurpressedAdd(new DataPoint(sampledTime, vSenseDataValue));
+
+                            //        if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                            //        {
+                            //            VSenseCollection.SurpressedRemoveAt(0);
+                            //        }
                             //    }));
                             //}
 
@@ -201,7 +206,12 @@ namespace DeviceManager.ViewModel
 
                             //    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                             //    {
-                            //        ISenseCollection.Add(new DataPoint(sampledTime, iSenseDataValue));
+                            //        ISenseCollection.SurpressedAdd(new DataPoint(sampledTime, iSenseDataValue));
+
+                            //        if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                            //        {
+                            //            ISenseCollection.SurpressedRemoveAt(0);
+                            //        }
                             //    }));
                             //}
 
@@ -212,41 +222,46 @@ namespace DeviceManager.ViewModel
 
                             //    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                             //    {
-                            //        IRefCollection.Add(new DataPoint(sampledTime, iRefDataValue));
+                            //        IRefCollection.SurpressedAdd(new DataPoint(sampledTime, iRefDataValue));
+
+                            //        if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                            //        {
+                            //            IRefCollection.SurpressedRemoveAt(0);
+                            //        }
                             //    }));
                             //}
 
-                            var temperatureOne = traceModel.ReadTempOneSamples(i).Result;
-                            if (temperatureOne.succesfulResponse)
-                            {
-                                var temperatureOneDataValue = Helper.GetFloatFromBigEndian(temperatureOne.response);
+                            //var temperatureOne = traceModel.ReadTempOneSamples(i).Result;
+                            //if (temperatureOne.succesfulResponse)
+                            //{
+                            //    var temperatureOneDataValue = Helper.GetFloatFromBigEndian(temperatureOne.response);
 
-                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    TemperatureOneCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureOneDataValue));
+                            //    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            //    {
+                            //        TemperatureOneCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureOneDataValue));
 
-                                    if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
-                                    {
-                                        TemperatureOneCollection.SurpressedRemoveAt(0);
-                                    }
-                                }));
-                            }
+                            //        if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                            //        {
+                            //            TemperatureOneCollection.SurpressedRemoveAt(0);
+                            //        }
+                            //    }));
+                            //}
 
-                            var temperatureTwo = traceModel.ReadTempTwoSamples(i).Result;
-                            if (temperatureTwo.succesfulResponse)
-                            {
-                                var temperatureTwoDataValue = Helper.GetFloatFromBigEndian(temperatureTwo.response);
+                            //var temperatureTwo = traceModel.ReadTempTwoSamples(i).Result;
+                            //if (temperatureTwo.succesfulResponse)
+                            //{
+                            //    var temperatureTwoDataValue = Helper.GetFloatFromBigEndian(temperatureTwo.response);
 
-                                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    TemperatureTwoCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureTwoDataValue));
+                            //    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            //    {
+                            //        TemperatureTwoCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureTwoDataValue));
 
-                                    if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
-                                    {
-                                        TemperatureTwoCollection.SurpressedRemoveAt(0);
-                                    }
-                                }));
-                            }
+                            //        if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                            //        {
+                            //            TemperatureTwoCollection.SurpressedRemoveAt(0);
+                            //        }
+                            //    }));
+                            //}
 
                             var temperatureThree = traceModel.ReadTempThreeSamples(i).Result;
                             if (temperatureThree.succesfulResponse)
@@ -290,9 +305,11 @@ namespace DeviceManager.ViewModel
                             {
                                 await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    SampleMinimumX = sampledTime - resolutionRangeMultiplier;
                                     SampleMaximumX = sampledTime;
+                                    SampleMinimumX = sampledTime - resolutionRangeMultiplier;
                                 }));
+
+                                updateRanges = 0;
                             }
                             
                             //}
