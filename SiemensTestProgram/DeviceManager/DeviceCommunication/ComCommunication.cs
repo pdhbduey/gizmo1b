@@ -62,7 +62,6 @@ namespace DeviceManager.DeviceCommunication
                 try
                 {
                     requestSemaphore.Wait();
-                    Console.WriteLine($"{testCounter}");
                     if (!serialPort.IsOpen)
                     {
                         CreateSerialPort();

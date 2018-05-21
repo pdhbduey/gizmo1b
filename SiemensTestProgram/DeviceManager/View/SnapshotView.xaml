@@ -4,33 +4,125 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DeviceManager.View"
+             xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Start" Command="{Binding StartCommand}"></Button>
-            <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopCommand}"></Button>
 
-            <StackPanel Margin="1,30,1,1"  Orientation="Horizontal">
-                <Label IsEnabled="{Binding IsNotSaving}" Width="105" Content="Resolution [s/sec]: "></Label>
-                <ComboBox IsEnabled="{Binding IsNotSaving}" Height="25" Width="70" HorizontalAlignment="Left" Margin="1" ItemsSource="{Binding Resolutions}" SelectedItem="{Binding SelectedResolution}"></ComboBox>
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label IsEnabled="{Binding IsNotSaving}" Width="105" Content="Resolution [s/sec]: "></Label>
+                        <ComboBox IsEnabled="{Binding IsNotSaving}" Height="25" Width="70" HorizontalAlignment="Left" Margin="1" ItemsSource="{Binding Resolutions}" SelectedItem="{Binding SelectedResolution}"></ComboBox>
+                    </StackPanel>
+                    <StackPanel Margin="1" Orientation="Horizontal">
+                        <Label IsEnabled="{Binding IsNotSaving}" Width="105" Content="Samples: "></Label>
+                        <TextBox IsEnabled="{Binding IsNotSaving}" Margin="1" Height="25" Width="70" Text="{Binding Path=NumberOfSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" MaxLength="4">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{Binding SetNumberOfSamplesCommand}" Key="Enter"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel>
+                    <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Start" Command="{Binding StartCommand}"></Button>
+                    <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopCommand}"></Button>
+                </StackPanel>
             </StackPanel>
-            <StackPanel Margin="1" Orientation="Horizontal">
-                <Label IsEnabled="{Binding IsNotSaving}" Width="105" Content="Samples: "></Label>
-                <TextBox IsEnabled="{Binding IsNotSaving}" Margin="1" Height="25" Width="70" Text="{Binding Path=NumberOfSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" MaxLength="4">
-                    <TextBox.InputBindings>
-                        <KeyBinding Command="{Binding SetNumberOfSamplesCommand}" Key="Enter"/>
-                    </TextBox.InputBindings>
-                </TextBox>
-            </StackPanel>
+            
+            
+            
         </StackPanel>
 
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+        <!--<Grid Grid.Row="1">-->
+
+        <chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="VSense">
+                <chartingToolkit:LineSeries Title="VSense"
+                            ItemsSource="{Binding VSenseCollection}"
+                            IndependentValueBinding="{Binding Sample}"
+                            DependentValueBinding="{Binding Value}"
+                            >
+
+                </chartingToolkit:LineSeries>
+                <chartingToolkit:Chart.Axes>
+                    <chartingToolkit:LinearAxis Orientation="Y" Title="Voltage" Minimum="0" Maximum="30" Interval="5"/>
+                <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="0.1"/>
+                </chartingToolkit:Chart.Axes>
+
+            </chartingToolkit:Chart>
+
+        <chartingToolkit:Chart Grid.Row="2" Grid.ColumnSpan="3" Title="ISense and IRef">
+                <chartingToolkit:Chart.Series>
+                    <chartingToolkit:LineSeries Title="ISense"
+                            ItemsSource="{Binding ISenseCollection}"
+                            IndependentValueBinding="{Binding Sample}"
+                            DependentValueBinding="{Binding Value}"
+                            >
+
+                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries Title="IRef"
+                            ItemsSource="{Binding IRefCollection}"
+                            IndependentValueBinding="{Binding Sample}"
+                            DependentValueBinding="{Binding Value}"
+                            >
+                    </chartingToolkit:LineSeries>
+
+                </chartingToolkit:Chart.Series>
+                
+                <chartingToolkit:Chart.Axes>
+                    <chartingToolkit:LinearAxis Orientation="Y" Minimum="-15" Maximum="15" Interval="5"/>
+                <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="0.1"/>
+                </chartingToolkit:Chart.Axes>
+                
+
+            </chartingToolkit:Chart>
+
+        <chartingToolkit:Chart Grid.Row="3" Grid.ColumnSpan="3" Title="Temperatures">
+                <chartingToolkit:Chart.Series>
+
+                    <chartingToolkit:LineSeries Title="Temperature One"
+                            ItemsSource="{Binding TemperatureOneCollection}"
+                            IndependentValueBinding="{Binding Sample}"
+                            DependentValueBinding="{Binding Value}"
+                            >
+                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries Title="Temperature Two"
+                            ItemsSource="{Binding TemperatureTwoCollection}"
+                            IndependentValueBinding="{Binding Sample}"
+                            DependentValueBinding="{Binding Value}"
+                            >
+                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries Title="Temperature Three"
+                            ItemsSource="{Binding TemperatureThreeCollection}"
+                            IndependentValueBinding="{Binding Sample}"
+                            DependentValueBinding="{Binding Value}"
+                            >
+                    </chartingToolkit:LineSeries>
+                    <chartingToolkit:LineSeries Title="Temperature Four"
+                            ItemsSource="{Binding TemperatureFourCollection}"
+                            IndependentValueBinding="{Binding Sample}"
+                            DependentValueBinding="{Binding Value}"
+                            >
+                    </chartingToolkit:LineSeries>
+
+                </chartingToolkit:Chart.Series>
+                <chartingToolkit:Chart.Axes>
+                    <chartingToolkit:LinearAxis Title="Temperature [°C]" Orientation="Y" Minimum="0" Maximum="40" Interval="5"/>
+                <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="0.1"/>
+                </chartingToolkit:Chart.Axes>
+            </chartingToolkit:Chart>
+        <!--</Grid>-->        
+        
+        <Grid Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
