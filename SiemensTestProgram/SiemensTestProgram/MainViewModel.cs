@@ -25,7 +25,7 @@
                 "Motor",
                 "Thermistor",
                 "Snapshot",
-                //"Trace",
+                "Trace",
                 "TEC"
             };
 
