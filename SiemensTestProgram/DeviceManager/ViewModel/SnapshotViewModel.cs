@@ -19,6 +19,7 @@ namespace DeviceManager.ViewModel
         private ISnapshotModel snapshotModel;
         private int selectedResolution;
         private int numberOfSamples;
+        private double sampleInterval;
         private int saveValue;
         private string progressText;
         private string fileName;
@@ -51,13 +52,13 @@ namespace DeviceManager.ViewModel
             SaveCommand = new RelayCommand(param => SaveSamples());
             BrowseCommand = new RelayCommand(param => Browse());
 
-            VSenseCollection = new ObservableCollection<DataPoint>();
-            IRefCollection = new ObservableCollection<DataPoint>();
-            ISenseCollection = new ObservableCollection<DataPoint>();
-            TemperatureOneCollection = new ObservableCollection<DataPoint>(); 
-            TemperatureTwoCollection = new ObservableCollection<DataPoint>();
-            TemperatureThreeCollection = new ObservableCollection<DataPoint>();
-            TemperatureFourCollection = new ObservableCollection<DataPoint>();
+            VSenseCollection = new BulkObservableCollection<DataPoint>();
+            IRefCollection = new BulkObservableCollection<DataPoint>();
+            ISenseCollection = new BulkObservableCollection<DataPoint>();
+            TemperatureOneCollection = new BulkObservableCollection<DataPoint>(); 
+            TemperatureTwoCollection = new BulkObservableCollection<DataPoint>();
+            TemperatureThreeCollection = new BulkObservableCollection<DataPoint>();
+            TemperatureFourCollection = new BulkObservableCollection<DataPoint>();
         }
 
         public class DataPoint
@@ -74,6 +75,20 @@ namespace DeviceManager.ViewModel
 
         private double sampleMinimumX;
         private double sampleMaximumX;
+
+        public double SampleInterval
+        {
+            get
+            {
+                return sampleInterval;
+            }
+
+            set
+            {
+                sampleInterval = value;
+                OnPropertyChanged(nameof(SampleInterval));
+            }
+        }
 
         public double SampleMinimumX
         {
@@ -103,19 +118,19 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        public ObservableCollection<DataPoint> VSenseCollection { get; set; }
+        public BulkObservableCollection<DataPoint> VSenseCollection { get; set; }
 
-        public ObservableCollection<DataPoint> ISenseCollection { get; set; }
+        public BulkObservableCollection<DataPoint> ISenseCollection { get; set; }
 
-        public ObservableCollection<DataPoint> IRefCollection { get; set; }
+        public BulkObservableCollection<DataPoint> IRefCollection { get; set; }
 
-        public ObservableCollection<DataPoint> TemperatureOneCollection { get; set; }
+        public BulkObservableCollection<DataPoint> TemperatureOneCollection { get; set; }
 
-        public ObservableCollection<DataPoint> TemperatureTwoCollection { get; set; }
+        public BulkObservableCollection<DataPoint> TemperatureTwoCollection { get; set; }
 
-        public ObservableCollection<DataPoint> TemperatureThreeCollection { get; set; }
+        public BulkObservableCollection<DataPoint> TemperatureThreeCollection { get; set; }
 
-        public ObservableCollection<DataPoint> TemperatureFourCollection { get; set; }
+        public BulkObservableCollection<DataPoint> TemperatureFourCollection { get; set; }
 
 
         public string FileName
@@ -260,7 +275,7 @@ namespace DeviceManager.ViewModel
                         vSenseData.Add(vSenseDataValue.ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            VSenseCollection.Add(new DataPoint(sampledTime, vSenseDataValue));
+                            VSenseCollection.SurpressedAdd(new DataPoint(sampledTime, vSenseDataValue), numberOfSamples);
                         }));
 
                         errorCounter = 0;
@@ -288,7 +303,7 @@ namespace DeviceManager.ViewModel
                         errorCounter = 0;
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            IRefCollection.Add(new DataPoint(sampledTime, iRefDataValue));
+                            IRefCollection.SurpressedAdd(new DataPoint(sampledTime, iRefDataValue), numberOfSamples);
                         }));
 
                         CommunicationData iSense;
@@ -315,7 +330,7 @@ namespace DeviceManager.ViewModel
                         iSenseData.Add(Helper.GetFloatFromBigEndian(iSense.response).ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            ISenseCollection.Add(new DataPoint(sampledTime, iSenseDataValue));
+                            ISenseCollection.SurpressedAdd(new DataPoint(sampledTime, iSenseDataValue), numberOfSamples);
                         }));
 
                         CommunicationData temperatureOne;
@@ -340,7 +355,7 @@ namespace DeviceManager.ViewModel
                         temperatureOneData.Add(Helper.GetFloatFromBigEndian(temperatureOne.response).ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            TemperatureOneCollection.Add(new DataPoint(sampledTime, temperatureOneDataValue));
+                            TemperatureOneCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureOneDataValue), numberOfSamples);
                         }));
 
                         errorCounter = 0;
@@ -367,7 +382,7 @@ namespace DeviceManager.ViewModel
                         temperatureTwoData.Add(Helper.GetFloatFromBigEndian(temperatureTwo.response).ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            TemperatureTwoCollection.Add(new DataPoint(sampledTime, temperatureTwoDataValue));
+                            TemperatureTwoCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureTwoDataValue), numberOfSamples);
                         }));
                         errorCounter = 0;
 
@@ -393,7 +408,7 @@ namespace DeviceManager.ViewModel
                         temperatureThreeData.Add(Helper.GetFloatFromBigEndian(temperatureThree.response).ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            TemperatureThreeCollection.Add(new DataPoint(sampledTime, temperatureThreeDataValue));
+                            TemperatureThreeCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureThreeDataValue), numberOfSamples);
                         }));
                         errorCounter = 0;
 
@@ -420,7 +435,7 @@ namespace DeviceManager.ViewModel
                         temperatureFourData.Add(Helper.GetFloatFromBigEndian(temperatureFour.response).ToString("0.##"));
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            TemperatureFourCollection.Add(new DataPoint(sampledTime, temperatureFourDataDataValue));
+                            TemperatureFourCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureFourDataDataValue), numberOfSamples);
                         }));
                         errorCounter = 0;
 
@@ -587,6 +602,7 @@ namespace DeviceManager.ViewModel
             {
                 numberOfSamples = value;
                 OnPropertyChanged(nameof(NumberOfSamples));
+                SampleInterval = (double)NumberOfSamples / 100;
             }
         }
 
@@ -602,6 +618,7 @@ namespace DeviceManager.ViewModel
 
         private async void Stop()
         {
+            cts?.Cancel();
             await snapshotModel.StopSnapshot();
         }
 

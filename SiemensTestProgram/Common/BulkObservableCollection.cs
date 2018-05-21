@@ -11,12 +11,10 @@ namespace Common
     public class BulkObservableCollection<T> : ObservableCollection<T>
     {
         private bool suppressNotification = false;
-        private int updateThreshold;
         private int counter;
 
-        public BulkObservableCollection(int threshold)
+        public BulkObservableCollection()
         {
-            updateThreshold = threshold;
             counter = 0;
         }
 
@@ -34,7 +32,7 @@ namespace Common
             Add(item);
             counter++;
 
-            if (counter >= threshold)
+            if (Count >= threshold)
             {
                 suppressNotification = false;
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

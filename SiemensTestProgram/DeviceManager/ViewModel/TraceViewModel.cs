@@ -41,13 +41,13 @@ namespace DeviceManager.ViewModel
             Resolutions = TraceDefaults.Resolutions;
             SelectedResolution = Resolutions[0];
 
-            VSenseCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
-            IRefCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
-            ISenseCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
-            TemperatureOneCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
-            TemperatureTwoCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
-            TemperatureThreeCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
-            TemperatureFourCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
+            VSenseCollection = new BulkObservableCollection<DataPoint>();
+            IRefCollection = new BulkObservableCollection<DataPoint>();
+            ISenseCollection = new BulkObservableCollection<DataPoint>();
+            TemperatureOneCollection = new BulkObservableCollection<DataPoint>();
+            TemperatureTwoCollection = new BulkObservableCollection<DataPoint>();
+            TemperatureThreeCollection = new BulkObservableCollection<DataPoint>();
+            TemperatureFourCollection = new BulkObservableCollection<DataPoint>();
 
             NumberOfSamples = TraceDefaults.SampleNumberMinimum;
             SampleMaximumX = 3;
