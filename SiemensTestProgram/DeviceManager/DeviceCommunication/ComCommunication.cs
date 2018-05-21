@@ -79,7 +79,8 @@ namespace DeviceManager.DeviceCommunication
                         {
                             throw new Exception($"Read operation exceeded timeout of {readTimeout} ms");
                         }
-                    } while (!receivedData); 
+                    } while (!receivedData);
+                    
                 }
                 catch
                 {
@@ -94,6 +95,9 @@ namespace DeviceManager.DeviceCommunication
                     requestSemaphore.Release();
                     return falseData;
                 }
+
+                
+                
 
                 var comData = new CommunicationData(true, dataBuffer);
                 requestSemaphore.Release();
