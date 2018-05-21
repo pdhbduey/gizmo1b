@@ -15,7 +15,7 @@ namespace DeviceManager
         public static List<int> Resolutions = new List<int>
         {
             10,
-            100
+            //100
         };
 
         public static byte[] SetStartCommand()
