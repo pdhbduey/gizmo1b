@@ -24,7 +24,7 @@
 
         
 
-        <chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="VSense">
+        <chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="Chart">
             <chartingToolkit:LineSeries Title="VSense"
                             ItemsSource="{Binding VSenseCollection}"
                             IndependentValueBinding="{Binding Sample}"
@@ -32,7 +32,7 @@
 
             </chartingToolkit:LineSeries>
             <chartingToolkit:Chart.Axes>
-                <chartingToolkit:LinearAxis Orientation="Y" Minimum="0" Maximum="30" Title="Voltage" Interval="5"/>
+                <chartingToolkit:LinearAxis Orientation="Y" Minimum="0" Maximum="30" Title="Units" Interval="5"/>
                 <chartingToolkit:LinearAxis Orientation="X" Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Title="Time [s]" Interval="0.1"/>
             </chartingToolkit:Chart.Axes>
 

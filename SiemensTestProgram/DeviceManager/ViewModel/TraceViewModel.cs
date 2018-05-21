@@ -21,6 +21,9 @@ namespace DeviceManager.ViewModel
         private int numberOfSamples;
         private const int resolutionRangeMultiplier = 2;
 
+        private int refresh;
+        private double refreshTime;
+
         private double sampleMinimumX;
         private double sampleMaximumX;
         
@@ -33,15 +36,14 @@ namespace DeviceManager.ViewModel
             this.traceModel = traceModel;
             Resolutions = TraceDefaults.Resolutions;
             SelectedResolution = Resolutions[0];
-            var updateThreshold = 10;
 
-            VSenseCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
-            IRefCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
-            ISenseCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
-            TemperatureOneCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
-            TemperatureTwoCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
-            TemperatureThreeCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
-            TemperatureFourCollection = new BulkObservableCollection<DataPoint>(updateThreshold);
+            VSenseCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
+            IRefCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
+            ISenseCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
+            TemperatureOneCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
+            TemperatureTwoCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
+            TemperatureThreeCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
+            TemperatureFourCollection = new BulkObservableCollection<DataPoint>(refresh * 2);
 
             NumberOfSamples = TraceDefaults.SampleNumberMinimum;
             SampleMaximumX = 3;
@@ -112,9 +114,19 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private async void SetResolution()
+        private void SetResolution()
         {
-            await traceModel.SetResolution(selectedResolution);
+            traceModel.SetResolution(selectedResolution).Wait();
+            if (selectedResolution == 10)
+            {
+                refresh = 10;
+                refreshTime = 1.0;
+            }
+            else
+            {
+                refresh = 200;
+                refreshTime = 2.0;
+            }
             //VSenseCollection.UpdateThreshold = selectedResolution;
             //IRefCollection.UpdateThreshold = selectedResolution;
             //ISenseCollection.UpdateThreshold = selectedResolution;
@@ -272,7 +284,7 @@ namespace DeviceManager.ViewModel
                                 {
                                     TemperatureThreeCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureThreeDataValue));
 
-                                    if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                                    if (sampleNumber >  selectedResolution)
                                     {
                                         TemperatureThreeCollection.SurpressedRemoveAt(0);
                                     }
@@ -287,7 +299,7 @@ namespace DeviceManager.ViewModel
                                     await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                                         {
                                             TemperatureFourCollection.SurpressedAdd(new DataPoint(sampledTime, temperatureFourDataValue));
-                                            if (sampleNumber > resolutionRangeMultiplier * selectedResolution)
+                                            if (sampleNumber >  selectedResolution)
                                             {
                                                 TemperatureFourCollection.SurpressedRemoveAt(0);
                                             }
@@ -301,12 +313,12 @@ namespace DeviceManager.ViewModel
                                 updateRanges++;
 
 
-                            if (updateRanges >= resolutionRangeMultiplier * selectedResolution)
+                            if (updateRanges >= refresh)
                             {
                                 await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                                 {
                                     SampleMaximumX = sampledTime;
-                                    SampleMinimumX = sampledTime - resolutionRangeMultiplier;
+                                    SampleMinimumX = sampledTime - refreshTime;
                                 }));
 
                                 updateRanges = 0;
