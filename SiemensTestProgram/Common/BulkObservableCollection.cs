@@ -28,13 +28,13 @@ namespace Common
                 base.OnCollectionChanged(e);
         }
 
-        public void SurpressedAdd(T item)
+        public void SurpressedAdd(T item, int threshold)
         {
             suppressNotification = true;
             Add(item);
             counter++;
 
-            if (counter >= updateThreshold)
+            if (counter >= threshold)
             {
                 suppressNotification = false;
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

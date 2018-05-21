@@ -36,7 +36,7 @@
 
         </chartingToolkit:Chart>-->
 
-        <chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="Trace Data">
+        <!--<chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="Trace Data">
             <chartingToolkit:Chart.Series>
                 <chartingToolkit:LineSeries Title="ISense"
                             ItemsSource="{Binding ISenseCollection}"
@@ -90,7 +90,7 @@
             </chartingToolkit:Chart.Axes>
             
 
-        </chartingToolkit:Chart>
+        </chartingToolkit:Chart>-->
 
         <!--<chartingToolkit:Chart  Grid.Row="3" Grid.ColumnSpan="3" Title="Temperatures">
             <chartingToolkit:Chart.Series>
