@@ -385,6 +385,7 @@ namespace DeviceManager.ViewModel
                         var removeSamples = traceModel.SetReadSamples(samplesToClear).Result;
                         if (removeSamples.succesfulResponse)
                         {
+                            Console.WriteLine($"Cleared: {samplesToClear} samples");
                             samplesToClear = 0;
                         }
                     }
