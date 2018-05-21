@@ -241,7 +241,7 @@ namespace DeviceManager.ViewModel
                         //    {
                         //        break;
                         //    }
-                            Console.WriteLine($"{availableSamples}");
+                            Console.WriteLine($"available samples: {availableSamples}");
 
                             var updateNumber = Math.Max(refresh, availableSamples);
                             for (var j = 0; j < availableSamples; j++)
