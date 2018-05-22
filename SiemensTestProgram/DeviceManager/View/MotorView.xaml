@@ -161,10 +161,10 @@
                     <Button Margin="1" Height="25" Width="100" HorizontalAlignment="Left" Content="Cycle" Command="{Binding CycleRelativeCommand}"></Button>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal">
+                
                     <Label Width="208" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="{Binding MotorPosition}"></Label>
-                    <Button Margin="1" Height="25" Width="100" HorizontalAlignment="Left" Content="Get Position" Command="{Binding RefreshPositionCommand}"></Button>
-                </StackPanel>
+                    
+                
                 
             </StackPanel>
         </GroupBox>

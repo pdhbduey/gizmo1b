@@ -9,6 +9,7 @@ namespace DeviceManager.ViewModel
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
 
     public class TecViewModel : BindableBase
     {
@@ -86,7 +87,7 @@ namespace DeviceManager.ViewModel
             SetWaveformCyclesCommand = new RelayCommand(param => SetWaveformCycles());
 
             InitialUpdate();
-            //StartUpdateTask();
+            StartUpdateTask();
         }
 
         public RelayCommand SetTecPeriodCommand { get; set; }
@@ -721,30 +722,71 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            updateTask = Task.Factory.StartNew(() =>
+            var thread = new Thread(() =>
             {
                 UpdateAllStatuses();
             });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
-        private void UpdateAllStatuses()
+        private async void UpdateAllStatuses()
         {
             while (true)
             {
                 try
                 {
-                    UpdateIref();
-                    Thread.Sleep(50);
+                    var irefData = new byte[5];
+                    if (tecModel.ReadIref(ref irefData))
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            IRef = Helper.GetFloatFromBigEndian(irefData);
+                        }));
 
-                    UpdateISense();
-                    Thread.Sleep(50);
+                    }
+                    Thread.Sleep(updateDelay);
 
-                    UpdateVSense();
-                    Thread.Sleep(50);
+                    var isenseData = new byte[5];
+                    if (tecModel.ReadIsense(ref isenseData))
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            ISense = Helper.GetFloatFromBigEndian(isenseData);
+                        }));
+                        
+                    }
+                    Thread.Sleep(updateDelay);
 
-                    UpdateStatus();
-                    Thread.Sleep(50);
+                    var vsenseData = new byte[5];
+                    if (tecModel.ReadVsense(ref vsenseData))
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            VSense = Helper.GetFloatFromBigEndian(vsenseData);
+                        }));
+                        
+                    }
+                    Thread.Sleep(updateDelay);
 
+                    var status = new byte[5];
+                    if (tecModel.ReadStatus(ref status))
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            ProcessStatus(status);
+                        }));
+                        
+                    }
+                    else
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            StatusMessage = "Communication Error";
+                        }));
+                        
+                    }
                     Thread.Sleep(updateDelay);
                 }
                 catch (Exception e)

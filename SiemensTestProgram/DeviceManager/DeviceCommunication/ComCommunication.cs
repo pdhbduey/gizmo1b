@@ -82,7 +82,7 @@ namespace DeviceManager.DeviceCommunication
                     } while (!receivedData);
                     
                 }
-                catch
+                catch (Exception e)
                 {
                     if (serialPort != null && serialPort.IsOpen)
                     {
@@ -95,9 +95,6 @@ namespace DeviceManager.DeviceCommunication
                     requestSemaphore.Release();
                     return falseData;
                 }
-
-                
-                
 
                 var comData = new CommunicationData(true, dataBuffer);
                 requestSemaphore.Release();

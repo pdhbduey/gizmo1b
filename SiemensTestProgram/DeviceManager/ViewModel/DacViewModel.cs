@@ -5,7 +5,7 @@ namespace DeviceManager.ViewModel
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using System.Windows;
     using Common.Bindings;
     using DeviceManager.Model;
 
@@ -33,8 +33,10 @@ namespace DeviceManager.ViewModel
             dacStatus = string.Empty;
 
             // Check DAC status
-            //StartUpdateTask();
             Update();
+
+            StartUpdateTask();
+            
             RefreshCommand = new RelayCommand(param => Update());
         }
 
@@ -142,19 +144,19 @@ namespace DeviceManager.ViewModel
         /// </summary>
         private void StartUpdateTask()
         {
-            cts = new CancellationTokenSource();
-            token = cts.Token;
-
-            updateTask = Task.Factory.StartNew(() =>
+            var thread = new Thread(() =>
             {
                 CheckDacStatus();
-            }, token);
+            });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         /// <summary>
         /// Checks the DAC status.
         /// </summary>
-        private void CheckDacStatus()
+        private async void CheckDacStatus()
         {
             while (true)
             {
@@ -169,11 +171,19 @@ namespace DeviceManager.ViewModel
 
                     if (dacModel.ReadDacStatusCommand(ref status))
                     {
-                        ProcessStatus(status);
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            ProcessStatus(status);
+                        }));
+                        
                     }
                     else
                     {
-                        DacStatus = "Communication Error";
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            DacStatus = "Communication Error";
+                        }));
+                        
                     }
                     
                     Thread.Sleep(updateDelay);

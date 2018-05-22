@@ -25,7 +25,7 @@ namespace DeviceManager.ViewModel
         private string statusMessage;
 
 
-        private int updateDelay = 200;
+        private int updateDelay = 300;
 
         public AdcViewModel(IAdcModel adcModel)
         {

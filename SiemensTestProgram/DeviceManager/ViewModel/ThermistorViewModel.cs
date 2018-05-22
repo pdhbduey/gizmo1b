@@ -22,7 +22,7 @@ namespace DeviceManager.ViewModel
         private float ainC;
         private float ainD;
         private string statusMessage;
-        private const int updateDelay = 200;
+        private const int updateDelay = 300;
 
         public ThermistorViewModel(IThermistorModel thermistorModel)
         {

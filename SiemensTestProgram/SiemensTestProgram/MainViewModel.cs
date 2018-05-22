@@ -118,6 +118,8 @@
                 default:
                     return;
             }
+
+            System.GC.Collect();
         }
     }
 }
