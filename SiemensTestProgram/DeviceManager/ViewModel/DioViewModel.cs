@@ -33,6 +33,8 @@ namespace DeviceManager.ViewModel
         private string doutSixStatus;
         private string doutSevenStatus;
 
+        private const int updateDelay = 300;
+
         public DioViewModel(IDioModel dioModel)
         {
             this.dioModel = dioModel;
@@ -76,10 +78,13 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            Task.Factory.StartNew(() =>
+            var thread = new Thread(() =>
             {
                 UpdateAllStatuses();
             });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private async void UpdateAllStatuses()
@@ -107,6 +112,8 @@ namespace DeviceManager.ViewModel
                     updateDinStatus(6, sixSet);
                     updateDinStatus(7, sevenSet);
                 }
+
+                Thread.Sleep(updateDelay);
             }
         }
 

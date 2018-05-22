@@ -5,6 +5,7 @@ namespace DeviceManager.ViewModel
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
     using Common;
     using Common.Bindings;
     using Model;
@@ -27,7 +28,7 @@ namespace DeviceManager.ViewModel
         // Update task variables
         private Task updateTask;
         private int updateDelay = 750;
-        private int delayBetweenRequests = 100;
+        private int delayBetweenRequests = 300;
 
         /// <summary>
         /// Creates a new instance of the FanViewModel class.
@@ -42,7 +43,7 @@ namespace DeviceManager.ViewModel
             RefreshCommand = new RelayCommand(param => Update());
             // Update statuses
             InitialUpdate();
-            //StartUpdateTask();
+            StartUpdateTask();
         }
 
         public RelayCommand RefreshCommand { get; set; }
@@ -217,10 +218,13 @@ namespace DeviceManager.ViewModel
         /// </summary>
         private void StartUpdateTask()
         {
-            updateTask = Task.Factory.StartNew(() =>
+            var thread = new Thread(() =>
             {
                 UpdateAllStatuses();
             });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private void Update()
@@ -330,7 +334,7 @@ namespace DeviceManager.ViewModel
         /// <summary>
         /// Updates Fan values.
         /// </summary>
-        private void UpdateAllStatuses()
+        private async void UpdateAllStatuses()
         {
             while (true)
             {
@@ -340,7 +344,11 @@ namespace DeviceManager.ViewModel
                     var sensorOneValue = new byte[5];
                     if (fanModel.GetFanSensorRpm(1, ref sensorOneValue))
                     {
-                        SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue);
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue);
+                        }));
+                        
                     }
 
                     Thread.Sleep(delayBetweenRequests);
@@ -348,7 +356,11 @@ namespace DeviceManager.ViewModel
                     var sensorTwoValue = new byte[5];
                     if (fanModel.GetFanSensorRpm(2, ref sensorTwoValue))
                     {
-                        SensorTwoRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            SensorTwoRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
+                        }));
+                        
                     }
                     
                     Thread.Sleep(delayBetweenRequests);
@@ -356,11 +368,19 @@ namespace DeviceManager.ViewModel
                     var status = new byte[5];
                     if (fanModel.GetFanStatus(ref status))
                     {
-                        ProcessStatus(status);
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            ProcessStatus(status);
+                        }));
+                       
                     }
                     else
                     {
-                        StatusMessage = "Communication Error";
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            StatusMessage = "Communication Error";
+                        }));
+                        
                     }
                     
 
@@ -368,7 +388,11 @@ namespace DeviceManager.ViewModel
                 }
                 catch (Exception e)
                 {
-                    StatusMessage = e.Message;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        StatusMessage = e.Message;
+                    }));
+                    
                 }
             }
         }

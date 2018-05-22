@@ -36,10 +36,9 @@
                         <Button x:Name="setButton" Content="Set" Margin="1" Height="25" Width="100" Command="{Binding SendDacValueCommand}"></Button>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
+                    
                         <Label Width="290" HorizontalAlignment="Left" VerticalAlignment="Bottom" Content="{Binding DacStatus}"></Label>
-                        <Button Content="Refresh" Margin="1" Height="25" Width="100" Command="{Binding RefreshCommand}"></Button>
-                    </StackPanel>
+                        
                     
                 </StackPanel>
 

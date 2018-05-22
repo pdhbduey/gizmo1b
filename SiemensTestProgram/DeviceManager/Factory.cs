@@ -12,24 +12,6 @@ namespace DeviceManager
         private static Factory instance = null;
         private IComCommunication serialCommunication;
 
-        // Singleton Views
-        private AdcView adcView;
-        private MotorView motorView;
-        private ThermistorView thermistorView;
-        private FaultView faultView;
-        private DacView dacView;
-        private TecView tecView;
-        private LedView ledView;
-
-        // Singleton View Models
-        private AdcViewModel adcViewModel;
-        private MotorViewModel motorViewModel;
-        private ThermistorViewModel thermistorViewModel;
-        private FaultViewModel faultViewModel;
-        private DacViewModel dacViewModel;
-        private TecViewModel tecViewModel;
-        private LedViewModel ledViewModel;
-
         /// <summary>
         /// Creates Device Manager Factory.
         /// </summary>
@@ -62,16 +44,11 @@ namespace DeviceManager
         /// <returns> DAC view </returns>
         public DacView GetDacView()
         {
-            if (dacViewModel == null)
-            {
-                dacViewModel = new DacViewModel(GetDacModel(serialCommunication));
-                dacView = new DacView()
+           return new DacView()
                 {
-                    DataContext = dacViewModel
+                    DataContext = new DacViewModel(GetDacModel())
                 };
-            }
-
-            return dacView;
+            
         }
 
         /// <summary>
@@ -97,16 +74,10 @@ namespace DeviceManager
         /// <returns> LED view </returns>
         public LedView GetLedView()
         {
-            if (ledViewModel == null)
+            return new LedView()
             {
-                ledViewModel = new LedViewModel(GetLedModel(serialCommunication));
-                ledView = new LedView()
-                {
-                    DataContext = ledViewModel
-                };
-            }
-
-            return ledView;
+                DataContext = new LedViewModel(GetLedModel())
+            };
         }
 
         /// <summary>
@@ -121,34 +92,16 @@ namespace DeviceManager
             };
         }
 
-        ///// <summary>
-        /////  Sets the data context for Capture view.
-        ///// </summary>
-        ///// <returns> Capture view </returns>
-        //public CaptureView GetCaptureView()
-        //{
-        //    return new CaptureView()
-        //    {
-        //        DataContext = new CaptureViewModel(GetCaptureModel())
-        //    };
-        //}
-
         /// <summary>
         ///  Sets the data context for TEC view.
         /// </summary>
         /// <returns> TEC view </returns>
         public TecView GetTecView()
         {
-            if (tecViewModel == null)
-            {
-                tecViewModel = new TecViewModel(GetTecModel(serialCommunication));
-                tecView = new TecView()
+            return new TecView()
                 {
-                    DataContext = tecViewModel
+                    DataContext = new TecViewModel(GetTecModel())
                 };
-            }
-
-            return tecView;
         }
 
         /// <summary>
@@ -157,16 +110,11 @@ namespace DeviceManager
         /// <returns> Thermistor view </returns>
         public ThermistorView GetThermistorView()
         {
-            if (thermistorViewModel == null)
-            {
-                thermistorViewModel = new ThermistorViewModel(GetThermistorModel());
-                thermistorView = new ThermistorView()
+            return new ThermistorView()
                 {
-                    DataContext = thermistorViewModel
+                    DataContext = new ThermistorViewModel(GetThermistorModel())
                 };
-            }
 
-            return thermistorView;
         }
 
         /// <summary>
@@ -175,16 +123,11 @@ namespace DeviceManager
         /// <returns> ADC view </returns>
         public AdcView GetAdcView()
         {
-            if (adcViewModel == null)
-            {
-                adcViewModel = new AdcViewModel(GetAdcModel());
-                adcView = new AdcView()
+            return new AdcView()
                 {
-                    DataContext = adcViewModel
+                    DataContext = new AdcViewModel(GetAdcModel())
                 };
-            }
-
-            return adcView;
+            
         }
 
         /// <summary>
@@ -195,7 +138,7 @@ namespace DeviceManager
         {
             return new CommunicationConfigurationView()
             {
-                DataContext = new CommunicationConfigurationViewModel(GetCommunicationConfigurationModel(serialCommunication))
+                DataContext = new CommunicationConfigurationViewModel(GetCommunicationConfigurationModel())
             };
         }
 
@@ -229,16 +172,11 @@ namespace DeviceManager
         /// <returns> Motor view. </returns>
         public MotorView GetMotorView()
         {
-            if (motorViewModel == null)
+           return new MotorView()
             {
-                motorViewModel = new MotorViewModel(GetMotorModel(serialCommunication));
-                motorView = new MotorView()
-                {
-                    DataContext = motorViewModel
-                };
-            }
-
-            return motorView;
+                DataContext = new MotorViewModel(GetMotorModel())
+            };
+            
         }
 
         /// <summary>
@@ -247,21 +185,15 @@ namespace DeviceManager
         /// <returns> Motor view. </returns>
         public FaultView GetFaultView()
         {
-            if (faultViewModel == null)
-            {
-                faultViewModel = new FaultViewModel(GetFaultModel());
-                faultView = new FaultView()
+            return new FaultView()
                 {
-                    DataContext = faultViewModel
+                    DataContext = new FaultViewModel(GetFaultModel())
                 };
-            }
-
-            return faultView;
         }
 
-        private LedModel GetLedModel(IComCommunication communication)
+        private LedModel GetLedModel()
         {
-            return new LedModel(communication);
+            return new LedModel(serialCommunication);
         }
 
         private IDioModel GetDioModel()
@@ -274,25 +206,20 @@ namespace DeviceManager
             return new FaultModel(serialCommunication);
         }
 
-        private IDacModel GetDacModel(IComCommunication communication)
+        private IDacModel GetDacModel()
         {
-            return new DacModel(communication);
+            return new DacModel(serialCommunication);
         }
 
-        private ITecModel GetTecModel(IComCommunication communication)
+        private ITecModel GetTecModel()
         {
-            return new TecModel(communication);
+            return new TecModel(serialCommunication);
         }
 
         private ISnapshotModel GetSnapshotModel()
         {
             return new SnapshotModel(serialCommunication);
         }
-
-        //private ICaptureModel GetCaptureModel()
-        //{
-        //    return new CaptureModel(serialCommunication);
-        //}
 
         private IThermistorModel GetThermistorModel()
         {
@@ -309,14 +236,14 @@ namespace DeviceManager
             return new FanModel(serialCommunication);
         }
 
-        private IMotorModel GetMotorModel(IComCommunication communication)
+        private IMotorModel GetMotorModel()
         {
             return new MotorModel(serialCommunication);
         }
 
-        private ICommunicationConfigurationModel GetCommunicationConfigurationModel(IComCommunication communication)
+        private ICommunicationConfigurationModel GetCommunicationConfigurationModel()
         {
-            return new CommunicationConfigurationModel(communication);
+            return new CommunicationConfigurationModel(serialCommunication);
         }
     }
 }
