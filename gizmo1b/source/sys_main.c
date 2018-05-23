@@ -73,9 +73,9 @@
 int main(void)
 {
 /* USER CODE BEGIN (3) */
-    boardTestAppStart();
+    //boardTestAppStart();
     //boardTestConsoleAppStart();
-    //boardTestFastPidAppStart();
+    boardTestFastPidAppStart();
 /* USER CODE END */
 
     return 0;
