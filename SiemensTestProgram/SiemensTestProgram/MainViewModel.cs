@@ -1,6 +1,7 @@
 ﻿namespace SiemensTestProgram
 {
     using System.Collections.ObjectModel;
+    using System.Threading;
     using System.Windows;
 
     using Common.Bindings;
@@ -21,6 +22,7 @@
                 "DIO",
                 "Fan",
                 "Fault",
+                "Heater",
                 "LED",
                 "Motor",
                 "Thermistor",
@@ -103,6 +105,9 @@
                 case "Fault":
                     Content = DeviceManager.Factory.Instance.GetFaultView();
                     break;
+                case "Heater":
+                    Content = DeviceManager.Factory.Instance.GetHeaterView();
+                    break;
                 case "Snapshot":
                     Content = DeviceManager.Factory.Instance.GetSnapshotView();
                     break;
@@ -119,6 +124,7 @@
                     return;
             }
 
+            Thread.Sleep(500);
             System.GC.Collect();
         }
     }

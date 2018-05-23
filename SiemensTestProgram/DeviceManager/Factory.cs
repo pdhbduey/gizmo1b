@@ -191,7 +191,24 @@ namespace DeviceManager
                 };
         }
 
-        private LedModel GetLedModel()
+        /// <summary>
+        ///  Sets the data context for Heater view.
+        /// </summary>
+        /// <returns> Motor view. </returns>
+        public HeaterView GetHeaterView()
+        {
+            return new HeaterView()
+            {
+                DataContext = new HeaterViewModel(GetHeaterModel())
+            };
+        }
+
+        private IHeaterModel GetHeaterModel()
+        {
+            return new HeaterModel(serialCommunication);
+        }
+
+        private ILedModel GetLedModel()
         {
             return new LedModel(serialCommunication);
         }
