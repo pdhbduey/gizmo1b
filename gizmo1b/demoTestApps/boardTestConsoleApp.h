@@ -22,6 +22,8 @@ private:
     void help(std::string& help);
     bool parseTecCommand(std::vector<std::string>& tokens,
                                                  std::string& res, int& result);
+    bool parseHeaterCommand(std::vector<std::string>& tokens,
+                                                 std::string& res, int& result);
     bool parseFaultCommand(std::vector<std::string>& tokens,
                                                  std::string& res, int& result);
     bool parseThermistorCommand(std::vector<std::string>& tokens,

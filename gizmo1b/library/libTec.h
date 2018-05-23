@@ -62,6 +62,22 @@ public:
         ERROR_TRACE_RESOLUTION_OUT_OF_RANGE             = 1 << 0,
         ERROR_TRACE_NUMBER_OF_READ_SAMPLES_OUT_OF_RANGE = 1 << 1,
     };
+    enum HeaterStatus {
+        HEATER_OKAY,
+        ERROR_HEATER_TREF_OUT_OF_RANGE,
+        ERROR_HEATER_IMAX_OUT_OF_RANGE,
+        ERROR_HEATER_PROPORTIONAL_GAIN_OUT_OF_RANGE,
+        ERROR_HEATER_INTEGRAL_GAIN_OUT_OF_RANGE,
+        ERROR_HEATER_DERIVATIVE_GAIN_OUT_OF_RANGE,
+        ERROR_HEATER_TIN_SELECT_OUT_OF_RANGE,
+        ERROR_TIN,
+    };
+    enum HeaterTinSelect {
+        HEATER_T1_SELECT,
+        HEATER_T2_SELECT,
+        HEATER_T3_SELECT,
+        HEATER_T4_SELECT,
+    };
 public:
     LibTec(const char* name = "LibTec");
     virtual ~LibTec();
@@ -110,6 +126,23 @@ public:
     int getTraceFirstSample();
     int getTraceNumberOfSamples();
     int setTraceNumberOfReadSamples(int number);
+    void heaterClosedLoopEnable();
+    void heaterClosedLoopDisable();
+    int heaterSetProportionalGain(float gain);
+    float heaterGetProportionalGain();
+    int heaterSetIntegralGain(float gain);
+    float heaterGetIntegrallGain();
+    int heaterSetDerivativeGain(float gain);
+    float heaterGetDerivativeGain();
+    bool isHeaterClosedLoopEnabled();
+    void heaterEnable(bool en);
+    bool isHeaterEnabled();
+    int setHeaterRefTemperature(float tref);
+    float getHeaterRefTemperature();
+    int setHeaterImax(float imax);
+    float getHeaterImax();
+    int heaterSetTin(int tin);
+    int heaterGetTin();
 private:
     enum adcChannels {
         ISENSE = LibAdc::CHANNEL_1,
@@ -132,6 +165,9 @@ private:
     bool isCustomWaveformEmpty(std::vector<struct IrefSample>& waveform);
     bool isCustomWaveformStartTimeZero(std::vector<struct IrefSample>& waveform);
     bool isSnapshotSampleInRange(int sample);
+    bool isRefTemperatureValid(float tref);
+    bool isImaxValid(float imax);
+    int getTin(float& tin);
 private:
     LibWrapGioPort::Port m_tecEnable;
     LibAdc m_libAdc;
@@ -172,6 +208,17 @@ private:
     static SemaphoreHandle_t s_traceMutex;
     bool m_isTraceRunning;
     int m_traceRes;
+    bool m_isHeaterEnabled;
+    bool m_isHeaterClosedLoopEnabled;
+    bool m_isHeaterClosedLoopInitialized;
+    float m_pidHeaterProportionalGain;
+    float m_pidHeaterIntegralGain;
+    float m_pidHeaterDerivativeGain;
+    float m_heaterRefTemperature;
+    float m_heaterImax;
+    int m_heaterTin;
+    float m_heaterPrevError;
+    float m_heaterAccError;
 };
 
 #endif // _LIB_TEC_H_

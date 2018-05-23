@@ -73,6 +73,14 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::TRACE_FIRST_SAMPLE]            = boardTestTec;
     m_boardTestMap[BoardTest::TRACE_NUMBER_OF_SAMPLES]       = boardTestTec;
     m_boardTestMap[BoardTest::TRACE_NUMBER_OF_READ_SAMPLES]  = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_CONTROL]                = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_STATUS]                 = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_TREF_VALUE]             = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_IMAX_VALUE]             = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_TIN_SELECT]             = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_PROPORTIONAL_GAIN]      = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_INTEGRAL_GAIN]          = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_DERIVATIVE_GAIN]        = boardTestTec;
     BoardTest* boardTestThermistor                     = new BoardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_STATUS]       = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A] = boardTestThermistor;

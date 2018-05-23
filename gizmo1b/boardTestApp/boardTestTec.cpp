@@ -179,6 +179,47 @@ int BoardTestTec::get(uint32 address, uint32& value)
     case TRACE_STATUS:
         value = m_traceStatus;
         break;
+    case HEATER_CONTROL:
+        value = 0;
+        value |= m_libTec.isHeaterEnabled()           ? HEATER_ENABLE             : HEATER_DISABLE;
+        value |= m_libTec.isHeaterClosedLoopEnabled() ? HEATER_CLOSED_LOOP_ENABLE : HEATER_CLOSED_LOOP_DISABLE;
+        break;
+    case HEATER_STATUS:
+        value = m_status;
+        break;
+    case HEATER_TREF_VALUE:
+        {
+            float f = m_libTec.getHeaterRefTemperature();
+            value = *reinterpret_cast<uint32*>(&f);
+        }
+        break;
+    case HEATER_IMAX_VALUE:
+        {
+            float f = m_libTec.getHeaterImax();
+            value = *reinterpret_cast<uint32*>(&f);
+        }
+        break;
+    case HEATER_TIN_SELECT:
+        value = m_libTec.heaterGetTin();
+        break;
+    case HEATER_PROPORTIONAL_GAIN:
+        {
+            float gain = m_libTec.heaterGetProportionalGain();
+            value = *reinterpret_cast<uint32*>(&gain);
+        }
+        break;
+    case HEATER_INTEGRAL_GAIN:
+        {
+            float gain = m_libTec.heaterGetIntegrallGain();
+            value = *reinterpret_cast<uint32*>(&gain);
+        }
+        break;
+    case HEATER_DERIVATIVE_GAIN:
+        {
+            float gain = m_libTec.heaterGetDerivativeGain();
+            value = *reinterpret_cast<uint32*>(&gain);
+        }
+        break;
     }
     return OKAY;
 }
@@ -227,6 +268,7 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TRACE_STATUS:
     case TRACE_FIRST_SAMPLE:
     case TRACE_NUMBER_OF_SAMPLES:
+    case HEATER_STATUS:
         return ERROR_RO;
     case TEC_CONTROL:
         if (value & DISABLE) {
@@ -334,6 +376,53 @@ int BoardTestTec::set(uint32 address, uint32 value)
         break;
     case TRACE_NUMBER_OF_READ_SAMPLES:
         m_traceStatus = m_libTec.setTraceNumberOfReadSamples(value);
+        break;
+    case HEATER_CONTROL:
+        if (value & HEATER_DISABLE) {
+            m_libTec.heaterEnable(false);
+        }
+        if (value & HEATER_ENABLE) {
+            m_libTec.heaterEnable(true);
+        }
+        if (value & HEATER_CLOSED_LOOP_DISABLE) {
+            m_libTec.heaterClosedLoopDisable();
+        }
+        if (value & HEATER_CLOSED_LOOP_ENABLE) {
+            m_libTec.heaterClosedLoopEnable();
+        }
+        break;
+    case HEATER_TREF_VALUE:
+        {
+            float f = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.setHeaterRefTemperature(f);
+        }
+        break;
+    case HEATER_IMAX_VALUE:
+        {
+            float f = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.setHeaterImax(f);
+        }
+        break;
+    case HEATER_TIN_SELECT:
+        m_status = m_libTec.heaterSetTin(value);
+        break;
+    case HEATER_PROPORTIONAL_GAIN:
+        {
+            float gain = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.heaterSetProportionalGain(gain);
+        }
+        break;
+    case HEATER_INTEGRAL_GAIN:
+        {
+            float gain = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.heaterSetIntegralGain(gain);
+        }
+        break;
+    case HEATER_DERIVATIVE_GAIN:
+        {
+            float gain = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.heaterSetDerivativeGain(gain);
+        }
         break;
     }
     return OKAY;

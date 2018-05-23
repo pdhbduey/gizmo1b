@@ -29,7 +29,8 @@ LibTec::LibTec(const char* name) :
     m_pidProportionalGain(1),
     m_snapshotNumSamples(10),
     m_snapshotRes(SNAPSHOT_RES_10),
-    m_traceCircularBuffer(1000)
+    m_traceCircularBuffer(1000),
+    m_pidHeaterProportionalGain(1)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
@@ -114,6 +115,24 @@ int LibTec::getVSense(float& vSense)
     }
     vSense = (value - 2.5) * 21.5 / 1.5;
     return OKAY;
+}
+
+int LibTec::getTin(float& tin)
+{
+    LibMutex libMutex(s_mutex);
+    float value;
+    int thermMap[] = {
+        [LibThermistor::AIN_A] = HEATER_T1_SELECT,
+        [LibThermistor::AIN_B] = HEATER_T2_SELECT,
+        [LibThermistor::AIN_C] = HEATER_T3_SELECT,
+        [LibThermistor::AIN_D] = HEATER_T4_SELECT,
+    };
+    int result = m_libThermistor.readTemp(thermMap[m_heaterTin], value);
+    if (result != LibThermistor::OKAY) {
+        return ERROR_TIN;
+    }
+    tin = value;
+    return HEATER_OKAY;
 }
 
 bool LibTec::driveControl(float control)
@@ -499,7 +518,36 @@ void LibTec::run()
     while (true) {
         vTaskDelay(1);
         TickType_t tick = xTaskGetTickCount();
-        float iRef      = getWaveformSample(tick);
+        float iRef;
+        // Temperature PID regulator
+        float heaterPidError = m_heaterRefTemperature;
+        float tin            = 0;
+        if (m_isHeaterClosedLoopEnabled && getTin(tin) == HEATER_OKAY) {
+            heaterPidError -= tin;
+        }
+        if (!m_isHeaterClosedLoopInitialized || !m_isHeaterClosedLoopEnabled) {
+            m_heaterPrevError = heaterPidError;
+            m_heaterAccError = 0;
+            if (!m_isHeaterClosedLoopInitialized) {
+                m_isHeaterClosedLoopInitialized = true;
+            }
+        }
+        if (m_pidHeaterDerivativeGain == 0) {
+            m_heaterPrevError = heaterPidError;
+        }
+        if (m_pidHeaterIntegralGain == 0) {
+            m_heaterAccError = 0;
+        }
+        float heaterControl = m_pidHeaterProportionalGain *  heaterPidError
+                            + m_pidHeaterIntegralGain     *  m_heaterAccError
+                            + m_pidHeaterDerivativeGain   * (heaterPidError - m_heaterPrevError);
+        heaterControl       = heaterControl < -m_heaterImax ? -m_heaterImax :
+                              heaterControl >  m_heaterImax ?  m_heaterImax :
+                                                               heaterControl;
+        m_heaterPrevError   = heaterPidError;
+        m_heaterAccError   += heaterPidError;
+        // Current PID regulator
+        iRef                = m_isHeaterEnabled ? heaterControl : getWaveformSample(tick);
         float pidError  = iRef;
         float iSense    = 0;
         if (m_isClosedLoopEnabled && getISense(iSense) == OKAY) {
@@ -781,4 +829,147 @@ int LibTec::setTraceNumberOfReadSamples(int number)
         m_traceCircularBuffer.popFront();
     }
     return OKAY;
+}
+
+void LibTec::heaterClosedLoopEnable()
+{
+    LibMutex libMutex(s_mutex);
+    m_isHeaterClosedLoopInitialized = false;
+    m_isHeaterClosedLoopEnabled = true;
+}
+
+void LibTec::heaterClosedLoopDisable()
+{
+    LibMutex libMutex(s_mutex);
+    m_isHeaterClosedLoopEnabled = false;
+}
+
+int LibTec::heaterSetProportionalGain(float gain)
+{
+    LibMutex libMutex(s_mutex);
+    if (gain < 0.01 || gain > 100) {
+        return ERROR_HEATER_PROPORTIONAL_GAIN_OUT_OF_RANGE;
+    }
+    m_pidHeaterProportionalGain = gain;
+    return HEATER_OKAY;
+}
+
+float LibTec::heaterGetProportionalGain()
+{
+    LibMutex libMutex(s_mutex);
+    return m_pidHeaterProportionalGain;
+}
+
+int LibTec::heaterSetIntegralGain(float gain)
+{
+    LibMutex libMutex(s_mutex);
+    if (gain < 0 || gain > 100) {
+        return ERROR_HEATER_INTEGRAL_GAIN_OUT_OF_RANGE;
+    }
+    m_pidHeaterIntegralGain = gain;
+    return HEATER_OKAY;
+}
+
+float LibTec::heaterGetIntegrallGain()
+{
+    LibMutex libMutex(s_mutex);
+    return m_pidHeaterIntegralGain;
+}
+
+int LibTec::heaterSetDerivativeGain(float gain)
+{
+    LibMutex libMutex(s_mutex);
+    if (gain < 0 || gain > 100) {
+        return ERROR_HEATER_DERIVATIVE_GAIN_OUT_OF_RANGE;
+    }
+    m_pidHeaterDerivativeGain = gain;
+    return HEATER_OKAY;
+}
+
+float LibTec::heaterGetDerivativeGain()
+{
+    LibMutex libMutex(s_mutex);
+    return m_pidHeaterDerivativeGain;
+}
+
+bool LibTec::isHeaterClosedLoopEnabled()
+{
+    LibMutex libMutex(s_mutex);
+    return m_isHeaterClosedLoopEnabled;
+}
+
+void LibTec::heaterEnable(bool en)
+{
+    LibMutex libMutex(s_mutex);
+    m_isHeaterEnabled = en;
+}
+
+bool LibTec::isHeaterEnabled()
+{
+    LibMutex libMutex(s_mutex);
+    return m_isHeaterEnabled;
+}
+
+bool LibTec::isRefTemperatureValid(float tref)
+{
+    return tref >= 0.0 && tref <= 100.0;
+}
+
+int LibTec::setHeaterRefTemperature(float tref)
+{
+    LibMutex libMutex(s_mutex);
+    if (!isRefTemperatureValid(tref)) {
+        return ERROR_HEATER_TREF_OUT_OF_RANGE;
+    }
+    m_heaterRefTemperature = tref;
+    return HEATER_OKAY;
+}
+
+float LibTec::getHeaterRefTemperature()
+{
+    LibMutex libMutex(s_mutex);
+    return m_heaterRefTemperature;
+}
+
+bool LibTec::isImaxValid(float imax)
+{
+    return imax >= 0.0 && imax <= 15.0;
+}
+
+int LibTec::setHeaterImax(float imax)
+{
+    LibMutex libMutex(s_mutex);
+    if (!isImaxValid(imax)) {
+        return ERROR_HEATER_IMAX_OUT_OF_RANGE;
+    }
+    m_heaterImax = imax;
+    return HEATER_OKAY;
+}
+
+float LibTec::getHeaterImax()
+{
+    LibMutex libMutex(s_mutex);
+    return m_heaterImax;
+}
+
+int LibTec::heaterSetTin(int tin)
+{
+    LibMutex libMutex(s_mutex);
+    switch (tin) {
+    default:
+        return ERROR_HEATER_TIN_SELECT_OUT_OF_RANGE;
+    case HEATER_T1_SELECT:
+    case HEATER_T2_SELECT:
+    case HEATER_T3_SELECT:
+    case HEATER_T4_SELECT:
+        break;
+    }
+    m_heaterTin = tin;
+    return HEATER_OKAY;
+}
+
+int LibTec::heaterGetTin()
+{
+    LibMutex libMutex(s_mutex);
+    return m_heaterTin;
 }
