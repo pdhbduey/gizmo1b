@@ -95,6 +95,19 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec set customiref [-15,15](A)\n\r";
     help += "tec set customcycles 0..4,294,967,296\n\r";
     help += "tec get customindex|customtime|customiref|customcycles\n\r";
+    help += "heater enable|disable\n\r";
+    help += "heater get enable\n\r";
+    help += "heater get tref|imax|closedloop|tin\n\r";
+    help += "heater set tref [0,120](deg C)\n\r";
+    help += "heater set imax [0,15](A)\n\r";
+    help += "heater set tin 1..4\n\r";
+    help += "heater set closedloop enable|disable\n\r";
+    help += "heater set propgain [0.01,100]\n\r";
+    help += "heater get propgain\n\r";
+    help += "heater set intgain [0,100]\n\r";
+    help += "heater get intgain\n\r";
+    help += "heater set dergain [0,100]\n\r";
+    help += "heater get dergain\n\r";
     help += "thermistor get a|b|c|d|all\n\r";
     help += "motor reset|initialize|limp|energize|stop\n\r";
     help += "motor get regaddress|regvalue|step|abspos|relpos|pos|status\n\r";
@@ -152,6 +165,9 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
         if (tokens.size() > COMPONENT) {
             if (tokens[COMPONENT] == "tec") {
                 isParsingError = parseTecCommand(tokens, res, result);
+            }
+            else if (tokens[COMPONENT] == "heater") {
+                isParsingError = parseHeaterCommand(tokens, res, result);
             }
             else if (tokens[COMPONENT] == "fault") {
                 isParsingError = parseFaultCommand(tokens, res, result);
@@ -1318,6 +1334,227 @@ bool BoardTestConsoleApp::parseDioCommand(std::vector<std::string>& tokens,
              && pinsMap.find(pin) != pinsMap.end()) {
                 result = regWrite(BoardTest::DIO_OUT, pinsMap[pin]);
                 isParsingError = false;
+            }
+        }
+    }
+    return isParsingError;
+}
+
+bool BoardTestConsoleApp::parseHeaterCommand(std::vector<std::string>& tokens,
+                                                  std::string& res, int& result)
+{
+    bool isParsingError = true;
+    std::vector<std::string> heaterStatus;
+    heaterStatus.push_back("HEATER_OKAY");
+    heaterStatus.push_back("ERROR_HEATER_TREF_OUT_OF_RANGE");
+    heaterStatus.push_back("ERROR_HEATER_IMAX_OUT_OF_RANGE");
+    heaterStatus.push_back("ERROR_HEATER_PROPORTIONAL_GAIN_OUT_OF_RANGE");
+    heaterStatus.push_back("ERROR_HEATER_INTEGRAL_GAIN_OUT_OF_RANGE");
+    heaterStatus.push_back("ERROR_HEATER_DERIVATIVE_GAIN_OUT_OF_RANGE");
+    heaterStatus.push_back("ERROR_HEATER_TIN_SELECT_OUT_OF_RANGE");
+    heaterStatus.push_back("ERROR_TIN");
+    if (tokens.size() > ACTION) {
+        if (tokens[ACTION] == "enable") {
+            result = regWrite(BoardTest::HEATER_CONTROL, BoardTestTec::HEATER_ENABLE);
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "disable") {
+            result = regWrite(BoardTest::HEATER_CONTROL, BoardTestTec::HEATER_DISABLE);
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "enable") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_CONTROL, value);
+                if (result == BoardTest::OKAY) {
+                    res = value & BoardTestTec::HEATER_DISABLE ? "disabled" :
+                          value & BoardTestTec::HEATER_ENABLE  ? "enabled"  :
+                                                                 "undefined";
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "tref") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_TREF_VALUE, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2fdegC", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "imax") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_IMAX_VALUE, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2fA", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "tin") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_TIN_SELECT, value);
+                if (result == BoardTest::OKAY) {
+                    std::map<int, std::string> tin;
+                    tin[LibTec::HEATER_T1_SELECT] = "T1";
+                    tin[LibTec::HEATER_T2_SELECT] = "T2";
+                    tin[LibTec::HEATER_T3_SELECT] = "T3";
+                    tin[LibTec::HEATER_T4_SELECT] = "T4";
+                    char t[16];
+                    sprintf(t, "%s", tin[value].c_str());
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "propgain") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_PROPORTIONAL_GAIN, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2f", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "intgain") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_INTEGRAL_GAIN, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2f", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "dergain") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_DERIVATIVE_GAIN, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2f", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "closedloop") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_CONTROL, value);
+                if (result == BoardTest::OKAY) {
+                    res = value & BoardTestTec::HEATER_CLOSED_LOOP_DISABLE ? "disabled" :
+                          value & BoardTestTec::HEATER_CLOSED_LOOP_ENABLE  ? "enabled"  :
+                                                                             "undefined";
+                }
+                isParsingError = false;
+            }
+        }
+        else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "tref" && tokens.size() > VALUE) {
+                float refCurr;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &refCurr) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&refCurr);
+                   result = regWrite(BoardTest::HEATER_TREF_VALUE, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::HEATER_STATUS, value);
+                       if (value != LibTec::HEATER_OKAY) {
+                           res = "heater status: " + heaterStatus[value];
+                       }
+                   }
+                   isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "imax" && tokens.size() > VALUE) {
+                float refCurr;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &refCurr) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&refCurr);
+                   result = regWrite(BoardTest::HEATER_IMAX_VALUE, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::HEATER_STATUS, value);
+                       if (value != LibTec::HEATER_OKAY) {
+                           res = "heater status: " + heaterStatus[value];
+                       }
+                   }
+                   isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "tin" && tokens.size() > VALUE) {
+                std::map<std::string, int> tin;
+                tin["1"] = LibTec::HEATER_T1_SELECT;
+                tin["2"] = LibTec::HEATER_T2_SELECT;
+                tin["3"] = LibTec::HEATER_T3_SELECT;
+                tin["4"] = LibTec::HEATER_T4_SELECT;
+                if (tin.find(tokens[VALUE]) != tin.end()) {
+                    uint32 value = tin[tokens[VALUE]];
+                    result = regWrite(BoardTest::HEATER_TIN_SELECT, value);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::HEATER_STATUS, v);
+                        if (v != LibTec::HEATER_OKAY) {
+                            res = "heater status: " + heaterStatus[v];
+                        }
+                    }
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "closedloop" && tokens.size() > VALUE) {
+                if (tokens[VALUE] == "enable") {
+                    result = regWrite(BoardTest::HEATER_CONTROL,
+                                              BoardTestTec::HEATER_CLOSED_LOOP_ENABLE);
+                    isParsingError = false;
+                }
+                else if (tokens[VALUE] == "disable") {
+                    result = regWrite(BoardTest::HEATER_CONTROL,
+                                             BoardTestTec::HEATER_CLOSED_LOOP_DISABLE);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "propgain" && tokens.size() > VALUE) {
+                float gain;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &gain) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&gain);
+                   result = regWrite(BoardTest::HEATER_PROPORTIONAL_GAIN, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::HEATER_STATUS, value);
+                       if (value != LibTec::HEATER_OKAY) {
+                           res = "heater status: " + heaterStatus[value];
+                       }
+                   }
+                   isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "intgain" && tokens.size() > VALUE) {
+                float gain;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &gain) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&gain);
+                   result = regWrite(BoardTest::HEATER_INTEGRAL_GAIN, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::HEATER_STATUS, value);
+                       if (value != LibTec::HEATER_OKAY) {
+                           res = "heater status: " + heaterStatus[value];
+                       }
+                   }
+                   isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "dergain" && tokens.size() > VALUE) {
+                float gain;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &gain) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&gain);
+                   result = regWrite(BoardTest::HEATER_DERIVATIVE_GAIN, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::HEATER_STATUS, value);
+                       if (value != LibTec::HEATER_OKAY) {
+                           res = "heater status: " + heaterStatus[value];
+                       }
+                   }
+                   isParsingError = false;
+                }
             }
         }
     }

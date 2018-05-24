@@ -26,6 +26,12 @@ public:
         TRACE_START = (uint32)((uint32) 1U << 0U),
         TRACE_STOP  = (uint32)((uint32) 1U << 1U),
     };
+    enum HeaterControl {
+        HEATER_DISABLE             = (uint32)((uint32) 1U << 0U),
+        HEATER_ENABLE              = (uint32)((uint32) 1U << 1U),
+        HEATER_CLOSED_LOOP_DISABLE = (uint32)((uint32) 1U << 4U),
+        HEATER_CLOSED_LOOP_ENABLE  = (uint32)((uint32) 1U << 5U),
+    };
 public:
     BoardTestTec();
     virtual ~BoardTestTec();
