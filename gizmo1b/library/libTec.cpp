@@ -122,10 +122,10 @@ int LibTec::getTin(float& tin)
     LibMutex libMutex(s_mutex);
     float value;
     int thermMap[] = {
-        [LibThermistor::AIN_A] = HEATER_T1_SELECT,
-        [LibThermistor::AIN_B] = HEATER_T2_SELECT,
-        [LibThermistor::AIN_C] = HEATER_T3_SELECT,
-        [LibThermistor::AIN_D] = HEATER_T4_SELECT,
+        [HEATER_T1_SELECT] = LibThermistor::AIN_A,
+        [HEATER_T2_SELECT] = LibThermistor::AIN_B,
+        [HEATER_T3_SELECT] = LibThermistor::AIN_C,
+        [HEATER_T4_SELECT] = LibThermistor::AIN_D,
     };
     int result = m_libThermistor.readTemp(thermMap[m_heaterTin], value);
     if (result != LibThermistor::OKAY) {
