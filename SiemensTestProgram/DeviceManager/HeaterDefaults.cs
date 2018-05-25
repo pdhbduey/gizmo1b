@@ -20,6 +20,23 @@ namespace DeviceManager
         public const float IMaxMinimum = 0;
         public const float IMaxMaximum = 15;
 
+        public static List<string> Tins = new List<string>
+        {
+            "T1",
+            "T2",
+            "T3",
+            "T4"
+        };
+
+        public static Dictionary<byte, string> TinReadMapping = new Dictionary<byte, string>()
+        {
+            { 0x00, "T1" },
+            { 0x01, "T2" },
+            { 0x02, "T3" },
+            { 0x03, "T4" }
+        };
+
+
         public static byte[] SetDisableCommand()
         {
             return new byte[]

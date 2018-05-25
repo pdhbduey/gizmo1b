@@ -78,6 +78,7 @@
     <Compile Include="DioDefaults.cs" />
     <Compile Include="FanDefaults.cs" />
     <Compile Include="FaultDefaults.cs" />
+    <Compile Include="HeaterDefaults.cs" />
     <Compile Include="LedDefaults.cs" />
     <Compile Include="Model\AdcModel.cs" />
     <Compile Include="Model\CommunicationConfigurationModel.cs" />
@@ -85,12 +86,14 @@
     <Compile Include="Model\DioModel.cs" />
     <Compile Include="Model\FanModel.cs" />
     <Compile Include="Model\FaultModel.cs" />
+    <Compile Include="Model\HeaterModel.cs" />
     <Compile Include="Model\IAdcModel.cs" />
     <Compile Include="Model\ICommunicationConfigurationModel.cs" />
     <Compile Include="Model\IDacModel.cs" />
     <Compile Include="Model\IDioModel.cs" />
     <Compile Include="Model\IFanModel.cs" />
     <Compile Include="Model\IFaultModel.cs" />
+    <Compile Include="Model\IHeaterModel.cs" />
     <Compile Include="Model\ILedModel.cs" />
     <Compile Include="Model\IMotorModel.cs" />
     <Compile Include="Model\ISnapshotModel.cs" />
@@ -114,6 +117,7 @@
     <Compile Include="ViewModel\DioViewModel.cs" />
     <Compile Include="ViewModel\FanViewModel.cs" />
     <Compile Include="ViewModel\FaultViewModel.cs" />
+    <Compile Include="ViewModel\HeaterViewModel.cs" />
     <Compile Include="ViewModel\MotorViewModel.cs" />
     <Compile Include="ViewModel\LedViewModel.cs" />
     <Compile Include="ViewModel\SnapshotViewModel.cs" />
@@ -140,6 +144,9 @@
     </Compile>
     <Compile Include="View\FaultView.xaml.cs">
       <DependentUpon>FaultView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\HeaterView.xaml.cs">
+      <DependentUpon>HeaterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\LedView.xaml.cs">
       <DependentUpon>LedView.xaml</DependentUpon>
@@ -197,6 +204,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\FaultView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\HeaterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

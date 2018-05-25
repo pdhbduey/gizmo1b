@@ -226,7 +226,6 @@ namespace DeviceManager.ViewModel
                     {
                         AinD = Helper.GetFloatFromBigEndian(ainDData.response);
                     }));
-                    
                 }
 
                 Thread.Sleep(updateDelay);

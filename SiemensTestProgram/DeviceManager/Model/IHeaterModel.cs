@@ -18,5 +18,31 @@ namespace DeviceManager.Model
         Task<CommunicationData> SetTRefCommand(float tRef);
 
         Task<CommunicationData> SetIMaxCommand(float iMax);
+
+        Task<CommunicationData> SetTinCommand(string selectedTin);
+
+        Task<CommunicationData> ReadTinCommand();
+
+        Task<CommunicationData> ReadStatusCommand();
+
+        Task<CommunicationData> StartClosedLoopCommand();
+
+        Task<CommunicationData> StopClosedLoopCommand();
+
+        Task<CommunicationData> EnableCommand();
+
+        Task<CommunicationData> DisableCommand();
+
+        Task<CommunicationData> ReadVSenseCommand();
+
+        Task<CommunicationData> ReadISenseCommand();
+
+        Task<CommunicationData> ReadTemperatureOne();
+
+        Task<CommunicationData> ReadTemperatureTwo();
+
+        Task<CommunicationData> ReadTemperatureThree();
+
+        Task<CommunicationData> ReadTemperatureFour();
     }
 }

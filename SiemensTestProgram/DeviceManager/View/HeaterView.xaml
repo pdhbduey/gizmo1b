@@ -83,8 +83,19 @@
                 <TextBlock Text="Select" FontWeight="Bold"/>
             </GroupBox.Header>
 
-            <StackPanel>
-                <Label Content="{Binding StatusMessage}"></Label>
+            <StackPanel Margin="1">
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="50" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Select:"></Label>
+                    <ComboBox Margin="1" Height="25" Width="70" HorizontalAlignment="Left" ItemsSource="{Binding Tins}" SelectedItem="{Binding SelectedTin}"></ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="50"></Label>
+                    <ToggleButton Margin="1" Width="70" Height="25" Content="{Binding EnableState}" HorizontalAlignment="Left" Command="{Binding EnableCommand}"></ToggleButton>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="50"></Label>
+                    <ToggleButton Width="70" Height="25" Margin="1" Content="{Binding ClosedLoopState}" HorizontalAlignment="Left" Command="{Binding StartClosedLoopCommand}"></ToggleButton>
+                </StackPanel>
             </StackPanel>
         </GroupBox>
         
@@ -95,7 +106,13 @@
             </GroupBox.Header>
 
             <StackPanel>
-                <Label Content="{Binding StatusMessage}"></Label>
+                <Label Margin="1" Content="{Binding StatusMessage}"></Label>
+                <Label Margin="1" Content="{Binding ISenseText}"></Label>
+                <Label Margin="1" Content="{Binding VSenseText}"></Label>
+                <Label Margin="1" Content="{Binding TemperatureOneText}"></Label>
+                <Label Margin="1" Content="{Binding TemperatureTwoText}"></Label>
+                <Label Margin="1" Content="{Binding TemperatureThreeText}"></Label>
+                <Label Margin="1" Content="{Binding TemperatureFourText}"></Label>
             </StackPanel>
         </GroupBox>
     </Grid>
