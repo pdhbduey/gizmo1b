@@ -54,23 +54,21 @@ namespace DeviceManager.Model
         public Task<CommunicationData> SetTinCommand(string selectedTin)
         {
             int intSelectedTin;
-            switch (selectedTin)
+            if (string.Equals(selectedTin, "T1"))
             {
-                case "1":
-                    intSelectedTin = 1;
-                    break;
-                case "2":
-                    intSelectedTin = 2;
-                    break;
-                case "3":
-                    intSelectedTin = 3;
-                    break;
-                case "4":
-                    intSelectedTin = 4;
-                    break;
-                default:
-                    intSelectedTin = 1;
-                    break;
+                intSelectedTin = 1;
+            }
+            else if (string.Equals(selectedTin, "T2"))
+            {
+                intSelectedTin = 2;
+            }
+            else if (string.Equals(selectedTin, "T3"))
+            {
+                intSelectedTin = 3;
+            }
+            else
+            {
+                intSelectedTin = 4;
             }
 
             var requestArray = HeaterDefaults.SetTinSelect(intSelectedTin);

@@ -48,7 +48,7 @@ namespace DeviceManager.ViewModel
             Tins = HeaterDefaults.Tins;
 
 
-            // InitialUpdate
+            
             selectedTin = Tins[0];
             enableState = TecDefaults.EnableText;
             closedLoopState = TecDefaults.EnableClosedLoopText;
@@ -57,9 +57,8 @@ namespace DeviceManager.ViewModel
             IMax = 0f;
             DerivativeGain = 0f;
             IntegralGain = 0f;
-            // read tref
-            // read imax
 
+            InitialUpdate();
             StartUpdateTask();
         }
 
@@ -380,6 +379,85 @@ namespace DeviceManager.ViewModel
             thread.Start();
         }
 
+        private void InitialUpdate()
+        {
+            var vData = heaterModel.ReadVSenseCommand().Result;
+            if (vData.succesfulResponse)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    VSense = Helper.GetFloatFromBigEndian(vData.response);
+                }));
+
+            }
+
+            var isenseData = heaterModel.ReadISenseCommand().Result;
+            if (isenseData.succesfulResponse)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    ISense = Helper.GetFloatFromBigEndian(isenseData.response);
+                }));
+
+            }
+
+            var TemperatureOneData = heaterModel.ReadTemperatureOne().Result;
+            if (TemperatureOneData.succesfulResponse)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    TemperatureOne = Helper.GetFloatFromBigEndian(TemperatureOneData.response);
+                }));
+
+            }
+
+            var TemperatureTwoData = heaterModel.ReadTemperatureTwo().Result;
+            if (TemperatureTwoData.succesfulResponse)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    TemperatureTwo = Helper.GetFloatFromBigEndian(TemperatureTwoData.response);
+                }));
+
+            }
+
+            var TemperatureThreeData = heaterModel.ReadTemperatureThree().Result;
+            if (TemperatureThreeData.succesfulResponse)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    TemperatureThree = Helper.GetFloatFromBigEndian(TemperatureThreeData.response);
+                }));
+
+            }
+
+            var TemperatureFourData = heaterModel.ReadTemperatureFour().Result;
+            if (TemperatureFourData.succesfulResponse)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    TemperatureFour = Helper.GetFloatFromBigEndian(TemperatureFourData.response);
+                }));
+            }
+
+            var status = heaterModel.ReadStatusCommand().Result;
+            if (status.succesfulResponse)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    ProcessStatus(status.response);
+                }));
+            }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    StatusMessage = "Communication Error";
+                }));
+
+            }
+        }
+
         private async void UpdateAllStatuses()
         {
             while (true)
@@ -508,9 +586,9 @@ namespace DeviceManager.ViewModel
         private async void ClosedLoopToggle()
         {
             var state = closedLoopState;
-            ClosedLoopState = closedLoopState == TecDefaults.StartWaveformText ? TecDefaults.StopWaveformText : TecDefaults.StartWaveformText;
+            ClosedLoopState = closedLoopState == TecDefaults.EnableClosedLoopText ? TecDefaults.DisableClosedLoopText : TecDefaults.EnableClosedLoopText;
             
-            if (string.Equals(state, TecDefaults.StartWaveformText))
+            if (string.Equals(state, TecDefaults.EnableClosedLoopText))
             {
                 await heaterModel.StartClosedLoopCommand();
             }
