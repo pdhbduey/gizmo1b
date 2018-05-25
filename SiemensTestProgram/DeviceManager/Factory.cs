@@ -12,6 +12,10 @@ namespace DeviceManager
         private static Factory instance = null;
         private IComCommunication serialCommunication;
 
+        // Singletons
+        private SnapshotView snapshotView;
+        private SnapshotViewModel snapshotViewModel;
+
         /// <summary>
         /// Creates Device Manager Factory.
         /// </summary>
@@ -45,10 +49,9 @@ namespace DeviceManager
         public DacView GetDacView()
         {
            return new DacView()
-                {
-                    DataContext = new DacViewModel(GetDacModel())
-                };
-            
+            {
+                DataContext = new DacViewModel(GetDacModel())
+            };
         }
 
         /// <summary>
@@ -86,10 +89,16 @@ namespace DeviceManager
         /// <returns> Snapshot view </returns>
         public SnapshotView GetSnapshotView()
         {
-            return new SnapshotView()
+            if (snapshotViewModel == null)
             {
-                DataContext = new SnapshotViewModel(GetSnapshotModel())
-            };
+                snapshotViewModel = new SnapshotViewModel(GetSnapshotModel());
+                snapshotView = new SnapshotView()
+                {
+                    DataContext = snapshotViewModel
+                };
+            }
+
+            return snapshotView;
         }
 
         /// <summary>
@@ -191,7 +200,24 @@ namespace DeviceManager
                 };
         }
 
-        private LedModel GetLedModel()
+        /// <summary>
+        ///  Sets the data context for Heater view.
+        /// </summary>
+        /// <returns> Motor view. </returns>
+        public HeaterView GetHeaterView()
+        {
+            return new HeaterView()
+            {
+                DataContext = new HeaterViewModel(GetHeaterModel())
+            };
+        }
+
+        private IHeaterModel GetHeaterModel()
+        {
+            return new HeaterModel(serialCommunication);
+        }
+
+        private ILedModel GetLedModel()
         {
             return new LedModel(serialCommunication);
         }
