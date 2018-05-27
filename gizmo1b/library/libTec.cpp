@@ -16,10 +16,10 @@ float* LibTec::s_snapshotT3;
 float* LibTec::s_snapshotT4;
 SemaphoreHandle_t LibTec::s_traceMutex;
 
-void LibTec::IrefSample::clear()
+void LibTec::Sample::clear()
 {
     m_time = 0;
-    m_iref = 0;
+    m_value = 0;
 }
 
 LibTec::LibTec(const char* name) :
@@ -129,7 +129,7 @@ int LibTec::getTin(float& tin)
     };
     int result = m_libThermistor.readTemp(thermMap[m_heaterTin], value);
     if (result != LibThermistor::OKAY) {
-        return ERROR_TIN;
+        return ERROR_HEATER_TIN;
     }
     tin = value;
     return HEATER_OKAY;
@@ -215,33 +215,33 @@ uint32 LibTec::getWaveformPeriod()
     return m_waveformPeriod;
 }
 
-float LibTec::getIrefFromCustomWaveform(std::vector<struct IrefSample>& waveform)
+float LibTec::getMaxValueFromCustomWaveform(std::vector<struct Sample>& waveform)
 {
-    float iref = waveform[0].m_iref;
+    float value = waveform[0].m_value;
     for (int i = 1; i < waveform.size(); i++) {
-        if (std::abs(waveform[i].m_iref) > std::abs(iref)) {
-            iref = waveform[i].m_iref;
+        if (std::abs(waveform[i].m_value) > std::abs(value)) {
+            value = waveform[i].m_value;
         }
     }
-    return iref;
+    return value;
 }
 
-uint32 LibTec::getPeriodFromCustomWaveform(std::vector<struct IrefSample>& waveform)
+uint32 LibTec::getPeriodFromCustomWaveform(std::vector<struct Sample>& waveform)
 {
     return waveform[waveform.size() - 1].m_time + 1;
 }
 
-bool LibTec::isCustomWaveformEmpty(std::vector<struct IrefSample>& waveform)
+bool LibTec::isCustomWaveformEmpty(std::vector<struct Sample>& waveform)
 {
     return waveform.size() == 0;
 }
 
-bool LibTec::isCustomWaveformStartTimeZero(std::vector<struct IrefSample>& waveform)
+bool LibTec::isCustomWaveformStartTimeZero(std::vector<struct Sample>& waveform)
 {
     return waveform[0].m_time == 0;
 }
 
-bool LibTec::isCustomWaveformTimeRising(std::vector<struct IrefSample>& waveform)
+bool LibTec::isCustomWaveformTimeRising(std::vector<struct Sample>& waveform)
 {
     if (waveform.size() > 1) {
         for (int i = 0; i < waveform.size() - 1; i++) {
@@ -253,7 +253,7 @@ bool LibTec::isCustomWaveformTimeRising(std::vector<struct IrefSample>& waveform
     return true;
 }
 
-int LibTec::setCustomWaveform(std::vector<struct IrefSample>& waveform, uint32 cycles)
+int LibTec::setCustomWaveform(std::vector<struct Sample>& waveform, uint32 cycles)
 {
     if (isCustomWaveformEmpty(waveform)) {
         return ERROR_CUSTOM_WAVEFORM_EMPTY;
@@ -268,7 +268,7 @@ int LibTec::setCustomWaveform(std::vector<struct IrefSample>& waveform, uint32 c
     if (!isWaveformPeriodValid(waveformPeriod)) {
         return ERROR_WAVEFORM_PERIOD_OUT_OF_RANGE;
     }
-    float iref = getIrefFromCustomWaveform(waveform);
+    float iref = getMaxValueFromCustomWaveform(waveform);
     if (!isRefCurrentValid(iref)) {
         return ERROR_REF_CURRENT_OUT_OF_RANGE;;
     }
@@ -279,7 +279,7 @@ int LibTec::setCustomWaveform(std::vector<struct IrefSample>& waveform, uint32 c
     return OKAY;
 }
 
-void LibTec::getCustomWaveform(std::vector<struct IrefSample>& waveform, uint32& cycles)
+void LibTec::getCustomWaveform(std::vector<struct Sample>& waveform, uint32& cycles)
 {
     waveform.clear();
     waveform = m_customWaveform;
@@ -289,7 +289,9 @@ void LibTec::getCustomWaveform(std::vector<struct IrefSample>& waveform, uint32&
 void LibTec::waveformStart()
 {
     LibMutex libMutex(s_mutex);
-    if (m_waveformType == WAVEFORM_TYPE_CONSTANT || m_isWaveformRunning)  {
+    if (m_waveformType == WAVEFORM_TYPE_CONSTANT
+     || m_isWaveformRunning
+     || m_isHeaterWaveformRunning)  {
         return;
     }
     float ticksPeriod = pdMS_TO_TICKS(m_waveformPeriod);
@@ -343,23 +345,23 @@ void LibTec::waveformStart()
                                                   * configTICK_RATE_HZ / 1000.0;
                     if (m_waveform[i].m_ticks <= leftTimeTicks
                      && leftTimeTicks <= m_waveform[i + 1].m_ticks) {
-                        m_waveform[i].m_iref = m_customWaveform[j++].m_iref;
+                        m_waveform[i].m_iref = m_customWaveform[j++].m_value;
                     }
                 }
             }
             for (int i = 0, j = 1; i < m_customWaveform.size() - 1; i++) {
-                struct IrefSample irefSampleLeft = m_customWaveform[i];
-                struct IrefSample irefSampleRight = m_customWaveform[i + 1];
+                struct Sample irefSampleLeft = m_customWaveform[i];
+                struct Sample irefSampleRight = m_customWaveform[i + 1];
                 float dticks = (irefSampleRight.m_time - irefSampleLeft.m_time)
                                                   * configTICK_RATE_HZ / 1000.0;
-                float dy = irefSampleRight.m_iref - irefSampleLeft.m_iref;
+                float dy = irefSampleRight.m_value - irefSampleLeft.m_value;
                 float leftTimeTicks = irefSampleLeft.m_time
                                                   * configTICK_RATE_HZ / 1000.0;
                 for ( ; j < 1000; j++) {
                     float ticks = ticksStep * j;
-                    float iref = irefSampleLeft.m_iref
+                    float iref = irefSampleLeft.m_value
                                         + dy / dticks * (ticks - leftTimeTicks);
-                    if (m_waveform[j].m_iref == irefSampleRight.m_iref) {
+                    if (m_waveform[j].m_iref == irefSampleRight.m_value) {
                         j++;
                         break;
                     }
@@ -518,9 +520,8 @@ void LibTec::run()
     while (true) {
         vTaskDelay(1);
         TickType_t tick = xTaskGetTickCount();
-        float iRef;
         // Temperature PID regulator
-        float heaterPidError = m_heaterRefTemperature;
+        float heaterPidError = getHeaterTref();
         float tin            = 0;
         if (m_isHeaterClosedLoopEnabled && getTin(tin) == HEATER_OKAY) {
             heaterPidError -= tin;
@@ -547,7 +548,7 @@ void LibTec::run()
         m_heaterPrevError   = heaterPidError;
         m_heaterAccError   += heaterPidError;
         // Current PID regulator
-        iRef                = m_isHeaterEnabled ? heaterControl : getWaveformSample(tick);
+        float iRef      = m_isHeaterEnabled ? heaterControl : getWaveformSample(tick);
         float pidError  = iRef;
         float iSense    = 0;
         if (m_isClosedLoopEnabled && getISense(iSense) == OKAY) {
@@ -972,4 +973,99 @@ int LibTec::heaterGetTin()
 {
     LibMutex libMutex(s_mutex);
     return m_heaterTin;
+}
+
+int LibTec::heaterSetCustomWaveform(std::vector<struct Sample>& waveform, uint32 cycles)
+{
+    if (isCustomWaveformEmpty(waveform)) {
+        return ERROR_HEATER_CUSTOM_WAVEFORM_EMPTY;
+    }
+    if (!isCustomWaveformStartTimeZero(waveform)) {
+        return ERROR_HEATER_CUSTOM_WAVEFORM_NON_ZERO_START_TIME;
+    }
+    if (!isCustomWaveformTimeRising(waveform)) {
+        return ERROR_HEATER_CUSTOM_WAVEFORM_TIME_NOT_RISING;
+    }
+    float tref = getMaxValueFromCustomWaveform(waveform);
+    if (!isRefTemperatureValid(tref)) {
+        return ERROR_HEATER_TREF_OUT_OF_RANGE;
+    }
+    LibMutex libMutex(s_mutex);
+    m_heaterCustomWaveform.clear();
+    m_heaterCustomWaveform = waveform;
+    m_heaterCycles = cycles;
+    return HEATER_OKAY;
+}
+
+void LibTec::heaterGetCustomWaveform(std::vector<struct Sample>& waveform, uint32& cycles)
+{
+    LibMutex libMutex(s_mutex);
+    waveform.clear();
+    waveform = m_heaterCustomWaveform;
+    cycles = m_heaterCycles;
+}
+
+void LibTec::heaterWaveformStart()
+{
+    LibMutex libMutex(s_mutex);
+    if (m_isHeaterWaveformRunning || m_heaterCustomWaveform.size() <= 1)  {
+        return;
+    }
+    if (!isCustomWaveformEmpty(m_heaterCustomWaveform)) {
+        m_isHeaterWaveformRunning = true;
+        m_heaterCurrentCycle      = 0;
+        m_heaterCurrentSample     = 0;
+        m_heaterSampleTime        = 0;
+        m_heaterThreadTick        = 0;
+    }
+}
+
+void LibTec::heaterWaveformStop()
+{
+    LibMutex libMutex(s_mutex);
+    if (!m_isHeaterWaveformRunning)  {
+        return;
+    }
+    m_isHeaterWaveformRunning = false;
+}
+
+float LibTec::getHeaterTref()
+{
+    LibMutex libMutex(s_mutex);
+    if (!m_isHeaterWaveformRunning) {
+        return m_heaterRefTemperature;
+    }
+    m_heaterThreadTick++;
+    if (m_heaterThreadTick >= configTICK_RATE_HZ) {
+        m_heaterSampleTime++;
+        m_heaterThreadTick = 0;
+    }
+    if (m_heaterSampleTime >=
+        m_heaterCustomWaveform[m_heaterCurrentSample + 1].m_time) {
+        m_heaterCurrentSample++;
+        if (m_heaterCurrentSample >= m_heaterCustomWaveform.size() - 1) {
+            m_heaterCurrentSample = 0;
+            m_heaterSampleTime    = 0;
+            m_heaterCurrentCycle++;
+            if (m_heaterCycles && m_heaterCurrentCycle >= m_heaterCycles) {
+                m_isHeaterWaveformRunning = false;
+                return m_heaterRefTemperature;
+            }
+        }
+    }
+    struct Sample currentSample = m_heaterCustomWaveform[m_heaterCurrentSample];
+    struct Sample nextSample    = m_heaterCustomWaveform[m_heaterCurrentSample + 1];
+    float x1 = currentSample.m_time * configTICK_RATE_HZ;
+    float x2 = nextSample.m_time    * configTICK_RATE_HZ;
+    float x  = m_heaterSampleTime   * configTICK_RATE_HZ + m_heaterThreadTick;
+    float y1 = currentSample.m_value;
+    float y2 = nextSample.m_value;
+    float tref = y1 + (y2 - y1) * (x - x1) / (x2 - x1);
+    return tref;
+}
+
+bool LibTec::isHeaterWaveformStarted()
+{
+    LibMutex libMutex(s_mutex);
+    return m_isHeaterWaveformRunning;
 }

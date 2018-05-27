@@ -16,9 +16,9 @@
 class LibTec : public LibTask
 {
 public:
-    struct IrefSample {
-        uint32 m_time; // 0ms-10,000ms
-        float m_iref;  // [-15A,15A]
+    struct Sample {
+        uint32 m_time;
+        float  m_value;
         void clear();
     };
     enum Status {
@@ -70,7 +70,10 @@ public:
         ERROR_HEATER_INTEGRAL_GAIN_OUT_OF_RANGE,
         ERROR_HEATER_DERIVATIVE_GAIN_OUT_OF_RANGE,
         ERROR_HEATER_TIN_SELECT_OUT_OF_RANGE,
-        ERROR_TIN,
+        ERROR_HEATER_TIN,
+        ERROR_HEATER_CUSTOM_WAVEFORM_EMPTY,
+        ERROR_HEATER_CUSTOM_WAVEFORM_TIME_NOT_RISING,
+        ERROR_HEATER_CUSTOM_WAVEFORM_NON_ZERO_START_TIME
     };
     enum HeaterTinSelect {
         HEATER_T1_SELECT,
@@ -91,8 +94,8 @@ public:
     uint32 getWaveformType();
     int setWaveformPeriod(uint32 waveformPeriod); // 2ms-10,000ms
     uint32 getWaveformPeriod();
-    int setCustomWaveform(std::vector<struct IrefSample>& waveform, uint32 cycles); // cycles = 0 means cycle forever
-    void getCustomWaveform(std::vector<struct IrefSample>& waveform, uint32& cycles);
+    int setCustomWaveform(std::vector<struct Sample>& waveform, uint32 cycles); // cycles = 0 means cycle forever
+    void getCustomWaveform(std::vector<struct Sample>& waveform, uint32& cycles);
     void waveformStart();
     void waveformStop();
     bool isWaveformStarted();
@@ -143,6 +146,11 @@ public:
     float getHeaterImax();
     int heaterSetTin(int tin);
     int heaterGetTin();
+    int heaterSetCustomWaveform(std::vector<struct Sample>& waveform, uint32 cycles); // cycles = 0 means cycle forever
+    void heaterGetCustomWaveform(std::vector<struct Sample>& waveform, uint32& cycles);
+    void heaterWaveformStart();
+    void heaterWaveformStop();
+    bool isHeaterWaveformStarted();
 private:
     enum adcChannels {
         ISENSE = LibAdc::CHANNEL_1,
@@ -159,15 +167,16 @@ private:
     float getWaveformSample(TickType_t tick);
     bool isWaveformPeriodValid(uint32 waveformPeriod);
     bool isRefCurrentValid(float refCurrent);
-    float getIrefFromCustomWaveform(std::vector<struct IrefSample>& waveform);
-    uint32 getPeriodFromCustomWaveform(std::vector<struct IrefSample>& waveform);
-    bool isCustomWaveformTimeRising(std::vector<struct IrefSample>& waveform);
-    bool isCustomWaveformEmpty(std::vector<struct IrefSample>& waveform);
-    bool isCustomWaveformStartTimeZero(std::vector<struct IrefSample>& waveform);
+    float getMaxValueFromCustomWaveform(std::vector<struct Sample>& waveform);
+    uint32 getPeriodFromCustomWaveform(std::vector<struct Sample>& waveform);
+    bool isCustomWaveformTimeRising(std::vector<struct Sample>& waveform);
+    bool isCustomWaveformEmpty(std::vector<struct Sample>& waveform);
+    bool isCustomWaveformStartTimeZero(std::vector<struct Sample>& waveform);
     bool isSnapshotSampleInRange(int sample);
     bool isRefTemperatureValid(float tref);
     bool isImaxValid(float imax);
     int getTin(float& tin);
+    float getHeaterTref();
 private:
     LibWrapGioPort::Port m_tecEnable;
     LibAdc m_libAdc;
@@ -191,7 +200,7 @@ private:
     bool m_isEnabled;
     std::queue<float> m_filterQueue;
     std::vector<float> m_filterTaps;
-    std::vector<struct IrefSample> m_customWaveform;
+    std::vector<struct Sample> m_customWaveform;
     uint32 m_cycles;
     static float* s_snapshotVsense;
     static float* s_snapshotIsense;
@@ -219,6 +228,13 @@ private:
     int m_heaterTin;
     float m_heaterPrevError;
     float m_heaterAccError;
+    std::vector<struct Sample> m_heaterCustomWaveform;
+    uint32 m_heaterCycles;
+    uint32 m_heaterCurrentCycle;
+    int m_heaterCurrentSample;
+    bool m_isHeaterWaveformRunning;
+    uint32 m_heaterSampleTime;
+    uint32 m_heaterThreadTick;
 };
 
 #endif // _LIB_TEC_H_

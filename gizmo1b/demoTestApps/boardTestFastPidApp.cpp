@@ -237,9 +237,9 @@ void BoardTestFastPidApp::sciNotification(sciBASE_t* sci, uint32 flags)
                         break;
                     case BoardTest::TEC_CONTROL:
                         value  = 0;
-                        value |= s_isClosedLoopEnabled ? BoardTestTec::CLOSED_LOOP_ENABLE : BoardTestTec::CLOSED_LOOP_DISABLE;
-                        value |= s_isTecEnabled        ? BoardTestTec::ENABLE             : BoardTestTec::DISABLE;
-                        value |= s_isWaveFormStarted   ? BoardTestTec::START_WAVEFORM     : BoardTestTec::STOP_WAVEFORM;
+                        value |= (s_isClosedLoopEnabled ? BoardTestTec::CLOSED_LOOP_ENABLE : BoardTestTec::CLOSED_LOOP_DISABLE);
+                        value |= (s_isTecEnabled        ? BoardTestTec::ENABLE             : BoardTestTec::DISABLE);
+                        value |= (s_isWaveFormStarted   ? BoardTestTec::START_WAVEFORM     : BoardTestTec::STOP_WAVEFORM);
                         break;
                     case BoardTest::TEC_ISENSE_VALUE:
                         value = *reinterpret_cast<uint32*>(&s_iSense);
