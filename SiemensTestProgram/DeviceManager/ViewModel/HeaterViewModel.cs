@@ -52,7 +52,7 @@ namespace DeviceManager.ViewModel
             selectedTin = Tins[0];
             enableState = TecDefaults.EnableText;
             closedLoopState = TecDefaults.EnableClosedLoopText;
-            ProportionalGain = 0.01f;
+            ProportionalGain = 1.00f;
             TRef = 0f;
             IMax = 0f;
             DerivativeGain = 0f;
