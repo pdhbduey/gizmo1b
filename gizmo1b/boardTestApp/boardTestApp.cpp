@@ -81,6 +81,10 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::HEATER_PROPORTIONAL_GAIN]      = boardTestTec;
     m_boardTestMap[BoardTest::HEATER_INTEGRAL_GAIN]          = boardTestTec;
     m_boardTestMap[BoardTest::HEATER_DERIVATIVE_GAIN]        = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_WAVEFORM_SAMPLE_INDEX]  = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_WAVEFORM_SAMPLE_TIME]   = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_WAVEFORM_SAMPLE_TREF]   = boardTestTec;
+    m_boardTestMap[BoardTest::HEATER_WAVEFORM_CYCLES]        = boardTestTec;
     BoardTest* boardTestThermistor                     = new BoardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_STATUS]       = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_A] = boardTestThermistor;

@@ -27,10 +27,14 @@ public:
         TRACE_STOP  = (uint32)((uint32) 1U << 1U),
     };
     enum HeaterControl {
-        HEATER_DISABLE             = (uint32)((uint32) 1U << 0U),
-        HEATER_ENABLE              = (uint32)((uint32) 1U << 1U),
-        HEATER_CLOSED_LOOP_DISABLE = (uint32)((uint32) 1U << 4U),
-        HEATER_CLOSED_LOOP_ENABLE  = (uint32)((uint32) 1U << 5U),
+        HEATER_DISABLE                     = (uint32)((uint32) 1U << 0U),
+        HEATER_ENABLE                      = (uint32)((uint32) 1U << 1U),
+        HEATER_START_WAVEFORM              = (uint32)((uint32) 1U << 2U),
+        HEATER_STOP_WAVEFORM               = (uint32)((uint32) 1U << 3U),
+        HEATER_CLOSED_LOOP_DISABLE         = (uint32)((uint32) 1U << 4U),
+        HEATER_CLOSED_LOOP_ENABLE          = (uint32)((uint32) 1U << 5U),
+        HEATER_CUSTOM_WAVEFORM_RESET_INDEX = (uint32)((uint32) 1U << 6U),
+        HEATER_CUSTOM_WAVEFORM_INC_INDEX   = (uint32)((uint32) 1U << 7U),
     };
 public:
     BoardTestTec();
@@ -40,12 +44,15 @@ public:
 private:
     LibTec m_libTec;
     int m_status;
-    std::vector<struct LibTec::IrefSample> m_customWaveform;
-    struct LibTec::IrefSample m_irefSample;
+    std::vector<struct LibTec::Sample> m_customWaveform;
+    struct LibTec::Sample m_irefSample;
     uint32 m_customeWaveformCycles;
     LibLed m_libLed;
     int m_snapshotStatus;
     int m_traceStatus;
+    std::vector<struct LibTec::Sample> m_heaterCustomWaveform;
+    struct LibTec::Sample m_heaterTrefSample;
+    uint32 m_heaterCustomeWaveformCycles;
 };
 
 #endif // _BOARD_TEST_TEC_H_

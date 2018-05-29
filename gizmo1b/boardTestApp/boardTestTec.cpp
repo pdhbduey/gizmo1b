@@ -85,9 +85,9 @@ int BoardTestTec::get(uint32 address, uint32& value)
         return ERROR_WO;
     case TEC_CONTROL:
         value = 0;
-        value |= m_libTec.isEnabled()           ? ENABLE             : DISABLE;
-        value |= m_libTec.isWaveformStarted()   ? START_WAVEFORM     : STOP_WAVEFORM;
-        value |= m_libTec.isClosedLoopEnabled() ? CLOSED_LOOP_ENABLE : CLOSED_LOOP_DISABLE;
+        value |= (m_libTec.isEnabled()           ? ENABLE             : DISABLE);
+        value |= (m_libTec.isWaveformStarted()   ? START_WAVEFORM     : STOP_WAVEFORM);
+        value |= (m_libTec.isClosedLoopEnabled() ? CLOSED_LOOP_ENABLE : CLOSED_LOOP_DISABLE);
         break;
     case TEC_IREF_VALUE:
         {
@@ -147,7 +147,7 @@ int BoardTestTec::get(uint32 address, uint32& value)
         value = m_irefSample.m_time;
         break;
     case TEC_WAVEFORM_SAMPLE_IREF:
-        value = *reinterpret_cast<uint32*>(&m_irefSample.m_iref);
+        value = *reinterpret_cast<uint32*>(&m_irefSample.m_value);
         break;
     case TEC_WAVEFORM_CYCLES:
         value = m_customeWaveformCycles;
@@ -181,8 +181,9 @@ int BoardTestTec::get(uint32 address, uint32& value)
         break;
     case HEATER_CONTROL:
         value = 0;
-        value |= m_libTec.isHeaterEnabled()           ? HEATER_ENABLE             : HEATER_DISABLE;
-        value |= m_libTec.isHeaterClosedLoopEnabled() ? HEATER_CLOSED_LOOP_ENABLE : HEATER_CLOSED_LOOP_DISABLE;
+        value |= (m_libTec.isHeaterEnabled()           ? HEATER_ENABLE             : HEATER_DISABLE);
+        value |= (m_libTec.isHeaterClosedLoopEnabled() ? HEATER_CLOSED_LOOP_ENABLE : HEATER_CLOSED_LOOP_DISABLE);
+        value |= (m_libTec.isHeaterWaveformStarted()   ? HEATER_START_WAVEFORM     : HEATER_STOP_WAVEFORM);
         break;
     case HEATER_STATUS:
         value = m_status;
@@ -219,6 +220,18 @@ int BoardTestTec::get(uint32 address, uint32& value)
             float gain = m_libTec.heaterGetDerivativeGain();
             value = *reinterpret_cast<uint32*>(&gain);
         }
+        break;
+    case HEATER_WAVEFORM_SAMPLE_INDEX:
+        value = m_heaterCustomWaveform.size();
+        break;
+    case HEATER_WAVEFORM_SAMPLE_TIME:
+        value = m_heaterTrefSample.m_time;
+        break;
+    case HEATER_WAVEFORM_SAMPLE_TREF:
+        value = *reinterpret_cast<uint32*>(&m_heaterTrefSample.m_value);
+        break;
+    case HEATER_WAVEFORM_CYCLES:
+        value = m_heaterCustomeWaveformCycles;
         break;
     }
     return OKAY;
@@ -269,6 +282,7 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TRACE_FIRST_SAMPLE:
     case TRACE_NUMBER_OF_SAMPLES:
     case HEATER_STATUS:
+    case HEATER_WAVEFORM_SAMPLE_INDEX:
         return ERROR_RO;
     case TEC_CONTROL:
         if (value & DISABLE) {
@@ -344,7 +358,7 @@ int BoardTestTec::set(uint32 address, uint32 value)
         m_irefSample.m_time = value;
         break;
     case TEC_WAVEFORM_SAMPLE_IREF:
-        m_irefSample.m_iref = *reinterpret_cast<float*>(&value);
+        m_irefSample.m_value = *reinterpret_cast<float*>(&value);
         break;
     case TEC_WAVEFORM_CYCLES:
         m_customeWaveformCycles = value;
@@ -384,11 +398,29 @@ int BoardTestTec::set(uint32 address, uint32 value)
         if (value & HEATER_ENABLE) {
             m_libTec.heaterEnable(true);
         }
+        if (value & HEATER_START_WAVEFORM) {
+            m_status = m_libTec.heaterSetCustomWaveform(m_heaterCustomWaveform,
+                                                        m_heaterCustomeWaveformCycles);
+            if (m_status == LibTec::HEATER_OKAY) {
+                m_libTec.heaterWaveformStart();
+            }
+        }
+        if (value & HEATER_STOP_WAVEFORM) {
+           m_libTec.heaterWaveformStop();
+        }
         if (value & HEATER_CLOSED_LOOP_DISABLE) {
             m_libTec.heaterClosedLoopDisable();
         }
         if (value & HEATER_CLOSED_LOOP_ENABLE) {
             m_libTec.heaterClosedLoopEnable();
+        }
+        if (value & HEATER_CUSTOM_WAVEFORM_RESET_INDEX) {
+            m_heaterCustomWaveform.clear();
+            m_heaterTrefSample.clear();
+        }
+        if (value & HEATER_CUSTOM_WAVEFORM_INC_INDEX) {
+            m_heaterCustomWaveform.push_back(m_heaterTrefSample);
+            m_heaterTrefSample.clear();
         }
         break;
     case HEATER_TREF_VALUE:
@@ -423,6 +455,15 @@ int BoardTestTec::set(uint32 address, uint32 value)
             float gain = *reinterpret_cast<float*>(&value);
             m_status = m_libTec.heaterSetDerivativeGain(gain);
         }
+        break;
+    case HEATER_WAVEFORM_SAMPLE_TIME:
+        m_heaterTrefSample.m_time = value;
+        break;
+    case HEATER_WAVEFORM_SAMPLE_TREF:
+        m_heaterTrefSample.m_value = *reinterpret_cast<float*>(&value);
+        break;
+    case HEATER_WAVEFORM_CYCLES:
+        m_heaterCustomeWaveformCycles = value;
         break;
     }
     return OKAY;

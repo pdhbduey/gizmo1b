@@ -91,14 +91,14 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec get dergain\n\r";
     help += "tec set customindex reset\n\r";
     help += "tec set customindex inc\n\r";
-    help += "tec set customtime 0..9,999ms\n\r";
+    help += "tec set customtime 0..9,999(ms)\n\r";
     help += "tec set customiref [-15,15](A)\n\r";
     help += "tec set customcycles 0..4,294,967,296\n\r";
     help += "tec get customindex|customtime|customiref|customcycles\n\r";
     help += "heater enable|disable\n\r";
     help += "heater get enable\n\r";
     help += "heater get tref|imax|closedloop|tin\n\r";
-    help += "heater set tref [0,120](deg C)\n\r";
+    help += "heater set tref [0,100](deg C)\n\r";
     help += "heater set imax [0,15](A)\n\r";
     help += "heater set tin 1..4\n\r";
     help += "heater set closedloop enable|disable\n\r";
@@ -108,6 +108,13 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "heater get intgain\n\r";
     help += "heater set dergain [0,100]\n\r";
     help += "heater get dergain\n\r";
+    help += "heater set customindex reset\n\r";
+    help += "heater set customindex inc\n\r";
+    help += "heater set customtime 0..10,000(s)\n\r";
+    help += "heater set customtref [0,100](deg C)\n\r";
+    help += "heater set customcycles 0..4,294,967,296\n\r";
+    help += "heater get customindex|customtime|customtref|customcycles|waveform\n\r";
+    help += "heater set waveform start|stop\n\r";
     help += "thermistor get a|b|c|d|all\n\r";
     help += "motor reset|initialize|limp|energize|stop\n\r";
     help += "motor get regaddress|regvalue|step|abspos|relpos|pos|status\n\r";
@@ -1352,7 +1359,10 @@ bool BoardTestConsoleApp::parseHeaterCommand(std::vector<std::string>& tokens,
     heaterStatus.push_back("ERROR_HEATER_INTEGRAL_GAIN_OUT_OF_RANGE");
     heaterStatus.push_back("ERROR_HEATER_DERIVATIVE_GAIN_OUT_OF_RANGE");
     heaterStatus.push_back("ERROR_HEATER_TIN_SELECT_OUT_OF_RANGE");
-    heaterStatus.push_back("ERROR_TIN");
+    heaterStatus.push_back("ERROR_HEATER_TIN");
+    heaterStatus.push_back("ERROR_HEATER_CUSTOM_WAVEFORM_EMPTY");
+    heaterStatus.push_back("ERROR_HEATER_CUSTOM_WAVEFORM_TIME_NOT_RISING");
+    heaterStatus.push_back("ERROR_HEATER_CUSTOM_WAVEFORM_NON_ZERO_START_TIME");
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "enable") {
             result = regWrite(BoardTest::HEATER_CONTROL, BoardTestTec::HEATER_ENABLE);
@@ -1450,6 +1460,57 @@ bool BoardTestConsoleApp::parseHeaterCommand(std::vector<std::string>& tokens,
                     res = value & BoardTestTec::HEATER_CLOSED_LOOP_DISABLE ? "disabled" :
                           value & BoardTestTec::HEATER_CLOSED_LOOP_ENABLE  ? "enabled"  :
                                                                              "undefined";
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "customindex") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_WAVEFORM_SAMPLE_INDEX, value);
+                if (result == BoardTest::OKAY) {
+                    char t[16];
+                    sprintf(t, "%d", value);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "customtime") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_WAVEFORM_SAMPLE_TIME, value);
+                if (result == BoardTest::OKAY) {
+                    char t[16];
+                    sprintf(t, "%ds", value);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "customtref") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_WAVEFORM_SAMPLE_TREF, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2fdegC", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "customcycles") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_WAVEFORM_CYCLES, value);
+                if (result == BoardTest::OKAY) {
+                    char t[16];
+                    sprintf(t, "%d", value);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "waveform") {
+                uint32 value;
+                result = regRead(BoardTest::HEATER_CONTROL, value);
+                if (result == BoardTest::OKAY) {
+                    res = value & BoardTestTec::HEATER_START_WAVEFORM ? "running"  :
+                          value & BoardTestTec::HEATER_STOP_WAVEFORM  ? "stopped"  :
+                                                                        "undefined";
                 }
                 isParsingError = false;
             }
@@ -1554,6 +1615,59 @@ bool BoardTestConsoleApp::parseHeaterCommand(std::vector<std::string>& tokens,
                        }
                    }
                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "customindex" && tokens.size() > VALUE) {
+                if (tokens[VALUE] == "reset") {
+                    result = regWrite(BoardTest::HEATER_CONTROL,
+                                     BoardTestTec::HEATER_CUSTOM_WAVEFORM_RESET_INDEX);
+                    isParsingError = false;
+                }
+                else if (tokens[VALUE] == "inc") {
+                    result = regWrite(BoardTest::HEATER_CONTROL,
+                                       BoardTestTec::HEATER_CUSTOM_WAVEFORM_INC_INDEX);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "customtime" && tokens.size() > VALUE) {
+                uint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &value) == 1) {
+                    result = regWrite(BoardTest::HEATER_WAVEFORM_SAMPLE_TIME, value);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "customtref" && tokens.size() > VALUE) {
+                float customiref;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &customiref) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&customiref);
+                   result = regWrite(BoardTest::HEATER_WAVEFORM_SAMPLE_TREF, value);
+                   isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "customcycles" && tokens.size() > VALUE) {
+                uint32 value;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &value) == 1) {
+                    result = regWrite(BoardTest::HEATER_WAVEFORM_CYCLES, value);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "waveform" && tokens.size() > VALUE) {
+                if (tokens[VALUE] == "start") {
+                    result = regWrite(BoardTest::HEATER_CONTROL,
+                                                  BoardTestTec::HEATER_START_WAVEFORM);
+                    if (result == BoardTest::OKAY) {
+                        uint32 v;
+                        result = regRead(BoardTest::HEATER_STATUS, v);
+                        if (v != LibTec::HEATER_OKAY) {
+                            res = "heater status: " + heaterStatus[v];
+                        }
+                    }
+                    isParsingError = false;
+                }
+                else if (tokens[VALUE] == "stop") {
+                    result = regWrite(BoardTest::HEATER_CONTROL,
+                                                   BoardTestTec::HEATER_STOP_WAVEFORM);
+                    isParsingError = false;
                 }
             }
         }

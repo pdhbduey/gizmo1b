@@ -17,25 +17,25 @@ int BoardTestDio::get(uint32 address, uint32& value)
     case DIO_IN:
         value = 0;
         m_libDio.getPin(LibDio::DIN_0, isSet);
-        value |= isSet ? DIN_0_STATE : 0;
+        value |= (isSet ? DIN_0_STATE : 0);
         m_libDio.getPin(LibDio::DIN_1, isSet);
-        value |= isSet ? DIN_1_STATE : 0;
+        value |= (isSet ? DIN_1_STATE : 0);
         m_libDio.getPin(LibDio::DIN_2, isSet);
-        value |= isSet ? DIN_2_STATE : 0;
+        value |= (isSet ? DIN_2_STATE : 0);
         m_libDio.getPin(LibDio::DIN_3, isSet);
-        value |= isSet ? DIN_3_STATE : 0;
+        value |= (isSet ? DIN_3_STATE : 0);
         m_libDio.getPin(LibDio::DIN_4, isSet);
-        value |= isSet ? DIN_4_STATE : 0;
+        value |= (isSet ? DIN_4_STATE : 0);
         m_libDio.getPin(LibDio::DIN_5, isSet);
-        value |= isSet ? DIN_5_STATE : 0;
+        value |= (isSet ? DIN_5_STATE : 0);
         m_libDio.getPin(LibDio::DIN_6, isSet);
-        value |= isSet ? DIN_6_STATE : 0;
+        value |= (isSet ? DIN_6_STATE : 0);
         m_libDio.getPin(LibDio::DIN_7, isSet);
-        value |= isSet ? DIN_7_STATE : 0;
+        value |= (isSet ? DIN_7_STATE : 0);
         m_libDio.getPin(LibDio::DIN_8, isSet);
-        value |= isSet ? DIN_8_STATE : 0;
+        value |= (isSet ? DIN_8_STATE : 0);
         m_libDio.getPin(LibDio::DIN_9, isSet);
-        value |= isSet ? DIN_9_STATE : 0;
+        value |= (isSet ? DIN_9_STATE : 0);
         break;
     case DIO_OUT:
         value = 0;
