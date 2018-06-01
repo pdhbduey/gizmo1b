@@ -52,6 +52,37 @@ int BoardTestThermistor::get(uint32 address, uint32& value)
             }
         }
         break;
+    case THERMISTOR_TYPE:
+        switch (m_libThermistor.getType()) {
+        default:
+        case LibThermistor::SC30F103AN:
+            value = SC30F103AN;
+            break;
+        case LibThermistor::USP12387:
+            value = USP12387;
+            break;
+        }
+        break;
+    }
+    return OKAY;
+}
+
+int BoardTestThermistor::set(uint32 address, uint32 value)
+{
+    switch (address) {
+    default:
+        return ERROR_ADDR;
+    case THERMISTOR_STATUS:
+    case THERMISTOR_RESULT_AIN_A:
+    case THERMISTOR_RESULT_AIN_B:
+    case THERMISTOR_RESULT_AIN_C:
+    case THERMISTOR_RESULT_AIN_D:
+        return ERROR_RO;
+    case THERMISTOR_TYPE:
+        m_status = (value & SC30F103AN ? m_libThermistor.setType(LibThermistor::SC30F103AN)
+                 :  value & USP12387   ? m_libThermistor.setType(LibThermistor::USP12387)
+                 :  LibThermistor::ERROR_INVALID_TYPE);
+        break;
     }
     return OKAY;
 }

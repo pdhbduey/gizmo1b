@@ -79,6 +79,7 @@ public:
         THERMISTOR_RESULT_AIN_B,
         THERMISTOR_RESULT_AIN_C,
         THERMISTOR_RESULT_AIN_D,
+        THERMISTOR_TYPE,
         LED_BASE    = 0x00000900,
         LED_CONTROL = LED_BASE,
         SNAPSHOT_BASE                     = 0x00000a00,

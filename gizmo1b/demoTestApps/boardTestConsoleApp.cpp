@@ -11,6 +11,7 @@
 #include "boardTestMotor.h"
 #include "boardTestFan.h"
 #include "boardTestDio.h"
+#include "boardTestThermistor.h"
 #include "boardTestConsoleApp.h"
 
 BoardTestConsoleApp::BoardTestConsoleApp(const char* name) :
@@ -116,6 +117,8 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "heater get customindex|customtime|customtref|customcycles|waveform\n\r";
     help += "heater set waveform start|stop\n\r";
     help += "thermistor get a|b|c|d|all\n\r";
+    help += "thermistor set type USP12387|SC30F103AN\n\r";
+    help += "thermistor get type\n\r";
     help += "motor reset|initialize|limp|energize|stop\n\r";
     help += "motor get regaddress|regvalue|step|abspos|relpos|pos|status\n\r";
     help += "motor set regaddress|regvalue 0x<hex>\n\r";
@@ -625,7 +628,8 @@ bool BoardTestConsoleApp::parseFaultCommand(std::vector<std::string>& tokens,
     }
     return isParsingError;
 }
-
+//help += "thermistor set type USP12387|SC30F103AN\n\r";
+//help += "thermistor get type\n\r";
 bool BoardTestConsoleApp::parseThermistorCommand(std::vector<std::string>& tokens,
                                                   std::string& res, int& result)
 {
@@ -684,6 +688,31 @@ bool BoardTestConsoleApp::parseThermistorCommand(std::vector<std::string>& token
                     res += t;
                 }
                 isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "type") {
+                std::map<int, std::string> thermTypes;
+                thermTypes[BoardTestThermistor::SC30F103AN] = "SC30F103AN";
+                thermTypes[BoardTestThermistor::USP12387]   = "USP12387";
+                uint32 type;
+                result = regRead(BoardTest::THERMISTOR_TYPE, type);
+                char t[16];
+                sprintf(t, "%s", thermTypes.find(type) != thermTypes.end()
+                                                      ? thermTypes[type].c_str()
+                                                      : "unknown");
+                res = t;
+                isParsingError = false;
+            }
+        }
+        else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "type" && tokens.size() > VALUE) {
+                std::map<std::string, int> thermTypes;
+                thermTypes["SC30F103AN"] = BoardTestThermistor::SC30F103AN;
+                thermTypes["USP12387"]   = BoardTestThermistor::USP12387;
+                if (thermTypes.find(tokens[VALUE]) != thermTypes.end()) {
+                    result = regWrite(BoardTest::THERMISTOR_TYPE,
+                                                     thermTypes[tokens[VALUE]]);
+                    isParsingError = false;
+                }
             }
         }
     }
