@@ -91,6 +91,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_B] = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_C] = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_D] = boardTestThermistor;
+    m_boardTestMap[BoardTest::THERMISTOR_TYPE]         = boardTestThermistor;
     m_boardTestMap[BoardTest::LED_CONTROL] = new BoardTestLed;
 }
 
