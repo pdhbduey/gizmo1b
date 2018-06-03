@@ -18,7 +18,6 @@ public:
     virtual ~LibDac();
     int set(float value); // 0-5V
     float get();
-    static void test();
 private:
     enum DacCtrl {
         CLR,

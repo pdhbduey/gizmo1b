@@ -12,6 +12,7 @@
 #include "boardTestFan.h"
 #include "boardTestDio.h"
 #include "boardTestThermistor.h"
+#include "boardTestPhotodiode.h"
 #include "boardTestConsoleApp.h"
 
 BoardTestConsoleApp::BoardTestConsoleApp(const char* name) :
@@ -25,8 +26,8 @@ BoardTestConsoleApp::~BoardTestConsoleApp()
 
 void BoardTestConsoleApp::run()
 {
-    int rxQueueLength = 2048;
-    int txQueueLength = 2048;
+    int rxQueueLength = 4096;
+    int txQueueLength = 4096;
     LibSci2 libSci(rxQueueLength, txQueueLength);
     bool resetSci = true;
     std::vector<uint8> message;
@@ -134,6 +135,11 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
     help += "dio get 0..9|all\n\r";
     help += "dio set|clear 0..7\n\r";
+    help += "pd get led|pd|time|intensity|result\n\r";
+    help += "pd set led blue1|green|red1|brown|red2|blue2\n\r";
+    help += "pd set pd 1..6\n\r";
+    help += "pd set time 10000..1000000(us)\n\r";
+    help += "pd set intensity [0-1](A)\n\r";
 }
 
 void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
@@ -202,6 +208,9 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
             }
             else if (tokens[COMPONENT] == "dio") {
                 isParsingError = parseDioCommand(tokens, res, result);
+            }
+            else if (tokens[COMPONENT] == "pd") {
+                isParsingError = parsePdCommand(tokens, res, result);
             }
         }
     }
@@ -628,8 +637,7 @@ bool BoardTestConsoleApp::parseFaultCommand(std::vector<std::string>& tokens,
     }
     return isParsingError;
 }
-//help += "thermistor set type USP12387|SC30F103AN\n\r";
-//help += "thermistor get type\n\r";
+
 bool BoardTestConsoleApp::parseThermistorCommand(std::vector<std::string>& tokens,
                                                   std::string& res, int& result)
 {
@@ -1697,6 +1705,146 @@ bool BoardTestConsoleApp::parseHeaterCommand(std::vector<std::string>& tokens,
                     result = regWrite(BoardTest::HEATER_CONTROL,
                                                    BoardTestTec::HEATER_STOP_WAVEFORM);
                     isParsingError = false;
+                }
+            }
+        }
+    }
+    return isParsingError;
+}
+
+bool BoardTestConsoleApp::parsePdCommand(std::vector<std::string>& tokens,
+                                                  std::string& res, int& result)
+{
+    bool isParsingError = true;
+    std::vector<std::string> pdStatus;
+    pdStatus.push_back("OKAY");
+    pdStatus.push_back("ERROR_INTEGRATION_TIME_OUT_OF_RANGE");
+    pdStatus.push_back("ERROR_SELECT_LED_OUT_OF_RANGE");
+    pdStatus.push_back("ERROR_SELECT_PHOTODIODE_OUT_OF_RANGE");
+    pdStatus.push_back("ERROR_LED_INTENSITY_OUT_OF_RANGE");
+    if (tokens.size() > ACTION) {
+        if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "led") {
+                uint32 control;
+                result = regRead(BoardTest::PHOTODIODE_CONTROL, control);
+                if (result == BoardTest::OKAY) {
+                    int led = control & LibPhotodiode::SELECT_LED_MASK;
+                    std::map<int, std::string> ledMap;
+                    ledMap[0]                               = "none";
+                    ledMap[LibPhotodiode::SELECT_LED_BLUE1] = "blue1";
+                    ledMap[LibPhotodiode::SELECT_LED_GREEN] = "green";
+                    ledMap[LibPhotodiode::SELECT_LED_RED1]  = "red1";
+                    ledMap[LibPhotodiode::SELECT_LED_BROWN] = "brown";
+                    ledMap[LibPhotodiode::SELECT_LED_RED2]  = "red2";
+                    ledMap[LibPhotodiode::SELECT_LED_BLUE2] = "blue2";
+                    res = (ledMap.find(led) != ledMap.end()
+                        ?  ledMap[led]
+                        :  "unknown");
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "pd") {
+                uint32 control;
+                result = regRead(BoardTest::PHOTODIODE_CONTROL, control);
+                if (result == BoardTest::OKAY) {
+                    int pd = control & LibPhotodiode::SELECT_PHOTODIODE_MASK;
+                    std::map<int, std::string> pdMap;
+                    pdMap[0]                                       = "none";
+                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D11_T1] = "1";
+                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D10_T1] = "2";
+                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D11_T2] = "3";
+                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D10_T2] = "4";
+                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D11_T3] = "5";
+                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D10_T3] = "6";
+                    res = (pdMap.find(pd) != pdMap.end()
+                        ?  pdMap[pd]
+                        :  "unknown");
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "time") {
+                uint32 intTimeInUs;
+                result = regRead(BoardTest::PHOTODIODE_INTEGRATION_TIME, intTimeInUs);
+                char t[16];
+                sprintf(t, "%dus", intTimeInUs);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "intensity") {
+                uint32 ledIntensity;
+                result = regRead(BoardTest::PHOTODIODE_LED_INTENSITY, ledIntensity);
+                float f = *reinterpret_cast<float*>(&ledIntensity);
+                char t[16];
+                sprintf(t, "%.2fA", f);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "result") {
+                uint32 pdReading;
+                result = regRead(BoardTest::PHOTODIODE_READING, pdReading);
+                float f = *reinterpret_cast<float*>(&pdReading);
+                char t[16];
+                sprintf(t, "%.2fV", f);
+                res = t;
+                isParsingError = false;
+            }
+        }
+        else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
+            if (tokens[ARGUMENT] == "led" && tokens.size() > VALUE) {
+                std::map<std::string, int> ledMap;
+                ledMap["blue1"] = LibPhotodiode::SELECT_LED_BLUE1;
+                ledMap["green"] = LibPhotodiode::SELECT_LED_GREEN;
+                ledMap["red1"]  = LibPhotodiode::SELECT_LED_RED1;
+                ledMap["brown"] = LibPhotodiode::SELECT_LED_BROWN;
+                ledMap["red2"]  = LibPhotodiode::SELECT_LED_RED2;
+                ledMap["blue2"] = LibPhotodiode::SELECT_LED_BLUE2;
+                if (ledMap.find(tokens[VALUE]) != ledMap.end()) {
+                    result = regWrite(BoardTest::PHOTODIODE_CONTROL,
+                                                         ledMap[tokens[VALUE]]);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "pd" && tokens.size() > VALUE) {
+                std::map<std::string, int> pdMap;
+                pdMap["1"] = LibPhotodiode::SELECT_PHOTODIODE_D11_T1;
+                pdMap["2"] = LibPhotodiode::SELECT_PHOTODIODE_D10_T1;
+                pdMap["3"] = LibPhotodiode::SELECT_PHOTODIODE_D11_T2;
+                pdMap["4"] = LibPhotodiode::SELECT_PHOTODIODE_D10_T2;
+                pdMap["5"] = LibPhotodiode::SELECT_PHOTODIODE_D11_T3;
+                pdMap["6"] = LibPhotodiode::SELECT_PHOTODIODE_D10_T3;
+                if (pdMap.find(tokens[VALUE]) != pdMap.end()) {
+                    result = regWrite(BoardTest::PHOTODIODE_CONTROL,
+                                                          pdMap[tokens[VALUE]]);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "time" && tokens.size() > VALUE) {
+                uint32 time;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &time) == 1) {
+                    result = regWrite(BoardTest::PHOTODIODE_INTEGRATION_TIME,
+                                                                          time);
+                    if (result == BoardTest::OKAY) {
+                        uint32 value;
+                        result = regRead(BoardTest::PHOTODIODE_STATUS, value);
+                        if (value != LibPhotodiode::OKAY) {
+                            res = "pd status: " + pdStatus[value];
+                        }
+                    }
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "intensity" && tokens.size() > VALUE) {
+                float intensity;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &intensity) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&intensity);
+                   result = regWrite(BoardTest::PHOTODIODE_LED_INTENSITY, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::PHOTODIODE_STATUS, value);
+                       if (value != LibPhotodiode::OKAY) {
+                           res = "pd status: " + pdStatus[value];
+                       }
+                   }
+                   isParsingError = false;
                 }
             }
         }

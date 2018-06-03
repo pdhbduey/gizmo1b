@@ -65,21 +65,3 @@ SemaphoreHandle_t& LibWrapMibSpi1::getSem()
 {
     return s_sem;
 }
-
-void LibWrapMibSpi1::test()
-{
-    LibWrapMibSpi& libWrapMibSpi = *new LibWrapMibSpi1;
-    uint16 txBuffer[10];
-    uint16 rxBuffer[10];
-    for (int i = 0; i < 10; i++) {
-        txBuffer[i] = i;
-        rxBuffer[i] = 0;
-    }
-    libWrapMibSpi.lock();
-    libWrapMibSpi.setData(LibWrapMibSpi::LOOP_BACK_TEST, txBuffer);
-    libWrapMibSpi.transfer(LibWrapMibSpi::LOOP_BACK_TEST);
-    if (libWrapMibSpi.waitForTransferComplete(LibWrapMibSpi::LOOP_BACK_TEST, 1)) {
-        libWrapMibSpi.getData(LibWrapMibSpi::LOOP_BACK_TEST, rxBuffer);
-    }
-    libWrapMibSpi.unlock();
-}
