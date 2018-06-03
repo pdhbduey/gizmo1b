@@ -40,6 +40,7 @@ namespace DeviceManager.ViewModel
         private float integralGain;
         private float derivativeGain;
         private string statusMessage;
+        private string customReadStatus;
         private const int updateDelay = 300;
 
         public TecViewModel(ITecModel tecModel)
@@ -62,8 +63,9 @@ namespace DeviceManager.ViewModel
             enableButtonState = TecDefaults.EnableText;
             closedLoopButtonState = TecDefaults.EnableClosedLoopText;
             numberOfSamples = 0;
+            CustomIndex = 0;
+            CustomReadStatus = "No data read";
 
-            
             //SliderIrefValue = 0;
 
             // Set commands
@@ -76,6 +78,7 @@ namespace DeviceManager.ViewModel
             UpdateIrefCommand = new RelayCommand(param => UpdateIrefForWaveform());
             IncrementCommand = new RelayCommand(param => IncrementCounter());
             RefreshCommand = new RelayCommand(param => InitialUpdate());
+            GetCustomWaveformDataCommand = new RelayCommand(param => GetCustomWaveformData());
 
             SetTecPeriodCommand = new RelayCommand(param => UpdatePeriod());
             SendIrefCommand = new RelayCommand(param => SetIref());
@@ -90,6 +93,7 @@ namespace DeviceManager.ViewModel
             StartUpdateTask();
         }
 
+        public RelayCommand GetCustomWaveformDataCommand { get; set; }
         public RelayCommand SetTecPeriodCommand { get; set; }
         public RelayCommand SendIrefCommand { get; set; }
         public RelayCommand SetIntegralGainCommand { get; set; }
@@ -492,6 +496,72 @@ namespace DeviceManager.ViewModel
                 statusMessage = value;
                 OnPropertyChanged(nameof(StatusMessage));
             }
+        }
+
+        public string CustomReadStatus
+        {
+            get
+            {
+                return customReadStatus;
+            }
+            set
+            {
+                customReadStatus = value;
+
+                OnPropertyChanged(nameof(CustomReadStatus));
+                //UpdateTRef();
+            }
+        }
+
+        private void GetCustomWaveformData()
+        {
+            try
+            {
+                var browser = new System.Windows.Forms.OpenFileDialog();
+                browser.Filter = "CSV files (*.csv)|*.csv";
+
+                string filePath = string.Empty;
+
+                if (browser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    filePath = browser.FileName;
+                    CustomReadStatus = $"Fetching data from: {filePath}";
+                }
+
+                var data = Helper.GetCsvData(filePath);
+
+                CustomReadStatus = $"Writing values";
+                Reset();
+                for (var index = 0; index < data.sampleTimes.Count; index++)
+                {
+                    if (SetCustomWaveformSampleTime(data.sampleTimes[index]) && SetCustomWaveformTref(data.sampleValueFirst[index]))
+                    {
+                        IncrementCounter();
+                    }
+                    else
+                    {
+                        throw new Exception("Writing data to registers. Please retry.");
+                    }
+                }
+
+                CustomReadStatus = "Complete";
+            }
+            catch (Exception e)
+            {
+                CustomReadStatus = $"Error: {e.Message}";
+            }
+        }
+
+        private bool SetCustomWaveformSampleTime(int time)
+        {
+            var response = tecModel.SetSampleTimeCommand(time).Result;
+            return response.succesfulResponse;
+        }
+
+        private bool SetCustomWaveformTref(float customWaveformTref)
+        {
+            var response = tecModel.SetCustomWaveformIRefCommand(customWaveformTref).Result;
+            return response.succesfulResponse;
         }
 
         private void EnableToggle()

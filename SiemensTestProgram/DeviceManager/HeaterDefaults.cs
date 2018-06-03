@@ -101,6 +101,55 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] ResetCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0B,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x40
+            };
+        }
+
+        public static byte[] IncrementCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0B,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x80
+            };
+        }
+
+        
+        public static byte[] ReadWaveformIndexCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0B,
+                0x08,
+                0x00,
+                0x00,
+                0x00,
+                0x80
+            };
+        }
+
         public static byte[] ReadStatus()
         {
             return new byte[]
@@ -143,6 +192,40 @@ namespace DeviceManager
                 0x00,
                 0x0B,
                 0x02,
+                valueBytes[0],
+                valueBytes[1],
+                valueBytes[2],
+                valueBytes[3]
+            };
+        }
+
+        public static byte[] SetCustomWaveformTref(float value)
+        {
+            var valueBytes = Helper.GetBigEndian(value);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0B,
+                0x0A,
+                valueBytes[0],
+                valueBytes[1],
+                valueBytes[2],
+                valueBytes[3]
+            };
+        }
+
+        public static byte[] SetCustomWaveformTime(int value)
+        {
+            var valueBytes = Helper.ConvertIntToByteArray(value);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0B,
+                0x09,
                 valueBytes[0],
                 valueBytes[1],
                 valueBytes[2],

@@ -3,6 +3,7 @@
 namespace DeviceManager.ViewModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -22,18 +23,35 @@ namespace DeviceManager.ViewModel
         private float ainC;
         private float ainD;
         private string statusMessage;
+        private string selectedType;
         private const int updateDelay = 300;
 
         public ThermistorViewModel(IThermistorModel thermistorModel)
         {
             this.thermistorModel = thermistorModel;
-            RefreshCommand = new RelayCommand(param => InitialUpdate());
 
+            Types = ThermistorDefaults.Types;
+            SelectedType = Types[1];
             InitialUpdate();
             StartUpdateTask();
         }
 
-        public RelayCommand RefreshCommand { get; set; }
+        public List<string> Types { get; set; }
+
+        public string SelectedType
+        {
+            get
+            {
+                return selectedType;
+            }
+            set
+            {
+                selectedType = value;
+                OnPropertyChanged(nameof(SelectedType));
+
+                SetType();
+            }
+        }
 
         /// <summary>
         /// Text value of AIN_A.
@@ -303,6 +321,11 @@ namespace DeviceManager.ViewModel
             ThermistorDefaults.Errors.TryGetValue(value, out response);
 
             return response == null ? "Unknown" : response;
+        }
+
+        private void SetType()
+        {
+            thermistorModel.SetType(selectedType);
         }
     }
 }

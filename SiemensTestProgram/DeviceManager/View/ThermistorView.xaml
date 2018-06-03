@@ -14,6 +14,7 @@
             </GroupBox.Header>
 
             <StackPanel Margin="2" Orientation="Vertical">
+                <ComboBox Margin="1" Height="25" Width="100" ItemsSource="{Binding Types}" SelectedItem="{Binding SelectedType}"></ComboBox>
                 <Label Margin="1" Content="{Binding AinAText}"></Label>
                 <Label Margin="1" Content="{Binding AinBText}"></Label>
                 <Label Margin="1" Content="{Binding AinCText}"></Label>

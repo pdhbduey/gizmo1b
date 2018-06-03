@@ -44,9 +44,44 @@ namespace DeviceManager.Model
             return status;
         }
 
+        public Task<CommunicationData> SetCustomWaveformTRefCommand(float tRef)
+        {
+            var requestArray = HeaterDefaults.SetCustomWaveformTref(tRef);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> SetCustomWaveformTimeCommand(int time)
+        {
+            var requestArray = HeaterDefaults.SetCustomWaveformTime(time);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
         public Task<CommunicationData> SetIMaxCommand(float iMax)
         {
             var requestArray = HeaterDefaults.SetImax(iMax);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ResetCounterCommand()
+        {
+            var requestArray = HeaterDefaults.ResetCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> IncrementCounterCommand()
+        {
+            var requestArray = HeaterDefaults.IncrementCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadWaveformIndex()
+        {
+            var requestArray = HeaterDefaults.ReadWaveformIndexCommand();
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }

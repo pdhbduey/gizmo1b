@@ -110,14 +110,13 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
-                    <StackPanel Margin="1">
-                        <Button Content="Increment" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Command="{Binding IncrementCommand}"></Button>
-                        <Button Content="Reset" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Command="{Binding ResetCustomWaveformCommand}"></Button>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Content="Index: "></Label>
-                            <Label Width="25" Content="{Binding CustomIndex}"></Label>
-                        </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Index: "></Label>
+                        <Label Width="25" Content="{Binding CustomIndex}"></Label>
                     </StackPanel>
+                    <Label Content="{Binding CustomReadStatus}"></Label>
+                    <Button Content="Browse" Margin="1" Width="110" Height="25" HorizontalAlignment="Left" Command="{Binding GetCustomWaveformDataCommand}"></Button>
+                    <Button Content="Reset" Margin="1" Width="110" Height="25" HorizontalAlignment="Left" Command="{Binding ResetCustomWaveformCommand}"></Button>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">

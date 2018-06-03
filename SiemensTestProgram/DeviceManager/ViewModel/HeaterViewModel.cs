@@ -3,6 +3,7 @@ using Common.Bindings;
 using DeviceManager.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -30,6 +31,8 @@ namespace DeviceManager.ViewModel
         private string closedLoopState;
         private string statusMessage;
         private string selectedTin;
+        private string customReadStatus;
+        private int customIndex;
         private const int updateDelay = 300;
 
 
@@ -44,11 +47,10 @@ namespace DeviceManager.ViewModel
             SetIMaxCommand = new RelayCommand(param => UpdateIMax());
             EnableCommand = new RelayCommand(param => EnableToggle());
             StartClosedLoopCommand = new RelayCommand(param => ClosedLoopToggle());
+            GetCustomWaveformDataCommand = new RelayCommand(param => GetCustomWaveformData());
+            ResetCustomWaveformCommand = new RelayCommand(param => Reset());
 
             Tins = HeaterDefaults.Tins;
-
-
-            
             selectedTin = Tins[0];
             enableState = TecDefaults.EnableText;
             closedLoopState = TecDefaults.EnableClosedLoopText;
@@ -57,6 +59,8 @@ namespace DeviceManager.ViewModel
             IMax = 0f;
             DerivativeGain = 0f;
             IntegralGain = 0f;
+            CustomIndex = 0;
+            CustomReadStatus = "No data read";
 
             InitialUpdate();
             StartUpdateTask();
@@ -150,6 +154,22 @@ namespace DeviceManager.ViewModel
                 tRef = value;
 
                 OnPropertyChanged(nameof(TRef));
+                //UpdateTRef();
+            }
+        }
+
+        
+        public string CustomReadStatus
+        {
+            get
+            {
+                return customReadStatus;
+            }
+            set
+            {
+                customReadStatus = value;
+
+                OnPropertyChanged(nameof(CustomReadStatus));
                 //UpdateTRef();
             }
         }
@@ -353,6 +373,24 @@ namespace DeviceManager.ViewModel
                 OnPropertyChanged(nameof(EnableState));
             }
         }
+
+        public int CustomIndex
+        {
+            get
+            {
+                return customIndex;
+            }
+
+            set
+            {
+                customIndex = value;
+                OnPropertyChanged(nameof(CustomIndex));
+            }
+        }
+
+        public RelayCommand GetCustomWaveformDataCommand { get; set; }
+
+        public RelayCommand ResetCustomWaveformCommand { get; set; }
 
         public RelayCommand StartClosedLoopCommand { get; set; }
 
@@ -671,6 +709,85 @@ namespace DeviceManager.ViewModel
             }
 
             await heaterModel.SetIMaxCommand(iMax);
+        }
+
+        private void GetCustomWaveformData()
+        {
+            try
+            {
+                var browser = new System.Windows.Forms.OpenFileDialog();
+                browser.Filter = "CSV files (*.csv)|*.csv";
+
+                string filePath = string.Empty;
+
+                if (browser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    filePath = browser.FileName;
+                    CustomReadStatus = $"Fetching data from: {filePath}";
+                }
+
+                var data = Helper.GetCsvData(filePath);
+
+                CustomReadStatus = $"Writing values";
+                Reset();
+                for (var index = 0; index < data.sampleTimes.Count; index++)
+                {
+                    if (SetCustomWaveformSampleTime(data.sampleTimes[index]) && SetCustomWaveformTref(data.sampleValueFirst[index]))
+                    {
+                        IncrementCounter();
+                    }
+                    else
+                    {
+                        throw new Exception("Writing data to registers. Please retry.");
+                    }
+                }
+
+                CustomReadStatus = "Complete";
+            }
+            catch(Exception e)
+            {
+                CustomReadStatus = $"Error: {e.Message}";
+            }
+        }
+
+        private bool SetCustomWaveformSampleTime(int time)
+        {
+            var response = heaterModel.SetCustomWaveformTimeCommand(time).Result;
+            return response.succesfulResponse;
+        }
+
+        private bool SetCustomWaveformTref(float customWaveformTref)
+        {
+            var response = heaterModel.SetCustomWaveformTRefCommand(customWaveformTref).Result;
+            return response.succesfulResponse;
+        }
+
+        private async void IncrementCounter()
+        {
+            var incrementResponse = await heaterModel.IncrementCounterCommand();
+
+            if (incrementResponse.succesfulResponse)
+            {
+                ReadCustomWaveformIndex();
+            }
+        }
+
+        private void Reset()
+        {
+            var resetResponse = heaterModel.ResetCounterCommand().Result;
+            if (resetResponse.succesfulResponse)
+            {
+                ReadCustomWaveformIndex();
+            }
+        }
+
+        private async void ReadCustomWaveformIndex()
+        {
+            var customIndexData = await heaterModel.ReadWaveformIndex();
+            if (customIndexData.succesfulResponse)
+            {
+                CustomIndex = Helper.GetIntFromBigEndian(customIndexData.response);
+            }
         }
     }
 }
