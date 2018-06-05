@@ -86,19 +86,3 @@ int LibDac::writeDac(uint16* txBuffer)
     m_libWrapMibSpi1.unlock();
     return result;
 }
-
-void LibDac::test()
-{
-    LibDac libDac;
-    while (true) {
-        for (int i = 0; i < 100; i++) {
-            libDac.set(5.0 / 100 * i);
-            LibDelay::us(1);
-        }
-        for (int i = 0; i < 100; i++) {
-            int j = 100 - i;
-            libDac.set(5.0 / 100 * j);
-            LibDelay::us(1);
-        }
-    }
-}
