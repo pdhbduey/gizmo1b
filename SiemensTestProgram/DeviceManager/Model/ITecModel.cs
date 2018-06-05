@@ -2,6 +2,7 @@
 
 namespace DeviceManager.Model
 {
+    using DeviceManager.DeviceCommunication;
     using System.Threading.Tasks;
 
     public interface ITecModel
@@ -31,6 +32,10 @@ namespace DeviceManager.Model
         bool SetProportionalGainCommand(float proportionalGain, ref byte[] response);
 
         bool SetWaveformIrefCommand(float irefGain, ref byte[] response);
+
+        Task<CommunicationData> SetSampleTimeCommand(int time);
+
+        Task<CommunicationData> SetCustomWaveformIRefCommand(float iref);
 
         bool SetIrefCommand(float irefGain, ref byte[] response);
 

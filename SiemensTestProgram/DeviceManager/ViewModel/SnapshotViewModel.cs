@@ -611,7 +611,7 @@ namespace DeviceManager.ViewModel
             await snapshotModel.SetResolution(selectedResolution);
         }
 
-        private async void Start()
+        private void Start()
         {
             snapshotModel.StartSnapshot().Wait();
         }

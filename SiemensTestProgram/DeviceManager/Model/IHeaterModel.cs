@@ -33,6 +33,16 @@ namespace DeviceManager.Model
 
         Task<CommunicationData> DisableCommand();
 
+        Task<CommunicationData> ResetCounterCommand();
+
+        Task<CommunicationData> IncrementCounterCommand();
+
+        Task<CommunicationData> SetCustomWaveformTRefCommand(float tRef);
+
+        Task<CommunicationData> SetCustomWaveformTimeCommand(int time);
+
+        Task<CommunicationData> ReadWaveformIndex();
+
         Task<CommunicationData> ReadVSenseCommand();
 
         Task<CommunicationData> ReadISenseCommand();

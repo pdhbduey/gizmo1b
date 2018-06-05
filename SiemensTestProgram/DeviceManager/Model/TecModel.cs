@@ -126,6 +126,20 @@ namespace DeviceManager.Model
             return status;
         }
 
+        public Task<CommunicationData> SetSampleTimeCommand(int time)
+        {
+            var requestArray = TecDefaults.GetSampleTimeCommand(time);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> SetCustomWaveformIRefCommand(float iref)
+        {
+            var requestArray = TecDefaults.SetWaveformIrefCommand(iref);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
         //public Task<byte[]> SetIrefGainCommand(int irefGain)
         //{
         //    var requestArray = TecDefaults.GetIrefGainCommand(irefGain);

@@ -84,5 +84,12 @@ namespace DeviceManager.Model
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
+
+        public Task<CommunicationData> SetType(string type)
+        {
+            var requestArray = ThermistorDefaults.SetTypeCommand(type);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
     }
 }

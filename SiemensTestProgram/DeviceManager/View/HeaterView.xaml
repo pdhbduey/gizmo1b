@@ -24,23 +24,38 @@
             </GroupBox.Header>
 
             <StackPanel Margin="1">
-                <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="60" Margin="1" Content="TRef [°C]: "></Label>
-                    <TextBox Height="25" Width="50" Text="{Binding Path=TRef, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
-                        <TextBox.InputBindings>
-                            <KeyBinding Command="{Binding SetTRefCommand}" Key="Enter"/>
-                        </TextBox.InputBindings>
-                    </TextBox>
+                <StackPanel>
+                    <StackPanel Margin="1" Orientation="Horizontal">
+                        <Label Width="60" Margin="1" Content="TRef [°C]: "></Label>
+                        <TextBox Height="25" Width="50" Text="{Binding Path=TRef, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{Binding SetTRefCommand}" Key="Enter"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </StackPanel>
+                    <StackPanel Margin="1" Orientation="Horizontal">
+                        <Label Width="60" Margin="1" Content="IMax [A]: "></Label>
+                        <TextBox Height="25" Width="50" Text="{Binding Path=IMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{Binding SetIMaxCommand}" Key="Enter"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="60" Margin="1" Content="IMax [A]: "></Label>
-                    <TextBox Height="25" Width="50" Text="{Binding Path=IMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
-                        <TextBox.InputBindings>
-                            <KeyBinding Command="{Binding SetIMaxCommand}" Key="Enter"/>
-                        </TextBox.InputBindings>
-                    </TextBox>
+
+                <StackPanel Margin="1,15,1,1">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Index: "></Label>
+                        <Label Width="25" Content="{Binding CustomIndex}"></Label>
+                    </StackPanel>
+                    <Label Content="{Binding CustomReadStatus}"></Label>
+                    <Button Content="Browse" Margin="1" Width="110" Height="25" HorizontalAlignment="Left" Command="{Binding GetCustomWaveformDataCommand}"></Button>
+                    <Button Content="Reset" Margin="1" Width="110" Height="25" HorizontalAlignment="Left" Command="{Binding ResetCustomWaveformCommand}"></Button>
                 </StackPanel>
             </StackPanel>
+            
+
+            
         </GroupBox>
 
         <!-- Gains -->

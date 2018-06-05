@@ -3,6 +3,8 @@
 namespace Common
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
 
     /// <summary>
     /// This is a helper class for doing generic computations.
@@ -100,6 +102,47 @@ namespace Common
             for (int i = 0; i < numberCharacters; i += 2)
                 bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             return bytes;
+        }
+
+        public class FileData
+        {
+            public List<int> sampleTimes;
+            public List<float> sampleValueFirst;
+
+            public FileData()
+            {
+                sampleTimes = new List<int>();
+                sampleValueFirst = new List<float>();
+            }
+
+            public void AddSample(int sampleTime, float firstValue)
+            {
+                sampleTimes.Add(sampleTime);
+                sampleValueFirst.Add(firstValue);
+            }
+        }
+
+        public static FileData GetCsvData(string filePath)
+        {
+            var fileData = new FileData();
+
+            using (var reader = new StreamReader(filePath))
+            {
+                // Reads the header
+                reader.ReadLine();
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+
+                    var time = Int32.Parse(values[0]); 
+                    var firstValue = float.Parse(values[1]);
+
+                    fileData.AddSample(time, firstValue);
+                }
+            }
+
+            return fileData;
         }
     }
 }
