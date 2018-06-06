@@ -132,7 +132,6 @@ public:
     void TimerTest(float period);
     uint16_t GetAdc(uint32_t nChanIdx);
     //void pwmNotification(hetBASE_t * hetREG,uint32 pwm, uint32 notification);
-    static SemaphoreHandle_t s_sem;
 protected:
   
 private:

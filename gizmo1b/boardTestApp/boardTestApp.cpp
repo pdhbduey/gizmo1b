@@ -99,7 +99,8 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::PHOTODIODE_STATUS]           = boardTestPhotodiode;
     m_boardTestMap[BoardTest::PHOTODIODE_INTEGRATION_TIME] = boardTestPhotodiode;
     m_boardTestMap[BoardTest::PHOTODIODE_LED_INTENSITY]    = boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_READING]          = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_READING_IN_VOLTS] = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_READING_RAW]      = boardTestPhotodiode;
 }
 
 BoardTestApp::~BoardTestApp()

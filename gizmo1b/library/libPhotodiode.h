@@ -39,21 +39,23 @@ public:
     int setPhotodiode(int photodiode);
     int getLed();
     int getPhotodiode();
-    int getIntegrationTimeInUs(); // 10,000us-1,000,000us
-    int setIntegrationTimeInUs(int integrationTimeInUs);
-    float getLedIntensity(); // 0A-1A
-    int setLedIntensity(float ledIntensity);
-    float readPhotodiode();
+    uint32 getIntegrationTimeInUs(); // 1,000us-1,000,000us
+    int setIntegrationTimeInUs(uint32 integrationTimeInUs);
+    uint32 getLedIntensity(); // 0-40,000
+    int setLedIntensity(uint32 ledIntensity);
+    float readPhotodiode(); // 0V-5V
+    uint32 readPhotodiodeRaw(); // 0-65,535
 private:
     OpticsDriver m_opticsDriver;
     static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
     int m_led;
     int m_photodiode;
-    int m_integrationTimeInUs;
-    float m_ledIntensity;
+    uint32 m_integrationTimeInUs;
+    uint32 m_ledIntensity;
     std::map<int, int> m_ledMap;
     std::map<int, int> m_pdMap;
+    uint32 m_photodiodeResultRaw;
 };
 
 #endif // _LIB_PHOTODIODE_H_

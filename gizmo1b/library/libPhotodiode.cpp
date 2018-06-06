@@ -75,30 +75,30 @@ int LibPhotodiode::getPhotodiode()
     return m_photodiode;
 }
 
-int LibPhotodiode::getIntegrationTimeInUs()
+uint32 LibPhotodiode::getIntegrationTimeInUs()
 {
     return m_integrationTimeInUs;
 }
 
-int LibPhotodiode::setIntegrationTimeInUs(int integrationTimeInUs)
+int LibPhotodiode::setIntegrationTimeInUs(uint32 integrationTimeInUs)
 {
     LibMutex libMutex(s_mutex);
-    if (integrationTimeInUs < 10000 || integrationTimeInUs > 1000000) {
+    if (integrationTimeInUs < 1000 || integrationTimeInUs > 1000000) {
         return ERROR_INTEGRATION_TIME_OUT_OF_RANGE;
     }
     m_integrationTimeInUs = integrationTimeInUs;
     return OKAY;
 }
 
-float LibPhotodiode::getLedIntensity()
+uint32 LibPhotodiode::getLedIntensity()
 {
     return m_ledIntensity;
 }
 
-int LibPhotodiode::setLedIntensity(float ledIntensity)
+int LibPhotodiode::setLedIntensity(uint32 ledIntensity)
 {
     LibMutex libMutex(s_mutex);
-    if (ledIntensity < 0 || ledIntensity > 1) {
+    if (ledIntensity > 40000) {
         return ERROR_LED_INTENSITY_OUT_OF_RANGE;
     }
     m_ledIntensity = ledIntensity;
@@ -111,10 +111,16 @@ float LibPhotodiode::readPhotodiode()
     uint32_t nledChanIdx   = m_ledMap[m_led];
     uint32_t npdChanIdx    = m_pdMap[m_photodiode];
     uint32_t nDuration_us  = m_integrationTimeInUs;
-    uint32_t nLedIntensity = m_ledIntensity * (40000  / 1.0);
+    uint32_t nLedIntensity = m_ledIntensity;
     uint16_t data;
     m_opticsDriver.GetPhotoDiodeValue(nledChanIdx, npdChanIdx, nDuration_us,
                                                           nLedIntensity, &data);
+    m_photodiodeResultRaw = data;
     float photoDiodeReading = data * (5.0 / 65535);
     return photoDiodeReading;
+}
+
+uint32 LibPhotodiode::readPhotodiodeRaw()
+{
+    return m_photodiodeResultRaw;
 }
