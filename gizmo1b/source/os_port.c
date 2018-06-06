@@ -77,6 +77,7 @@
 #include "sys_core.h"
 
 /* USER CODE BEGIN (1) */
+#include "rti.h"
 /* USER CODE END */
 
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
@@ -380,6 +381,14 @@ static void prvSetupTimerInterrupt(void)
 
 	/* COMPSEL0 will use the RTIFRC0 counter. */
 	portRTI_COMPCTRL_REG = 0x00000000U;
+	
+	/* USER CODE BEGIN (1) */
+    /** - Enable/Disable capture event sources for both counter blocks */
+    rtiREG1->CAPCTRL = 0U | 0U;
+
+    /** - Setup input source compare 0-3 */
+    rtiREG1->COMPCTRL = 0x00000010U | 0x00000000U;
+    /* USER CODE END */
 
 	/* Initialise the counter and the prescale counter registers. */
 	portRTI_CNT0_UC0_REG  =  0x00000000U;
@@ -389,6 +398,26 @@ static void prvSetupTimerInterrupt(void)
 	portRTI_CNT0_CPUC0_REG = 0x00000001U;
 	portRTI_CNT0_COMP0_REG = ( configCPU_CLOCK_HZ / 2 ) / configTICK_RATE_HZ;
 	portRTI_CNT0_UDCP0_REG = ( configCPU_CLOCK_HZ / 2 ) / configTICK_RATE_HZ;
+
+	/* USER CODE BEGIN (1) */
+    /** - Reset up counter 1 */
+    rtiREG1->CNT[1U].UCx = 0x00000000U;
+
+    /** - Reset free running counter 1 */
+    rtiREG1->CNT[1U].FRCx  = 0x00000000U;
+
+    /** - Setup up counter 1 compare value
+    *     - 0x00000000: Divide by 2^32
+    *     - 0x00000001-0xFFFFFFFF: Divide by (CPUC1 + 1)
+    */
+    rtiREG1->CNT[1U].CPUCx = 1U;
+
+    /** - Setup compare 1 value. This value is compared with selected free running counter. */
+    rtiREG1->CMP[1U].COMPx = 40U;
+
+    /** - Setup update compare 1 value. This value is added to the compare 1 value on each compare match. */
+    rtiREG1->CMP[1U].UDCPx = 40U;
+	/* USER CODE END */
 
 	/* Clear interrupts. */
 	portRTI_INTFLAG_REG     =  0x0007000FU;

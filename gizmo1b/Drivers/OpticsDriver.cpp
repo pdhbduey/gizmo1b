@@ -8,9 +8,6 @@
 #include "OpticsDriver.h"
 #include "het.h"
 
-bool _integrationEnd = FALSE;
-#define delay_uS 10000
-SemaphoreHandle_t OpticsDriver::s_sem = 0;
 /**
  * Name: OpticsDriver
  * Parameters:
@@ -23,9 +20,6 @@ OpticsDriver::OpticsDriver(uint32_t nSiteIdx)
     uint16_t adcValue[30] = {0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
                              0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
                              0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000};
-    if (!s_sem) {
-        s_sem = xSemaphoreCreateBinary();
-    }
     adcValuePointer = &adcValue[0];
     /* Initialize LED and PD Board Driver */
     OpticsDriverInit();
@@ -179,6 +173,40 @@ void OpticsDriver::SetLedsOff(uint32_t nChanIdx)
 
 }
 
+inline static void delayInUs(uint32 timeInUs)
+{
+    uint32 ticks    = RTI_UDCP1_CONFIGVALUE * timeInUs;
+    uint32 counter  = rtiCOUNTER_BLOCK1;
+    rtiREG1->GCTRL &= ~(uint32)((uint32)1U << (counter & 3U)); // Stop counter
+    //
+    // Clear counter
+    //
+    rtiREG1->CNT[counter].UCx   = 0x00000000U;
+    rtiREG1->CNT[counter].FRCx  = 0x00000000U;
+    rtiREG1->CMP[counter].COMPx = 0x00000000U;;
+    rtiREG1->GCTRL |= ((uint32)1U << (counter & 3U)); // Start counter
+    while (rtiREG1->CMP[rtiCOMPARE1].COMPx < ticks);
+}
+
+inline static void restartTimer()
+{
+    uint32 counter  = rtiCOUNTER_BLOCK1;
+    rtiREG1->GCTRL &= ~(uint32)((uint32)1U << (counter & 3U)); // Stop counter
+    //
+    // Clear counter
+    //
+    rtiREG1->CNT[counter].UCx   = 0x00000000U;
+    rtiREG1->CNT[counter].FRCx  = 0x00000000U;
+    rtiREG1->CMP[counter].COMPx = 0x00000000U;;
+    rtiREG1->GCTRL |= ((uint32)1U << (counter & 3U)); // Start counter
+}
+
+inline static void waitForUsTimerToExpire(uint32 timeInUs)
+{
+    uint32 ticks    = RTI_UDCP1_CONFIGVALUE * timeInUs;
+    while (rtiREG1->CMP[rtiCOMPARE1].COMPx < ticks);
+}
+
 /**
  * Name: GetPhotoDiodeValue()
  * Parameters:
@@ -188,12 +216,7 @@ void OpticsDriver::SetLedsOff(uint32_t nChanIdx)
 void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx, uint32_t nDuration_us, uint32_t nLedIntensity, uint16_t *data)
 {
     uint16_t adcValue = 0x0000;
-    hetSIGNAL_t signal;
     uint32_t adcChannel = 0;
-
-    signal.duty = 50;
-    signal.period = nDuration_us;
-    _integrationEnd = FALSE;
 
     switch(npdChanIdx)
     {
@@ -226,52 +249,55 @@ void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
         break;
     }
 
-    //SetLedIntensity(nledChanIdx, nLedIntensity);
-    //for(int i=0; i<100000; i++);// 10 ms delay
     /* Reset Integrator first */
     SetIntegratorState(RESET_STATE, npdChanIdx);
-    gioSetBit(hetPORT1, LATCH_PIN, 1); //Enable Reset State
-    for(int i=0; i<delay_uS; i++); //10 ms delay
-    //vTaskDelay(2); // ~ 1 ms delay
-    //SetIntegratorState(HOLD_STATE, npdChanIdx);
-    //gioSetBit(hetPORT1, LATCH_PIN, 1); //Enable Hold State
-    //for(int i=0; i<delay_uS; i++); //10 ms delay
+    gioSetBit(hetPORT1, LATCH_PIN, 1);
+
+    /* 10 ms delay */
+    delayInUs(10000);
 
     /* Turn On LED */
     SetLedIntensity(nledChanIdx, nLedIntensity);
-    for(int i=0; i<delay_uS*10; i++); //Hold for 10 ms time before reading
 
-    /* Set Duration for Integration */
-    pwmSetSignal(hetRAM1, pwm2, signal);
-    pwmEnableNotification(hetREG1, pwm2, pwmEND_OF_PERIOD);
+    /* Hold for 1 ms time before integrating */
+    delayInUs(1000);
 
+    /* Start Integration */
     SetIntegratorState(INTEGRATE_STATE, npdChanIdx);
-    //for(int i=0; i<delay_uS; i++);
-    /* Wait until interrupt occurs */
-    //while (!_integrationEnd);
-    xSemaphoreTake(s_sem, pdMS_TO_TICKS(nDuration_us / 500));
-    _integrationEnd = FALSE;
-    gioSetBit(hetPORT1, LATCH_PIN, 1); //Enable Integration State (start integrating)
+    gioSetBit(hetPORT1, LATCH_PIN, 1);
 
-    SetIntegratorState(HOLD_STATE, npdChanIdx); //Configure Hold state
+    /* Start the integrator timer */
+    taskENTER_CRITICAL();
+    restartTimer();
 
-    /* Wait for integrationTimeExpired flag to be set */
-    //while (!_integrationEnd);
-    xSemaphoreTake(s_sem, pdMS_TO_TICKS(nDuration_us / 500));
-    pwmDisableNotification(hetREG1, pwm2, pwmEND_OF_BOTH);
+    /* Wait for integration time to expire */
+    delayInUs(nDuration_us);
 
-    for(int i=0; i<delay_uS; i++);
+    /* Prepare the Hold state but don't latch it yet */
+    SetIntegratorState(HOLD_STATE, npdChanIdx);
+
+    /* Wait for integration time to expire */
+    waitForUsTimerToExpire(nDuration_us);
+
+    /* Latch the hold state */
+    gioSetBit(hetPORT1, LATCH_PIN, 1);
+    taskEXIT_CRITICAL();
+
+    /* Hold for 1ms time before reading */
+    delayInUs(1000);
+
+    /* Read ADC */
+    adcValue = GetAdc(adcChannel);
+
+    /* Hold for 1ms time before turning off LED */
+    delayInUs(1000);
+
     /* Turn Off LED */
     SetLedsOff(nledChanIdx);
 
-    for(int i=0; i<delay_uS; i++); //Hold for 10 ms time before reading
-
-    adcValue = GetAdc(adcChannel);
-    for(int i=0; i<delay_uS; i++);
-
-    //SetLedsOff(nledChanIdx);
+    /* Reset Integrator */
     SetIntegratorState(RESET_STATE, npdChanIdx);
-    gioSetBit(hetPORT1, LATCH_PIN, 1); //Enable Reset State
+    gioSetBit(hetPORT1, LATCH_PIN, 1);
 
     *data = adcValue;
 }
@@ -502,24 +528,3 @@ void OpticsDriver::TimerTest(float period)
     //while (rtiGetCurrentTick(rtiCOMPARE0) < tickTimeEnd);
     //gioSetBit(hetPORT1, 13, 1);
 }
-
-void pwmNotification(hetBASE_t * hetREG,uint32 pwm, uint32 notification)
-{
-    //OpticsDriver optDrv;
-/*  enter user code between the USER CODE BEGIN and USER CODE END. */
-/* USER CODE BEGIN (35) */
-   if ((pwm == pwm2) && (notification == pwmEND_OF_PERIOD))
-   {
-       /* Trigger Hold on Integrated Value */
-       gioSetBit(hetPORT1, PIN_HET_28, 1);
-       /* Set flag pwmNotification */
-       _integrationEnd = TRUE;
-       BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-       xHigherPriorityTaskWoken = pdFALSE;
-       xSemaphoreGiveFromISR(OpticsDriver::s_sem, &xHigherPriorityTaskWoken);
-   }
-
-
-/* USER CODE END */
-}
-

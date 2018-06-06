@@ -40,7 +40,7 @@ private:
                                                  std::string& res, int& result);
     bool parseDioCommand(std::vector<std::string>& tokens,
                                                  std::string& res, int& result);
-    bool parsePdCommand(std::vector<std::string>& tokens,
+    bool parseOpticsCommand(std::vector<std::string>& tokens,
                                                  std::string& res, int& result);
 private:
     std::string m_prevMsg;

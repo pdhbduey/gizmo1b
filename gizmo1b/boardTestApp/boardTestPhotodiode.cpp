@@ -24,16 +24,16 @@ int BoardTestPhotodiode::get(uint32 address, uint32& value)
         value = m_libPhotodiode.getIntegrationTimeInUs();
         break;
     case PHOTODIODE_LED_INTENSITY:
-        {
-            float ledIntensity = m_libPhotodiode.getLedIntensity();
-            value = *reinterpret_cast<uint32*>(&ledIntensity);
-        }
+        value = m_libPhotodiode.getLedIntensity();
         break;
-    case PHOTODIODE_READING:
+    case PHOTODIODE_READING_IN_VOLTS:
         {
             float photoDiodeReading = m_libPhotodiode.readPhotodiode();
             value = *reinterpret_cast<uint32*>(&photoDiodeReading);
         }
+        break;
+    case PHOTODIODE_READING_RAW:
+        value = m_libPhotodiode.readPhotodiodeRaw();
         break;
     }
     return OKAY;
@@ -44,7 +44,8 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
     switch (address) {
     default:
         return ERROR_ADDR;
-    case PHOTODIODE_READING:
+    case PHOTODIODE_READING_IN_VOLTS:
+    case PHOTODIODE_READING_RAW:
     case PHOTODIODE_STATUS:
         return ERROR_RO;
     case PHOTODIODE_CONTROL:
@@ -66,10 +67,7 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
         m_status = m_libPhotodiode.setIntegrationTimeInUs(value);
         break;
     case PHOTODIODE_LED_INTENSITY:
-        {
-            float ledIntensity = *reinterpret_cast<float*>(&value);
-            m_status = m_libPhotodiode.setLedIntensity(ledIntensity);
-        }
+        m_status = m_libPhotodiode.setLedIntensity(value);
         break;
     }
     return OKAY;

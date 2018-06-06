@@ -126,7 +126,8 @@ public:
         PHOTODIODE_STATUS,
         PHOTODIODE_INTEGRATION_TIME,
         PHOTODIODE_LED_INTENSITY,
-        PHOTODIODE_READING,
+        PHOTODIODE_READING_IN_VOLTS,
+        PHOTODIODE_READING_RAW,
     };
     BoardTest();
     virtual ~BoardTest();

@@ -135,11 +135,11 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
     help += "dio get 0..9|all\n\r";
     help += "dio set|clear 0..7\n\r";
-    help += "pd get led|pd|time|intensity|result\n\r";
-    help += "pd set led blue1|green|red1|brown|red2|blue2\n\r";
-    help += "pd set pd 1..6\n\r";
-    help += "pd set time 10000..1000000(us)\n\r";
-    help += "pd set intensity [0-1](A)\n\r";
+    help += "optics get led|pd|time|intensity|result\n\r";
+    help += "optics set led 1..6\n\r";
+    help += "optics set pd 1..6\n\r";
+    help += "optics set time 1,000..1,000,000(us)\n\r";
+    help += "optics set intensity 0..40,000\n\r";
 }
 
 void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
@@ -209,8 +209,8 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
             else if (tokens[COMPONENT] == "dio") {
                 isParsingError = parseDioCommand(tokens, res, result);
             }
-            else if (tokens[COMPONENT] == "pd") {
-                isParsingError = parsePdCommand(tokens, res, result);
+            else if (tokens[COMPONENT] == "optics") {
+                isParsingError = parseOpticsCommand(tokens, res, result);
             }
         }
     }
@@ -1712,7 +1712,7 @@ bool BoardTestConsoleApp::parseHeaterCommand(std::vector<std::string>& tokens,
     return isParsingError;
 }
 
-bool BoardTestConsoleApp::parsePdCommand(std::vector<std::string>& tokens,
+bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                                                   std::string& res, int& result)
 {
     bool isParsingError = true;
@@ -1731,12 +1731,12 @@ bool BoardTestConsoleApp::parsePdCommand(std::vector<std::string>& tokens,
                     int led = control & LibPhotodiode::SELECT_LED_MASK;
                     std::map<int, std::string> ledMap;
                     ledMap[0]                               = "none";
-                    ledMap[LibPhotodiode::SELECT_LED_BLUE1] = "blue1";
-                    ledMap[LibPhotodiode::SELECT_LED_GREEN] = "green";
-                    ledMap[LibPhotodiode::SELECT_LED_RED1]  = "red1";
-                    ledMap[LibPhotodiode::SELECT_LED_BROWN] = "brown";
-                    ledMap[LibPhotodiode::SELECT_LED_RED2]  = "red2";
-                    ledMap[LibPhotodiode::SELECT_LED_BLUE2] = "blue2";
+                    ledMap[LibPhotodiode::SELECT_LED_BLUE1] = "1";
+                    ledMap[LibPhotodiode::SELECT_LED_GREEN] = "2";
+                    ledMap[LibPhotodiode::SELECT_LED_RED1]  = "3";
+                    ledMap[LibPhotodiode::SELECT_LED_BROWN] = "4";
+                    ledMap[LibPhotodiode::SELECT_LED_RED2]  = "5";
+                    ledMap[LibPhotodiode::SELECT_LED_BLUE2] = "6";
                     res = (ledMap.find(led) != ledMap.end()
                         ?  ledMap[led]
                         :  "unknown");
@@ -1773,18 +1773,18 @@ bool BoardTestConsoleApp::parsePdCommand(std::vector<std::string>& tokens,
             else if (tokens[ARGUMENT] == "intensity") {
                 uint32 ledIntensity;
                 result = regRead(BoardTest::PHOTODIODE_LED_INTENSITY, ledIntensity);
-                float f = *reinterpret_cast<float*>(&ledIntensity);
                 char t[16];
-                sprintf(t, "%.2fA", f);
+                sprintf(t, "%d", ledIntensity);
                 res = t;
                 isParsingError = false;
             }
             else if (tokens[ARGUMENT] == "result") {
                 uint32 pdReading;
-                result = regRead(BoardTest::PHOTODIODE_READING, pdReading);
+                result = regRead(BoardTest::PHOTODIODE_READING_IN_VOLTS, pdReading);
                 float f = *reinterpret_cast<float*>(&pdReading);
-                char t[16];
-                sprintf(t, "%.2fV", f);
+                result = regRead(BoardTest::PHOTODIODE_READING_RAW, pdReading);
+                char t[128];
+                sprintf(t, "voltage: %.2fV, count: %d", f, pdReading);
                 res = t;
                 isParsingError = false;
             }
@@ -1792,12 +1792,12 @@ bool BoardTestConsoleApp::parsePdCommand(std::vector<std::string>& tokens,
         else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
             if (tokens[ARGUMENT] == "led" && tokens.size() > VALUE) {
                 std::map<std::string, int> ledMap;
-                ledMap["blue1"] = LibPhotodiode::SELECT_LED_BLUE1;
-                ledMap["green"] = LibPhotodiode::SELECT_LED_GREEN;
-                ledMap["red1"]  = LibPhotodiode::SELECT_LED_RED1;
-                ledMap["brown"] = LibPhotodiode::SELECT_LED_BROWN;
-                ledMap["red2"]  = LibPhotodiode::SELECT_LED_RED2;
-                ledMap["blue2"] = LibPhotodiode::SELECT_LED_BLUE2;
+                ledMap["1"] = LibPhotodiode::SELECT_LED_BLUE1;
+                ledMap["2"] = LibPhotodiode::SELECT_LED_GREEN;
+                ledMap["3"] = LibPhotodiode::SELECT_LED_RED1;
+                ledMap["4"] = LibPhotodiode::SELECT_LED_BROWN;
+                ledMap["5"] = LibPhotodiode::SELECT_LED_RED2;
+                ledMap["6"] = LibPhotodiode::SELECT_LED_BLUE2;
                 if (ledMap.find(tokens[VALUE]) != ledMap.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_CONTROL,
                                                          ledMap[tokens[VALUE]]);
@@ -1834,11 +1834,11 @@ bool BoardTestConsoleApp::parsePdCommand(std::vector<std::string>& tokens,
                 }
             }
             else if (tokens[ARGUMENT] == "intensity" && tokens.size() > VALUE) {
-                float intensity;
-                if (sscanf(tokens[VALUE].c_str(), "%f", &intensity) == 1) {
-                   uint32 value = *reinterpret_cast<uint32*>(&intensity);
-                   result = regWrite(BoardTest::PHOTODIODE_LED_INTENSITY, value);
+                uint32 intensity;
+                if (sscanf(tokens[VALUE].c_str(), "%d", &intensity) == 1) {
+                   result = regWrite(BoardTest::PHOTODIODE_LED_INTENSITY, intensity);
                    if (result == BoardTest::OKAY) {
+                       uint32 value;
                        result = regRead(BoardTest::PHOTODIODE_STATUS, value);
                        if (value != LibPhotodiode::OKAY) {
                            res = "pd status: " + pdStatus[value];
