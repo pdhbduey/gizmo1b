@@ -189,6 +189,19 @@ namespace DeviceManager
         }
 
         /// <summary>
+        ///  Sets the data context for Optics view.
+        /// </summary>
+        /// <returns> Optics view. </returns>
+        public OpticsView GetOpticsView()
+        {
+            return new OpticsView()
+            {
+                DataContext = new OpticsViewModel(GetOpticsModel())
+            };
+
+        }
+
+        /// <summary>
         ///  Sets the data context for fault view.
         /// </summary>
         /// <returns> Motor view. </returns>
@@ -240,6 +253,11 @@ namespace DeviceManager
         private ITecModel GetTecModel()
         {
             return new TecModel(serialCommunication);
+        }
+
+        private IOpticsModel GetOpticsModel()
+        {
+            return new OpticsModel(serialCommunication);
         }
 
         private ISnapshotModel GetSnapshotModel()
