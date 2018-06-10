@@ -25,6 +25,7 @@
                 "Heater",
                 "LED",
                 "Motor",
+                "Optics",
                 "Thermistor",
                 "Snapshot",
                 //"Trace",
@@ -98,6 +99,9 @@
                     break;
                 case "Motor":
                     Content = DeviceManager.Factory.Instance.GetMotorView();
+                    break;
+                case "Optics":
+                    Content = DeviceManager.Factory.Instance.GetOpticsView();
                     break;
                 case "Fan":
                     Content = DeviceManager.Factory.Instance.GetFanView();

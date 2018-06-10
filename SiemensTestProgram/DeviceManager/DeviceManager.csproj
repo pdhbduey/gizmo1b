@@ -96,17 +96,20 @@
     <Compile Include="Model\IHeaterModel.cs" />
     <Compile Include="Model\ILedModel.cs" />
     <Compile Include="Model\IMotorModel.cs" />
+    <Compile Include="Model\IOpticsModel.cs" />
     <Compile Include="Model\ISnapshotModel.cs" />
     <Compile Include="Model\ITecModel.cs" />
     <Compile Include="Model\IThermistorModel.cs" />
     <Compile Include="Model\ITraceModel.cs" />
     <Compile Include="Model\LedModel.cs" />
     <Compile Include="Model\MotorModel.cs" />
+    <Compile Include="Model\OpticsModel.cs" />
     <Compile Include="Model\SnapshotModel.cs" />
     <Compile Include="Model\TecModel.cs" />
     <Compile Include="Model\ThermistorModel.cs" />
     <Compile Include="Model\TraceModel.cs" />
     <Compile Include="MotorDefaults.cs" />
+    <Compile Include="OpticsDefault.cs" />
     <Compile Include="SnapshotDefaults.cs" />
     <Compile Include="TecDefaults.cs" />
     <Compile Include="ThermistorDefaults.cs" />
@@ -120,6 +123,7 @@
     <Compile Include="ViewModel\HeaterViewModel.cs" />
     <Compile Include="ViewModel\MotorViewModel.cs" />
     <Compile Include="ViewModel\LedViewModel.cs" />
+    <Compile Include="ViewModel\OpticsViewModel.cs" />
     <Compile Include="ViewModel\SnapshotViewModel.cs" />
     <Compile Include="ViewModel\TecViewModel.cs" />
     <Compile Include="ViewModel\ThermistorViewModel.cs" />
@@ -153,6 +157,9 @@
     </Compile>
     <Compile Include="View\MotorView.xaml.cs">
       <DependentUpon>MotorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\OpticsView.xaml.cs">
+      <DependentUpon>OpticsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\SnapshotView.xaml.cs">
       <DependentUpon>SnapshotView.xaml</DependentUpon>
@@ -216,6 +223,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\MotorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\OpticsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
