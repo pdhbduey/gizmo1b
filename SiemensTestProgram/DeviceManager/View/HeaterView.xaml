@@ -75,7 +75,7 @@
             <StackPanel Margin="1">
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110" Margin="1" Content="Integral Gain: "></Label>
-                    <TextBox Height="25" Width="50" Text="{Binding Path=IntegralGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                    <TextBox Height="25" Width="100" Text="{Binding Path=IntegralGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetIntegralGainCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
@@ -83,7 +83,7 @@
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110" Margin="1" Content="Proportional Gain: "></Label>
-                    <TextBox Height="25" Width="50" Text="{Binding Path=ProportionalGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                    <TextBox Height="25" Width="100" Text="{Binding Path=ProportionalGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetProportionalGainCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
@@ -91,11 +91,15 @@
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110" Margin="1" Content="Derivative Gain: "></Label>
-                    <TextBox Height="25" Width="50" HorizontalAlignment="Left" Text="{Binding Path=DerivativeGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                    <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=DerivativeGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetDerivativeGainCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
                     </TextBox>
+                </StackPanel>
+                <StackPanel Margin="1" Orientation="Horizontal">
+                    <Label Width="110"></Label>
+                    <ToggleButton Width="100" Height="25" Margin="1" Content="{Binding ClosedLoopState}" HorizontalAlignment="Left" Command="{Binding StartClosedLoopCommand}"></ToggleButton>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
@@ -114,10 +118,6 @@
                 <StackPanel Orientation="Horizontal">
                     <Label Width="50"></Label>
                     <ToggleButton Margin="1" Width="110" Height="25" Content="{Binding EnableState}" HorizontalAlignment="Left" Command="{Binding EnableCommand}"></ToggleButton>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label Width="50"></Label>
-                    <ToggleButton Width="110" Height="25" Margin="1" Content="{Binding ClosedLoopState}" HorizontalAlignment="Left" Command="{Binding StartClosedLoopCommand}"></ToggleButton>
                 </StackPanel>
             </StackPanel>
         </GroupBox>

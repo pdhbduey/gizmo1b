@@ -52,6 +52,14 @@
                         </TextBox.InputBindings>
                     </TextBox>
                 </StackPanel>
+                <StackPanel Margin="1" Orientation="Horizontal">
+                    <Label Width="70" VerticalAlignment="Center" Margin="1"/>
+                    <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
+                </StackPanel>
+                <StackPanel Margin="1" Orientation="Horizontal">
+                    <Label Width="70" VerticalAlignment="Center" Margin="1"/>
+                    <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>
+                </StackPanel>
             </StackPanel>
         </GroupBox>
 
@@ -100,8 +108,6 @@
                 <StackPanel>
                     <Label Content="{Binding CustomReadStatus}"></Label>
                     <Button Content="Browse" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Command="{Binding GetCustomWaveformDataCommand}"></Button>
-                    <ToggleButton Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
-                    <ToggleButton Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>
                     <ToggleButton Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding ClosedLoopButtonState}" Command="{Binding ClosedLoopToggleCommand}"></ToggleButton>
                 </StackPanel>
             </Grid>
