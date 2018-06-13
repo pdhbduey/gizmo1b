@@ -16,6 +16,20 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
+        public Task<CommunicationData> ControlCommand(string state)
+        {
+            var requestArray = HeaterDefaults.SetWaveformControl(state);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> SetWaveformCyclesCommand(int waveformCycles)
+        {
+            var requestArray = HeaterDefaults.SetWaveformCycles(waveformCycles);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
         public Task<CommunicationData> SetProportionalGainCommand(float gain)
         {
             var requestArray = HeaterDefaults.SetProportionalGain(gain);

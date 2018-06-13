@@ -9,6 +9,8 @@ namespace DeviceManager
 {
     public static class HeaterDefaults
     {
+        public const int WaveformCyclesMinimum = 0;
+        public const int WaveformCyclesMaximum = int.MaxValue;
         public const float ProportionalGainMinimum = 0.01F;
         public const float ProportionalGainMaximum = 100;
         public const float DerivativeGainMinimum = 0;
@@ -279,6 +281,46 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x00
+            };
+        }
+
+        public static byte[] SetWaveformControl(string state)
+        {
+            byte value = 0x04;
+
+            if (state.Equals(TecDefaults.StopWaveformText))
+            {
+                value = 0x08;
+            }
+
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0B,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                value
+            };
+        }
+
+        public static byte[] SetWaveformCycles(int value)
+         {
+            var valueBytes = Helper.ConvertIntToByteArray(value);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0B,
+                0x0B,
+                valueBytes[0],
+                valueBytes[1],
+                valueBytes[2],
+                valueBytes[3]
             };
         }
 

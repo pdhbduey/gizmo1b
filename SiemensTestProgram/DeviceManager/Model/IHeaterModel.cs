@@ -9,6 +9,11 @@ namespace DeviceManager.Model
 {
     public interface IHeaterModel
     {
+
+        Task<CommunicationData> ControlCommand(string state);
+
+        Task<CommunicationData> SetWaveformCyclesCommand(int waveformCycles);
+
         Task<CommunicationData> SetProportionalGainCommand(float gain);
 
         Task<CommunicationData> SetIntegralGainCommand(float gain);
