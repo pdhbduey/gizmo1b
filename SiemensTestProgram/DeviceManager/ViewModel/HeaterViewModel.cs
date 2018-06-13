@@ -33,8 +33,9 @@ namespace DeviceManager.ViewModel
         private string selectedTin;
         private string customReadStatus;
         private int customIndex;
+        private int waveformCycles;
         private const int updateDelay = 300;
-
+        private string waveformButtonState;
 
         public HeaterViewModel(IHeaterModel heaterModel)
         {
@@ -49,6 +50,8 @@ namespace DeviceManager.ViewModel
             StartClosedLoopCommand = new RelayCommand(param => ClosedLoopToggle());
             GetCustomWaveformDataCommand = new RelayCommand(param => GetCustomWaveformData());
             ResetCustomWaveformCommand = new RelayCommand(param => Reset());
+            SetWaveformCyclesCommand = new RelayCommand(param => SetWaveformCycles());
+            StartStopWaveformCommand = new RelayCommand(param => WaveformToggle());
 
             Tins = HeaterDefaults.Tins;
             selectedTin = Tins[0];
@@ -61,9 +64,68 @@ namespace DeviceManager.ViewModel
             IntegralGain = 0f;
             CustomIndex = 0;
             CustomReadStatus = "No data read";
+            WaveformCycles = TecDefaults.WaveformCyclesMinimum;
+            WaveformButtonState = TecDefaults.StartWaveformText;
 
             InitialUpdate();
             StartUpdateTask();
+        }
+
+        public RelayCommand StartStopWaveformCommand { get; set; }
+
+        private async void WaveformToggle()
+        {
+            var state = waveformButtonState;
+            WaveformButtonState = waveformButtonState == TecDefaults.StartWaveformText ? TecDefaults.StopWaveformText : TecDefaults.StartWaveformText;
+
+            await heaterModel.ControlCommand(state);
+        }
+
+        public string WaveformButtonState
+        {
+            get
+            {
+                return waveformButtonState;
+            }
+
+            set
+            {
+                waveformButtonState = value;
+                OnPropertyChanged(nameof(WaveformButtonState));
+            }
+        }
+
+        public RelayCommand SetWaveformCyclesCommand { get; set; }
+
+        private async void SetWaveformCycles()
+        {
+            if (waveformCycles < HeaterDefaults.WaveformCyclesMinimum)
+            {
+                WaveformCycles = HeaterDefaults.WaveformCyclesMinimum;
+            }
+            else if (waveformCycles > HeaterDefaults.WaveformCyclesMaximum)
+            {
+                WaveformCycles = HeaterDefaults.WaveformCyclesMaximum;
+            }
+
+            await heaterModel.SetWaveformCyclesCommand(waveformCycles);
+        }
+
+        public int WaveformCycles
+        {
+            get
+            {
+                return waveformCycles;
+            }
+
+            set
+            {
+                waveformCycles = value;
+
+                OnPropertyChanged(nameof(WaveformCycles));
+
+                //SetWaveformCycles();
+            }
         }
 
         public List<string> Tins { get; set; }

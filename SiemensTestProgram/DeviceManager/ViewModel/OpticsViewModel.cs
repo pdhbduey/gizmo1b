@@ -1,16 +1,10 @@
-﻿using Common;
-using Common.Bindings;
-using DeviceManager.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-
-namespace DeviceManager.ViewModel
+﻿namespace DeviceManager.ViewModel
 {
+    using Common;
+    using Common.Bindings;
+    using DeviceManager.Model;
+    using System.Collections.Generic;
+
     public class OpticsViewModel : BindableBase
     {
         private IOpticsModel opticsModel;
@@ -29,6 +23,7 @@ namespace DeviceManager.ViewModel
 
             SetIntegrationTimeCommand = new RelayCommand(param => UpdateIntegrationTime());
             SetIntensityCommand = new RelayCommand(param => UpdateIntensity());
+            UpdateCommand = new RelayCommand(param => Update());
 
             // Initial Set
             IntegrationTime = OpticsDefault.IntegrationTimeDefault;
@@ -37,17 +32,16 @@ namespace DeviceManager.ViewModel
             SelectedLed = Leds[0];
             Photodiodes = OpticsDefault.Photodiodes;
             SelectedPhotodiode = Photodiodes[0];
-
-            InitialUpdate();
-            StartUpdateTask();
         }
 
-        private void InitialUpdate()
+        public RelayCommand UpdateCommand { get; set; }
+
+        private void Update()
         {
-            var status = opticsModel.ReadStatusCommand().Result;
-            if (status.succesfulResponse)
+            var photodiodeVoltsRead = opticsModel.ReadPhotodiodeVoltsCommand().Result;
+            if (photodiodeVoltsRead.succesfulResponse)
             {
-                ProcessStatus(status.response);
+                PhotodiodeVolts = Helper.GetFloatFromBigEndian(photodiodeVoltsRead.response);
             }
 
             var photodiodeRawRead = opticsModel.ReadPhotodiodeRawCommand().Result;
@@ -56,61 +50,10 @@ namespace DeviceManager.ViewModel
                 PhotodiodeRaw = Helper.GetIntFromBigEndian(photodiodeRawRead.response);
             }
 
-            var photodiodeVoltsRead = opticsModel.ReadPhotodiodeVoltsCommand().Result;
-            if (photodiodeVoltsRead.succesfulResponse)
+            var status = opticsModel.ReadStatusCommand().Result;
+            if (status.succesfulResponse)
             {
-                PhotodiodeVolts = Helper.GetFloatFromBigEndian(photodiodeVoltsRead.response);
-            }
-        }
-
-        private void StartUpdateTask()
-        {
-            var thread = new Thread(() =>
-            {
-                UpdateAllStatuses();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-        }
-
-        private async void UpdateAllStatuses()
-        {
-            while (true)
-            {
-                var status = await opticsModel.ReadStatusCommand();
-                if (status.succesfulResponse)
-                {
-                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        //VSense = Helper.GetFloatFromBigEndian(vData.response);
-                        ProcessStatus(status.response);
-                    }));
-                }
-
-                Thread.Sleep(updateDelay);
-
-                var photodiodeRawRead = await opticsModel.ReadPhotodiodeRawCommand();
-                if (photodiodeRawRead.succesfulResponse)
-                {
-                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        PhotodiodeRaw = Helper.GetIntFromBigEndian(photodiodeRawRead.response);
-                    }));
-                }
-
-                Thread.Sleep(updateDelay);
-
-                var photodiodeVoltsRead = await opticsModel.ReadPhotodiodeVoltsCommand();
-                if (photodiodeVoltsRead.succesfulResponse)
-                {
-                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        PhotodiodeVolts = Helper.GetFloatFromBigEndian(photodiodeVoltsRead.response);
-                    }));
-                }
-
-                Thread.Sleep(updateDelay);
+                ProcessStatus(status.response);
             }
         }
 
