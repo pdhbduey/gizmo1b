@@ -21,6 +21,7 @@ namespace DeviceManager.DeviceCommunication
         private volatile object mutex;
         private SemaphoreSlim requestSemaphore;
         private ErrorWindow errorDisplay;
+        private bool errorWindowOpen = false;
         //private SemaphoreSlim readSemaphore;
 
         // Default configuration
@@ -243,7 +244,7 @@ namespace DeviceManager.DeviceCommunication
             }
             catch
             {
-                if (errorDisplay == null)
+                if (errorWindowOpen == false)
                 {
                     Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                     {
@@ -252,6 +253,8 @@ namespace DeviceManager.DeviceCommunication
                         errorDisplay.errorMsg.Content = "Error connecting to serial port.";
                         errorDisplay.Show();
                     }));
+
+                    errorWindowOpen = true;
                 }
                 
                 isConfigured = false;
