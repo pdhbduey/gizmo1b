@@ -32,6 +32,7 @@ namespace DeviceManager.ViewModel
         private int customIndex;
         private int waveformCycles;
         private int sampleTime;
+        private float voutValue;
 
         private float vSense;
         private float iSense;
@@ -62,6 +63,7 @@ namespace DeviceManager.ViewModel
             waveformButtonState = TecDefaults.StartWaveformText;
             enableButtonState = TecDefaults.EnableText;
             closedLoopButtonState = TecDefaults.EnableClosedLoopText;
+            VoutValue = TecDefaults.VoutMaximum;
             numberOfSamples = 0;
             CustomIndex = 0;
             CustomReadStatus = "No data read";
@@ -81,6 +83,7 @@ namespace DeviceManager.ViewModel
             GetCustomWaveformDataCommand = new RelayCommand(param => GetCustomWaveformData());
 
             SetTecPeriodCommand = new RelayCommand(param => UpdatePeriod());
+            SetVoutCommand = new RelayCommand(param => SetVout());
             SendIrefCommand = new RelayCommand(param => SetIref());
             SetIntegralGainCommand = new RelayCommand(param => UpdateIntegralGain());
             SetProportionalGainCommand = new RelayCommand(param => UpdateProportionalGain());
@@ -95,6 +98,7 @@ namespace DeviceManager.ViewModel
 
         public RelayCommand GetCustomWaveformDataCommand { get; set; }
         public RelayCommand SetTecPeriodCommand { get; set; }
+        public RelayCommand SetVoutCommand { get; set; }
         public RelayCommand SendIrefCommand { get; set; }
         public RelayCommand SetIntegralGainCommand { get; set; }
         public RelayCommand SetProportionalGainCommand { get; set; }
@@ -461,6 +465,20 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        public float VoutValue
+        {
+            get
+            {
+                return voutValue;
+            }
+
+            set
+            {
+                voutValue = value;
+                OnPropertyChanged(nameof(VoutValue));
+            }
+        }
+
         public string ISenseText
         {
             get
@@ -652,6 +670,20 @@ namespace DeviceManager.ViewModel
 
             var response = new byte[5];
             tecModel.SetIrefCommand(irefValue, ref response);
+        }
+
+        private async void SetVout()
+        {
+            if (voutValue < TecDefaults.VoutMinimum)
+            {
+                VoutValue = TecDefaults.VoutMinimum;
+            }
+            else if (voutValue > TecDefaults.VoutMaximum)
+            {
+                VoutValue = TecDefaults.VoutMaximum;
+            }
+
+            await tecModel.SetVoutCommand(voutValue);
         }
 
         private void UpdateWaveform()

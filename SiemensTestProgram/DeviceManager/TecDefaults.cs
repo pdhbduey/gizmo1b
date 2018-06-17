@@ -14,6 +14,8 @@ namespace DeviceManager
         public const int WaveformCyclesMaximum = int.MaxValue;
         public const int SampleTimeMinimum = 0;
         public const int SampleTimeMaximum = 9999;
+        public const float VoutMinimum = 0.00f;
+        public const float VoutMaximum = 21.00f;
         //public const int IrefGainMinimum = 1;
         //public const int IrefGainMaximum = 3;
 
@@ -117,6 +119,23 @@ namespace DeviceManager
                 iref[1],
                 iref[2],
                 iref[3]
+            };
+        }
+
+        public static byte[] SetVoutCommand(float value)
+        {
+            var vout = Helper.GetBigEndian(value);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x07,
+                0x0F,
+                vout[0],
+                vout[1],
+                vout[2],
+                vout[3]
             };
         }
 

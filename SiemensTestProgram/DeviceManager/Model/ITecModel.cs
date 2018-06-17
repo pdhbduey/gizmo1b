@@ -33,6 +33,8 @@ namespace DeviceManager.Model
 
         bool SetWaveformIrefCommand(float irefGain, ref byte[] response);
 
+        Task<CommunicationData> SetVoutCommand(float value);
+
         Task<CommunicationData> SetSampleTimeCommand(int time);
 
         Task<CommunicationData> SetCustomWaveformIRefCommand(float iref);

@@ -21,6 +21,13 @@ namespace DeviceManager.Model
             return status;
         }
 
+        public Task<CommunicationData> SetVoutCommand(float value)
+        {
+            var requestArray = TecDefaults.SetVoutCommand(value);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
         public bool SetIrefCommand(float value, ref byte[] response)
         {
             var requestArray = TecDefaults.SetIrefCommand(value);

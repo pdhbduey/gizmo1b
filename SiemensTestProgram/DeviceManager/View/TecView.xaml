@@ -45,6 +45,14 @@
                     </TextBox>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
+                    <Label Height="25" Width="70" VerticalAlignment="Center" Margin="1" Content="Vout: "></Label>
+                    <TextBox Height="25" Width="100" Text="{Binding Path=VoutValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2}" HorizontalAlignment="Left">
+                        <TextBox.InputBindings>
+                            <KeyBinding Command="{Binding SetVoutCommand}" Key="Enter"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                </StackPanel>
+                <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="70" VerticalAlignment="Center" Margin="1" Content="Cycles:"></Label>
                     <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=WaveformCycles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.InputBindings>
