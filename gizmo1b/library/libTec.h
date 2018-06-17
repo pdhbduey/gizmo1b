@@ -35,6 +35,7 @@ public:
        ERROR_DERIVATIVE_GAIN_OUT_OF_RANGE,
        ERROR_CUSTOM_WAVEFORM_TIME_NOT_RISING,
        ERROR_CUSTOM_WAVEFORM_NON_ZERO_START_TIME,
+       ERROR_VOUT_MAX_OUT_OF_RANGE,
     };
     enum WaveformType {
         WAVEFORM_TYPE_CONSTANT,
@@ -108,6 +109,8 @@ public:
     int setDerivativeGain(float gain); // 0-100
     float getDerivativeGain();
     bool isClosedLoopEnabled();
+    float getVoutMax(); // 0V-21V
+    int setVoutMax(float voutLimit);
     void startSnaphot();
     void stopSnapshot();
     int setSnapshotNumberOfSamples(int nsamples);
@@ -198,6 +201,8 @@ private:
     float m_pidDerivativeGain;
     bool m_isClosedLoopEnabled;
     bool m_isEnabled;
+    float m_voutLimit;
+    float m_controlLimit;
     std::queue<float> m_filterQueue;
     std::vector<float> m_filterTaps;
     std::vector<struct Sample> m_customWaveform;
