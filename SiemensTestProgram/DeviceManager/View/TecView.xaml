@@ -45,7 +45,7 @@
                     </TextBox>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Height="25" Width="70" VerticalAlignment="Center" Margin="1" Content="Vout: "></Label>
+                    <Label Height="25" Width="70" VerticalAlignment="Center" Margin="1" Content="VMax [V]: "></Label>
                     <TextBox Height="25" Width="100" Text="{Binding Path=VoutValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2}" HorizontalAlignment="Left">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetVoutCommand}" Key="Enter"/>
@@ -100,18 +100,15 @@
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110" VerticalAlignment="Center" Margin="1"/>
-                    <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
+                    <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding ClosedLoopButtonState}" Command="{Binding ClosedLoopToggleCommand}"></ToggleButton>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110" VerticalAlignment="Center" Margin="1"/>
-                    <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding ClosedLoopButtonState}" Command="{Binding ClosedLoopToggleCommand}"></ToggleButton>
+                    <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
                 </StackPanel>
-                
             </StackPanel>
         </GroupBox>
 
-        
-        
         <!-- Custom waveform -->
         <GroupBox Grid.Row="1" Grid.Column="0">
             <GroupBox.Header>
