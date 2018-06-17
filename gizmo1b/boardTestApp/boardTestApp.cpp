@@ -63,6 +63,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_TIME]      = boardTestTec;
     m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_IREF]      = boardTestTec;
     m_boardTestMap[BoardTest::TEC_WAVEFORM_CYCLES]           = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_VOUT_MAX]                  = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_CONTROL]              = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_STATUS]               = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_RESOLUTION]           = boardTestTec;

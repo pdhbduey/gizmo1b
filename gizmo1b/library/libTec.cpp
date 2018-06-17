@@ -71,6 +71,7 @@ LibTec::LibTec(const char* name) :
     for (int i = 0; i < m_filterTaps.size(); i++) {
         m_filterQueue.push(0);
     }
+    setVoutMax(21);
 }
 
 LibTec::~LibTec()
@@ -458,6 +459,22 @@ bool LibTec::isClosedLoopEnabled()
     return m_isClosedLoopEnabled;
 }
 
+float LibTec::getVoutMax()
+{
+    return m_voutLimit;
+}
+
+int LibTec::setVoutMax(float voutLimit)
+{
+    LibMutex libMutex(s_mutex);
+    if (voutLimit < 0 || voutLimit > 21) {
+        return ERROR_VOUT_MAX_OUT_OF_RANGE;
+    }
+    m_voutLimit    = voutLimit;
+    m_controlLimit = voutLimit / 25 * 2.5;
+    return OKAY;
+}
+
 float LibTec::filter(float value)
 {
     std::queue<float> temp;
@@ -542,11 +559,16 @@ void LibTec::run()
         float heaterControl = m_pidHeaterProportionalGain *  heaterPidError
                             + m_pidHeaterIntegralGain     *  m_heaterAccError
                             + m_pidHeaterDerivativeGain   * (heaterPidError - m_heaterPrevError);
-        heaterControl       = heaterControl < -m_heaterImax ? -m_heaterImax :
+        float heaterControlOut
+                            =(heaterControl < -m_heaterImax ? -m_heaterImax :
                               heaterControl >  m_heaterImax ?  m_heaterImax :
-                                                               heaterControl;
+                                                               heaterControl);
+        bool isSaturated    = heaterControlOut != heaterControl;
+        bool isIntAdding    = heaterPidError > 0 && heaterControl > 0
+                           || heaterPidError < 0 && heaterControl < 0;
+        bool clamp          = isSaturated && isIntAdding;
+        m_heaterAccError   +=(clamp ? 0 : heaterPidError);
         m_heaterPrevError   = heaterPidError;
-        m_heaterAccError   += heaterPidError;
         // Current PID regulator
         float iRef      = m_isHeaterEnabled ? heaterControl : getWaveformSample(tick);
         float pidError  = iRef;
@@ -568,14 +590,21 @@ void LibTec::run()
         if (m_pidIntegralGain == 0) {
             m_accError = 0;
         }
-        float control = m_pidProportionalGain *  pidError
-                      + m_pidIntegralGain     *  m_accError
-                      + m_pidDerivativeGain   * (pidError - m_prevError);
-        m_prevError   = pidError;
-        m_accError   += pidError;
-        control      *= 2.5 / 15;
+        float control    = m_pidProportionalGain *  pidError
+                         + m_pidIntegralGain     *  m_accError
+                         + m_pidDerivativeGain   * (pidError - m_prevError);
+        control         *= 0.1; // scale a bit so that the gains are not small
+        float controlOut = (control < -m_controlLimit ? -m_controlLimit :
+                            control >  m_controlLimit ?  m_controlLimit :
+                                                         control);
+        isSaturated      = controlOut != control;
+        isIntAdding      = pidError > 0 && control > 0
+                        || pidError < 0 && control < 0;
+        clamp            = isSaturated && isIntAdding;
+        m_accError      +=(clamp ? 0 : pidError);
+        m_prevError      = pidError;
         if (m_isEnabled) {
-            driveControl(control);
+            driveControl(controlOut);
         }
         if (m_isSnapshotRunning) {
             int res[3] = { [SNAPSHOT_RES_10  ] = 100,

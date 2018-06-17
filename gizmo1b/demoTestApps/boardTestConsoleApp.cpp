@@ -91,6 +91,8 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "tec get intgain\n\r";
     help += "tec set dergain [0,100]\n\r";
     help += "tec get dergain\n\r";
+    help += "tec set voutmax [0,21](V)\n\r";
+    help += "tec get voutmax\n\r";
     help += "tec set customindex reset\n\r";
     help += "tec set customindex inc\n\r";
     help += "tec set customtime 0..9,999(ms)\n\r";
@@ -255,6 +257,7 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
     tecStatus.push_back("ERROR_DERIVATIVE_GAIN_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_CUSTOM_WAVEFORM_TIME_NOT_RISING");
     tecStatus.push_back("ERROR_CUSTOM_WAVEFORM_NON_ZERO_START_TIME");
+    tecStatus.push_back("ERROR_VOUT_MAX_OUT_OF_RANGE");
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "enable") {
             result = regWrite(BoardTest::TEC_CONTROL, BoardTestTec::ENABLE);
@@ -371,6 +374,17 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                     float f = *reinterpret_cast<float*>(&value);
                     char t[16];
                     sprintf(t, "%.2f", f);
+                    res = t;
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "voutmax") {
+                uint32 value;
+                result = regRead(BoardTest::TEC_VOUT_MAX, value);
+                if (result == BoardTest::OKAY) {
+                    float f = *reinterpret_cast<float*>(&value);
+                    char t[16];
+                    sprintf(t, "%.2fV", f);
                     res = t;
                 }
                 isParsingError = false;
@@ -542,6 +556,20 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 if (sscanf(tokens[VALUE].c_str(), "%f", &gain) == 1) {
                    uint32 value = *reinterpret_cast<uint32*>(&gain);
                    result = regWrite(BoardTest::TEC_DERIVATIVE_GAIN, value);
+                   if (result == BoardTest::OKAY) {
+                       result = regRead(BoardTest::TEC_STATUS, value);
+                       if (value != LibTec::OKAY) {
+                           res = "tec  status: " + tecStatus[value];
+                       }
+                   }
+                   isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "voutmax" && tokens.size() > VALUE) {
+                float voutMax;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &voutMax) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&voutMax);
+                   result = regWrite(BoardTest::TEC_VOUT_MAX, value);
                    if (result == BoardTest::OKAY) {
                        result = regRead(BoardTest::TEC_STATUS, value);
                        if (value != LibTec::OKAY) {
