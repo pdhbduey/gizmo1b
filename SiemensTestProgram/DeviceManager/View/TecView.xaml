@@ -54,10 +54,6 @@
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="70" VerticalAlignment="Center" Margin="1"/>
-                    <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
-                </StackPanel>
-                <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="70" VerticalAlignment="Center" Margin="1"/>
                     <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>
                 </StackPanel>
             </StackPanel>
@@ -72,7 +68,7 @@
             <StackPanel Margin="1">
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110" Margin="1" Content="Integral Gain: "></Label>
-                    <TextBox Height="25" Width="50" Text="{Binding Path=IntegralGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                    <TextBox Height="25" Width="100" Text="{Binding Path=IntegralGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetIntegralGainCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
@@ -80,7 +76,7 @@
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110" Margin="1" Content="Proportional Gain: "></Label>
-                    <TextBox Height="25" Width="50" Text="{Binding Path=ProportionalGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                    <TextBox Height="25" Width="100" Text="{Binding Path=ProportionalGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetProportionalGainCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
@@ -88,12 +84,21 @@
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110" Margin="1" Content="Derivative Gain: "></Label>
-                    <TextBox Height="25" Width="50" HorizontalAlignment="Left" Text="{Binding Path=DerivativeGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                    <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=DerivativeGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetDerivativeGainCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
                     </TextBox>
                 </StackPanel>
+                <StackPanel Margin="1" Orientation="Horizontal">
+                    <Label Width="110" VerticalAlignment="Center" Margin="1"/>
+                    <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
+                </StackPanel>
+                <StackPanel Margin="1" Orientation="Horizontal">
+                    <Label Width="110" VerticalAlignment="Center" Margin="1"/>
+                    <ToggleButton Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding ClosedLoopButtonState}" Command="{Binding ClosedLoopToggleCommand}"></ToggleButton>
+                </StackPanel>
+                
             </StackPanel>
         </GroupBox>
 
@@ -108,7 +113,6 @@
                 <StackPanel>
                     <Label Content="{Binding CustomReadStatus}"></Label>
                     <Button Content="Browse" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Command="{Binding GetCustomWaveformDataCommand}"></Button>
-                    <ToggleButton Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding ClosedLoopButtonState}" Command="{Binding ClosedLoopToggleCommand}"></ToggleButton>
                 </StackPanel>
             </Grid>
         </GroupBox>
