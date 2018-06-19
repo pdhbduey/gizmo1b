@@ -8,8 +8,8 @@
         xmlns:local="clr-namespace:SiemensTestProgram"
         mc:Ignorable="d"
         Title="Gizmo1B"
-        MinHeight="800"
-        MinWidth="1200"
+        MinHeight="600"
+        MinWidth="800"
 
         Background="GhostWhite">
 
