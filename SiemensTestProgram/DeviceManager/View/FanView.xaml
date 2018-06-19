@@ -73,7 +73,7 @@
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Grid.Row="1" Grid.Column="0">
+        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <GroupBox.Header>
                 <TextBlock Text="Status" FontWeight="Bold"/>
             </GroupBox.Header>
