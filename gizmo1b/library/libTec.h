@@ -218,6 +218,7 @@ private:
     int m_snapshotNumSamples;
     int m_snapshotRes;
     int m_snapshotSample;
+    int m_snapshotResCount;
     LibCircularBuffer m_traceCircularBuffer;
     static SemaphoreHandle_t s_traceMutex;
     bool m_isTraceRunning;
