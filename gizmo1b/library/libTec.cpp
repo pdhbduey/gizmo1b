@@ -607,21 +607,26 @@ void LibTec::run()
             driveControl(controlOut);
         }
         if (m_isSnapshotRunning) {
-            int res[3] = { [SNAPSHOT_RES_10  ] = 100,
-                           [SNAPSHOT_RES_100 ] =  10,
-                           [SNAPSHOT_RES_1000] =   1, };
-            if (tick % res[m_snapshotRes]) {
-                continue;
-            }
             if (m_snapshotSample < m_snapshotNumSamples) {
-                getVSense(s_snapshotVsense[m_snapshotSample]);
-                s_snapshotIsense[m_snapshotSample] = iSense;
-                s_snapshotIref  [m_snapshotSample] = iRef;
-                m_libThermistor.readTemp(LibThermistor::AIN_A, s_snapshotT1[m_snapshotSample]);
-                m_libThermistor.readTemp(LibThermistor::AIN_B, s_snapshotT2[m_snapshotSample]);
-                m_libThermistor.readTemp(LibThermistor::AIN_C, s_snapshotT3[m_snapshotSample]);
-                m_libThermistor.readTemp(LibThermistor::AIN_D, s_snapshotT4[m_snapshotSample]);
-                m_snapshotSample++;
+                int res[3] = { [SNAPSHOT_RES_10  ] = 100,
+                               [SNAPSHOT_RES_100 ] =  10,
+                               [SNAPSHOT_RES_1000] =   1, };
+                if (m_snapshotResCount >= res[m_snapshotRes]) {
+                    m_snapshotResCount = 0;
+                }
+                if (m_snapshotResCount == 0) {
+                    getVSense(s_snapshotVsense[m_snapshotSample]);
+                    s_snapshotIsense[m_snapshotSample] = iSense;
+                    s_snapshotIref  [m_snapshotSample] = iRef;
+                    m_libThermistor.readTemp(LibThermistor::AIN_A, s_snapshotT1[m_snapshotSample]);
+                    m_libThermistor.readTemp(LibThermistor::AIN_B, s_snapshotT2[m_snapshotSample]);
+                    m_libThermistor.readTemp(LibThermistor::AIN_C, s_snapshotT3[m_snapshotSample]);
+                    m_libThermistor.readTemp(LibThermistor::AIN_D, s_snapshotT4[m_snapshotSample]);
+                    m_snapshotSample++;
+                }
+                else {
+                    m_snapshotResCount++;
+                }
             }
             else {
                 m_isSnapshotRunning = false;
@@ -652,6 +657,7 @@ void LibTec::startSnaphot()
     LibMutex libMutex(s_mutex);
     if (!m_isSnapshotRunning) {
         m_snapshotSample    = 0;
+        m_snapshotResCount  = 0;
         m_isSnapshotRunning = true;
     }
 }
