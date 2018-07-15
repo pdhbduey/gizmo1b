@@ -25,8 +25,8 @@ public:
 public:
     LibAdc();
     virtual ~LibAdc();
-    int read(int channel, float& value); // 0-5V
-    static void test();
+    int read(int channel, float& value);  // 0-5V
+    int read(int channel, uint32& value); // 0-65535
 private:
     enum CtrlRegisterShifts {
         CFG_SHIFT         = 13,

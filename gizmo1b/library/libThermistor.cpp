@@ -437,6 +437,50 @@ int LibThermistor::readTemp(int channel, float& value)
     return OKAY;
 }
 
+int LibThermistor::readTemp(int channel, uint32& value)
+{
+    LibMutex libMutex(s_mutex);
+    int result = OKAY;
+    int adcChannel;
+    switch (channel) {
+    case AIN_A:
+        adcChannel = TEMP_AIN_A;
+        break;
+    case AIN_B:
+        adcChannel = TEMP_AIN_B;
+        break;
+    case AIN_C:
+        adcChannel = TEMP_AIN_C;
+        break;
+    case AIN_D:
+        adcChannel = TEMP_AIN_D;
+        break;
+    default:
+        return ERROR_INVALID_TEMP_CHANNEL;
+    }
+    uint32 ain;
+    result = m_libAdc.read(adcChannel, ain);
+    if (result != LibAdc::OKAY) {
+        switch (channel) {
+        case AIN_A:
+            result = ERROR_READ_TEMP_AIN_A;
+            break;
+        case AIN_B:
+            result = ERROR_READ_TEMP_AIN_B;
+            break;
+        case AIN_C:
+            result = ERROR_READ_TEMP_AIN_C;
+            break;
+        case AIN_D:
+            result = ERROR_READ_TEMP_AIN_D;
+            break;
+        }
+        return result;
+    }
+    value = ain;
+    return OKAY;
+}
+
 int LibThermistor::setType(int type)
 {
     switch (type) {

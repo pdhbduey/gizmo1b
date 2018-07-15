@@ -37,7 +37,8 @@ public:
     LibThermistor();
     virtual ~LibThermistor();
     // Calculated Temp Based on Thermistor resistance table
-    int readTemp(int channel, float& value);
+    int readTemp(int channel, float& value);  // degC/degF
+    int readTemp(int channel, uint32& value); // 0-65535
     int setType(int type);
     int getType();
     int setUnits(int units);
