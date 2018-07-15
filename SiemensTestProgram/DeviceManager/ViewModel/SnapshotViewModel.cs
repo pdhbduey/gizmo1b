@@ -24,6 +24,7 @@ namespace DeviceManager.ViewModel
         private string progressText;
         private string fileName;
         private bool isNotSaving;
+        private bool rawDataSelected;
         private const int numberOfErrorsBeforeRetry = 50;
 
         private CancellationTokenSource cts;
@@ -72,6 +73,8 @@ namespace DeviceManager.ViewModel
             public double Value { get; set; }
             public double Sample { get; set; }
         }
+
+        public bool RawDataSelected { get; set; }
 
         private double sampleMinimumX;
         private double sampleMaximumX;
@@ -613,13 +616,13 @@ namespace DeviceManager.ViewModel
 
         private void Start()
         {
-            snapshotModel.StartSnapshot().Wait();
+            snapshotModel.StartSnapshot(RawDataSelected).Wait();
         }
 
         private async void Stop()
         {
             cts?.Cancel();
-            await snapshotModel.StopSnapshot();
+            await snapshotModel.StopSnapshot(RawDataSelected);
         }
 
         private async void SetNumberOfSamples()

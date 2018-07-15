@@ -19,8 +19,15 @@ namespace DeviceManager
             1000
         };
 
-        public static byte[] StartSnapshot()
+        public static byte[] StartSnapshot(bool raw)
         {
+            byte value = 0x01;
+            
+            if (raw)
+            {
+                value = 0x05;
+            }
+
             return new byte[]
             {
                 DataHelper.REGISTER_WRITE,
@@ -31,12 +38,19 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x00,
-                0x01
+                value
             };
         }
 
-        public static byte[] StopSnapshot()
+        public static byte[] StopSnapshot(bool raw)
         {
+            byte value = 0x02;
+
+            if (raw)
+            {
+                value = 0x06;
+            }
+
             return new byte[]
             {
                 DataHelper.REGISTER_WRITE,
@@ -47,7 +61,7 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x00,
-                0x02
+                value
             };
         }
 

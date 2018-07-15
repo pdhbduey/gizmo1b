@@ -9,9 +9,9 @@ namespace DeviceManager.Model
 {
     public interface ISnapshotModel
     {
-        Task<CommunicationData> StartSnapshot();
+        Task<CommunicationData> StartSnapshot(bool enableRaw);
 
-        Task<CommunicationData> StopSnapshot();
+        Task<CommunicationData> StopSnapshot(bool enableRaw);
 
         Task<CommunicationData> SetResolution(int resolution);
 

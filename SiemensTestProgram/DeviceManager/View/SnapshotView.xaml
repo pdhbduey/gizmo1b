@@ -33,11 +33,16 @@
                                 </TextBox.InputBindings>
                             </TextBox>
                         </StackPanel>
+                        
+
+
                     </StackPanel>
-                    <StackPanel>
+                    <StackPanel Margin="1">
                         <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Start" Command="{Binding StartCommand}"></Button>
                         <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopCommand}"></Button>
+                        
                     </StackPanel>
+                    <CheckBox Margin="10 1 0 0" Content="Raw Data" IsChecked="{Binding RawDataSelected}"/>
                 </StackPanel>
 
 
