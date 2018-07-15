@@ -93,7 +93,7 @@ int LibAdc::get(uint16& data)
     return result;
 }
 
-int LibAdc::read(int channel, float& value)
+int LibAdc::read(int channel, uint32& value)
 {
     int result = isChannelCorrect(channel);
     if (result != OKAY) {
@@ -115,6 +115,16 @@ int LibAdc::read(int channel, float& value)
     if (result != OKAY) {
         return result;
     }
-    value = data * (5.0 / 65535);
+    value = data;
+    return result;
+}
+
+int LibAdc::read(int channel, float& value)
+{
+    uint32 data;
+    int result = read(channel, data);
+    if (result == OKAY) {
+        value = data * (5.0 / 65535);
+    }
     return result;
 }

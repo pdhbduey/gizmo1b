@@ -173,6 +173,9 @@ int BoardTestTec::get(uint32 address, uint32& value)
     case SNAPSHOT_NUMBER_OF_SAMPLES:
         value = m_libTec.getSnapshotNumberOfSamples();
         break;
+    case SNAPSHOT_PERCENT_COMPLETED:
+        value = m_libTec.getSnapshotPercentCompleted();
+        break;
     case TRACE_RESOLUTION:
         value = m_libTec.getTraceNumberOfSamples();
         break;
@@ -284,6 +287,7 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TEC_STATUS:
     case TEC_WAVEFORM_SAMPLE_INDEX:
     case SNAPSHOT_STATUS:
+    case SNAPSHOT_PERCENT_COMPLETED:
     case TRACE_STATUS:
     case TRACE_FIRST_SAMPLE:
     case TRACE_NUMBER_OF_SAMPLES:
@@ -376,6 +380,7 @@ int BoardTestTec::set(uint32 address, uint32 value)
         }
         break;
     case SNAPSHOT_CONTROL:
+        m_libTec.setSnapshotRaw(value & SNAPSHOT_RAW);
         if (value & SNAPSHOT_START) {
             m_libTec.startSnaphot();
         }

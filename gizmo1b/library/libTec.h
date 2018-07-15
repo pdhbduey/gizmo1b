@@ -36,6 +36,9 @@ public:
        ERROR_CUSTOM_WAVEFORM_TIME_NOT_RISING,
        ERROR_CUSTOM_WAVEFORM_NON_ZERO_START_TIME,
        ERROR_VOUT_MAX_OUT_OF_RANGE,
+       ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE,
+       ERROR_SNAPSHOT_RESOLUTION_OUT_OF_RANGE,
+       ERROR_SNAPSHOT_NUMBER_OF_SAMPLES_OUT_OF_RANGE,
     };
     enum WaveformType {
         WAVEFORM_TYPE_CONSTANT,
@@ -45,10 +48,7 @@ public:
         WAVEFORM_TYPE_CUSTOM,
     };
     enum SnapshotStatus {
-        SNAPSHOT_IN_PROGRESS                          = 1 << 0,
-        ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE            = 1 << 1,
-        ERROR_SNAPSHOT_RESOLUTION_OUT_OF_RANGE        = 1 << 2,
-        ERROR_SNAPSHOT_NUMBER_OF_SAMPLES_OUT_OF_RANGE = 1 << 3,
+        SNAPSHOT_IN_PROGRESS = 1 << 0,
     };
     enum SnapshotRes {
         SNAPSHOT_RES_10,
@@ -125,6 +125,8 @@ public:
     int getSnapshotT2(int sample, float& value);
     int getSnapshotT3(int sample, float& value);
     int getSnapshotT4(int sample, float& value);
+    int getSnapshotPercentCompleted();
+    void setSnapshotRaw(bool snapshotRaw);
     void startTrace();
     void stopTrace();
     int setTraceResolution(int res);
@@ -219,6 +221,7 @@ private:
     int m_snapshotRes;
     int m_snapshotSample;
     int m_snapshotResCount;
+    bool m_snapshotRaw;
     LibCircularBuffer m_traceCircularBuffer;
     static SemaphoreHandle_t s_traceMutex;
     bool m_isTraceRunning;

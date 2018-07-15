@@ -258,6 +258,9 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
     tecStatus.push_back("ERROR_CUSTOM_WAVEFORM_TIME_NOT_RISING");
     tecStatus.push_back("ERROR_CUSTOM_WAVEFORM_NON_ZERO_START_TIME");
     tecStatus.push_back("ERROR_VOUT_MAX_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_SNAPSHOT_RESOLUTION_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_SNAPSHOT_NUMBER_OF_SAMPLES_OUT_OF_RANGE");
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "enable") {
             result = regWrite(BoardTest::TEC_CONTROL, BoardTestTec::ENABLE);

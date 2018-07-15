@@ -615,13 +615,35 @@ void LibTec::run()
                     m_snapshotResCount = 0;
                 }
                 if (m_snapshotResCount == 0) {
-                    getVSense(s_snapshotVsense[m_snapshotSample]);
-                    s_snapshotIsense[m_snapshotSample] = iSense;
-                    s_snapshotIref  [m_snapshotSample] = iRef;
-                    m_libThermistor.readTemp(LibThermistor::AIN_A, s_snapshotT1[m_snapshotSample]);
-                    m_libThermistor.readTemp(LibThermistor::AIN_B, s_snapshotT2[m_snapshotSample]);
-                    m_libThermistor.readTemp(LibThermistor::AIN_C, s_snapshotT3[m_snapshotSample]);
-                    m_libThermistor.readTemp(LibThermistor::AIN_D, s_snapshotT4[m_snapshotSample]);
+                    if (!m_snapshotRaw) {
+                        getVSense(s_snapshotVsense[m_snapshotSample]);
+                        s_snapshotIsense[m_snapshotSample] = iSense;
+                        m_libThermistor.readTemp(LibThermistor::AIN_A, s_snapshotT1[m_snapshotSample]);
+                        m_libThermistor.readTemp(LibThermistor::AIN_B, s_snapshotT2[m_snapshotSample]);
+                        m_libThermistor.readTemp(LibThermistor::AIN_C, s_snapshotT3[m_snapshotSample]);
+                        m_libThermistor.readTemp(LibThermistor::AIN_D, s_snapshotT4[m_snapshotSample]);
+                    }
+                    else {
+                        uint32 snapshotVsense;
+                        uint32 snapshotIsense;
+                        uint32 snapshotT1;
+                        uint32 snapshotT2;
+                        uint32 snapshotT3;
+                        uint32 snapshotT4;
+                        m_libAdc.read(VSENSE, snapshotVsense);
+                        m_libAdc.read(ISENSE, snapshotIsense);
+                        m_libThermistor.readTemp(LibThermistor::AIN_A, snapshotT1);
+                        m_libThermistor.readTemp(LibThermistor::AIN_B, snapshotT2);
+                        m_libThermistor.readTemp(LibThermistor::AIN_C, snapshotT3);
+                        m_libThermistor.readTemp(LibThermistor::AIN_D, snapshotT4);
+                        s_snapshotVsense[m_snapshotSample] = *reinterpret_cast<float*>(&snapshotVsense);
+                        s_snapshotIsense[m_snapshotSample] = *reinterpret_cast<float*>(&snapshotIsense);
+                        s_snapshotT1    [m_snapshotSample] = *reinterpret_cast<float*>(&snapshotT1);
+                        s_snapshotT2    [m_snapshotSample] = *reinterpret_cast<float*>(&snapshotT2);
+                        s_snapshotT3    [m_snapshotSample] = *reinterpret_cast<float*>(&snapshotT3);
+                        s_snapshotT4    [m_snapshotSample] = *reinterpret_cast<float*>(&snapshotT4);
+                    }
+                    s_snapshotIref[m_snapshotSample] = iRef;
                     m_snapshotSample++;
                 }
                 else {
@@ -802,6 +824,19 @@ int LibTec::getSnapshotT4(int sample, float& value)
         result = ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE;
     }
     return result;
+}
+
+int LibTec::getSnapshotPercentCompleted()
+{
+    float snapshotSample     = m_snapshotSample;
+    float snapshotNumSamples = m_snapshotNumSamples;
+    float percentCompleted   = snapshotSample / snapshotNumSamples * 100;
+    return percentCompleted;
+}
+
+void LibTec::setSnapshotRaw(bool snapshotRaw)
+{
+    m_snapshotRaw = snapshotRaw;
 }
 
 void LibTec::startTrace()

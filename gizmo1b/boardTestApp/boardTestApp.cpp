@@ -75,6 +75,7 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::TRACE_FIRST_SAMPLE]            = boardTestTec;
     m_boardTestMap[BoardTest::TRACE_NUMBER_OF_SAMPLES]       = boardTestTec;
     m_boardTestMap[BoardTest::TRACE_NUMBER_OF_READ_SAMPLES]  = boardTestTec;
+    m_boardTestMap[BoardTest::SNAPSHOT_PERCENT_COMPLETED]    = boardTestTec;
     m_boardTestMap[BoardTest::HEATER_CONTROL]                = boardTestTec;
     m_boardTestMap[BoardTest::HEATER_STATUS]                 = boardTestTec;
     m_boardTestMap[BoardTest::HEATER_TREF_VALUE]             = boardTestTec;

@@ -19,8 +19,9 @@ public:
         CUSTOM_WAVEFORM_INC_INDEX   = (uint32)((uint32) 1U << 7U),
     };
     enum SnaphotControl {
-        SNAPSHOT_START = (uint32)((uint32) 1U << 0U),
-        SNAPSHOT_STOP  = (uint32)((uint32) 1U << 1U),
+        SNAPSHOT_START  = (uint32)((uint32) 1U << 0U),
+        SNAPSHOT_STOP   = (uint32)((uint32) 1U << 1U),
+        SNAPSHOT_RAW    = (uint32)((uint32) 1U << 2U),
     };
     enum TraceControl {
         TRACE_START = (uint32)((uint32) 1U << 0U),
