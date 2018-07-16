@@ -24,7 +24,10 @@ namespace DeviceManager.ViewModel
         private string progressText;
         private string fileName;
         private bool isNotSaving;
-        private bool rawDataSelected;
+        private bool isCancelEnabled;
+        private bool isStopEnabled;
+        private bool isStartEnabled;
+        private bool isSaveEnabled;
         private const int numberOfErrorsBeforeRetry = 50;
 
         private CancellationTokenSource cts;
@@ -39,6 +42,7 @@ namespace DeviceManager.ViewModel
             progressText = string.Empty;
             fileName = string.Empty;
             isNotSaving = true;
+            RawDataSelected = false;
 
             Resolutions = SnapshotDefaults.Resolutions;
             SelectedResolution = Resolutions[0];
@@ -60,6 +64,59 @@ namespace DeviceManager.ViewModel
             TemperatureTwoCollection = new BulkObservableCollection<DataPoint>();
             TemperatureThreeCollection = new BulkObservableCollection<DataPoint>();
             TemperatureFourCollection = new BulkObservableCollection<DataPoint>();
+        }
+
+        private enum ButtonAction
+        {
+            State1,
+            State2,
+            State3,
+            State4,
+            State5,
+            State6
+        }
+
+        private void SetEnableStatuses(ButtonAction action)
+        {
+            switch (action)
+            {
+                case ButtonAction.State1:
+                    IsStartEnabled = false;
+                    IsStopEnabled = true;
+                    IsCancelEnabled = false;
+                    IsSaveEnabled = false;
+                    break;
+                case ButtonAction.State2:
+                    IsStartEnabled = false;
+                    IsStopEnabled = true;
+                    IsCancelEnabled = false;
+                    IsSaveEnabled = false;
+                    break;
+                case ButtonAction.State3:
+                    IsStartEnabled = false;
+                    IsStopEnabled = true;
+                    IsCancelEnabled = false;
+                    IsSaveEnabled = false;
+                    break;
+                case ButtonAction.State4:
+                    IsStartEnabled = false;
+                    IsStopEnabled = true;
+                    IsCancelEnabled = false;
+                    IsSaveEnabled = false;
+                    break;
+                case ButtonAction.State5:
+                    IsStartEnabled = false;
+                    IsStopEnabled = true;
+                    IsCancelEnabled = false;
+                    IsSaveEnabled = false;
+                    break;
+                case ButtonAction.State6:
+                    IsStartEnabled = false;
+                    IsStopEnabled = true;
+                    IsCancelEnabled = false;
+                    IsSaveEnabled = false;
+                    break;
+            }
         }
 
         public class DataPoint
@@ -135,6 +192,62 @@ namespace DeviceManager.ViewModel
 
         public BulkObservableCollection<DataPoint> TemperatureFourCollection { get; set; }
 
+
+        public bool IsCancelEnabled
+        {
+            get
+            {
+                return isCancelEnabled;
+            }
+
+            set
+            {
+                isCancelEnabled = value;
+                OnPropertyChanged(nameof(IsCancelEnabled));
+            }
+        }
+
+        public bool IsSaveEnabled
+        {
+            get
+            {
+                return isSaveEnabled;
+            }
+
+            set
+            {
+                isSaveEnabled = value;
+                OnPropertyChanged(nameof(IsSaveEnabled));
+            }
+        }
+
+        public bool IsStartEnabled
+        {
+            get
+            {
+                return isStartEnabled;
+            }
+
+            set
+            {
+                isStartEnabled = value;
+                OnPropertyChanged(nameof(IsStartEnabled));
+            }
+        }
+
+        public bool IsStopEnabled
+        {
+            get
+            {
+                return isStopEnabled;
+            }
+
+            set
+            {
+                isStopEnabled = value;
+                OnPropertyChanged(nameof(IsStopEnabled));
+            }
+        }
 
         public string FileName
         {
@@ -501,7 +614,7 @@ namespace DeviceManager.ViewModel
 
         private string ReadDataInSelectedFormat(byte[] data, out double dataValue)
         {
-            if (rawDataSelected)
+            if (RawDataSelected)
             {
                 dataValue = Helper.GetFloatFromBigEndian(data);
             }
