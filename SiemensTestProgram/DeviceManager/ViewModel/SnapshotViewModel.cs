@@ -616,11 +616,11 @@ namespace DeviceManager.ViewModel
         {
             if (RawDataSelected)
             {
-                dataValue = Helper.GetFloatFromBigEndian(data);
+                dataValue = Helper.GetIntFromBigEndian(data);
             }
             else
             {
-                dataValue = Helper.GetIntFromBigEndian(data);
+                dataValue = Helper.GetFloatFromBigEndian(data);
             }
 
             return dataValue.ToString();
