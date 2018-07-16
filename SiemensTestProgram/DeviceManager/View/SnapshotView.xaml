@@ -68,7 +68,7 @@
                     </chartingToolkit:LineSeries.DataPointStyle>
                 </chartingToolkit:LineSeries>
                 <chartingToolkit:Chart.Axes>
-                    <chartingToolkit:LinearAxis Orientation="Y" Title="Volts" Interval="5"/>
+                    <chartingToolkit:LinearAxis Orientation="Y" Title="Volts"/>
                     <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="{Binding SampleInterval}"/>
                 </chartingToolkit:Chart.Axes>
 
@@ -106,7 +106,7 @@
                 </chartingToolkit:Chart.Series>
 
                 <chartingToolkit:Chart.Axes>
-                    <chartingToolkit:LinearAxis Orientation="Y" Title="Amps" Interval="5"/>
+                    <chartingToolkit:LinearAxis Orientation="Y" Title="Amps"/>
                     <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="{Binding SampleInterval}"/>
                 </chartingToolkit:Chart.Axes>
 
@@ -171,7 +171,7 @@
 
                 </chartingToolkit:Chart.Series>
                 <chartingToolkit:Chart.Axes>
-                    <chartingToolkit:LinearAxis Title="Celcius" Orientation="Y" Interval="5"/>
+                    <chartingToolkit:LinearAxis Title="Celcius" Orientation="Y"/>
                     <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="{Binding SampleInterval}"/>
                 </chartingToolkit:Chart.Axes>
             </chartingToolkit:Chart>
