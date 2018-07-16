@@ -16,16 +16,16 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public Task<CommunicationData> StartSnapshot()
+        public Task<CommunicationData> StartSnapshot(bool enableRaw)
         {
-            var requestArray = SnapshotDefaults.StartSnapshot();
+            var requestArray = SnapshotDefaults.StartSnapshot(enableRaw);
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
 
-        public Task<CommunicationData> StopSnapshot()
+        public Task<CommunicationData> StopSnapshot(bool enableRaw)
         {
-            var requestArray = SnapshotDefaults.StopSnapshot();
+            var requestArray = SnapshotDefaults.StopSnapshot(enableRaw);
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }

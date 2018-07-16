@@ -33,11 +33,16 @@
                                 </TextBox.InputBindings>
                             </TextBox>
                         </StackPanel>
+                        
+
+
                     </StackPanel>
-                    <StackPanel>
+                    <StackPanel Margin="1">
                         <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Start" Command="{Binding StartCommand}"></Button>
                         <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopCommand}"></Button>
+                        
                     </StackPanel>
+                    <CheckBox Margin="10 1 0 0" Content="Raw Data" IsChecked="{Binding RawDataSelected}"/>
                 </StackPanel>
 
 
@@ -63,7 +68,7 @@
                     </chartingToolkit:LineSeries.DataPointStyle>
                 </chartingToolkit:LineSeries>
                 <chartingToolkit:Chart.Axes>
-                    <chartingToolkit:LinearAxis Orientation="Y" Title="Volts" Interval="5"/>
+                    <chartingToolkit:LinearAxis Orientation="Y" Title="Volts"/>
                     <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="{Binding SampleInterval}"/>
                 </chartingToolkit:Chart.Axes>
 
@@ -101,7 +106,7 @@
                 </chartingToolkit:Chart.Series>
 
                 <chartingToolkit:Chart.Axes>
-                    <chartingToolkit:LinearAxis Orientation="Y" Title="Amps" Interval="5"/>
+                    <chartingToolkit:LinearAxis Orientation="Y" Title="Amps"/>
                     <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="{Binding SampleInterval}"/>
                 </chartingToolkit:Chart.Axes>
 
@@ -166,7 +171,7 @@
 
                 </chartingToolkit:Chart.Series>
                 <chartingToolkit:Chart.Axes>
-                    <chartingToolkit:LinearAxis Title="Celcius" Orientation="Y" Interval="5"/>
+                    <chartingToolkit:LinearAxis Title="Celcius" Orientation="Y"/>
                     <chartingToolkit:LinearAxis Minimum="{Binding SampleMinimumX}" Maximum="{Binding SampleMaximumX}" Orientation="X" Title="Time [s]" Interval="{Binding SampleInterval}"/>
                 </chartingToolkit:Chart.Axes>
             </chartingToolkit:Chart>
