@@ -2,6 +2,7 @@
 
 namespace DeviceManager.Model
 {
+    using DeviceManager.DeviceCommunication;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -9,11 +10,6 @@ namespace DeviceManager.Model
     /// </summary>
     public interface ILedModel
     {
-        /// <summary>
-        /// Writes to LED request.
-        /// </summary>
-        /// <param name="request"> LED toggle status. </param>
-        /// <returns> Task which will return LED register response. </returns>
-        bool SetLedCommand(string ledRequest, ref byte[] response);
+        Task<CommunicationData> SetLedCommand(string ledRequest);
     }
 }

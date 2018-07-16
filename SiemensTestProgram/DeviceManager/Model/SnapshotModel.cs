@@ -16,6 +16,13 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
+        public Task<CommunicationData> ReadPercentCompleted()
+        {
+            var requestArray = SnapshotDefaults.ReadPercentCompleted();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
         public Task<CommunicationData> StartSnapshot(bool enableRaw)
         {
             var requestArray = SnapshotDefaults.StartSnapshot(enableRaw);

@@ -107,7 +107,7 @@ namespace DeviceManager
 
         public static List<string> Types = new List<string>
         {
-            "USP12387",
+            "USP12837",
             "SC30F103AN"
         };
 

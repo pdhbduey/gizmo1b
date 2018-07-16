@@ -240,9 +240,10 @@ namespace DeviceManager.DeviceCommunication
                 serialPort.ReceivedBytesThreshold = readBufferSize;
                 serialPort.DataReceived += HandleDataReceived;
                 serialPort.Open();
+                
                 isConfigured = true;
             }
-            catch
+            catch (Exception e)
             {
                 if (errorWindowOpen == false)
                 {

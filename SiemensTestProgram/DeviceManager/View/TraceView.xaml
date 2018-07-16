@@ -56,25 +56,25 @@
                 </chartingToolkit:LineSeries>
                 <chartingToolkit:LineSeries 
                             Name="TemperatureOneLine"
-                            Title="Temperature One"
+                            Title="Temperature 1"
                             ItemsSource="{Binding TemperatureOneCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
                 </chartingToolkit:LineSeries>
-                <chartingToolkit:LineSeries Title="Temperature Two"
+                <chartingToolkit:LineSeries Title="Temperature 2"
                             ItemsSource="{Binding TemperatureTwoCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
                 </chartingToolkit:LineSeries>
-                <chartingToolkit:LineSeries Title="Temperature Three"
+                <chartingToolkit:LineSeries Title="Temperature 3"
                             ItemsSource="{Binding TemperatureThreeCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
                             >
                 </chartingToolkit:LineSeries>
-                <chartingToolkit:LineSeries Title="Temperature Four"
+                <chartingToolkit:LineSeries Title="Temperature 4"
                             ItemsSource="{Binding TemperatureFourCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"

@@ -105,6 +105,22 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] GetIrefSamplesCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x01,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+            };
+        }
+
         public static byte[] SetIrefCommand(float value)
         {
             var iref = Helper.GetBigEndian(value);
@@ -136,6 +152,22 @@ namespace DeviceManager
                 vout[1],
                 vout[2],
                 vout[3]
+            };
+        }
+
+        public static byte[] GetVmaxCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x0F,
+                0x00,
+                0x00,
+                0x00,
+                0x00
             };
         }
 
@@ -219,7 +251,7 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] GetWaveformTypeCommand(string waveform)
+        public static byte[] SetWaveformTypeCommand(string waveform)
         {
             var waveformType = WaveFormByteValues[waveform];
             return new byte[]
@@ -236,7 +268,23 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] GetSampleTimeCommand(int sampleTime)
+        public static byte[] GetWaveformTypeCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x05,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] SetSampleTimeCommand(int sampleTime)
         {
             var sampleTimeValue = Helper.ConvertIntToByteArray(sampleTime);
             return new byte[]
@@ -253,7 +301,7 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] GetWaveNumberOfCyclesCommand(int cycles)
+        public static byte[] SetWaveNumberOfCyclesCommand(int cycles)
         {
             var cycleValue = Helper.ConvertIntToByteArray(cycles);
             return new byte[]
@@ -270,7 +318,23 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] GetWaveformPeriodCommand(int waveformPeriod)
+        public static byte[] GetReadCyclesCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x0E,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] SetWaveformPeriodCommand(int waveformPeriod)
         {
             var waveformPeriodArray = Helper.ConvertIntToByteArray(waveformPeriod);
             return new byte[]
@@ -287,7 +351,23 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] GetDerivateGainCommand(float derivateGain)
+        public static byte[] GetWaveformPeriodCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x06,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] SetDerivateGainCommand(float derivateGain)
         {
             var derivateGainArray = Helper.GetBigEndian(derivateGain);
             return new byte[]
@@ -304,7 +384,7 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] GetIntegralGainCommand(float integralGain)
+        public static byte[] SetIntegralGainCommand(float integralGain)
         {
             var integralGainArray = Helper.GetBigEndian(integralGain);
             return new byte[]
@@ -321,7 +401,7 @@ namespace DeviceManager
             };
         }
 
-        public static byte[] GetProportionalGainCommand(float proportionalGain)
+        public static byte[] SetProportionalGainCommand(float proportionalGain)
         {
             var proportionalGainArray = Helper.GetBigEndian(proportionalGain);
             return new byte[]
@@ -335,6 +415,54 @@ namespace DeviceManager
                 proportionalGainArray[1],
                 proportionalGainArray[2],
                 proportionalGainArray[3]
+            };
+        }
+
+        public static byte[] GetDerivativeGainCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x0A,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] GetIntegralGainCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x09,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] GetProportionalGainCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x08,
+                0x00,
+                0x00,
+                0x00,
+                0x00
             };
         }
 

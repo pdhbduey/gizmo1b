@@ -22,7 +22,7 @@ namespace DeviceManager
         public static byte[] StartSnapshot(bool raw)
         {
             byte value = 0x01;
-            
+
             if (raw)
             {
                 value = 0x05;
@@ -41,6 +41,23 @@ namespace DeviceManager
                 value
             };
         }
+
+        public static byte[] ReadPercentCompleted()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0A,
+                0x0B,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
 
         public static byte[] StopSnapshot(bool raw)
         {

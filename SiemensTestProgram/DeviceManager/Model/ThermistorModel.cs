@@ -15,41 +15,6 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public bool ReadStatus(ref byte[] response)
-        {
-            var requestArray = ThermistorDefaults.GetStatusCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
-            return status;
-        }
-
-        public bool ReadAinA(ref byte[] response)
-        {
-            var requestArray = ThermistorDefaults.GetReadAinACommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
-            return status;
-        }
-
-        public bool ReadAinB(ref byte[] response)
-        {
-            var requestArray = ThermistorDefaults.GetReadAinBCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
-            return status;
-        }
-
-        public bool ReadAinC(ref byte[] response)
-        {
-            var requestArray = ThermistorDefaults.GetReadAinCCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
-            return status;
-        }
-
-        public bool ReadAinD(ref byte[] response)
-        {
-            var requestArray = ThermistorDefaults.GetReadAinDCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
-            return status;
-        }
-
         public Task<CommunicationData> ReadAinA()
         {
             var requestArray = ThermistorDefaults.GetReadAinACommand();

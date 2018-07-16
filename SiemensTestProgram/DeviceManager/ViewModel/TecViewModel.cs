@@ -905,6 +905,60 @@ namespace DeviceManager.ViewModel
             UpdateISense();
             UpdateVSense();
             UpdateStatus();
+
+            var vmaxResponse = tecModel.ReadVmax().Result;
+            if (vmaxResponse.succesfulResponse)
+            {
+                VoutValue = Helper.GetFloatFromBigEndian(vmaxResponse.response);
+            }
+
+            var irefSamplesResponse = tecModel.ReadIrefSamples().Result;
+            if (irefSamplesResponse.succesfulResponse)
+            {
+                IrefValue = Helper.GetFloatFromBigEndian(irefSamplesResponse.response);
+            }
+
+            var readCyclesResponse = tecModel.ReadCycles().Result;
+            if (readCyclesResponse.succesfulResponse)
+            {
+                WaveformCycles = Helper.GetIntFromBigEndian(readCyclesResponse.response);
+            }
+
+            var readPeriodResponse = tecModel.ReadPeriod().Result;
+            if (readPeriodResponse.succesfulResponse)
+            {
+                TecPeriod = Helper.GetIntFromBigEndian(readPeriodResponse.response);
+            }
+
+            var integralGainResponse = tecModel.ReadIntegralGain().Result;
+            if (integralGainResponse.succesfulResponse)
+            {
+                IntegralGain = Helper.GetFloatFromBigEndian(integralGainResponse.response);
+            }
+
+            var derivativeGainResponse = tecModel.ReadDerivativeGain().Result;
+            if (derivativeGainResponse.succesfulResponse)
+            {
+                DerivativeGain = Helper.GetFloatFromBigEndian(derivativeGainResponse.response);
+            }
+
+            var proportionalGainResponse = tecModel.ReadProportionalGain().Result;
+            if (proportionalGainResponse.succesfulResponse)
+            {
+                ProportionalGain = Helper.GetFloatFromBigEndian(proportionalGainResponse.response);
+            }
+
+            var readWaveformResponse = tecModel.ReadWaveform().Result;
+            if (readWaveformResponse.succesfulResponse)
+            {
+                var waveformPosition = (int)readWaveformResponse.response[4];
+                if (waveformPosition < 0 || waveformPosition > 4)
+                {
+                    waveformPosition = 0;
+                }
+
+                SelectedWaveForm = Waveforms[waveformPosition];
+            }
         }
 
         private void ReadCustomWaveformIndex()

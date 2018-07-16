@@ -87,14 +87,14 @@ namespace DeviceManager.ViewModel
         /// <summary>
         /// Toggles the red LED.
         /// </summary>
-        private void ToggleLedRed()
+        private async void ToggleLedRed()
         {
             var state = redLedStatus;
             RedLedStatus = redLedStatus == LedDefaults.redLedOn ? LedDefaults.redLedOff : LedDefaults.redLedOn;
-            var status = new byte[5];
-            if (ledModel.SetLedCommand(state, ref status))
+            var status = await ledModel.SetLedCommand(state);
+            if (status.succesfulResponse)
             {
-                ProcessStatus(status);
+                ProcessStatus(status.response);
             }
             else
             {
@@ -105,14 +105,14 @@ namespace DeviceManager.ViewModel
         /// <summary>
         /// Toggles the green LED.
         /// </summary>
-        private void ToggleLedGreen()
+        private async void ToggleLedGreen()
         {
             var state = greenLedStatus;
             GreenLedStatus = greenLedStatus == LedDefaults.greenLedOn ? LedDefaults.greenLedOff : LedDefaults.greenLedOn;
-            var status = new byte[5];
-            if (ledModel.SetLedCommand(state, ref status))
+            var status = await ledModel.SetLedCommand(state);
+            if (status.succesfulResponse)
             {
-                ProcessStatus(status);
+                ProcessStatus(status.response);
             }
             else
             {

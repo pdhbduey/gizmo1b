@@ -243,7 +243,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"Temperature One: {temperatureOne.ToString("0.##")} °C";
+                return $"Temperature 1: {temperatureOne.ToString("0.##")} °C";
             }
         }
 
@@ -271,7 +271,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"Temperature Two: {temperatureTwo.ToString("0.##")} °C";
+                return $"Temperature 2: {temperatureTwo.ToString("0.##")} °C";
             }
         }
 
@@ -299,7 +299,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"Temperature Three: {temperatureThree.ToString("0.##")} °C";
+                return $"Temperature 3: {temperatureThree.ToString("0.##")} °C";
             }
         }
 
@@ -327,7 +327,7 @@ namespace DeviceManager.ViewModel
         {
             get
             {
-                return $"Temperature Four: {temperatureFour.ToString("0.##")} °C";
+                return $"Temperature 4: {temperatureFour.ToString("0.##")} °C";
             }
         }
 

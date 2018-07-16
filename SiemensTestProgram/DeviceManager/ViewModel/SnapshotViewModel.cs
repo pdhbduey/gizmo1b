@@ -19,6 +19,7 @@ namespace DeviceManager.ViewModel
         private ISnapshotModel snapshotModel;
         private int selectedResolution;
         private int numberOfSamples;
+        private int percentCompleted;
         private double sampleInterval;
         private int saveValue;
         private string progressText;
@@ -30,8 +31,11 @@ namespace DeviceManager.ViewModel
         private bool isSaveEnabled;
         private const int numberOfErrorsBeforeRetry = 50;
 
+        private CancellationTokenSource startCts;
+        private CancellationToken startToken;
         private CancellationTokenSource cts;
         private CancellationToken token;
+        private Task startTask;
         private Task saveTask;
 
         public SnapshotViewModel(ISnapshotModel snapshotModel)
@@ -43,6 +47,7 @@ namespace DeviceManager.ViewModel
             fileName = string.Empty;
             isNotSaving = true;
             RawDataSelected = false;
+            IsStartEnabled = true;
 
             Resolutions = SnapshotDefaults.Resolutions;
             SelectedResolution = Resolutions[0];
@@ -71,9 +76,8 @@ namespace DeviceManager.ViewModel
             State1,
             State2,
             State3,
-            State4,
-            State5,
-            State6
+            SavingState,
+            AfterSaveCancelOrFinished
         }
 
         private void SetEnableStatuses(ButtonAction action)
@@ -87,34 +91,28 @@ namespace DeviceManager.ViewModel
                     IsSaveEnabled = false;
                     break;
                 case ButtonAction.State2:
-                    IsStartEnabled = false;
-                    IsStopEnabled = true;
+                    IsStartEnabled = true;
+                    IsStopEnabled = false;
                     IsCancelEnabled = false;
-                    IsSaveEnabled = false;
+                    IsSaveEnabled = true;
                     break;
                 case ButtonAction.State3:
-                    IsStartEnabled = false;
-                    IsStopEnabled = true;
+                    IsStartEnabled = true;
+                    IsStopEnabled = false;
                     IsCancelEnabled = false;
                     IsSaveEnabled = false;
                     break;
-                case ButtonAction.State4:
+                case ButtonAction.SavingState:
                     IsStartEnabled = false;
-                    IsStopEnabled = true;
-                    IsCancelEnabled = false;
+                    IsStopEnabled = false;
+                    IsCancelEnabled = true;
                     IsSaveEnabled = false;
                     break;
-                case ButtonAction.State5:
-                    IsStartEnabled = false;
-                    IsStopEnabled = true;
+                case ButtonAction.AfterSaveCancelOrFinished:
+                    IsStartEnabled = true;
+                    IsStopEnabled = false;
                     IsCancelEnabled = false;
-                    IsSaveEnabled = false;
-                    break;
-                case ButtonAction.State6:
-                    IsStartEnabled = false;
-                    IsStopEnabled = true;
-                    IsCancelEnabled = false;
-                    IsSaveEnabled = false;
+                    IsSaveEnabled = true;
                     break;
             }
         }
@@ -336,6 +334,7 @@ namespace DeviceManager.ViewModel
                         TemperatureThreeCollection.Clear();
                         TemperatureTwoCollection.Clear();
                         TemperatureOneCollection.Clear();
+                        SetEnableStatuses(ButtonAction.SavingState);
                     }));
 
 
@@ -355,6 +354,7 @@ namespace DeviceManager.ViewModel
                                 TemperatureTwoCollection.Clear();
                                 TemperatureOneCollection.Clear();
                                 IsNotSaving = true;
+                                SetEnableStatuses(ButtonAction.AfterSaveCancelOrFinished);
                             }));
 
                             return;
@@ -583,17 +583,20 @@ namespace DeviceManager.ViewModel
                     }
                     catch
                     {
-                        ProgressText = "Exception Thrown, Save incomplete.";
-                        SaveValue = 0;
-                        VSenseCollection.Clear();
-                        ISenseCollection.Clear();
-                        IRefCollection.Clear();
-                        TemperatureFourCollection.Clear();
-                        TemperatureThreeCollection.Clear();
-                        TemperatureTwoCollection.Clear();
-                        TemperatureOneCollection.Clear();
-                        IsNotSaving = true;
-
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            ProgressText = "Exception Thrown, Save incomplete.";
+                            SaveValue = 0;
+                            VSenseCollection.Clear();
+                            ISenseCollection.Clear();
+                            IRefCollection.Clear();
+                            TemperatureFourCollection.Clear();
+                            TemperatureThreeCollection.Clear();
+                            TemperatureTwoCollection.Clear();
+                            TemperatureOneCollection.Clear();
+                            IsNotSaving = true;
+                            SetEnableStatuses(ButtonAction.AfterSaveCancelOrFinished);
+                        }));
                         if (File.Exists(filePath))
                         {
                             File.Delete(filePath);
@@ -601,9 +604,14 @@ namespace DeviceManager.ViewModel
                         return;
                     }
 
-                    ProgressText = "Complete";
-                    SaveValue = 0;
-                    IsNotSaving = true;
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        SetEnableStatuses(ButtonAction.AfterSaveCancelOrFinished);
+                        ProgressText = "Complete";
+                        SaveValue = 0;
+                        IsNotSaving = true;
+                    }));
+                    
                 }
             }
             else
@@ -636,6 +644,20 @@ namespace DeviceManager.ViewModel
             }
 
             return false;
+        }
+
+        public int PercentCompleted
+        {
+            get
+            {
+                return percentCompleted;
+            }
+
+            set
+            {
+                percentCompleted = value;
+                OnPropertyChanged(nameof(PercentCompleted));
+            }
         }
 
         public string ProgressText
@@ -735,15 +757,69 @@ namespace DeviceManager.ViewModel
             await snapshotModel.SetResolution(selectedResolution);
         }
 
-        private void Start()
+        private async void Start()
         {
-            snapshotModel.StartSnapshot(RawDataSelected).Wait();
+            var startStatus = await snapshotModel.StartSnapshot(RawDataSelected);
+
+            if (startStatus.succesfulResponse)
+            {
+                ReadPercentCompleted();
+                IsStartEnabled = false;
+                startCts = new CancellationTokenSource();
+                startToken = startCts.Token;
+
+                startTask = Task.Factory.StartNew(() =>
+                {
+                    StartTask();
+                }, startToken);
+
+
+                SetEnableStatuses(ButtonAction.State1);
+            }
+        }
+
+        private void StartTask()
+        {
+            while (PercentCompleted < 100)
+            {
+                ReadPercentCompleted();
+
+                if (startToken.IsCancellationRequested)
+                {
+                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        SetEnableStatuses(ButtonAction.State3);
+                    }));
+
+                    break;
+                }
+            }
+
+            if (PercentCompleted >= 100)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    SetEnableStatuses(ButtonAction.State2);
+                }));
+            }
         }
 
         private async void Stop()
         {
-            cts?.Cancel();
+            startCts?.Cancel();
             await snapshotModel.StopSnapshot(RawDataSelected);
+        }
+
+        private void ReadPercentCompleted()
+        {
+            var percentData = snapshotModel.ReadPercentCompleted().Result;
+            if (percentData.succesfulResponse)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    PercentCompleted = Helper.GetIntFromBigEndian(percentData.response);
+                }));
+            }
         }
 
         private async void SetNumberOfSamples()

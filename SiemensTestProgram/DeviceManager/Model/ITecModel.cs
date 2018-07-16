@@ -7,6 +7,22 @@ namespace DeviceManager.Model
 
     public interface ITecModel
     {
+        Task<CommunicationData> ReadVmax();
+
+        Task<CommunicationData> ReadIrefSamples();
+
+        Task<CommunicationData> ReadCycles();
+
+        Task<CommunicationData> ReadPeriod();
+
+        Task<CommunicationData> ReadIntegralGain();
+
+        Task<CommunicationData> ReadDerivativeGain();
+
+        Task<CommunicationData> ReadProportionalGain();
+
+        Task<CommunicationData> ReadWaveform();
+
         bool ReadIsense(ref byte[] response);
 
         bool ReadVsense(ref byte[] response);

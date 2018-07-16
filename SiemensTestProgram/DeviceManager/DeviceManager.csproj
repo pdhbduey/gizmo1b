@@ -155,6 +155,9 @@
     <Compile Include="View\LedView.xaml.cs">
       <DependentUpon>LedView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\MergedTecAndHeaterView.xaml.cs">
+      <DependentUpon>MergedTecAndHeaterView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\MotorView.xaml.cs">
       <DependentUpon>MotorView.xaml</DependentUpon>
     </Compile>
@@ -219,6 +222,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\LedView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\MergedTecAndHeaterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

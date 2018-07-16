@@ -195,132 +195,45 @@ namespace DeviceManager.ViewModel
             thread.Start();
         }
 
-        private void InitialUpdate(int delay)
+        private void HandleResults(int channel)
         {
-            // Channel Zero
-            var response = new byte[5];
-            adcModel.ControlAdcChannel(0, ref response);
-            response = new byte[5];
+            var control = adcModel.ControlAdcChannel(channel).Result;
 
-            if (adcModel.ReadStatus(ref response))
+            var statusResponse = adcModel.ReadStatus().Result;
+
+            if (statusResponse.succesfulResponse)
             {
-                var statusChannelZero = response;
-                if (ProcessStatus(statusChannelZero, 0))
+                var statusChannelZero = statusResponse.response;
+                if (ProcessStatus(statusChannelZero, channel))
                 {
-                    response = new byte[5];
-                    if (adcModel.ReadAdcResult(ref response))
+                    var result = adcModel.ReadAdcResult().Result;
+                    if (result.succesfulResponse)
                     {
-                        var channelZeroResult = response;
+                        var channelZeroResult = result.response;
                         ChannelZeroValue = Helper.GetFloatFromBigEndian(channelZeroResult);
                     }
                 }
             }
+        }
 
+        private void InitialUpdate(int delay)
+        {
+            HandleResults(0);
             Thread.Sleep(delay);
 
-            //// Channel One
-            response = new byte[5];
-            adcModel.ControlAdcChannel(1, ref response);
-            response = new byte[5];
-
-            if (adcModel.ReadStatus(ref response))
-            {
-                var statusChannelOne = response;
-                if (ProcessStatus(statusChannelOne, 1))
-                {
-                    response = new byte[5];
-                    if (adcModel.ReadAdcResult(ref response))
-                    {
-                        var channelOneResult = response;
-                        ChannelOneValue = Helper.GetFloatFromBigEndian(channelOneResult);
-                    }
-                }
-            }
-
+            HandleResults(1);
             Thread.Sleep(delay);
 
-            // Channel Two
-            response = new byte[5];
-            adcModel.ControlAdcChannel(2, ref response);
-            response = new byte[5];
-
-            if (adcModel.ReadStatus(ref response))
-            {
-                var statusChannelTwo = response;
-                if (ProcessStatus(statusChannelTwo, 2))
-                {
-                    response = new byte[5];
-                    if (adcModel.ReadAdcResult(ref response))
-                    {
-                        var channelTwoResult = response;
-                        ChannelTwoValue = Helper.GetFloatFromBigEndian(channelTwoResult);
-                    }
-                }
-            }
-
+            HandleResults(2);
             Thread.Sleep(delay);
 
-            // Channel Three
-            response = new byte[5];
-            adcModel.ControlAdcChannel(3, ref response);
-            response = new byte[5];
-
-            if (adcModel.ReadStatus(ref response))
-            {
-                var statusChannelThree = response;
-                if (ProcessStatus(statusChannelThree, 3))
-                {
-                    response = new byte[5];
-                    if (adcModel.ReadAdcResult(ref response))
-                    {
-                        var channelThreeResult = response;
-                        ChannelThreeValue = Helper.GetFloatFromBigEndian(channelThreeResult);
-                    }
-                }
-            }
-
+            HandleResults(3);
             Thread.Sleep(delay);
 
-            // Channel Four
-            response = new byte[5];
-            adcModel.ControlAdcChannel(4, ref response);
-            response = new byte[5];
-
-            if (adcModel.ReadStatus(ref response))
-            {
-                var statusChannelFour = response;
-                if (ProcessStatus(statusChannelFour, 4))
-                {
-                    response = new byte[5];
-                    if (adcModel.ReadAdcResult(ref response))
-                    {
-                        var channelFourResult = response;
-                        ChannelFourValue = Helper.GetFloatFromBigEndian(channelFourResult);
-                    }
-                }
-            }
-
+            HandleResults(4);
             Thread.Sleep(delay);
 
-            // Channel Five
-            response = new byte[5];
-            adcModel.ControlAdcChannel(5, ref response);
-            response = new byte[5];
-
-            if (adcModel.ReadStatus(ref response))
-            {
-                var statusChannelFive = response;
-                if (ProcessStatus(statusChannelFive, 5))
-                {
-                    response = new byte[5];
-                    if (adcModel.ReadAdcResult(ref response))
-                    {
-                        var channelFiveResult = response;
-                        ChannelFiveValue = Helper.GetFloatFromBigEndian(channelFiveResult);
-                    }
-                }
-            }
-
+            HandleResults(5);
             Thread.Sleep(delay);
         }
 
