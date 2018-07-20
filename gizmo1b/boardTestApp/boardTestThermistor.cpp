@@ -58,8 +58,8 @@ int BoardTestThermistor::get(uint32 address, uint32& value)
         case LibThermistor::SC30F103AN:
             value = SC30F103AN;
             break;
-        case LibThermistor::USP12387:
-            value = USP12387;
+        case LibThermistor::USP12837:
+            value = USP12837;
             break;
         }
         break;
@@ -80,8 +80,8 @@ int BoardTestThermistor::set(uint32 address, uint32 value)
         return ERROR_RO;
     case THERMISTOR_TYPE:
         m_status = (value & SC30F103AN ? m_libThermistor.setType(LibThermistor::SC30F103AN)
-                 :  value & USP12387   ? m_libThermistor.setType(LibThermistor::USP12387)
-                 :  LibThermistor::ERROR_INVALID_TYPE);
+                 : (value & USP12837   ? m_libThermistor.setType(LibThermistor::USP12837)
+                 :                       LibThermistor::ERROR_INVALID_TYPE));
         break;
     }
     return OKAY;
