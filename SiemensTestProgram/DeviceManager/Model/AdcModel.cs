@@ -23,28 +23,6 @@ namespace DeviceManager.Model
             return status;
         }
 
-        public bool ReadStatus(ref byte[] response)
-        {
-            var requestArray = AdcDefaults.GetStatusCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
-            return status;
-        }
-
-        public Task<CommunicationData> ControlAdcChannel(int channelNumber)
-        {
-            var requestArray = AdcDefaults.GetControlAdcCommand(channelNumber);
-            var status = communication.ProcessCommunicationRequest(requestArray);
-            return status;
-        }
-
-        public bool ControlAdcChannel(int channelNumber, ref byte[] response)
-        {           
-            var requestArray = AdcDefaults.GetControlAdcCommand(channelNumber);
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
-            return status;
-        }
-
-
         public Task<CommunicationData> ReadAdcResult()
         {
             var requestArray = AdcDefaults.GetReadAdcCommand();
@@ -52,10 +30,10 @@ namespace DeviceManager.Model
             return status;
         }
 
-        public bool ReadAdcResult(ref byte[] response)
+        public Task<CommunicationData> ControlAdcChannel(int channelNumber)
         {
-            var requestArray = AdcDefaults.GetReadAdcCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            var requestArray = AdcDefaults.GetControlAdcCommand(channelNumber);
+            var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
     }

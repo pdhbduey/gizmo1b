@@ -139,16 +139,23 @@ namespace DeviceManager
             
         }
 
+        private CommunicationConfigurationView comConfiguration;
+
         /// <summary>
         ///  Sets the data context for com configuration view.
         /// </summary>
         /// <returns> Communication configuration view. </returns>
         public CommunicationConfigurationView GetCommunicationConfigurationView()
         {
-            return new CommunicationConfigurationView()
+            if (comConfiguration == null)
             {
-                DataContext = new CommunicationConfigurationViewModel(GetCommunicationConfigurationModel())
-            };
+                comConfiguration = new CommunicationConfigurationView()
+                {
+                    DataContext = new CommunicationConfigurationViewModel(GetCommunicationConfigurationModel())
+                };
+            }
+
+            return comConfiguration;
         }
 
         /// <summary>

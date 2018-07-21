@@ -11,9 +11,9 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*"/>
-                <RowDefinition Height="7*"/>
-                <RowDefinition Height="7*"/>
-                <RowDefinition Height="7*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
 
@@ -38,11 +38,15 @@
 
                     </StackPanel>
                     <StackPanel Margin="1">
-                        <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Start" Command="{Binding StartCommand}"></Button>
-                        <Button IsEnabled="{Binding IsNotSaving}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopCommand}"></Button>
+                        <Button IsEnabled="{Binding IsStartEnabled}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Start" Command="{Binding StartCommand}"></Button>
+                        <Button IsEnabled="{Binding IsStopEnabled}" Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Stop" Command="{Binding StopCommand}"></Button>
                         
                     </StackPanel>
-                    <CheckBox Margin="10 1 0 0" Content="Raw Data" IsChecked="{Binding RawDataSelected}"/>
+                    <StackPanel Margin="10 1 0 0">
+                        <CheckBox Width="100" Content="Raw Data" IsChecked="{Binding RawDataSelected}"/>
+                        <Label Width="100" Content="{Binding PercentCompleted}"></Label>
+                    </StackPanel>
+                    
                 </StackPanel>
 
 
@@ -51,7 +55,7 @@
 
             <!--<Grid Grid.Row="1">-->
 
-            <chartingToolkit:Chart Grid.Row="1" Grid.ColumnSpan="3" Title="VSense">
+            <chartingToolkit:Chart Height="250" Grid.Row="1" Grid.ColumnSpan="3" Title="VSense">
                 <chartingToolkit:LineSeries 
                             Name="SeriesVSense"
                     Title="VSense"
@@ -63,7 +67,7 @@
                         <Style TargetType="{x:Type chartingToolkit:LineDataPoint}">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Setter Property="Opacity" Value="0" />
-                            <Setter Property="Background" Value="Yellow" />
+                            <Setter Property="Background" Value="Green" />
                         </Style>
                     </chartingToolkit:LineSeries.DataPointStyle>
                 </chartingToolkit:LineSeries>
@@ -74,7 +78,7 @@
 
             </chartingToolkit:Chart>
 
-            <chartingToolkit:Chart Grid.Row="2" Grid.ColumnSpan="3" Title="ISense and IRef">
+            <chartingToolkit:Chart Height="250" Grid.Row="2" Grid.ColumnSpan="3" Title="ISense and IRef">
                 <chartingToolkit:Chart.Series>
                     <chartingToolkit:LineSeries Title="ISense"
                             ItemsSource="{Binding ISenseCollection}"
@@ -113,10 +117,10 @@
 
             </chartingToolkit:Chart>
 
-            <chartingToolkit:Chart Grid.Row="3" Grid.ColumnSpan="3" Title="Temperatures">
+            <chartingToolkit:Chart Height="250" Grid.Row="3" Grid.ColumnSpan="3" Title="Temperatures">
                 <chartingToolkit:Chart.Series>
 
-                    <chartingToolkit:LineSeries Title="Temperature One"
+                    <chartingToolkit:LineSeries Title="Temperature 1"
                             ItemsSource="{Binding TemperatureOneCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
@@ -129,7 +133,7 @@
                             </Style>
                         </chartingToolkit:LineSeries.DataPointStyle>
                     </chartingToolkit:LineSeries>
-                    <chartingToolkit:LineSeries Title="Temperature Two"
+                    <chartingToolkit:LineSeries Title="Temperature 2"
                             ItemsSource="{Binding TemperatureTwoCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
@@ -142,7 +146,7 @@
                             </Style>
                         </chartingToolkit:LineSeries.DataPointStyle>
                     </chartingToolkit:LineSeries>
-                    <chartingToolkit:LineSeries Title="Temperature Three"
+                    <chartingToolkit:LineSeries Title="Temperature 3"
                             ItemsSource="{Binding TemperatureThreeCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
@@ -155,7 +159,7 @@
                             </Style>
                         </chartingToolkit:LineSeries.DataPointStyle>
                     </chartingToolkit:LineSeries>
-                    <chartingToolkit:LineSeries Title="Temperature Four"
+                    <chartingToolkit:LineSeries Title="Temperature 4"
                             ItemsSource="{Binding TemperatureFourCollection}"
                             IndependentValueBinding="{Binding Sample}"
                             DependentValueBinding="{Binding Value}"
@@ -207,8 +211,8 @@
                     <TextBlock Text="{Binding ProgressText}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
-                    <Button Margin="1" Width="100" Height="25" IsEnabled="{Binding IsSaving}" Content="Cancel" Command="{Binding CancelCommand}"></Button>
-                    <Button Margin="1" Width="100" Height="25" IsEnabled="{Binding IsNotSaving}" Content="Save" Command="{Binding SaveCommand}"></Button>
+                    <Button Margin="1" Width="100" Height="25" IsEnabled="{Binding IsCancelEnabled}" Content="Cancel" Command="{Binding CancelCommand}"></Button>
+                    <Button Margin="1" Width="100" Height="25" IsEnabled="{Binding IsSaveEnabled}" Content="Save" Command="{Binding SaveCommand}"></Button>
                 </StackPanel>
 
             </Grid>

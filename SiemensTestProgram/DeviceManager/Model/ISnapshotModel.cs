@@ -32,5 +32,7 @@ namespace DeviceManager.Model
         Task<CommunicationData> ReadTempThreeSamples(int sampleNumber);
 
         Task<CommunicationData> ReadTempFourSamples(int sampleNumber);
+
+        Task<CommunicationData> ReadPercentCompleted();
     }
 }

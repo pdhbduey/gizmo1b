@@ -15,20 +15,6 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public bool SetDout(int channel, bool set, ref byte[] response)
-        {
-            var request = DioDefaults.SetDioOutCommand(channel, set);
-            var status = communication.ProcessCommunicationRequest(request, ref response);
-            return status;
-        }
-
-        public bool ReadDin(ref byte[] response)
-        {
-            var request = DioDefaults.ReadDioInCommand();
-            var status = communication.ProcessCommunicationRequest(request, ref response);
-            return status;
-        }
-
         public Task<CommunicationData> ReadDin()
         {
             var request = DioDefaults.ReadDioInCommand();

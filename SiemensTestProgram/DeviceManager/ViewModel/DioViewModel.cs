@@ -117,16 +117,16 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private void SetDoutCommand(int channel, string status)
+        private async void SetDoutCommand(int channel, string status)
         {
             var response = new byte[5];
             if (status.Contains("Set"))
             {
-                dioModel.SetDout(channel, set: true, response: ref response);
+                await dioModel.SetDout(channel, set: true);
             }
             else
             {
-                dioModel.SetDout(channel, set: false, response: ref response);
+                await dioModel.SetDout(channel, set: false);
             }
 
             UpdateChannelDout(channel);
@@ -432,17 +432,17 @@ namespace DeviceManager.ViewModel
 
         private void Update()
         {
-            var din = new byte[5];
-            if (dioModel.ReadDin(ref din))
+            var din = dioModel.ReadDin().Result;
+            if (din.succesfulResponse)
             {
-                var zeroSet = DioDefaults.IsDinSet(din, 0);
-                var oneSet = DioDefaults.IsDinSet(din, 1);
-                var twoSet = DioDefaults.IsDinSet(din, 2);
-                var threeSet = DioDefaults.IsDinSet(din, 3);
-                var fourSet = DioDefaults.IsDinSet(din, 4);
-                var fiveSet = DioDefaults.IsDinSet(din, 5);
-                var sixSet = DioDefaults.IsDinSet(din, 6);
-                var sevenSet = DioDefaults.IsDinSet(din, 7);
+                var zeroSet = DioDefaults.IsDinSet(din.response, 0);
+                var oneSet = DioDefaults.IsDinSet(din.response, 1);
+                var twoSet = DioDefaults.IsDinSet(din.response, 2);
+                var threeSet = DioDefaults.IsDinSet(din.response, 3);
+                var fourSet = DioDefaults.IsDinSet(din.response, 4);
+                var fiveSet = DioDefaults.IsDinSet(din.response, 5);
+                var sixSet = DioDefaults.IsDinSet(din.response, 6);
+                var sevenSet = DioDefaults.IsDinSet(din.response, 7);
 
                 updateDinStatus(0, zeroSet);
                 updateDinStatus(1, oneSet);

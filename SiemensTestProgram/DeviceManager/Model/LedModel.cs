@@ -22,15 +22,10 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        /// <summary>
-        /// Writes to LED request.
-        /// </summary>
-        /// <param name="request"> LED toggle status. </param>
-        /// <returns> Task which will return LED register response. </returns>
-        public bool SetLedCommand(string ledRequest, ref byte[] response)
+        public Task<CommunicationData> SetLedCommand(string ledRequest)
         {
             var requestArray = LedDefaults.GetLedWriteCommand(ledRequest);
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
     }

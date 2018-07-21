@@ -255,7 +255,6 @@ namespace DeviceManager.ViewModel
                     {
                         ProcessStatus(status.response);
                     }));
-                    
                 }
 
                 Thread.Sleep(updateDelay);
@@ -279,34 +278,34 @@ namespace DeviceManager.ViewModel
 
         private void InitialUpdate()
         {
-            var ainAData = new byte[5];
-            if (thermistorModel.ReadAinA(ref ainAData))
+            var ainAData = thermistorModel.ReadAinA().Result;
+            if (ainAData.succesfulResponse)
             {
-                AinA = Helper.GetFloatFromBigEndian(ainAData);
+                AinA = Helper.GetFloatFromBigEndian(ainAData.response);
             }
 
-            var ainBData = new byte[5];
-            if (thermistorModel.ReadAinB(ref ainBData))
+            var ainBData = thermistorModel.ReadAinB().Result;
+            if (ainBData.succesfulResponse)
             {
-                AinB = Helper.GetFloatFromBigEndian(ainBData);
+                AinB = Helper.GetFloatFromBigEndian(ainBData.response);
             }
 
-            var ainCData = new byte[5];
-            if (thermistorModel.ReadAinC(ref ainCData))
+            var ainCData = thermistorModel.ReadAinC().Result;
+            if (ainCData.succesfulResponse)
             {
-                AinC = Helper.GetFloatFromBigEndian(ainCData);
+                AinC = Helper.GetFloatFromBigEndian(ainCData.response);
             }
 
-            var ainDData = new byte[5];
-            if (thermistorModel.ReadAinD(ref ainDData))
+            var ainDData = thermistorModel.ReadAinD().Result;
+            if (ainDData.succesfulResponse)
             {
-                AinD = Helper.GetFloatFromBigEndian(ainDData);
+                AinD = Helper.GetFloatFromBigEndian(ainDData.response);
             }
 
-            var status = new byte[5];
-            if (thermistorModel.ReadStatus(ref status))
+            var status = thermistorModel.ReadStatus().Result;
+            if (status.succesfulResponse)
             {
-                ProcessStatus(status);
+                ProcessStatus(status.response);
             }
         }
 
