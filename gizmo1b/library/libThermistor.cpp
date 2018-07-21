@@ -4,10 +4,10 @@
 SemaphoreHandle_t LibThermistor::s_mutex;
 bool LibThermistor::s_isInitialized;
 struct LibThermistor::Conversion* LibThermistor::s_types[] = {
-    [USP12387]   = s_convTableUSP12387,
+    [USP12837]   = s_convTableUSP12837,
     [SC30F103AN] = s_convTableSC30F103AN,
 };
-struct LibThermistor::Conversion LibThermistor::s_convTableUSP12387[] = {
+struct LibThermistor::Conversion LibThermistor::s_convTableUSP12837[] = {
     { .rt = 336479.00, .temp = {  -40, -40.0 } },
     { .rt = 314904.00, .temp = {  -39, -38.2 } },
     { .rt = 294848.00, .temp = {  -38, -36.4 } },
@@ -360,12 +360,11 @@ LibThermistor::~LibThermistor()
 {
 }
 
-// TEMP_AINx = 2.048 * Rt/(107000 + Rt)
-// 1/TEMP_AINx = (107000 / Rt + 1) / 2.048
-// 1 / Rt = (2.048 /TEMP_AINx - 1) / 107000
+// TEMP_AINx = 2.048 * Rt/(10,700 + Rt)
+// Rt = 10,700 / (2.048 / TEMP_AINx - 1)
 float LibThermistor::convertVoltageToTemp(float ain, int standard)
 {
-    float rt = 107000 / (2.048 / ain - 1);
+    float rt = 10700 / (2.048 / ain - 1);
     int i;
     float temp;
     struct Conversion* convTable = s_types[m_type];
@@ -380,9 +379,9 @@ float LibThermistor::convertVoltageToTemp(float ain, int standard)
             }
             else {
                 temp = convTable[i + 1].temp[standard]
-                  + (rt - convTable[i + 1].rt)
-                  * (convTable[i].temp[standard] - convTable[i + 1].temp[standard])
-                  / (convTable[i].rt - convTable[i + 1].rt);
+                     + (rt - convTable[i + 1].rt)
+                     * (convTable[i].temp[standard] - convTable[i + 1].temp[standard])
+                     / (convTable[i].rt - convTable[i + 1].rt);
                  break;
             }
         }
@@ -486,7 +485,7 @@ int LibThermistor::setType(int type)
     switch (type) {
     default:
         return ERROR_INVALID_TYPE;
-    case USP12387:
+    case USP12837:
     case SC30F103AN:
         m_type = type;
         break;

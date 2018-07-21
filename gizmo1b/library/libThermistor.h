@@ -26,7 +26,7 @@ public:
         ERROR_INVALID_UNITS,
     };
     enum Type {
-        USP12387,
+        USP12837,
         SC30F103AN,
     };
     enum Units {
@@ -60,7 +60,7 @@ private:
     LibAdc m_libAdc;
     static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
-    static struct Conversion s_convTableUSP12387[];
+    static struct Conversion s_convTableUSP12837[];
     static struct Conversion s_convTableSC30F103AN[];
     int m_units;
     int m_type;

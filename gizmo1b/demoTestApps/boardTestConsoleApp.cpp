@@ -120,7 +120,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "heater get customindex|customtime|customtref|customcycles|waveform\n\r";
     help += "heater set waveform start|stop\n\r";
     help += "thermistor get a|b|c|d|all\n\r";
-    help += "thermistor set type USP12387|SC30F103AN\n\r";
+    help += "thermistor set type USP12837|SC30F103AN\n\r";
     help += "thermistor get type\n\r";
     help += "motor reset|initialize|limp|energize|stop\n\r";
     help += "motor get regaddress|regvalue|step|abspos|relpos|pos|status\n\r";
@@ -731,7 +731,7 @@ bool BoardTestConsoleApp::parseThermistorCommand(std::vector<std::string>& token
             else if (tokens[ARGUMENT] == "type") {
                 std::map<int, std::string> thermTypes;
                 thermTypes[BoardTestThermistor::SC30F103AN] = "SC30F103AN";
-                thermTypes[BoardTestThermistor::USP12387]   = "USP12387";
+                thermTypes[BoardTestThermistor::USP12837]   = "USP12837";
                 uint32 type;
                 result = regRead(BoardTest::THERMISTOR_TYPE, type);
                 char t[16];
@@ -746,7 +746,7 @@ bool BoardTestConsoleApp::parseThermistorCommand(std::vector<std::string>& token
             if (tokens[ARGUMENT] == "type" && tokens.size() > VALUE) {
                 std::map<std::string, int> thermTypes;
                 thermTypes["SC30F103AN"] = BoardTestThermistor::SC30F103AN;
-                thermTypes["USP12387"]   = BoardTestThermistor::USP12387;
+                thermTypes["USP12837"]   = BoardTestThermistor::USP12837;
                 if (thermTypes.find(tokens[VALUE]) != thermTypes.end()) {
                     result = regWrite(BoardTest::THERMISTOR_TYPE,
                                                      thermTypes[tokens[VALUE]]);

@@ -9,7 +9,7 @@ class BoardTestThermistor: public BoardTest
 public:
     enum Type {
         SC30F103AN = 1 << LibThermistor::SC30F103AN,
-        USP12387   = 1 << LibThermistor::USP12387,
+        USP12837   = 1 << LibThermistor::USP12837,
     };
 public:
     BoardTestThermistor();
