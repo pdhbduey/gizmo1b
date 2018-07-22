@@ -23,6 +23,8 @@ namespace DeviceManager.Model
 
         Task<CommunicationData> ReadWaveform();
 
+        Task<CommunicationData> ReadControlState();
+
         bool ReadIsense(ref byte[] response);
 
         bool ReadVsense(ref byte[] response);

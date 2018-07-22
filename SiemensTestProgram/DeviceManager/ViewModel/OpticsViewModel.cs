@@ -3,7 +3,10 @@
     using Common;
     using Common.Bindings;
     using DeviceManager.Model;
+    using System;
     using System.Collections.Generic;
+    using System.Threading;
+    using System.Windows;
 
     public class OpticsViewModel : BindableBase
     {
@@ -14,7 +17,14 @@
         private int intensity;
         private const int updateDelay = 300;
         private float photodiodeVolts;
+        private float pdTemperature;
+        private float ledTemperature;
+        private float pdTemperatureDuringIntegration;
+        private float ledTemperatureDuringIntegration;
         private int photodiodeRaw;
+        private int selectedPdVersion;
+        private int selectedLedVersion;
+        private float ledMonitorVolts;
         private string statusMessage;
 
         public OpticsViewModel(IOpticsModel opticsModel)
@@ -32,6 +42,14 @@
             SelectedLed = Leds[0];
             Photodiodes = OpticsDefault.Photodiodes;
             SelectedPhotodiode = Photodiodes[0];
+
+            PdBoardVersions = OpticsDefault.PdBoardVersions;
+            SelectedPdVersion = PdBoardVersions[0];
+            LedBoardVersions = OpticsDefault.LedBoardVersions;
+            SelectedLedVersion = LedBoardVersions[0];
+
+            Update();
+            StartUpdateTask();
         }
 
         public RelayCommand UpdateCommand { get; set; }
@@ -50,10 +68,90 @@
                 PhotodiodeRaw = Helper.GetIntFromBigEndian(photodiodeRawRead.response);
             }
 
+            var readLedMonitor = opticsModel.ReadLedMonitorVolts().Result;
+            if (readLedMonitor.succesfulResponse)
+            {
+                LedMonitorVolts = Helper.GetFloatFromBigEndian(readLedMonitor.response);
+            }
+
+            var ledTemperatureReadDuringIntegration = opticsModel.ReadLedTemperatureDuringIntegrationCommand().Result;
+            if (ledTemperatureReadDuringIntegration.succesfulResponse)
+            {
+                LedTemperatureDuringIntegration = Helper.GetFloatFromBigEndian(ledTemperatureReadDuringIntegration.response);
+            }
+
+            var pdTemperatureReadDuringIntegration = opticsModel.ReadPdTemperatureDuringIntegrationCommand().Result;
+            if (pdTemperatureReadDuringIntegration.succesfulResponse)
+            {
+                PdTemperatureDuringIntegration = Helper.GetFloatFromBigEndian(pdTemperatureReadDuringIntegration.response);
+            }
+
+            var ledTemperatureRead = opticsModel.ReadLedTemperatureCommand().Result;
+            if (ledTemperatureRead.succesfulResponse)
+            {
+                LedTemperature = Helper.GetFloatFromBigEndian(ledTemperatureRead.response);
+            }
+
+            var pdTemperatureRead = opticsModel.ReadPdTemperatureCommand().Result;
+            if (pdTemperatureRead.succesfulResponse)
+            {
+                PdTemperature = Helper.GetFloatFromBigEndian(pdTemperatureRead.response);
+            }
+
             var status = opticsModel.ReadStatusCommand().Result;
             if (status.succesfulResponse)
             {
                 ProcessStatus(status.response);
+            }
+        }
+
+        private void StartUpdateTask()
+        {
+            var thread = new Thread(() =>
+            {
+                UpdateAllStatuses();
+            });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+        }
+
+        private async void UpdateAllStatuses()
+        {
+            while (true)
+            {
+                var pdTemperatureRead = await opticsModel.ReadPdTemperatureCommand();
+                if (pdTemperatureRead.succesfulResponse)
+                {
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        PdTemperature = Helper.GetFloatFromBigEndian(pdTemperatureRead.response);
+                    }));
+                }
+
+                Thread.Sleep(updateDelay);
+
+                var ledTemperatureRead = await opticsModel.ReadLedTemperatureCommand();
+                if (ledTemperatureRead.succesfulResponse)
+                {
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        LedTemperature = Helper.GetFloatFromBigEndian(ledTemperatureRead.response);
+                    }));
+                }
+
+                Thread.Sleep(updateDelay);
+
+                var status = await opticsModel.ReadStatusCommand();
+                if (status.succesfulResponse)
+                {
+                    await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        ProcessStatus(status.response);
+                    }));
+                }
+
+                Thread.Sleep(updateDelay);
             }
         }
 
@@ -86,6 +184,116 @@
             }
         }
 
+        public string LedMonitorVoltsText
+        {
+            get
+            {
+                return $"LED Monitor: {ledMonitorVolts.ToString("0.##")} V";
+            }
+        }
+
+        public float LedMonitorVolts
+        {
+            get
+            {
+                return ledMonitorVolts;
+            }
+
+            set
+            {
+                ledMonitorVolts = value;
+                OnPropertyChanged(nameof(LedMonitorVoltsText));
+            }
+        }
+
+        public string PdTemperatureText
+        {
+            get
+            {
+                return $"Photodiode temperature: {pdTemperature.ToString("0.##")} °C";
+            }
+        }
+
+        public string LedTemperatureText
+        {
+            get
+            {
+                return $"LED temperature: {ledTemperature.ToString("0.##")} °C";
+            }
+        }
+
+        public float PdTemperature
+        {
+            get
+            {
+                return pdTemperature;
+            }
+
+            set
+            {
+                pdTemperature = value;
+                OnPropertyChanged(nameof(PdTemperatureText));
+            }
+        }
+
+        public float LedTemperature
+        {
+            get
+            {
+                return ledTemperature;
+            }
+
+            set
+            {
+                ledTemperature = value;
+                OnPropertyChanged(nameof(LedTemperatureText));
+            }
+        }
+
+        public string PdTemperatureDuringIntegrationText
+        {
+            get
+            {
+                return $"Photodiode temperature during integration: {pdTemperatureDuringIntegration.ToString("0.##")} °C";
+            }
+        }
+
+        public string LedTemperatureDuringIntegrationText
+        {
+            get
+            {
+                return $"LED temperature during integration: {ledTemperatureDuringIntegration.ToString("0.##")} °C";
+            }
+        }
+
+        public float PdTemperatureDuringIntegration
+        {
+            get
+            {
+                return pdTemperatureDuringIntegration;
+            }
+
+            set
+            {
+                pdTemperatureDuringIntegration = value;
+                OnPropertyChanged(nameof(PdTemperatureDuringIntegrationText));
+            }
+        }
+
+        public float LedTemperatureDuringIntegration
+        {
+            get
+            {
+                return ledTemperatureDuringIntegration;
+            }
+
+            set
+            {
+                ledTemperatureDuringIntegration = value;
+                OnPropertyChanged(nameof(LedTemperatureDuringIntegrationText));
+            }
+        }
+
         public string PhotodiodeVoltsText
         {
             get
@@ -115,6 +323,8 @@
                 OnPropertyChanged(nameof(PhotodiodeVoltsText));
             }
         }
+
+
 
         private int PhotodiodeRaw
         {
@@ -190,6 +400,50 @@
             }
         }
 
+        public List<int> PdBoardVersions { get; set; }
+
+        public int SelectedPdVersion
+        {
+            get
+            {
+                return selectedPdVersion;
+            }
+
+            set
+            {
+                selectedPdVersion = value;
+                OnPropertyChanged(nameof(SelectedPdVersion));
+                UpdatePdBoardVersion();
+            }
+        }
+
+        private async void UpdatePdBoardVersion()
+        {
+            await opticsModel.SetPdBoardVersion(selectedPdVersion);
+        }
+
+        public List<int> LedBoardVersions { get; set; }
+
+        public int SelectedLedVersion
+        {
+            get
+            {
+                return selectedLedVersion;
+            }
+
+            set
+            {
+                selectedLedVersion = value;
+                OnPropertyChanged(nameof(SelectedLedVersion));
+                ULedateLedBoardVersion();
+            }
+        }
+
+        private async void ULedateLedBoardVersion()
+        {
+            await opticsModel.SetLedBoardVersion(selectedLedVersion);
+        }
+
         public List<string> Leds { get; set; }
 
         public string SelectedLed
@@ -233,5 +487,7 @@
         {
             await opticsModel.SetPhotodiodeCommand(selectedPhotodiode);
         }
+
+
     }
 }
