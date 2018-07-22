@@ -22,5 +22,19 @@ namespace DeviceManager.Model
         Task<CommunicationData> ReadPhotodiodeVoltsCommand();
 
         Task<CommunicationData> ReadPhotodiodeRawCommand();
+
+        Task<CommunicationData> ReadLedTemperatureCommand();
+
+        Task<CommunicationData> ReadPdTemperatureCommand();
+
+        Task<CommunicationData> ReadLedTemperatureDuringIntegrationCommand();
+
+        Task<CommunicationData> ReadPdTemperatureDuringIntegrationCommand();
+
+        Task<CommunicationData> SetPdBoardVersion(int version);
+
+        Task<CommunicationData> SetLedBoardVersion(int version);
+
+        Task<CommunicationData> ReadLedMonitorVolts();
     }
 }

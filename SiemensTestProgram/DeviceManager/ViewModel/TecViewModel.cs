@@ -138,6 +138,7 @@ namespace DeviceManager.ViewModel
             {
                 enableButtonState = value;
                 OnPropertyChanged(nameof(EnableButtonState));
+                OnPropertyChanged(nameof(EnableButtonIsChecked));
             }
         }
 
@@ -166,6 +167,7 @@ namespace DeviceManager.ViewModel
             {
                 closedLoopButtonState = value;
                 OnPropertyChanged(nameof(ClosedLoopButtonState));
+                OnPropertyChanged(nameof(ClosedLoopButtonIsChecked));
             }
         }
 
@@ -202,6 +204,7 @@ namespace DeviceManager.ViewModel
             {
                 waveformButtonState = value;
                 OnPropertyChanged(nameof(WaveformButtonState));
+                OnPropertyChanged(nameof(WaveformButtonIsChecked));
                 OnPropertyChanged(nameof(IsIRefEditable));
             }
         }
@@ -898,6 +901,45 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        public bool ClosedLoopButtonIsChecked
+        {
+            get
+            {
+                if (closedLoopButtonState.Equals(TecDefaults.EnableClosedLoopText))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+        public bool EnableButtonIsChecked
+        {
+            get
+            {
+                if (enableButtonState.Equals(TecDefaults.EnableText))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        public bool WaveformButtonIsChecked
+        {
+            get
+            {
+                if (waveformButtonState.Equals(TecDefaults.StartWaveformText))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+
         private void InitialUpdate()
         {
             ReadCustomWaveformIndex();
@@ -946,6 +988,15 @@ namespace DeviceManager.ViewModel
             if (proportionalGainResponse.succesfulResponse)
             {
                 ProportionalGain = Helper.GetFloatFromBigEndian(proportionalGainResponse.response);
+            }
+
+            var controlStateResponse = tecModel.ReadControlState().Result;
+            if (controlStateResponse.succesfulResponse)
+            {
+                var buttonBytes = controlStateResponse.response[4];
+                EnableButtonState = Helper.IsBitSet(buttonBytes, 1) ? TecDefaults.DisableText : TecDefaults.EnableText;
+                WaveformButtonState = Helper.IsBitSet(buttonBytes, 2) ? TecDefaults.StopWaveformText : TecDefaults.StartWaveformText;
+                ClosedLoopButtonState = Helper.IsBitSet(buttonBytes, 5) ? TecDefaults.DisableClosedLoopText : TecDefaults.EnableClosedLoopText;
             }
 
             var readWaveformResponse = tecModel.ReadWaveform().Result;

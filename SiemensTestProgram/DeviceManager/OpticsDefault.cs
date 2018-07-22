@@ -25,6 +25,18 @@ namespace DeviceManager
             "6"
         };
 
+        public static List<int> LedBoardVersions = new List<int>
+        {
+            1,
+            2
+        };
+
+        public static List<int> PdBoardVersions = new List<int>
+        {
+            1,
+            2
+        };
+
         public static Dictionary<string, byte> SelectLedMapping = new Dictionary<string, byte>()
         {
             { Leds[0], 0x01},
@@ -100,6 +112,120 @@ namespace DeviceManager
                 0x00,
                 0x0C,
                 0x01,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] SetLedBoardVersionCommand(int version)
+        {
+            byte value = Helper.IntegerToByte(version);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0C,
+                0x06,
+                0x00,
+                0x00,
+                0x00,
+                value
+            };
+        }
+
+        public static byte[] SetPdBoardVersionCommand(int version)
+        {
+            byte value = Helper.IntegerToByte(version);
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0C,
+                0x07,
+                0x00,
+                0x00,
+                0x00,
+                value
+            };
+        }
+
+        public static byte[] ReadLedTemperatureDuringIntegrationCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x0C,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] ReadPdTemperatureDuringIntegrationCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x0B,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] ReadLedTemperatureCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x08,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] ReadPdTemperatureCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x09,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] ReadLedMonitorVolts()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x0A,
                 0x00,
                 0x00,
                 0x00,

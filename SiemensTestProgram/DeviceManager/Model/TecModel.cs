@@ -14,6 +14,13 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
+        public Task<CommunicationData> ReadControlState()
+        {
+            var requestArray = TecDefaults.ReadControlCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
         public Task<CommunicationData> ReadVmax()
         {
             var requestArray = TecDefaults.GetVmaxCommand();
@@ -35,7 +42,6 @@ namespace DeviceManager.Model
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
-
 
         public Task<CommunicationData> ReadPeriod()
         {

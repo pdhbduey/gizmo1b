@@ -61,5 +61,55 @@ namespace DeviceManager.Model
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
+
+        public Task<CommunicationData> ReadLedTemperatureDuringIntegrationCommand()
+        {
+            var requestArray = OpticsDefault.ReadLedTemperatureDuringIntegrationCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadPdTemperatureDuringIntegrationCommand()
+        {
+            var requestArray = OpticsDefault.ReadPdTemperatureDuringIntegrationCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadLedTemperatureCommand()
+        {
+            var requestArray = OpticsDefault.ReadLedTemperatureCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadPdTemperatureCommand()
+        {
+            var requestArray = OpticsDefault.ReadPdTemperatureCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> SetPdBoardVersion(int version)
+        {
+            var requestArray = OpticsDefault.SetPdBoardVersionCommand(version);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> SetLedBoardVersion(int version)
+        {
+            var requestArray = OpticsDefault.SetLedBoardVersionCommand(version);
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadLedMonitorVolts()
+        {
+            var requestArray = OpticsDefault.ReadLedMonitorVolts();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
     }
 }

@@ -55,6 +55,38 @@ namespace DeviceManager
             "Custom"
         };
 
+        public static byte[] ReadWaveformIndex()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x0B,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] ReadControlCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x07,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
         public static byte[] GetControlCommand(string command) 
         {
             var controlCommand = TecControlByteValues[command];
@@ -70,22 +102,6 @@ namespace DeviceManager
                 0x00,
                 controlCommand
             }; 
-        }
-
-        public static byte[] ReadWaveformIndex()
-        {
-            return new byte[]
-            {
-                DataHelper.REGISTER_READ,
-                0x00,
-                0x00,
-                0x07,
-                0x0B,
-                0x00,
-                0x00,
-                0x00,
-                0x00
-            };
         }
 
         public static byte[] SetWaveformIrefCommand(float value)
