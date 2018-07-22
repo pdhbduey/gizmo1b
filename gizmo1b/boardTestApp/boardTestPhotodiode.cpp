@@ -35,6 +35,24 @@ int BoardTestPhotodiode::get(uint32 address, uint32& value)
     case PHOTODIODE_READING_RAW:
         value = m_libPhotodiode.readPhotodiodeRaw();
         break;
+    case PHOTODIODE_LED_BOARD_VERSION:
+        value = m_libPhotodiode.readLedBoardVersion();
+        break;
+    case PHOTODIODE_PD_BOARD_VERSION:
+        value = m_libPhotodiode.readPhotodiodeBoardVersion();
+        break;
+    case PHOTODIODE_LED_TEMPERATURE:
+        {
+            float temperature = m_libPhotodiode.readLedTemperature();
+            value = *reinterpret_cast<uint32*>(&temperature);
+        }
+        break;
+    case PHOTODIODE_PD_TEMPERATURE:
+        {
+            float temperature = m_libPhotodiode.readPhotodiodeTemperature();
+            value = *reinterpret_cast<uint32*>(&temperature);
+        }
+        break;
     }
     return OKAY;
 }
@@ -47,6 +65,8 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
     case PHOTODIODE_READING_IN_VOLTS:
     case PHOTODIODE_READING_RAW:
     case PHOTODIODE_STATUS:
+    case PHOTODIODE_LED_TEMPERATURE:
+    case PHOTODIODE_PD_TEMPERATURE:
         return ERROR_RO;
     case PHOTODIODE_CONTROL:
         {
@@ -68,6 +88,12 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
         break;
     case PHOTODIODE_LED_INTENSITY:
         m_status = m_libPhotodiode.setLedIntensity(value);
+        break;
+    case PHOTODIODE_LED_BOARD_VERSION:
+        m_status = m_libPhotodiode.setLedBoardVersion(value);
+        break;
+    case PHOTODIODE_PD_BOARD_VERSION:
+        m_status = m_libPhotodiode.setPhotodiodeBoardVersion(value);
         break;
     }
     return OKAY;

@@ -5,7 +5,10 @@ SemaphoreHandle_t LibPhotodiode::s_mutex;
 bool LibPhotodiode::s_isInitialized;
 
 LibPhotodiode::LibPhotodiode() :
-    m_integrationTimeInUs(10000)
+    m_integrationTimeInUs(10000),
+    m_temperatureUnits(CELSIUS),
+    m_ledBoardVersion(LED_BOARD_V1),
+    m_photodiodeBoardVersion(PHOTODIODE_BOARD_V1)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
@@ -123,4 +126,50 @@ float LibPhotodiode::readPhotodiode()
 uint32 LibPhotodiode::readPhotodiodeRaw()
 {
     return m_photodiodeResultRaw;
+}
+
+uint32 LibPhotodiode::readLedBoardVersion()
+{
+    return m_ledBoardVersion;
+}
+
+uint32 LibPhotodiode::readPhotodiodeBoardVersion()
+{
+    return m_photodiodeBoardVersion;
+}
+
+int LibPhotodiode::setLedBoardVersion(uint32 version)
+{
+    switch (version) {
+    default:
+        return ERROR_LED_BOARD_VERSION_INVALID;
+    case LED_BOARD_V1:
+    case LED_BOARD_V2:
+        m_ledBoardVersion = version;
+        break;
+    }
+    return OKAY;
+}
+
+int LibPhotodiode::setPhotodiodeBoardVersion(uint32 version)
+{
+    switch (version) {
+    default:
+        return ERROR_PHOTODIODE_BOARD_VERSION_INVALID;
+    case PHOTODIODE_BOARD_V1:
+    case PHOTODIODE_BOARD_V2:
+        m_photodiodeBoardVersion = version;
+        break;
+    }
+    return OKAY;
+}
+
+float LibPhotodiode::readLedTemperature()
+{
+    return 22.5;
+}
+
+float LibPhotodiode::readPhotodiodeTemperature()
+{
+    return -22.5;
 }

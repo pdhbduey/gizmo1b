@@ -31,6 +31,20 @@ public:
         ERROR_SELECT_LED_OUT_OF_RANGE,
         ERROR_SELECT_PHOTODIODE_OUT_OF_RANGE,
         ERROR_LED_INTENSITY_OUT_OF_RANGE,
+        ERROR_LED_BOARD_VERSION_INVALID,
+        ERROR_PHOTODIODE_BOARD_VERSION_INVALID,
+    };
+    enum LedBoardVersion {
+        LED_BOARD_V1 = 1 << 0,
+        LED_BOARD_V2 = 1 << 1,
+    };
+    enum PhotodiodeBoardVersion {
+        PHOTODIODE_BOARD_V1 = 1 << 0,
+        PHOTODIODE_BOARD_V2 = 1 << 1,
+    };
+    enum TemperatureUnits {
+        CELSIUS,
+        FAHRENHEIT,
     };
 public:
     LibPhotodiode();
@@ -45,6 +59,12 @@ public:
     int setLedIntensity(uint32 ledIntensity);
     float readPhotodiode(); // 0V-5V
     uint32 readPhotodiodeRaw(); // 0-65,535
+    uint32 readLedBoardVersion();
+    uint32 readPhotodiodeBoardVersion();
+    int setLedBoardVersion(uint32 version);
+    int setPhotodiodeBoardVersion(uint32 version);
+    float readLedTemperature();        // degC
+    float readPhotodiodeTemperature(); // degC
 private:
     OpticsDriver m_opticsDriver;
     static bool s_isInitialized;
@@ -56,6 +76,9 @@ private:
     std::map<int, int> m_ledMap;
     std::map<int, int> m_pdMap;
     uint32 m_photodiodeResultRaw;
+    int m_temperatureUnits;
+    int m_ledBoardVersion;
+    int m_photodiodeBoardVersion;
 };
 
 #endif // _LIB_PHOTODIODE_H_
