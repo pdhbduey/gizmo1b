@@ -137,11 +137,14 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
     help += "dio get 0..9|all\n\r";
     help += "dio set|clear 0..7\n\r";
-    help += "optics get led|pd|time|intensity|result\n\r";
+    help += "optics get led|pd|time|intensity|result|ledtemp|pdtemp\n\r";
     help += "optics set led 1..6\n\r";
     help += "optics set pd 1..6\n\r";
     help += "optics set time 1,000..1,000,000(us)\n\r";
     help += "optics set intensity 0..40,000\n\r";
+    help += "optics get ledver|pdver\n\r";
+    help += "optics set ledver v1|v2\n\r";
+    help += "optics set pdver v1|v2\n\r";
 }
 
 void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
@@ -1753,6 +1756,8 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
     pdStatus.push_back("ERROR_SELECT_LED_OUT_OF_RANGE");
     pdStatus.push_back("ERROR_SELECT_PHOTODIODE_OUT_OF_RANGE");
     pdStatus.push_back("ERROR_LED_INTENSITY_OUT_OF_RANGE");
+    pdStatus.push_back("ERROR_LED_BOARD_VERSION_INVALID");
+    pdStatus.push_back("ERROR_PHOTODIODE_BOARD_VERSION_INVALID");
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
             if (tokens[ARGUMENT] == "led") {
@@ -1810,12 +1815,65 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                 isParsingError = false;
             }
             else if (tokens[ARGUMENT] == "result") {
-                uint32 pdReading;
-                result = regRead(BoardTest::PHOTODIODE_READING_IN_VOLTS, pdReading);
-                float f = *reinterpret_cast<float*>(&pdReading);
-                result = regRead(BoardTest::PHOTODIODE_READING_RAW, pdReading);
-                char t[128];
-                sprintf(t, "voltage: %.2fV, count: %d", f, pdReading);
+                uint32 value;
+                result = regRead(BoardTest::PHOTODIODE_READING_IN_VOLTS, value);
+                float pdVolts = *reinterpret_cast<float*>(&value);
+                uint32 pdRaw;
+                result = regRead(BoardTest::PHOTODIODE_READING_RAW, pdRaw);
+                result = regRead(BoardTest::PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS, value);
+                float ledMonotorPdVolts = *reinterpret_cast<float*>(&value);
+                result = regRead(BoardTest::PHOTODIODE_LED_TEMPERATURE_DURING_INTEGRATION, value);
+                float ledTemp = *reinterpret_cast<float*>(&value);
+                result = regRead(BoardTest::PHOTODIODE_PD_TEMPERATURE_DURING_INTEGRATION, value);
+                float pdTemp = *reinterpret_cast<float*>(&value);
+                char t[256];
+                sprintf(t, "pd voltage: %.2fV, pd count: %d\n\r"
+                           "led monitor pd voltage: %.2fV, led temp: %.1fdegC, pd temp: %.1fdegC",
+                            pdVolts, pdRaw, ledMonotorPdVolts, ledTemp, pdTemp);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "ledtemp") {
+                uint32 value;
+                result = regRead(BoardTest::PHOTODIODE_LED_TEMPERATURE, value);
+                float ledTemp = *reinterpret_cast<float*>(&value);
+                char t[16];
+                sprintf(t, "%.1fdegC", ledTemp);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "pdtemp") {
+                uint32 value;
+                result = regRead(BoardTest::PHOTODIODE_PD_TEMPERATURE, value);
+                float pdTemp = *reinterpret_cast<float*>(&value);
+                char t[16];
+                sprintf(t, "%.1fdegC", pdTemp);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "ledver") {
+                std::map<int, std::string> ledVer;
+                ledVer[LibPhotodiode::LED_BOARD_V1] = "v1";
+                ledVer[LibPhotodiode::LED_BOARD_V2] = "v2";
+                uint32 ver;
+                result = regRead(BoardTest::PHOTODIODE_LED_BOARD_VERSION, ver);
+                char t[16];
+                sprintf(t, "%s", ledVer.find(ver) != ledVer.end()
+                               ? ledVer[ver].c_str()
+                               : "unknown");
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "pdver") {
+                std::map<int, std::string> pdVer;
+                pdVer[LibPhotodiode::PHOTODIODE_BOARD_V1] = "v1";
+                pdVer[LibPhotodiode::PHOTODIODE_BOARD_V2] = "v2";
+                uint32 ver;
+                result = regRead(BoardTest::PHOTODIODE_PD_BOARD_VERSION, ver);
+                char t[16];
+                sprintf(t, "%s", pdVer.find(ver) != pdVer.end()
+                               ? pdVer[ver].c_str()
+                               : "unknown");
                 res = t;
                 isParsingError = false;
             }
@@ -1876,6 +1934,26 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                        }
                    }
                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "ledver" && tokens.size() > VALUE) {
+                std::map<std::string, int> ledVer;
+                ledVer["v1"] = LibPhotodiode::LED_BOARD_V1;
+                ledVer["v2"] = LibPhotodiode::LED_BOARD_V2;
+                if (ledVer.find(tokens[VALUE]) != ledVer.end()) {
+                    result = regWrite(BoardTest::PHOTODIODE_LED_BOARD_VERSION,
+                                                         ledVer[tokens[VALUE]]);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "pdver" && tokens.size() > VALUE) {
+                std::map<std::string, int> pdVer;
+                pdVer["v1"] = LibPhotodiode::PHOTODIODE_BOARD_V1;
+                pdVer["v2"] = LibPhotodiode::PHOTODIODE_BOARD_V2;
+                if (pdVer.find(tokens[VALUE]) != pdVer.end()) {
+                    result = regWrite(BoardTest::PHOTODIODE_PD_BOARD_VERSION,
+                                                          pdVer[tokens[VALUE]]);
+                    isParsingError = false;
                 }
             }
         }

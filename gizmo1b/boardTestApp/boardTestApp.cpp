@@ -96,17 +96,20 @@ BoardTestApp::BoardTestApp(const char* name) :
     m_boardTestMap[BoardTest::THERMISTOR_RESULT_AIN_D] = boardTestThermistor;
     m_boardTestMap[BoardTest::THERMISTOR_TYPE]         = boardTestThermistor;
     m_boardTestMap[BoardTest::LED_CONTROL] = new BoardTestLed;
-    BoardTest* boardTestPhotodiode                         = new BoardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_CONTROL]          = boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_STATUS]           = boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_INTEGRATION_TIME] = boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_LED_INTENSITY]    = boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_READING_IN_VOLTS] = boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_READING_RAW]      = boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_LED_BOARD_VERSION]= boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_PD_BOARD_VERSION] = boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_LED_TEMPERATURE]  = boardTestPhotodiode;
-    m_boardTestMap[BoardTest::PHOTODIODE_PD_TEMPERATURE]   = boardTestPhotodiode;
+    BoardTest* boardTestPhotodiode                                           = new BoardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_CONTROL]                            = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_STATUS]                             = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_INTEGRATION_TIME]                   = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_LED_INTENSITY]                      = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_READING_IN_VOLTS]                   = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_READING_RAW]                        = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_LED_BOARD_VERSION]                  = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_PD_BOARD_VERSION]                   = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_LED_TEMPERATURE]                    = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_PD_TEMPERATURE]                     = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS]    = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_LED_TEMPERATURE_DURING_INTEGRATION] = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_PD_TEMPERATURE_DURING_INTEGRATION]  = boardTestPhotodiode;
 }
 
 BoardTestApp::~BoardTestApp()
