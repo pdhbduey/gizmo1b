@@ -173,3 +173,19 @@ float LibPhotodiode::readPhotodiodeTemperature()
 {
     return -22.5;
 }
+
+float LibPhotodiode::readLedMonitorPhotodiode()
+{
+    return 2.45;
+}
+
+float LibPhotodiode::readLedTemperatureDuringIntegration()
+{
+    return 22.6;
+}
+
+float LibPhotodiode::readPhotodiodeTemperatureDuringIntegration()
+{
+    return -22.6;
+}
+

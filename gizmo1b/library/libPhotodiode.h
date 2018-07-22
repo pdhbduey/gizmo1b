@@ -65,6 +65,9 @@ public:
     int setPhotodiodeBoardVersion(uint32 version);
     float readLedTemperature();        // degC
     float readPhotodiodeTemperature(); // degC
+    float readLedMonitorPhotodiode();  // 0V-5V
+    float readLedTemperatureDuringIntegration();        // degC
+    float readPhotodiodeTemperatureDuringIntegration(); // degC
 private:
     OpticsDriver m_opticsDriver;
     static bool s_isInitialized;

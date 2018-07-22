@@ -53,6 +53,24 @@ int BoardTestPhotodiode::get(uint32 address, uint32& value)
             value = *reinterpret_cast<uint32*>(&temperature);
         }
         break;
+    case PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS:
+        {
+            float ledMonitorPhotdiode = m_libPhotodiode.readLedMonitorPhotodiode();
+            value = *reinterpret_cast<uint32*>(&ledMonitorPhotdiode);
+        }
+        break;
+    case PHOTODIODE_LED_TEMPERATURE_DURING_INTEGRATION:
+        {
+            float temperature = m_libPhotodiode.readLedTemperatureDuringIntegration();
+            value = *reinterpret_cast<uint32*>(&temperature);
+        }
+        break;
+    case PHOTODIODE_PD_TEMPERATURE_DURING_INTEGRATION:
+        {
+            float temperature = m_libPhotodiode.readPhotodiodeTemperatureDuringIntegration();
+            value = *reinterpret_cast<uint32*>(&temperature);
+        }
+        break;
     }
     return OKAY;
 }
@@ -67,6 +85,9 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
     case PHOTODIODE_STATUS:
     case PHOTODIODE_LED_TEMPERATURE:
     case PHOTODIODE_PD_TEMPERATURE:
+    case PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS:
+    case PHOTODIODE_LED_TEMPERATURE_DURING_INTEGRATION:
+    case PHOTODIODE_PD_TEMPERATURE_DURING_INTEGRATION:
         return ERROR_RO;
     case PHOTODIODE_CONTROL:
         {
