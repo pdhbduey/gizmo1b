@@ -6,9 +6,7 @@ bool LibPhotodiode::s_isInitialized;
 
 LibPhotodiode::LibPhotodiode() :
     m_integrationTimeInUs(10000),
-    m_temperatureUnits(CELSIUS),
-    m_ledBoardVersion(LED_BOARD_V1),
-    m_photodiodeBoardVersion(PHOTODIODE_BOARD_V1)
+    m_photodiodeThermistor(LibThermistor::NTCG163JF103FT1, LibThermistor::CELSIUS)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
@@ -26,6 +24,8 @@ LibPhotodiode::LibPhotodiode() :
     m_pdMap[SELECT_PHOTODIODE_D10_T2] = 4;
     m_pdMap[SELECT_PHOTODIODE_D11_T3] = 5;
     m_pdMap[SELECT_PHOTODIODE_D10_T3] = 6;
+    setLedBoardVersion(OpticsDriver::LED_BOARD_V1);
+    setPhotodiodeBoardVersion(OpticsDriver::PHOTODIODE_BOARD_V1);
 }
 
 LibPhotodiode::~LibPhotodiode()
@@ -115,11 +115,15 @@ float LibPhotodiode::readPhotodiode()
     uint32_t npdChanIdx    = m_pdMap[m_photodiode];
     uint32_t nDuration_us  = m_integrationTimeInUs;
     uint32_t nLedIntensity = m_ledIntensity;
-    uint16_t data;
+    struct OpticsDriver::Data data = {
+        .m_photodiodeBoardVersion = m_photodiodeBoardVersion,
+    };
     m_opticsDriver.GetPhotoDiodeValue(nledChanIdx, npdChanIdx, nDuration_us,
                                                           nLedIntensity, &data);
-    m_photodiodeResultRaw = data;
-    float photoDiodeReading = data * (5.0 / 65535);
+    m_photodiodeResultRaw = data.m_photodiodeResultRaw;
+    float rt = convertRawDataToResistance(data.m_photodiodeTemperatureRaw);
+    m_photodiodeTemperatureDuringIntegration = m_photodiodeThermistor.getTemperature(rt);
+    float photoDiodeReading = m_photodiodeResultRaw * (m_photodiodeVref / 65535);
     return photoDiodeReading;
 }
 
@@ -143,11 +147,11 @@ int LibPhotodiode::setLedBoardVersion(uint32 version)
     switch (version) {
     default:
         return ERROR_LED_BOARD_VERSION_INVALID;
-    case LED_BOARD_V1:
-    case LED_BOARD_V2:
-        m_ledBoardVersion = version;
+    case OpticsDriver::LED_BOARD_V1:
+    case OpticsDriver::LED_BOARD_V2:
         break;
     }
+    m_ledBoardVersion = version;
     return OKAY;
 }
 
@@ -156,36 +160,58 @@ int LibPhotodiode::setPhotodiodeBoardVersion(uint32 version)
     switch (version) {
     default:
         return ERROR_PHOTODIODE_BOARD_VERSION_INVALID;
-    case PHOTODIODE_BOARD_V1:
-    case PHOTODIODE_BOARD_V2:
-        m_photodiodeBoardVersion = version;
+    case OpticsDriver::PHOTODIODE_BOARD_V1:
+        m_photodiodeVref = 5;
+        break;
+    case OpticsDriver::PHOTODIODE_BOARD_V2:
+        m_photodiodeVref = 4.096;
         break;
     }
+    m_photodiodeBoardVersion = version;
     return OKAY;
 }
 
 float LibPhotodiode::readLedTemperature()
 {
-    return 22.5;
+    return 0;
 }
 
 float LibPhotodiode::readPhotodiodeTemperature()
 {
-    return -22.5;
+    LibMutex libMutex(s_mutex);
+    uint32_t npdChanIdx = m_pdMap[m_photodiode];
+    struct OpticsDriver::Data data = {
+        .m_photodiodeBoardVersion = m_photodiodeBoardVersion,
+    };
+    m_opticsDriver.GetPhotoDiodeTemperatureRaw(npdChanIdx, &data);
+    float rt = convertRawDataToResistance(data.m_photodiodeTemperatureRaw);
+    float temperature = m_photodiodeThermistor.getTemperature(rt);
+    return temperature;
 }
 
-float LibPhotodiode::readLedMonitorPhotodiode()
+float LibPhotodiode::readLedMonitorPhotodiodeDuringIntegration()
 {
-    return 2.45;
+    return 0;
 }
 
 float LibPhotodiode::readLedTemperatureDuringIntegration()
 {
-    return 22.6;
+    return 0;
 }
 
 float LibPhotodiode::readPhotodiodeTemperatureDuringIntegration()
 {
-    return -22.6;
+    return m_photodiodeTemperatureDuringIntegration;
 }
 
+// TEMP_AINx = Vref * Rt/(10,700 + Rt)
+// Rt = 10,700 / (Vref / TEMP_AINx - 1)
+float LibPhotodiode::convertRawDataToResistance(uint16_t data)
+{
+    float voltage = data  * (m_photodiodeVref / 65535);
+    if (voltage == 0 || voltage == m_photodiodeVref) {
+        return 10000;
+    }
+    float rt = 10700 / (m_photodiodeVref / voltage - 1);
+    return rt;
+}

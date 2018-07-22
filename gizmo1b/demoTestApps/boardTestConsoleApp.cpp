@@ -1820,7 +1820,7 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                 float pdVolts = *reinterpret_cast<float*>(&value);
                 uint32 pdRaw;
                 result = regRead(BoardTest::PHOTODIODE_READING_RAW, pdRaw);
-                result = regRead(BoardTest::PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS, value);
+                result = regRead(BoardTest::PHOTODIODE_LED_MONITOR_PD_READING_DURING_INTEGRATION_IN_VOLTS, value);
                 float ledMonotorPdVolts = *reinterpret_cast<float*>(&value);
                 result = regRead(BoardTest::PHOTODIODE_LED_TEMPERATURE_DURING_INTEGRATION, value);
                 float ledTemp = *reinterpret_cast<float*>(&value);
@@ -1853,8 +1853,8 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "ledver") {
                 std::map<int, std::string> ledVer;
-                ledVer[LibPhotodiode::LED_BOARD_V1] = "v1";
-                ledVer[LibPhotodiode::LED_BOARD_V2] = "v2";
+                ledVer[OpticsDriver::LED_BOARD_V1] = "v1";
+                ledVer[OpticsDriver::LED_BOARD_V2] = "v2";
                 uint32 ver;
                 result = regRead(BoardTest::PHOTODIODE_LED_BOARD_VERSION, ver);
                 char t[16];
@@ -1866,8 +1866,8 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "pdver") {
                 std::map<int, std::string> pdVer;
-                pdVer[LibPhotodiode::PHOTODIODE_BOARD_V1] = "v1";
-                pdVer[LibPhotodiode::PHOTODIODE_BOARD_V2] = "v2";
+                pdVer[OpticsDriver::PHOTODIODE_BOARD_V1] = "v1";
+                pdVer[OpticsDriver::PHOTODIODE_BOARD_V2] = "v2";
                 uint32 ver;
                 result = regRead(BoardTest::PHOTODIODE_PD_BOARD_VERSION, ver);
                 char t[16];
@@ -1938,8 +1938,8 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "ledver" && tokens.size() > VALUE) {
                 std::map<std::string, int> ledVer;
-                ledVer["v1"] = LibPhotodiode::LED_BOARD_V1;
-                ledVer["v2"] = LibPhotodiode::LED_BOARD_V2;
+                ledVer["v1"] = OpticsDriver::LED_BOARD_V1;
+                ledVer["v2"] = OpticsDriver::LED_BOARD_V2;
                 if (ledVer.find(tokens[VALUE]) != ledVer.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_LED_BOARD_VERSION,
                                                          ledVer[tokens[VALUE]]);
@@ -1948,8 +1948,8 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "pdver" && tokens.size() > VALUE) {
                 std::map<std::string, int> pdVer;
-                pdVer["v1"] = LibPhotodiode::PHOTODIODE_BOARD_V1;
-                pdVer["v2"] = LibPhotodiode::PHOTODIODE_BOARD_V2;
+                pdVer["v1"] = OpticsDriver::PHOTODIODE_BOARD_V1;
+                pdVer["v2"] = OpticsDriver::PHOTODIODE_BOARD_V2;
                 if (pdVer.find(tokens[VALUE]) != pdVer.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_PD_BOARD_VERSION,
                                                           pdVer[tokens[VALUE]]);

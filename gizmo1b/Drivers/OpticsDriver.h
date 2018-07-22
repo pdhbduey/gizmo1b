@@ -113,6 +113,19 @@ public:
         CLK_PIN = PIN_HET_26,
         LATCH_PIN = PIN_HET_28
     };
+    enum LedBoardVersion {
+        LED_BOARD_V1 = 1 << 0,
+        LED_BOARD_V2 = 1 << 1,
+    };
+    enum PhotodiodeBoardVersion {
+        PHOTODIODE_BOARD_V1 = 1 << 0,
+        PHOTODIODE_BOARD_V2 = 1 << 1,
+    };
+    struct Data {
+        uint16_t m_photodiodeResultRaw;
+        uint16_t m_photodiodeTemperatureRaw;
+        int      m_photodiodeBoardVersion;
+    };
 
     //bool _integrationEnd;
 
@@ -125,7 +138,9 @@ public:
     void SetLedState2(uint32_t nChanIdx, uint32_t nIntensity, uint32_t nDuration_us);
     void SetLedIntensity(uint32_t nChanIdx, uint32_t nLedIntensity);
     void SetLedsOff(uint32_t nChanIdx);
-    void GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx, uint32_t nDuration_us, uint32_t nLedIntensity, uint16_t *data);
+    void GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
+            uint32_t nDuration_us, uint32_t nLedIntensity, struct Data *data);
+    void GetPhotoDiodeTemperatureRaw(uint32_t npdChanIdx, struct Data *data);
     void OpticsDriverInit();
     void AdcConfig();
     void SetIntegratorState(pdIntegratorState state, uint32_t npdChanIdx);
