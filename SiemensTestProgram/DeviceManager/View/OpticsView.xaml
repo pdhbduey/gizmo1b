@@ -65,20 +65,28 @@
                 <TextBlock Text="Status" FontWeight="Bold"/>
             </GroupBox.Header>
 
-            <StackPanel Margin="1">
-                <StackPanel>
-                    <Label Margin="1" Content="{Binding StatusMessage}"></Label>
-                    <Label Margin="1" Content="{Binding PhotodiodeVoltsText}"></Label>
-                    <Label Margin="1" Content="{Binding PhotodiodeRawText}"></Label>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="1">
+                    <StackPanel>
+                        <Label Margin="1" Content="{Binding StatusMessage}"/>
+                        <Label Margin="1" Content="{Binding PhotodiodeVoltsText}"/>
+                        <Label Margin="1" Content="{Binding PhotodiodeRawText}"/>
+                        <Label Margin="1" Content="{Binding PdTemperatureDuringIntegrationText}"/>
+                        <Label Margin="1" Content="{Binding LedTemperatureDuringIntegrationText}"/>
+                        <Label Margin="1" Content="{Binding LedMonitorVoltsText}"/>
+                        <Button Margin="1" Content="Read" Width="100" Height="25" HorizontalAlignment="Left" Command="{Binding UpdateCommand}"></Button>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="1">
                     <Label Margin="1" Content="{Binding PdTemperatureText}"></Label>
                     <Label Margin="1" Content="{Binding LedTemperatureText}"></Label>
-                    <Label Margin="1" Content="{Binding LedMonitorVoltsText}"></Label>
-                    <Label Margin="1" Content="{Binding PdTemperatureDuringIntegrationText}"></Label>
-                    <Label Margin="1" Content="{Binding LedTemperatureDuringIntegrationText}"></Label>
-                    <Button Margin="1" Content="Read" Width="100" Height="25" HorizontalAlignment="Left" Command="{Binding UpdateCommand}"></Button>
                 </StackPanel>
-            </StackPanel>
-
+            </Grid>
         </GroupBox>
     </Grid>
 </UserControl>
