@@ -16,28 +16,10 @@
  */
 OpticsDriver::OpticsDriver(uint32_t nSiteIdx)
 {
-    uint16_t *adcValuePointer = NULL;
-    uint16_t adcValue[30] = {0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-                             0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-                             0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000};
-    adcValuePointer = &adcValue[0];
     /* Initialize LED and PD Board Driver */
     OpticsDriverInit();
-
-//    for (int j = 1; j<4; j++)
-//    {
-//        for(int i=0; i<10; i++)
-//        {
-//
-//            GetPhotoDiodeValue(0, 3, 100000*j, 40000, adcValuePointer);
-//            adcValuePointer++;
-//            //for (int k=0; k<300000000; k++);
-//            //GetPhotoDiodeValue(0, 1, 200000, 40000, adcValuePointer);
-//            //GetPhotoDiodeValue(0, 1, 300000, 40000, adcValuePointer);
-//        }
-//        //adcValuePointer = &adcValue[0];
-//    }
-    GetPhotoDiodeValue(0, 1, 100000, 40000, adcValuePointer);
+    struct Data data;
+    GetPhotoDiodeValue(0, 1, 100000, 40000, &data);
 }
 
 /**
@@ -213,39 +195,64 @@ inline static void waitForUsTimerToExpire(uint32 timeInUs)
  * Returns:
  * Description:
  */
-void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx, uint32_t nDuration_us, uint32_t nLedIntensity, uint16_t *data)
+void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
+               uint32_t nDuration_us, uint32_t nLedIntensity, struct Data *data)
 {
     uint16_t adcValue = 0x0000;
     uint32_t adcChannel = 0;
+    uint32_t adcTemperatureChannel = 6;
 
     switch(npdChanIdx)
     {
+    default:
+        // fall through
     case 1:
         npdChanIdx = 0x0001 << PDINPUTA1;
         adcChannel = 0;
+        adcTemperatureChannel = 6;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 0
+        // TEMP_SW_CTRL_B = 0
         break;
     case 2:
         npdChanIdx = 0x0001 << PDINPUTB1;
         adcChannel = 3;
+        adcTemperatureChannel = 7;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 0
+        // TEMP_SW_CTRL_B = 0
         break;
     case 3:
         npdChanIdx = 0x0001 << PDINPUTA2;
         adcChannel = 1;
+        adcTemperatureChannel = 6;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 0
+        // TEMP_SW_CTRL_B = 1
         break;
     case 4:
         npdChanIdx = 0x0001 << PDINPUTB2;
         adcChannel = 4;
+        adcTemperatureChannel = 7;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 0
+        // TEMP_SW_CTRL_B = 1
         break;
     case 5:
         npdChanIdx = 0x0001 << PDINPUTA3;
         adcChannel = 2;
+        adcTemperatureChannel = 6;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 1
+        // TEMP_SW_CTRL_B = 0
         break;
     case 6:
         npdChanIdx = 0x0001 << PDINPUTB3;
         adcChannel = 5;
-        break;
-    default:
-        npdChanIdx = 0x0001 << PDINPUTA1;
+        adcTemperatureChannel = 7;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 1
+        // TEMP_SW_CTRL_B = 0
         break;
     }
 
@@ -286,8 +293,18 @@ void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
     /* Hold for 1ms time before reading */
     delayInUs(1000);
 
-    /* Read ADC */
+    /* Read photodiode result */
     adcValue = GetAdc(adcChannel);
+    data->m_photodiodeResultRaw = adcValue;
+
+    if (data->m_photodiodeBoardVersion == PHOTODIODE_BOARD_V2) {
+        /* Read photodiode temperature */
+        adcValue = GetAdc(adcTemperatureChannel);
+        data->m_photodiodeTemperatureRaw = adcValue;
+    }
+    else {
+        data->m_photodiodeTemperatureRaw = 0;
+    }
 
     /* Hold for 1ms time before turning off LED */
     delayInUs(1000);
@@ -298,8 +315,64 @@ void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
     /* Reset Integrator */
     SetIntegratorState(RESET_STATE, npdChanIdx);
     gioSetBit(hetPORT1, LATCH_PIN, 1);
+}
 
-    *data = adcValue;
+/**
+ * Name: GetPhotoDiodeTemperatureRaw()
+ * Parameters:
+ * Returns:
+ * Description:
+ */
+void OpticsDriver::GetPhotoDiodeTemperatureRaw(uint32_t npdChanIdx,
+                                                              struct Data *data)
+{
+    if (data->m_photodiodeBoardVersion == PHOTODIODE_BOARD_V1) {
+        data->m_photodiodeTemperatureRaw = 0;
+        return;
+    }
+    uint32_t adcTemperatureChannel;
+    switch(npdChanIdx)
+    {
+    default:
+        // fall through
+    case 1:
+        adcTemperatureChannel = 6;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 0
+        // TEMP_SW_CTRL_B = 0
+        break;
+    case 2:
+        adcTemperatureChannel = 7;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 0
+        // TEMP_SW_CTRL_B = 0
+        break;
+    case 3:
+        adcTemperatureChannel = 6;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 0
+        // TEMP_SW_CTRL_B = 1
+        break;
+    case 4:
+        adcTemperatureChannel = 7;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 0
+        // TEMP_SW_CTRL_B = 1
+        break;
+    case 5:
+        adcTemperatureChannel = 6;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 1
+        // TEMP_SW_CTRL_B = 0
+        break;
+    case 6:
+        adcTemperatureChannel = 7;
+        // Select temperature input
+        // TEMP_SW_CTRL_A = 1
+        // TEMP_SW_CTRL_B = 0
+        break;
+    }
+    data->m_photodiodeTemperatureRaw = GetAdc(adcTemperatureChannel);
 }
 
 

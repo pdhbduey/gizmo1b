@@ -5,6 +5,7 @@
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "OpticsDriver.h"
+#include "libThermistor.h"
 
 class LibPhotodiode
 {
@@ -34,18 +35,6 @@ public:
         ERROR_LED_BOARD_VERSION_INVALID,
         ERROR_PHOTODIODE_BOARD_VERSION_INVALID,
     };
-    enum LedBoardVersion {
-        LED_BOARD_V1 = 1 << 0,
-        LED_BOARD_V2 = 1 << 1,
-    };
-    enum PhotodiodeBoardVersion {
-        PHOTODIODE_BOARD_V1 = 1 << 0,
-        PHOTODIODE_BOARD_V2 = 1 << 1,
-    };
-    enum TemperatureUnits {
-        CELSIUS,
-        FAHRENHEIT,
-    };
 public:
     LibPhotodiode();
     virtual ~LibPhotodiode();
@@ -57,7 +46,7 @@ public:
     int setIntegrationTimeInUs(uint32 integrationTimeInUs);
     uint32 getLedIntensity(); // 0-40,000
     int setLedIntensity(uint32 ledIntensity);
-    float readPhotodiode(); // 0V-5V
+    float readPhotodiode(); // 0V-4.096V
     uint32 readPhotodiodeRaw(); // 0-65,535
     uint32 readLedBoardVersion();
     uint32 readPhotodiodeBoardVersion();
@@ -65,9 +54,11 @@ public:
     int setPhotodiodeBoardVersion(uint32 version);
     float readLedTemperature();        // degC
     float readPhotodiodeTemperature(); // degC
-    float readLedMonitorPhotodiode();  // 0V-5V
+    float readLedMonitorPhotodiodeDuringIntegration();  // 0V-4.096V
     float readLedTemperatureDuringIntegration();        // degC
     float readPhotodiodeTemperatureDuringIntegration(); // degC
+private:
+    float convertRawDataToResistance(uint16_t data);
 private:
     OpticsDriver m_opticsDriver;
     static bool s_isInitialized;
@@ -79,9 +70,11 @@ private:
     std::map<int, int> m_ledMap;
     std::map<int, int> m_pdMap;
     uint32 m_photodiodeResultRaw;
-    int m_temperatureUnits;
+    float m_photodiodeTemperatureDuringIntegration;
     int m_ledBoardVersion;
     int m_photodiodeBoardVersion;
+    LibThermistor m_photodiodeThermistor;
+    float m_photodiodeVref;
 };
 
 #endif // _LIB_PHOTODIODE_H_

@@ -1,11 +1,10 @@
 #include "libMutex.h"
 #include "libThermistor.h"
 
-SemaphoreHandle_t LibThermistor::s_mutex;
-bool LibThermistor::s_isInitialized;
 struct LibThermistor::Conversion* LibThermistor::s_types[] = {
-    [USP12837]   = s_convTableUSP12837,
-    [SC30F103AN] = s_convTableSC30F103AN,
+    [USP12837]        = s_convTableUSP12837,
+    [SC30F103AN]      = s_convTableSC30F103AN,
+    [NTCG163JF103FT1] = s_convTableSC30F103AN,
 };
 struct LibThermistor::Conversion LibThermistor::s_convTableUSP12837[] = {
     { .rt = 336479.00, .temp = {  -40, -40.0 } },
@@ -345,56 +344,275 @@ struct LibThermistor::Conversion LibThermistor::s_convTableSC30F103AN[] = {
     { .rt =       344.19, .temp = { 125,   257.0 } },
     { .rt =         0,                             },
 };
+struct LibThermistor::Conversion LibThermistor::s_convTableNTCG163JF103FT1[] = {
+    { .rt = 188500, .temp = { -40, -40 }, },
+    { .rt = 178600, .temp = { -39, -38.2 }, },
+    { .rt = 169200, .temp = { -38, -36.4 }, },
+    { .rt = 160400, .temp = { -37, -34.6 }, },
+    { .rt = 152100, .temp = { -36, -32.8 }, },
+    { .rt = 144300, .temp = { -35, -31 }, },
+    { .rt = 136900, .temp = { -34, -29.2 }, },
+    { .rt = 130000, .temp = { -33, -27.4 }, },
+    { .rt = 123400, .temp = { -32, -25.6 }, },
+    { .rt = 117200, .temp = { -31, -23.8 }, },
+    { .rt = 111300, .temp = { -30, -22 }, },
+    { .rt = 105800, .temp = { -29, -20.2 }, },
+    { .rt = 100600, .temp = { -28, -18.4 }, },
+    { .rt = 95640, .temp = { -27, -16.6 }, },
+    { .rt = 90970, .temp = { -26, -14.8 }, },
+    { .rt = 86560, .temp = { -25, -13 }, },
+    { .rt = 82380, .temp = { -24, -11.2 }, },
+    { .rt = 78430, .temp = { -23, -9.4 }, },
+    { .rt = 74690, .temp = { -22, -7.6 }, },
+    { .rt = 71140, .temp = { -21, -5.8 }, },
+    { .rt = 67790, .temp = { -20, -4 }, },
+    { .rt = 64610, .temp = { -19, -2.2 }, },
+    { .rt = 61600, .temp = { -18, -0.4 }, },
+    { .rt = 58740, .temp = { -17, 1.4 }, },
+    { .rt = 56030, .temp = { -16, 3.2 }, },
+    { .rt = 53460, .temp = { -15, 5 }, },
+    { .rt = 51030, .temp = { -14, 6.8 }, },
+    { .rt = 48710, .temp = { -13, 8.6 }, },
+    { .rt = 46520, .temp = { -12, 10.4 }, },
+    { .rt = 44430, .temp = { -11, 12.2 }, },
+    { .rt = 42450, .temp = { -10, 14 }, },
+    { .rt = 40570, .temp = { -9, 15.8 }, },
+    { .rt = 38780, .temp = { -8, 17.6 }, },
+    { .rt = 37080, .temp = { -7, 19.4 }, },
+    { .rt = 35460, .temp = { -6, 21.2 }, },
+    { .rt = 33930, .temp = { -5, 23 }, },
+    { .rt = 32460, .temp = { -4, 24.8 }, },
+    { .rt = 31070, .temp = { -3, 26.6 }, },
+    { .rt = 29750, .temp = { -2, 28.4 }, },
+    { .rt = 28490, .temp = { -1, 30.2 }, },
+    { .rt = 27280, .temp = { 0, 32 }, },
+    { .rt = 26140, .temp = { 1, 33.8 }, },
+    { .rt = 25050, .temp = { 2, 35.6 }, },
+    { .rt = 24010, .temp = { 3, 37.4 }, },
+    { .rt = 23020, .temp = { 4, 39.2 }, },
+    { .rt = 22070, .temp = { 5, 41 }, },
+    { .rt = 21170, .temp = { 6, 42.8 }, },
+    { .rt = 20310, .temp = { 7, 44.6 }, },
+    { .rt = 19490, .temp = { 8, 46.4 }, },
+    { .rt = 18710, .temp = { 9, 48.2 }, },
+    { .rt = 17960, .temp = { 10, 50 }, },
+    { .rt = 17250, .temp = { 11, 51.8 }, },
+    { .rt = 16570, .temp = { 12, 53.6 }, },
+    { .rt = 15910, .temp = { 13, 55.4 }, },
+    { .rt = 15290, .temp = { 14, 57.2 }, },
+    { .rt = 14700, .temp = { 15, 59 }, },
+    { .rt = 14130, .temp = { 16, 60.8 }, },
+    { .rt = 13590, .temp = { 17, 62.6 }, },
+    { .rt = 13070, .temp = { 18, 64.4 }, },
+    { .rt = 12570, .temp = { 19, 66.2 }, },
+    { .rt = 12090, .temp = { 20, 68 }, },
+    { .rt = 11640, .temp = { 21, 69.8 }, },
+    { .rt = 11200, .temp = { 22, 71.6 }, },
+    { .rt = 10780, .temp = { 23, 73.4 }, },
+    { .rt = 10380, .temp = { 24, 75.2 }, },
+    { .rt = 10000, .temp = { 25, 77 }, },
+    { .rt = 9633, .temp = { 26, 78.8 }, },
+    { .rt = 9282, .temp = { 27, 80.6 }, },
+    { .rt = 8945, .temp = { 28, 82.4 }, },
+    { .rt = 8622, .temp = { 29, 84.2 }, },
+    { .rt = 8312, .temp = { 30, 86 }, },
+    { .rt = 8015, .temp = { 31, 87.8 }, },
+    { .rt = 7730, .temp = { 32, 89.6 }, },
+    { .rt = 7456, .temp = { 33, 91.4 }, },
+    { .rt = 7194, .temp = { 34, 93.2 }, },
+    { .rt = 6942, .temp = { 35, 95 }, },
+    { .rt = 6700, .temp = { 36, 96.8 }, },
+    { .rt = 6468, .temp = { 37, 98.6 }, },
+    { .rt = 6245, .temp = { 38, 100.4 }, },
+    { .rt = 6031, .temp = { 39, 102.2 }, },
+    { .rt = 5826, .temp = { 40, 104 }, },
+    { .rt = 5628, .temp = { 41, 105.8 }, },
+    { .rt = 5438, .temp = { 42, 107.6 }, },
+    { .rt = 5255, .temp = { 43, 109.4 }, },
+    { .rt = 5080, .temp = { 44, 111.2 }, },
+    { .rt = 4911, .temp = { 45, 113 }, },
+    { .rt = 4749, .temp = { 46, 114.8 }, },
+    { .rt = 4592, .temp = { 47, 116.6 }, },
+    { .rt = 4442, .temp = { 48, 118.4 }, },
+    { .rt = 4297, .temp = { 49, 120.2 }, },
+    { .rt = 4158, .temp = { 50, 122 }, },
+    { .rt = 4024, .temp = { 51, 123.8 }, },
+    { .rt = 3895, .temp = { 52, 125.6 }, },
+    { .rt = 3771, .temp = { 53, 127.4 }, },
+    { .rt = 3651, .temp = { 54, 129.2 }, },
+    { .rt = 3536, .temp = { 55, 131 }, },
+    { .rt = 3425, .temp = { 56, 132.8 }, },
+    { .rt = 3318, .temp = { 57, 134.6 }, },
+    { .rt = 3215, .temp = { 58, 136.4 }, },
+    { .rt = 3115, .temp = { 59, 138.2 }, },
+    { .rt = 3019, .temp = { 60, 140 }, },
+    { .rt = 2927, .temp = { 61, 141.8 }, },
+    { .rt = 2837, .temp = { 62, 143.6 }, },
+    { .rt = 2751, .temp = { 63, 145.4 }, },
+    { .rt = 2668, .temp = { 64, 147.2 }, },
+    { .rt = 2588, .temp = { 65, 149 }, },
+    { .rt = 2511, .temp = { 66, 150.8 }, },
+    { .rt = 2436, .temp = { 67, 152.6 }, },
+    { .rt = 2364, .temp = { 68, 154.4 }, },
+    { .rt = 2295, .temp = { 69, 156.2 }, },
+    { .rt = 2227, .temp = { 70, 158 }, },
+    { .rt = 2163, .temp = { 71, 159.8 }, },
+    { .rt = 2100, .temp = { 72, 161.6 }, },
+    { .rt = 2039, .temp = { 73, 163.4 }, },
+    { .rt = 1981, .temp = { 74, 165.2 }, },
+    { .rt = 1924, .temp = { 75, 167 }, },
+    { .rt = 1869, .temp = { 76, 168.8 }, },
+    { .rt = 1817, .temp = { 77, 170.6 }, },
+    { .rt = 1765, .temp = { 78, 172.4 }, },
+    { .rt = 1716, .temp = { 79, 174.2 }, },
+    { .rt = 1668, .temp = { 80, 176 }, },
+    { .rt = 1622, .temp = { 81, 177.8 }, },
+    { .rt = 1577, .temp = { 82, 179.6 }, },
+    { .rt = 1534, .temp = { 83, 181.4 }, },
+    { .rt = 1492, .temp = { 84, 183.2 }, },
+    { .rt = 1451, .temp = { 85, 185 }, },
+    { .rt = 1412, .temp = { 86, 186.8 }, },
+    { .rt = 1374, .temp = { 87, 188.6 }, },
+    { .rt = 1337, .temp = { 88, 190.4 }, },
+    { .rt = 1302, .temp = { 89, 192.2 }, },
+    { .rt = 1267, .temp = { 90, 194 }, },
+    { .rt = 1234, .temp = { 91, 195.8 }, },
+    { .rt = 1201, .temp = { 92, 197.6 }, },
+    { .rt = 1170, .temp = { 93, 199.4 }, },
+    { .rt = 1139, .temp = { 94, 201.2 }, },
+    { .rt = 1110, .temp = { 95, 203 }, },
+    { .rt = 1081, .temp = { 96, 204.8 }, },
+    { .rt = 1054, .temp = { 97, 206.6 }, },
+    { .rt = 1027, .temp = { 98, 208.4 }, },
+    { .rt = 1001, .temp = { 99, 210.2 }, },
+    { .rt = 975, .temp = { 100, 212 }, },
+    { .rt = 951, .temp = { 101, 213.8 }, },
+    { .rt = 927, .temp = { 102, 215.6 }, },
+    { .rt = 904, .temp = { 103, 217.4 }, },
+    { .rt = 881, .temp = { 104, 219.2 }, },
+    { .rt = 860, .temp = { 105, 221 }, },
+    { .rt = 838, .temp = { 106, 222.8 }, },
+    { .rt = 818, .temp = { 107, 224.6 }, },
+    { .rt = 798, .temp = { 108, 226.4 }, },
+    { .rt = 779, .temp = { 109, 228.2 }, },
+    { .rt = 760, .temp = { 110, 230 }, },
+    { .rt = 742, .temp = { 111, 231.8 }, },
+    { .rt = 724, .temp = { 112, 233.6 }, },
+    { .rt = 707, .temp = { 113, 235.4 }, },
+    { .rt = 690, .temp = { 114, 237.2 }, },
+    { .rt = 674, .temp = { 115, 239 }, },
+    { .rt = 658, .temp = { 116, 240.8 }, },
+    { .rt = 643, .temp = { 117, 242.6 }, },
+    { .rt = 628, .temp = { 118, 244.4 }, },
+    { .rt = 613, .temp = { 119, 246.2 }, },
+    { .rt = 599, .temp = { 120, 248 }, },
+    { .rt = 585, .temp = { 121, 249.8 }, },
+    { .rt = 572, .temp = { 122, 251.6 }, },
+    { .rt = 559, .temp = { 123, 253.4 }, },
+    { .rt = 546, .temp = { 124, 255.2 }, },
+    { .rt = 534, .temp = { 125, 257 }, },
+    { .rt =   0,                       },
+};
 
 LibThermistor::LibThermistor() :
     m_units(CELSIUS),
-    m_type(SC30F103AN)
+    m_type(SC30F103AN),
+    m_mutex(xSemaphoreCreateMutex())
 {
-    if (!s_isInitialized) {
-        s_mutex = xSemaphoreCreateMutex();
-        s_isInitialized = true;
-    }
+}
+
+LibThermistor::LibThermistor(int type, int units) :
+    m_units(units),
+    m_type(type),
+    m_mutex(xSemaphoreCreateMutex())
+{
 }
 
 LibThermistor::~LibThermistor()
 {
 }
 
-// TEMP_AINx = 2.048 * Rt/(10,700 + Rt)
-// Rt = 10,700 / (2.048 / TEMP_AINx - 1)
-float LibThermistor::convertVoltageToTemp(float ain, int standard)
+float LibThermistor::getTemperature(float rt)
 {
-    float rt = 10700 / (2.048 / ain - 1);
+    LibMutex libMutex(m_mutex);
     int i;
     float temp;
     struct Conversion* convTable = s_types[m_type];
     if (rt > convTable[0].rt) {
-        return convTable[0].temp[standard];
+        return convTable[0].temp[m_units];
     }
     for (i = 0; convTable[i].rt; i++) {
         if (convTable[i].rt >= rt && rt >= convTable[i + 1].rt) {
             if (convTable[i + 1].rt == 0) {
-                temp = convTable[i].temp[standard];
+                temp = convTable[i].temp[m_units];
                 break;
             }
             else {
-                temp = convTable[i + 1].temp[standard]
+                temp = convTable[i + 1].temp[m_units]
                      + (rt - convTable[i + 1].rt)
-                     * (convTable[i].temp[standard] - convTable[i + 1].temp[standard])
+                     * (convTable[i].temp[m_units] - convTable[i + 1].temp[m_units])
                      / (convTable[i].rt - convTable[i + 1].rt);
                  break;
             }
         }
     }
     if (!convTable[i].rt) {
-        return convTable[i].temp[standard];
+        return convTable[i].temp[m_units];
     }
     return temp;
 }
 
+int LibThermistor::setType(int type)
+{
+    LibMutex libMutex(m_mutex);
+    switch (type) {
+    default:
+        return ERROR_INVALID_TYPE;
+    case USP12837:
+    case SC30F103AN:
+        m_type = type;
+        break;
+    }
+    return OKAY;
+}
+
+int LibThermistor::getType()
+{
+    return m_type;
+}
+
+int LibThermistor::setUnits(int units)
+{
+    LibMutex libMutex(m_mutex);
+    switch (units) {
+    default:
+        return ERROR_INVALID_UNITS;
+    case CELSIUS:
+    case FAHRENHEIT:
+        m_units = units;
+        break;
+    }
+    return OKAY;
+}
+
+int LibThermistor::getUnits()
+{
+    return m_units;
+}
+
+// TEMP_AINx = 2.048 * Rt/(10,700 + Rt)
+// Rt = 10,700 / (2.048 / TEMP_AINx - 1)
+float LibThermistor::convertVoltageToResistance(float ain)
+{
+    if (ain == 0 || ain == 2.048) {
+        return 10000;
+    }
+    float rt = 10700 / (2.048 / ain - 1);
+    return rt;
+}
+
 int LibThermistor::readTemp(int channel, float& value)
 {
-    LibMutex libMutex(s_mutex);
     int result = OKAY;
     int adcChannel;
     switch (channel) {
@@ -432,13 +650,14 @@ int LibThermistor::readTemp(int channel, float& value)
         }
         return result;
     }
-    value = convertVoltageToTemp(ain, m_units);
+
+    float rt = convertVoltageToResistance(ain);
+    value    = getTemperature(rt);
     return OKAY;
 }
 
 int LibThermistor::readTemp(int channel, uint32& value)
 {
-    LibMutex libMutex(s_mutex);
     int result = OKAY;
     int adcChannel;
     switch (channel) {
@@ -478,40 +697,4 @@ int LibThermistor::readTemp(int channel, uint32& value)
     }
     value = ain;
     return OKAY;
-}
-
-int LibThermistor::setType(int type)
-{
-    switch (type) {
-    default:
-        return ERROR_INVALID_TYPE;
-    case USP12837:
-    case SC30F103AN:
-        m_type = type;
-        break;
-    }
-    return OKAY;
-}
-
-int LibThermistor::getType()
-{
-    return m_type;
-}
-
-int LibThermistor::setUnits(int units)
-{
-    switch (units) {
-    default:
-        return ERROR_INVALID_UNITS;
-    case CELSIUS:
-    case FAHRENHEIT:
-        m_units = units;
-        break;
-    }
-    return OKAY;
-}
-
-int LibThermistor::getUnits()
-{
-    return m_units;
 }

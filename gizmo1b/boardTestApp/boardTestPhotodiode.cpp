@@ -53,10 +53,10 @@ int BoardTestPhotodiode::get(uint32 address, uint32& value)
             value = *reinterpret_cast<uint32*>(&temperature);
         }
         break;
-    case PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS:
+    case PHOTODIODE_LED_MONITOR_PD_READING_DURING_INTEGRATION_IN_VOLTS:
         {
-            float ledMonitorPhotdiode = m_libPhotodiode.readLedMonitorPhotodiode();
-            value = *reinterpret_cast<uint32*>(&ledMonitorPhotdiode);
+            float volts = m_libPhotodiode.readLedMonitorPhotodiodeDuringIntegration();
+            value = *reinterpret_cast<uint32*>(&volts);
         }
         break;
     case PHOTODIODE_LED_TEMPERATURE_DURING_INTEGRATION:
@@ -85,7 +85,7 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
     case PHOTODIODE_STATUS:
     case PHOTODIODE_LED_TEMPERATURE:
     case PHOTODIODE_PD_TEMPERATURE:
-    case PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS:
+    case PHOTODIODE_LED_MONITOR_PD_READING_DURING_INTEGRATION_IN_VOLTS:
     case PHOTODIODE_LED_TEMPERATURE_DURING_INTEGRATION:
     case PHOTODIODE_PD_TEMPERATURE_DURING_INTEGRATION:
         return ERROR_RO;
