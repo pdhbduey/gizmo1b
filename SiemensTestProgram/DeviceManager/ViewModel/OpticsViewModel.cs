@@ -188,7 +188,7 @@
         {
             get
             {
-                return $"LED Monitor: {ledMonitorVolts.ToString("0.##")} V";
+                return $"LED monitor during integrating: {ledMonitorVolts.ToString("0.##")} V";
             }
         }
 
