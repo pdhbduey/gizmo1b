@@ -1,7 +1,6 @@
 #ifndef __OpticsDriver_H
 #define __OpticsDriver_H
 
-//#include <cstdint>
 #include "FreeRTOS.h"
 #include "os_task.h"
 #include "os_semphr.h"
@@ -10,48 +9,9 @@
 #include "het.h"
 #include "rti.h"
 
-/*#include    "stm32l4xx_hal.h"
-#include    "stm32l4xx_hal_spi.h"
-#include    "stm32l4xx_hal_spi_ex.h"
-#include    "stm32l4xx_hal_uart.h"
-#include    "stm32l4xx_hal_uart_ex.h"
-
-#define     kAdcCS_Port     GPIOA
-#define     kAdcCS_Pin      GPIO_PIN_0
-
-#define     kSClk_Port      GPIOB
-#define     kSClk_Pin       GPIO_PIN_0
-#define     kMiso_Port      GPIOA
-#define     kMiso_Pin       GPIO_PIN_1
-#define     kMosi_Port      GPIOA
-#define     kMosi_Pin       GPIO_PIN_4
-
-#define     kLedSDI_Port    GPIOA
-#define     kLedSDI_Pin     GPIO_PIN_5
-#define     kLedCLK_Port    GPIOA
-#define     kLedCLK_Pin     GPIO_PIN_6
-#define     kLedLE_Port     GPIOA
-#define     kLedLE_Pin      GPIO_PIN_7
-#define     kLedOE_Port     GPIOA
-#define     kLedOE_Pin      GPIO_PIN_8
-
-#define     kLed_CS_Port        GPIOC
-#define     kLed_CS_Pin         GPIO_PIN_8
-#define     kLed_SClk_Port      GPIOC
-#define     kLed_SClk_Pin       GPIO_PIN_6
-#define     kLed_Miso_Port      GPIOB
-#define     kLed_Miso_Pin       GPIO_PIN_8
-#define     kLed_Mosi_Port      GPIOB
-#define     kLed_Mosi_Pin       GPIO_PIN_9
-#define     kLed_Ldac_Port      GPIOC
-#define     kLed_Ldac_Pin       GPIO_PIN_5*/
-
 #define     kledDacGroup        (0)
 #define     kpdAdcGroup         (1)
 
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
 class OpticsDriver
 {
 public:
@@ -108,10 +68,45 @@ public:
         RESET_SW = 0,
         HOLD_SW = 1
     };
-    enum pdShiftRegisterPins {
-        DATA_PIN = PIN_HET_24,
-        CLK_PIN = PIN_HET_26,
-        LATCH_PIN = PIN_HET_28
+    /*
+     * Use SPI3 and configure SPI3A_SOMI by setting SPI3_SOMI_SW to 0
+     *
+     * Configure following GPIOs
+     * v1 boards:
+     * ==========
+     * LED GPIO:    N2HET1[13] -> CS   (Output/High);
+     *              N2HET1[12] -> LDAC (Output/High)
+     * PD ADC GPIO: N2HET1[14] -> CNV  (Output/Low)
+     * PD SR GPIO:  N2HET1[24] -> DS   (Serial Data In);
+     *              N2HET1[26] -> SHCP (Shift Reg Clock Input)
+     *              N2HET1[28] -> STCP (Storage Reg Clock Input)
+     * v2 boards
+     * =========
+     * PD ADC GPIO: N2HET1[26] -> CNV  (Output/Low)
+     * PD SR GPIO:  N2HET1[12] -> DS   (Serial Data In/DATA);
+     *              N2HET1[13] -> SHCP (Shift Reg Clock Input/CLK)
+     *              N2HET1[24] -> STCP (Storage Reg Clock Input/LATCH)
+     * PD T CTRL:   N2HET1[28] -> CT_A (Temperature Ctrl A)
+     *              N2HET1[30] -> CT_B (Temperature Ctrl B)
+     */
+    enum OpticsPinMappings {
+        OPTICS_MCU_SPI3_SOMI_SW = PIN_CS0,
+    };
+    enum PhotoDiodePinMappingBoardV1 {
+        LED_BOARD_V1_CS_PIN   = PIN_HET_13,
+        LED_BOARD_V1_LDAC_PIN = PIN_HET_12,
+        PD_BOARD_V1_DATA_PIN  = PIN_HET_24,
+        PD_BOARD_V1_CLK_PIN   = PIN_HET_26,
+        PD_BOARD_V1_LATCH_PIN = PIN_HET_28,
+        PD_BOARD_V1_CNV_PIN   = PIN_HET_14,
+    };
+    enum PhotodiodePinMappingBoardV2 {
+        PD_BOARD_V2_DATA_PIN  = PIN_HET_12,
+        PD_BOARD_V2_CLK_PIN   = PIN_HET_13,
+        PD_BOARD_V2_LATCH_PIN = PIN_HET_24,
+        PD_BOARD_V2_CNV_PIN   = PIN_HET_26,
+        PD_BOARD_V2_T_CTRL_A  = PIN_HET_28,
+        PD_BOARD_V2_T_CTRL_B  = PIN_HET_30,
     };
     enum LedBoardVersion {
         LED_BOARD_V1 = 1 << 0,
@@ -124,34 +119,36 @@ public:
     struct Data {
         uint16_t m_photodiodeResultRaw;
         uint16_t m_photodiodeTemperatureRaw;
-        int      m_photodiodeBoardVersion;
     };
-
-    //bool _integrationEnd;
-
-
-    OpticsDriver(uint32_t nSiteIdx = 0);
-       
-    uint32_t GetDarkReading(uint32_t nChanIdx);
-    uint32_t GetIlluminatedReading(uint32_t nChanIdx);
-    void SetLedState(uint32_t nChanIdx, bool bStateOn = true);
-    void SetLedState2(uint32_t nChanIdx, uint32_t nIntensity, uint32_t nDuration_us);
+    struct BoardVersion {
+        int m_photodiodeBoardVersion;
+        int m_ledBoardVersion;
+    };
+public:
+    OpticsDriver();
+    void GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
+              uint32_t nDuration_us, uint32_t nLedIntensity, struct Data *data);
+    void GetPhotoDiodeTemperatureRaw(uint32_t npdChanIdx, struct Data *data);
+    void SetBoardVersion(struct BoardVersion& boardVersion);
+    void GetBoardVersion(struct BoardVersion& boardVersion);
+    float GetPhotodiodeVref();
+private:
     void SetLedIntensity(uint32_t nChanIdx, uint32_t nLedIntensity);
     void SetLedsOff(uint32_t nChanIdx);
-    void GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
-            uint32_t nDuration_us, uint32_t nLedIntensity, struct Data *data);
-    void GetPhotoDiodeTemperatureRaw(uint32_t npdChanIdx, struct Data *data);
     void OpticsDriverInit();
     void AdcConfig();
     void SetIntegratorState(pdIntegratorState state, uint32_t npdChanIdx);
-    void TimerTest(float period);
     uint16_t GetAdc(uint32_t nChanIdx);
-    //void pwmNotification(hetBASE_t * hetREG,uint32 pwm, uint32 notification);
-protected:
-  
+    void SetPhotodiodeTemperatureCtrl(uint32_t npdChanIdx);
 private:
-    uint32_t            _nLedStateMsk;
-//    SPI_HandleTypeDef   _hSpi;
+    struct BoardVersion m_boardVersion;
+    float m_photodiodeVref;
+    uint32 m_dataPin;
+    uint32 m_clkPin;
+    uint32 m_latchPin;
+    uint32 m_cnvPin;
+    uint32 m_tCtrlA;
+    uint32 m_tCtrlB;
 };
 
 #endif // __OpticsDriver_H

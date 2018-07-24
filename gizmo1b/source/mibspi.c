@@ -696,7 +696,7 @@ uint32 i ;
                                           | (uint16)((uint16)0U << 11U)  /* lock transmission */
                                           | (uint16)((uint16)0U << 8U)  /* data format */
 										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
-                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_0)) & (uint16)0x00FFU);  /* chip select */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_NONE)) & (uint16)0x00FFU);  /* chip select */
                 i++;
             }
 #endif
@@ -705,7 +705,7 @@ uint32 i ;
                                       | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
                                       | (uint16)((uint16)0U << 8U)  /* data format */
 										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
-                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_0)) & (uint16)0x00FFU);  /* chip select */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_NONE)) & (uint16)0x00FFU);  /* chip select */
 
 
             i++;
@@ -725,7 +725,7 @@ uint32 i ;
                                           | (uint16)((uint16)0U << 11U)  /* lock transmission */
                                           | (uint16)((uint16)1U << 8U)  /* data format */
 										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
-                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_1)) & (uint16)0x00FFU);  /* chip select */
+                                          | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_NONE)) & (uint16)0x00FFU);  /* chip select */
 
                 i++;
             }
@@ -735,7 +735,7 @@ uint32 i ;
                                       | (uint16)((uint16)0U << 10U)  /* enable WDELAY */
                                       | (uint16)((uint16)1U << 8U)  /* data format */
 										  /*SAFETYMCUSW 334 S MR:10.5 <APPROVED> "LDRA Tool issue" */
-                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_1)) & (uint16)0x00FFU);  /* chip select */
+                                      | ((uint16)(~((uint16)0xFFU ^ (uint16)CS_NONE)) & (uint16)0x00FFU);  /* chip select */
 
             i++;
         }
@@ -942,7 +942,7 @@ uint32 i ;
     /** @b initialize @b MIBSPI3 @b Port */
 
     /** - MIBSPI3 Port output values */
-    mibspiREG3->PC3 = (uint32)((uint32)1U << 0U)  /* SCS[0] */
+    mibspiREG3->PC3 = (uint32)((uint32)0U << 0U)  /* SCS[0] */
                     | (uint32)((uint32)1U << 1U)  /* SCS[1] */
                     | (uint32)((uint32)1U << 2U)  /* SCS[2] */
                     | (uint32)((uint32)1U << 3U)  /* SCS[3] */
@@ -1005,7 +1005,7 @@ uint32 i ;
 
 
     /* MIBSPI3 set all pins to functional */
-    mibspiREG3->PC0 = (uint32)((uint32)1U << 0U)  /* SCS[0] */
+    mibspiREG3->PC0 = (uint32)((uint32)0U << 0U)  /* SCS[0] */
                     | (uint32)((uint32)0U << 1U)  /* SCS[1] */
                     | (uint32)((uint32)0U << 2U)  /* SCS[2] */
                     | (uint32)((uint32)0U << 3U)  /* SCS[3] */

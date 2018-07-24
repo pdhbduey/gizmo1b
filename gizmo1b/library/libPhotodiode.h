@@ -71,10 +71,7 @@ private:
     std::map<int, int> m_pdMap;
     uint32 m_photodiodeResultRaw;
     float m_photodiodeTemperatureDuringIntegration;
-    int m_ledBoardVersion;
-    int m_photodiodeBoardVersion;
     LibThermistor m_photodiodeThermistor;
-    float m_photodiodeVref;
 };
 
 #endif // _LIB_PHOTODIODE_H_
