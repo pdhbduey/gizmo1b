@@ -16,9 +16,12 @@
 OpticsDriver::OpticsDriver()
 {
     /* Initialize LED and PD Board Driver */
-    OpticsDriverInit();
-    struct Data data;
-    GetPhotoDiodeValue(0, 1, 100000, 40000, &data);
+    struct BoardVersion boardVersion =
+        { .m_photodiodeBoardVersion   = PHOTODIODE_BOARD_V1,
+          .m_isLedBoardEnabled        = true,
+          .m_ledBoardVersion          = LED_BOARD_V1,
+          .m_isPhotodiodeBoardEnabled = true, };
+    SetBoardVersion(boardVersion);
 }
 
 /**
@@ -96,106 +99,101 @@ inline static void waitForUsTimerToExpire(uint32 timeInUs)
 void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
                uint32_t nDuration_us, uint32_t nLedIntensity, struct Data *data)
 {
-    uint16_t adcValue = 0x0000;
-    uint32_t adcChannel = 0;
-    uint32_t adcTemperatureChannel = 6;
-
-    switch(npdChanIdx)
-    {
-    default:
-        // fall through
-    case 1:
-        npdChanIdx = 0x0001 << PDINPUTA1;
-        adcChannel = 0;
-        adcTemperatureChannel = 6;
-        break;
-    case 2:
-        npdChanIdx = 0x0001 << PDINPUTB1;
-        adcChannel = 3;
-        adcTemperatureChannel = 7;
-        break;
-    case 3:
-        npdChanIdx = 0x0001 << PDINPUTA2;
-        adcChannel = 1;
-        adcTemperatureChannel = 6;
-        break;
-    case 4:
-        npdChanIdx = 0x0001 << PDINPUTB2;
-        adcChannel = 4;
-        adcTemperatureChannel = 7;
-        break;
-    case 5:
-        npdChanIdx = 0x0001 << PDINPUTA3;
-        adcChannel = 2;
-        adcTemperatureChannel = 6;
-        break;
-    case 6:
-        npdChanIdx = 0x0001 << PDINPUTB3;
-        adcChannel = 5;
-        adcTemperatureChannel = 7;
-        break;
+    data->m_photodiodeResultRaw      = 0;
+    data->m_photodiodeTemperatureRaw = 0;
+    uint32_t adcChannel;
+    uint32_t adcTemperatureChannel;
+    if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
+        switch(npdChanIdx)
+        {
+        default:
+            // fall through
+        case 1:
+            npdChanIdx = 0x0001 << PDINPUTA1;
+            adcChannel = 0;
+            adcTemperatureChannel = 6;
+            break;
+        case 2:
+            npdChanIdx = 0x0001 << PDINPUTB1;
+            adcChannel = 3;
+            adcTemperatureChannel = 7;
+            break;
+        case 3:
+            npdChanIdx = 0x0001 << PDINPUTA2;
+            adcChannel = 1;
+            adcTemperatureChannel = 6;
+            break;
+        case 4:
+            npdChanIdx = 0x0001 << PDINPUTB2;
+            adcChannel = 4;
+            adcTemperatureChannel = 7;
+            break;
+        case 5:
+            npdChanIdx = 0x0001 << PDINPUTA3;
+            adcChannel = 2;
+            adcTemperatureChannel = 6;
+            break;
+        case 6:
+            npdChanIdx = 0x0001 << PDINPUTB3;
+            adcChannel = 5;
+            adcTemperatureChannel = 7;
+            break;
+        }
+        /* Reset Integrator first */
+        SetIntegratorState(RESET_STATE, npdChanIdx);
+        gioSetBit(hetPORT1, m_latchPin, 1);
     }
-
-    /* Reset Integrator first */
-    SetIntegratorState(RESET_STATE, npdChanIdx);
-    gioSetBit(hetPORT1, m_latchPin, 1);
-
     /* 10 ms delay */
     delayInUs(10000);
-
-    /* Turn On LED */
-    SetLedIntensity(nledChanIdx, nLedIntensity);
-
+    if (m_boardVersion.m_isLedBoardEnabled) {
+        /* Turn On LED */
+        SetLedIntensity(nledChanIdx, nLedIntensity);
+    }
     /* Hold for 1 ms time before integrating */
     delayInUs(1000);
-
-    /* Start Integration */
-    SetIntegratorState(INTEGRATE_STATE, npdChanIdx);
-    gioSetBit(hetPORT1, m_latchPin, 1);
-
+    if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
+        /* Start Integration */
+        SetIntegratorState(INTEGRATE_STATE, npdChanIdx);
+        gioSetBit(hetPORT1, m_latchPin, 1);
+    }
     /* Start the integrator timer */
     taskENTER_CRITICAL();
     restartTimer();
-
     /* Wait for integration time to expire */
     delayInUs(nDuration_us);
-
-    /* Prepare the Hold state but don't latch it yet */
-    SetIntegratorState(HOLD_STATE, npdChanIdx);
-
+    if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
+        /* Prepare the Hold state but don't latch it yet */
+        SetIntegratorState(HOLD_STATE, npdChanIdx);
+    }
     /* Wait for integration time to expire */
     waitForUsTimerToExpire(nDuration_us);
-
-    /* Latch the hold state */
-    gioSetBit(hetPORT1, m_latchPin, 1);
+    if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
+        /* Latch the hold state */
+        gioSetBit(hetPORT1, m_latchPin, 1);
+    }
     taskEXIT_CRITICAL();
-
     /* Hold for 1ms time before reading */
     delayInUs(1000);
-
-    /* Read photodiode result */
-    adcValue = GetAdc(adcChannel);
-    data->m_photodiodeResultRaw = adcValue;
-
-    if (m_boardVersion.m_photodiodeBoardVersion == PHOTODIODE_BOARD_V2) {
-        /* Read photodiode temperature */
-        SetPhotodiodeTemperatureCtrl(npdChanIdx);
-        adcValue = GetAdc(adcTemperatureChannel);
-        data->m_photodiodeTemperatureRaw = adcValue;
+    if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
+        /* Read photodiode result */
+        data->m_photodiodeResultRaw = GetAdc(adcChannel);
+        if (m_boardVersion.m_photodiodeBoardVersion == PHOTODIODE_BOARD_V2) {
+            /* Read photodiode temperature */
+            SetPhotodiodeTemperatureCtrl(npdChanIdx);
+            data->m_photodiodeTemperatureRaw = GetAdc(adcTemperatureChannel);
+        }
     }
-    else {
-        data->m_photodiodeTemperatureRaw = 0;
-    }
-
     /* Hold for 1ms time before turning off LED */
     delayInUs(1000);
-
-    /* Turn Off LED */
-    SetLedsOff(nledChanIdx);
-
+    if (m_boardVersion.m_isLedBoardEnabled) {
+        /* Turn Off LED */
+        SetLedsOff(nledChanIdx);
+    }
     /* Reset Integrator */
-    SetIntegratorState(RESET_STATE, npdChanIdx);
-    gioSetBit(hetPORT1, m_latchPin, 1);
+    if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
+        SetIntegratorState(RESET_STATE, npdChanIdx);
+        gioSetBit(hetPORT1, m_latchPin, 1);
+    }
 }
 
 /**
@@ -207,8 +205,9 @@ void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
 void OpticsDriver::GetPhotoDiodeTemperatureRaw(uint32_t npdChanIdx,
                                                               struct Data *data)
 {
-    if (m_boardVersion.m_photodiodeBoardVersion == PHOTODIODE_BOARD_V1) {
-        data->m_photodiodeTemperatureRaw = 0;
+    data->m_photodiodeTemperatureRaw = 0;
+    if (!m_boardVersion.m_isPhotodiodeBoardEnabled
+      || m_boardVersion.m_photodiodeBoardVersion == PHOTODIODE_BOARD_V1) {
         return;
     }
     uint32_t adcTemperatureChannel;
@@ -237,23 +236,6 @@ void OpticsDriver::GetPhotoDiodeTemperatureRaw(uint32_t npdChanIdx,
     }
     SetPhotodiodeTemperatureCtrl(npdChanIdx);
     data->m_photodiodeTemperatureRaw = GetAdc(adcTemperatureChannel);
-}
-
-
-/**
- * Name: OpticsDriverInit()
- * Parameters:
- * Returns:
- * Description:
- */
-void OpticsDriver::OpticsDriverInit(void)
-{
-    struct BoardVersion boardVersion =
-        { .m_photodiodeBoardVersion = PHOTODIODE_BOARD_V1,
-          .m_ledBoardVersion        = LED_BOARD_V1,        };
-    SetBoardVersion(boardVersion);
-    /* Configure ADC on Photo Diode board */
-    AdcConfig();
 }
 
 void OpticsDriver::AdcConfig(void)
@@ -417,54 +399,62 @@ void OpticsDriver::SetBoardVersion(struct BoardVersion& boardVersion)
     uint32_t gpioDirectionConfig = 0;
     uint32_t gpioOutputState     = 0;
     m_boardVersion               = boardVersion;
-    switch (boardVersion.m_ledBoardVersion) {
-    default:
-    case LED_BOARD_V1:
-    case LED_BOARD_V2:
-        gpioDirectionConfig |= (1<<LED_BOARD_V1_CS_PIN);
-        gpioDirectionConfig |= (1<<LED_BOARD_V1_LDAC_PIN);
-        gpioOutputState     |= (1<<LED_BOARD_V1_CS_PIN);
-        gpioOutputState     |= (1<<LED_BOARD_V1_LDAC_PIN);
-        break;
+    if (m_boardVersion.m_isLedBoardEnabled) {
+        switch (boardVersion.m_ledBoardVersion) {
+        default:
+        case LED_BOARD_V1:
+        case LED_BOARD_V2:
+            gpioDirectionConfig |= (1<<LED_BOARD_V1_CS_PIN);
+            gpioDirectionConfig |= (1<<LED_BOARD_V1_LDAC_PIN);
+            gpioOutputState     |= (1<<LED_BOARD_V1_CS_PIN);
+            gpioOutputState     |= (1<<LED_BOARD_V1_LDAC_PIN);
+            break;
+        }
     }
-    switch (boardVersion.m_photodiodeBoardVersion) {
-    default:
-    case PHOTODIODE_BOARD_V1:
-        gpioDirectionConfig |= (1<<PD_BOARD_V1_CNV_PIN);
-        gpioDirectionConfig |= (1<<PD_BOARD_V1_DATA_PIN);
-        gpioDirectionConfig |= (1<<PD_BOARD_V1_CLK_PIN);
-        gpioDirectionConfig |= (1<<PD_BOARD_V1_LATCH_PIN);
-        gpioOutputState     |= (1<<PD_BOARD_V1_CNV_PIN);
-        gpioOutputState     |= (0<<PD_BOARD_V1_DATA_PIN);
-        gpioOutputState     |= (0<<PD_BOARD_V1_CLK_PIN);
-        gpioOutputState     |= (1<<PD_BOARD_V1_LATCH_PIN); //Latch pin is high to start with
-        m_photodiodeVref     = 5;
-        m_dataPin            = PD_BOARD_V1_DATA_PIN;
-        m_clkPin             = PD_BOARD_V1_CLK_PIN;
-        m_latchPin           = PD_BOARD_V1_LATCH_PIN;
-        m_cnvPin             = PD_BOARD_V1_CNV_PIN;
-        break;
-    case PHOTODIODE_BOARD_V2:
-        gpioDirectionConfig |= (1<<PD_BOARD_V2_CNV_PIN);
-        gpioDirectionConfig |= (1<<PD_BOARD_V2_DATA_PIN);
-        gpioDirectionConfig |= (1<<PD_BOARD_V2_CLK_PIN);
-        gpioDirectionConfig |= (1<<PD_BOARD_V2_LATCH_PIN);
-        gpioDirectionConfig |= (1<<PD_BOARD_V2_T_CTRL_A);
-        gpioDirectionConfig |= (1<<PD_BOARD_V2_T_CTRL_B);
-        gpioOutputState     |= (1<<PD_BOARD_V2_CNV_PIN);
-        gpioOutputState     |= (0<<PD_BOARD_V2_DATA_PIN);
-        gpioOutputState     |= (0<<PD_BOARD_V2_CLK_PIN);
-        gpioOutputState     |= (1<<PD_BOARD_V2_LATCH_PIN); //Latch pin is high to start with
-        gpioOutputState     |= (0<<PD_BOARD_V2_T_CTRL_A);
-        gpioOutputState     |= (0<<PD_BOARD_V2_T_CTRL_B);
-        m_photodiodeVref     = 4.096;
-        m_dataPin            = PD_BOARD_V1_DATA_PIN;
-        m_clkPin             = PD_BOARD_V1_CLK_PIN;
-        m_latchPin           = PD_BOARD_V1_LATCH_PIN;
-        m_cnvPin             = PD_BOARD_V1_CNV_PIN;
-        m_tCtrlA             = PD_BOARD_V2_T_CTRL_A;
-        m_tCtrlB             = PD_BOARD_V2_T_CTRL_B;
-        break;
+    if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
+        if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
+            /* Configure ADC on Photo Diode board */
+            AdcConfig();
+        }
+        switch (boardVersion.m_photodiodeBoardVersion) {
+        default:
+        case PHOTODIODE_BOARD_V1:
+            gpioDirectionConfig |= (1<<PD_BOARD_V1_CNV_PIN);
+            gpioDirectionConfig |= (1<<PD_BOARD_V1_DATA_PIN);
+            gpioDirectionConfig |= (1<<PD_BOARD_V1_CLK_PIN);
+            gpioDirectionConfig |= (1<<PD_BOARD_V1_LATCH_PIN);
+            gpioOutputState     |= (1<<PD_BOARD_V1_CNV_PIN);
+            gpioOutputState     |= (0<<PD_BOARD_V1_DATA_PIN);
+            gpioOutputState     |= (0<<PD_BOARD_V1_CLK_PIN);
+            gpioOutputState     |= (1<<PD_BOARD_V1_LATCH_PIN); //Latch pin is high to start with
+            m_photodiodeVref     = 5;
+            m_dataPin            = PD_BOARD_V1_DATA_PIN;
+            m_clkPin             = PD_BOARD_V1_CLK_PIN;
+            m_latchPin           = PD_BOARD_V1_LATCH_PIN;
+            m_cnvPin             = PD_BOARD_V1_CNV_PIN;
+            break;
+        case PHOTODIODE_BOARD_V2:
+            gpioDirectionConfig |= (1<<PD_BOARD_V2_CNV_PIN);
+            gpioDirectionConfig |= (1<<PD_BOARD_V2_DATA_PIN);
+            gpioDirectionConfig |= (1<<PD_BOARD_V2_CLK_PIN);
+            gpioDirectionConfig |= (1<<PD_BOARD_V2_LATCH_PIN);
+            gpioDirectionConfig |= (1<<PD_BOARD_V2_T_CTRL_A);
+            gpioDirectionConfig |= (1<<PD_BOARD_V2_T_CTRL_B);
+            gpioOutputState     |= (1<<PD_BOARD_V2_CNV_PIN);
+            gpioOutputState     |= (0<<PD_BOARD_V2_DATA_PIN);
+            gpioOutputState     |= (0<<PD_BOARD_V2_CLK_PIN);
+            gpioOutputState     |= (1<<PD_BOARD_V2_LATCH_PIN); //Latch pin is high to start with
+            gpioOutputState     |= (0<<PD_BOARD_V2_T_CTRL_A);
+            gpioOutputState     |= (0<<PD_BOARD_V2_T_CTRL_B);
+            m_photodiodeVref     = 4.096;
+            m_dataPin            = PD_BOARD_V1_DATA_PIN;
+            m_clkPin             = PD_BOARD_V1_CLK_PIN;
+            m_latchPin           = PD_BOARD_V1_LATCH_PIN;
+            m_cnvPin             = PD_BOARD_V1_CNV_PIN;
+            m_tCtrlA             = PD_BOARD_V2_T_CTRL_A;
+            m_tCtrlB             = PD_BOARD_V2_T_CTRL_B;
+            break;
+        }
     }
     gioSetDirection(hetPORT1, gpioDirectionConfig);
     gioSetPort(hetPORT1, gpioOutputState);
@@ -482,9 +472,6 @@ float OpticsDriver::GetPhotodiodeVref()
 
 void OpticsDriver::SetPhotodiodeTemperatureCtrl(uint32_t npdChanIdx)
 {
-    if (m_boardVersion.m_photodiodeBoardVersion == PHOTODIODE_BOARD_V1) {
-        return;
-    }
     switch(npdChanIdx)
     {
     default:
@@ -505,4 +492,42 @@ void OpticsDriver::SetPhotodiodeTemperatureCtrl(uint32_t npdChanIdx)
         gioSetBit(hetPORT1, m_tCtrlB, 0);
         break;
     }
+}
+
+void OpticsDriver::LedBoardEnable()
+{
+    struct BoardVersion boardVersion = m_boardVersion;
+    boardVersion.m_isLedBoardEnabled = true;
+    SetBoardVersion(boardVersion);
+}
+
+void OpticsDriver::LedBoardDisable()
+{
+    struct BoardVersion boardVersion = m_boardVersion;
+    boardVersion.m_isLedBoardEnabled = false;
+    SetBoardVersion(boardVersion);
+}
+
+void OpticsDriver::PhotodiodeBoardEnable()
+{
+    struct BoardVersion boardVersion        = m_boardVersion;
+    boardVersion.m_isPhotodiodeBoardEnabled = true;
+    SetBoardVersion(boardVersion);
+}
+
+void OpticsDriver::PhotodiodeBoardDisable()
+{
+    struct BoardVersion boardVersion        = m_boardVersion;
+    boardVersion.m_isPhotodiodeBoardEnabled = false;
+    SetBoardVersion(boardVersion);
+}
+
+bool OpticsDriver::IsLedBoardEnabled()
+{
+    return m_boardVersion.m_isLedBoardEnabled;
+}
+
+bool OpticsDriver::IsPhotodiodeBoardEnabled()
+{
+    return m_boardVersion.m_isPhotodiodeBoardEnabled;
 }
