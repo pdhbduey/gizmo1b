@@ -24,7 +24,11 @@ public:
         SELECT_PHOTODIODE_D10_T2 = 4 << 3,
         SELECT_PHOTODIODE_D11_T3 = 5 << 3,
         SELECT_PHOTODIODE_D10_T3 = 6 << 3,
-        SELECT_PHOTODIODE_MASK   = 7 << 3
+        SELECT_PHOTODIODE_MASK   = 7 << 3,
+        LED_BOARD_ENABLED  = 1 << 6,
+        LED_BOARD_DISABLED = 1 << 7,
+        PD_BOARD_ENABLED   = 1 << 8,
+        PD_BOARD_DISABLED  = 1 << 9,
     };
     enum Status {
         OKAY,
@@ -57,6 +61,12 @@ public:
     float readLedMonitorPhotodiodeDuringIntegration();  // 0V-4.096V
     float readLedTemperatureDuringIntegration();        // degC
     float readPhotodiodeTemperatureDuringIntegration(); // degC
+    void ledBoardEnable();
+    void ledBoardDisable();
+    void pdBoardEnable();
+    void pdBoardDisable();
+    uint32 getLedBoardEnabledStatus();
+    uint32 getPhotodiodeBoardEnabledStatus();
 private:
     float convertRawDataToResistance(uint16_t data);
 private:

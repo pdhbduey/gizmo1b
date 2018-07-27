@@ -82,6 +82,11 @@ public:
      *              N2HET1[28] -> STCP (Storage Reg Clock Input)
      * v2 boards
      * =========
+     * LED GPIO:    N2HET1[15] -> S0   (Output)
+     *              N2HET1[13] -> S1   (Output)
+     * NOTE:                      S2 is mapped to BB J13(10) GND
+     *              N2HET1[14] -> SYNC (Output/TBD)
+     * LED ADC GPIO:N2HET1[12] -> CNV  (Output/Low)
      * PD ADC GPIO: N2HET1[26] -> CNV  (Output/Low)
      * PD SR GPIO:  N2HET1[12] -> DS   (Serial Data In/DATA);
      *              N2HET1[13] -> SHCP (Shift Reg Clock Input/CLK)
@@ -122,7 +127,9 @@ public:
     };
     struct BoardVersion {
         int m_photodiodeBoardVersion;
+        bool m_isLedBoardEnabled;
         int m_ledBoardVersion;
+        bool m_isPhotodiodeBoardEnabled;
     };
 public:
     OpticsDriver();
@@ -132,10 +139,15 @@ public:
     void SetBoardVersion(struct BoardVersion& boardVersion);
     void GetBoardVersion(struct BoardVersion& boardVersion);
     float GetPhotodiodeVref();
+    void LedBoardEnable();
+    void LedBoardDisable();
+    void PhotodiodeBoardEnable();
+    void PhotodiodeBoardDisable();
+    bool IsLedBoardEnabled();
+    bool IsPhotodiodeBoardEnabled();
 private:
     void SetLedIntensity(uint32_t nChanIdx, uint32_t nLedIntensity);
     void SetLedsOff(uint32_t nChanIdx);
-    void OpticsDriverInit();
     void AdcConfig();
     void SetIntegratorState(pdIntegratorState state, uint32_t npdChanIdx);
     uint16_t GetAdc(uint32_t nChanIdx);

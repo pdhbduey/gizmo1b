@@ -6,7 +6,9 @@ bool LibPhotodiode::s_isInitialized;
 
 LibPhotodiode::LibPhotodiode() :
     m_integrationTimeInUs(10000),
-    m_photodiodeThermistor(LibThermistor::NTCG163JF103FT1, LibThermistor::CELSIUS)
+    m_photodiodeThermistor(LibThermistor::NTCG163JF103FT1, LibThermistor::CELSIUS),
+    m_led(SELECT_LED_BLUE1),
+    m_photodiode(SELECT_PHOTODIODE_D11_T1)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
@@ -219,4 +221,36 @@ float LibPhotodiode::convertRawDataToResistance(uint16_t data)
     }
     float rt = 10700 / (m_opticsDriver.GetPhotodiodeVref() / voltage - 1);
     return rt;
+}
+
+void LibPhotodiode::ledBoardEnable()
+{
+    m_opticsDriver.LedBoardEnable();
+}
+
+void LibPhotodiode::ledBoardDisable()
+{
+    m_opticsDriver.LedBoardDisable();
+}
+
+void LibPhotodiode::pdBoardEnable()
+{
+    m_opticsDriver.PhotodiodeBoardEnable();
+}
+
+void LibPhotodiode::pdBoardDisable()
+{
+    m_opticsDriver.PhotodiodeBoardDisable();
+}
+
+uint32 LibPhotodiode::getLedBoardEnabledStatus()
+{
+    return m_opticsDriver.IsLedBoardEnabled() ? LED_BOARD_ENABLED
+                                              : LED_BOARD_DISABLED;
+}
+
+uint32 LibPhotodiode::getPhotodiodeBoardEnabledStatus()
+{
+    return m_opticsDriver.IsPhotodiodeBoardEnabled() ? PD_BOARD_ENABLED
+                                                     : PD_BOARD_DISABLED;
 }
