@@ -145,6 +145,8 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "optics get ledver|pdver\n\r";
     help += "optics set ledver v1|v2\n\r";
     help += "optics set pdver v1|v2\n\r";
+    help += "optics set ledstatus|pdstatus enabled|disabled\n\r";
+    help += "optics get ledstatus|pdstatus\n\r";
 }
 
 void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
@@ -1877,6 +1879,34 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                 res = t;
                 isParsingError = false;
             }
+            else if (tokens[ARGUMENT] == "ledstatus") {
+                uint32 control;
+                result = regRead(BoardTest::PHOTODIODE_CONTROL, control);
+                if (result == BoardTest::OKAY) {
+                    int ledstatus = control & LibPhotodiode::LED_BOARD_MASK;
+                    std::map<int, std::string> ledstatusMap;
+                    ledstatusMap[LibPhotodiode::LED_BOARD_ENABLED]  = "enabled";
+                    ledstatusMap[LibPhotodiode::LED_BOARD_DISABLED] = "disabled";
+                    res = (ledstatusMap.find(ledstatus) != ledstatusMap.end()
+                        ?  ledstatusMap[ledstatus]
+                        :  "unknown");
+                }
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "pdstatus") {
+                uint32 control;
+                result = regRead(BoardTest::PHOTODIODE_CONTROL, control);
+                if (result == BoardTest::OKAY) {
+                    int pdstatus = control & LibPhotodiode::PD_BOARD_MASK;
+                    std::map<int, std::string> pdstatusMap;
+                    pdstatusMap[LibPhotodiode::PD_BOARD_ENABLED]  = "enabled";
+                    pdstatusMap[LibPhotodiode::PD_BOARD_DISABLED] = "disabled";
+                    res = (pdstatusMap.find(pdstatus) != pdstatusMap.end()
+                        ?  pdstatusMap[pdstatus]
+                        :  "unknown");
+                }
+                isParsingError = false;
+            }
         }
         else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
             if (tokens[ARGUMENT] == "led" && tokens.size() > VALUE) {
@@ -1953,6 +1983,26 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                 if (pdVer.find(tokens[VALUE]) != pdVer.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_PD_BOARD_VERSION,
                                                           pdVer[tokens[VALUE]]);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "ledstatus" && tokens.size() > VALUE) {
+                std::map<std::string, int> ledstatusMap;
+                ledstatusMap["enabled"]  = LibPhotodiode::LED_BOARD_ENABLED;
+                ledstatusMap["disabled"] = LibPhotodiode::LED_BOARD_DISABLED;
+                if (ledstatusMap.find(tokens[VALUE]) != ledstatusMap.end()) {
+                    result = regWrite(BoardTest::PHOTODIODE_CONTROL,
+                                                   ledstatusMap[tokens[VALUE]]);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "pdstatus" && tokens.size() > VALUE) {
+                std::map<std::string, int> pdstatusMap;
+                pdstatusMap["enabled"]  = LibPhotodiode::PD_BOARD_ENABLED;
+                pdstatusMap["disabled"] = LibPhotodiode::PD_BOARD_DISABLED;
+                if (pdstatusMap.find(tokens[VALUE]) != pdstatusMap.end()) {
+                    result = regWrite(BoardTest::PHOTODIODE_CONTROL,
+                                                    pdstatusMap[tokens[VALUE]]);
                     isParsingError = false;
                 }
             }

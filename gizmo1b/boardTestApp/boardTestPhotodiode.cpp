@@ -93,19 +93,17 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
         return ERROR_RO;
     case PHOTODIODE_CONTROL:
         {
-            int led = value & LibPhotodiode::SELECT_LED_MASK;
-            if (led) {
-                m_status = m_libPhotodiode.setLed(led);
+            if (value & LibPhotodiode::SELECT_LED_MASK) {
+                m_status = m_libPhotodiode.setLed(value & LibPhotodiode::SELECT_LED_MASK);
+                if (m_status != LibPhotodiode::OKAY) {
+                    break;
+                }
             }
-            if (m_status != LibPhotodiode::OKAY) {
-                break;
-            }
-            int photodiode = value & LibPhotodiode::SELECT_PHOTODIODE_MASK;
-            if (photodiode) {
-                m_status = m_libPhotodiode.setPhotodiode(photodiode);
-            }
-            if (m_status != LibPhotodiode::OKAY) {
-                break;
+            if (value & LibPhotodiode::SELECT_PHOTODIODE_MASK) {
+                m_status = m_libPhotodiode.setPhotodiode(value & LibPhotodiode::SELECT_PHOTODIODE_MASK);
+                if (m_status != LibPhotodiode::OKAY) {
+                    break;
+                }
             }
             if (value & LibPhotodiode::LED_BOARD_ENABLED) {
                 m_libPhotodiode.ledBoardEnable();
