@@ -412,10 +412,8 @@ void OpticsDriver::SetBoardVersion(struct BoardVersion& boardVersion)
         }
     }
     if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
-        if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
-            /* Configure ADC on Photo Diode board */
-            AdcConfig();
-        }
+        /* Configure ADC on Photo Diode board */
+        AdcConfig();
         switch (boardVersion.m_photodiodeBoardVersion) {
         default:
         case PHOTODIODE_BOARD_V1:

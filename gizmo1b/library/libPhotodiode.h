@@ -27,8 +27,10 @@ public:
         SELECT_PHOTODIODE_MASK   = 7 << 3,
         LED_BOARD_ENABLED  = 1 << 6,
         LED_BOARD_DISABLED = 1 << 7,
+        LED_BOARD_MASK     = 3 << 6,
         PD_BOARD_ENABLED   = 1 << 8,
         PD_BOARD_DISABLED  = 1 << 9,
+        PD_BOARD_MASK      = 3 << 8,
     };
     enum Status {
         OKAY,
