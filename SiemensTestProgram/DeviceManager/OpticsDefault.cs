@@ -85,6 +85,86 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] EnableLedBoardCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0C,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x40
+            };
+        }
+
+        public static byte[] DisableLedBoardCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0C,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x80
+            };
+        }
+
+        public static byte[] EnablePdBoardCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0C,
+                0x00,
+                0x00,
+                0x00,
+                0x10,
+                0x00
+            };
+        }
+
+        public static byte[] DisablePdBoardCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0C,
+                0x00,
+                0x00,
+                0x00,
+                0x20,
+                0x00
+            };
+        }
+
+        public static byte[] ResetControlSettingsCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_WRITE,
+                0x00,
+                0x00,
+                0x0C,
+                0x00,
+                0x00,
+                0x00,
+                0x01,
+                0x49
+            };
+        }
+
         public static byte[] SetPhotodiodeControlCommand(string photodiode)
         {
             var value = SelectPhotodiodeMapping[photodiode];

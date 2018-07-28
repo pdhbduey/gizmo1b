@@ -36,5 +36,15 @@ namespace DeviceManager.Model
         Task<CommunicationData> SetLedBoardVersion(int version);
 
         Task<CommunicationData> ReadLedMonitorVolts();
+
+        Task<CommunicationData> LedBoardEnableCommand();
+
+        Task<CommunicationData> LedBoardDisableCommand();
+
+        Task<CommunicationData> PdBoardEnableCommand();
+
+        Task<CommunicationData> PdBoardDisableCommand();
+
+        Task<CommunicationData> ResetControlSettingsCommand();
     }
 }

@@ -18,45 +18,57 @@
                 <TextBlock Text="Setup" FontWeight="Bold"/>
             </GroupBox.Header>
 
-            <StackPanel Margin="1">
-                <StackPanel Orientation="Horizontal">
-                    <Label Width="120" Margin="1" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Photodiode:"></Label>
-                    <ComboBox Margin="1" Height="25" Width="80" HorizontalAlignment="Left" ItemsSource="{Binding Photodiodes}" SelectedItem="{Binding SelectedPhotodiode}"></ComboBox>
-                </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal">
-                    <Label Width="120" Margin="1" VerticalAlignment="Center" HorizontalAlignment="Right" Content="LED:"></Label>
-                    <ComboBox Margin="1" Height="25" Width="80" HorizontalAlignment="Left" ItemsSource="{Binding Leds}" SelectedItem="{Binding SelectedLed}"></ComboBox>
-                </StackPanel>
+                <StackPanel Grid.Column="0" Margin="1 1 20 1">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Width="120" Margin="1" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Photodiode:"></Label>
+                        <ComboBox Margin="1" Height="25" Width="80" HorizontalAlignment="Left" ItemsSource="{Binding Photodiodes}" SelectedItem="{Binding SelectedPhotodiode}"></ComboBox>
+                    </StackPanel>
 
-                <StackPanel Orientation="Horizontal">
-                    <Label Width="120" Margin="1" VerticalAlignment="Center" HorizontalAlignment="Right" Content="PD Board Version:"></Label>
-                    <ComboBox Margin="1" Height="25" Width="80" HorizontalAlignment="Left" ItemsSource="{Binding PdBoardVersions}" SelectedItem="{Binding SelectedPdVersion}"></ComboBox>
-                </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Width="120" Margin="1" VerticalAlignment="Center" HorizontalAlignment="Right" Content="LED:"></Label>
+                        <ComboBox Margin="1" Height="25" Width="80" HorizontalAlignment="Left" ItemsSource="{Binding Leds}" SelectedItem="{Binding SelectedLed}"></ComboBox>
+                    </StackPanel>
 
-                <StackPanel Orientation="Horizontal">
-                    <Label Width="120" Margin="1" VerticalAlignment="Center" HorizontalAlignment="Right" Content="LED Board Version:"></Label>
-                    <ComboBox Margin="1" Height="25" Width="80" HorizontalAlignment="Left" ItemsSource="{Binding LedBoardVersions}" SelectedItem="{Binding SelectedLedVersion}"></ComboBox>
-                </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Width="120" Margin="1" VerticalAlignment="Center" HorizontalAlignment="Right" Content="PD Board Version:"></Label>
+                        <ComboBox Margin="1" Height="25" Width="80" HorizontalAlignment="Left" ItemsSource="{Binding PdBoardVersions}" SelectedItem="{Binding SelectedPdVersion}"></ComboBox>
+                    </StackPanel>
 
-                <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="120" Margin="1" Content="Integration time [µs]: "></Label>
-                    <TextBox Height="25" Width="80" Text="{Binding Path=IntegrationTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <TextBox.InputBindings>
-                            <KeyBinding Command="{Binding SetIntegrationTimeCommand}" Key="Enter"/>
-                        </TextBox.InputBindings>
-                    </TextBox>
-                </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Width="120" Margin="1" VerticalAlignment="Center" HorizontalAlignment="Right" Content="LED Board Version:"></Label>
+                        <ComboBox Margin="1" Height="25" Width="80" HorizontalAlignment="Left" ItemsSource="{Binding LedBoardVersions}" SelectedItem="{Binding SelectedLedVersion}"></ComboBox>
+                    </StackPanel>
 
-                <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="120" Margin="1" Content="Intensity: "></Label>
-                    <TextBox Height="25" Width="80" Text="{Binding Path=Intensity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <TextBox.InputBindings>
-                            <KeyBinding Command="{Binding SetIntensityCommand}" Key="Enter"/>
-                        </TextBox.InputBindings>
-                    </TextBox>
+                    <StackPanel Margin="1" Orientation="Horizontal">
+                        <Label Width="120" Margin="1" Content="Integration time [µs]: "></Label>
+                        <TextBox Height="25" Width="80" Text="{Binding Path=IntegrationTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{Binding SetIntegrationTimeCommand}" Key="Enter"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </StackPanel>
+
+                    <StackPanel Margin="1" Orientation="Horizontal">
+                        <Label Width="120" Margin="1" Content="Intensity: "></Label>
+                        <TextBox Height="25" Width="80" Text="{Binding Path=Intensity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{Binding SetIntensityCommand}" Key="Enter"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Vertical" Margin="1" HorizontalAlignment="Left">
+                    <CheckBox Content="LED Board Enable" IsChecked="{Binding LedBoardEnabled}"/>
+                    <CheckBox Content="PD Board Enable" IsChecked="{Binding PdBoardEnabled}"/>
+                </StackPanel>
+            </Grid>
         </GroupBox>
 
         <!--Status-->
