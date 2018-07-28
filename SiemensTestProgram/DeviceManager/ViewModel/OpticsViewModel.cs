@@ -26,6 +26,8 @@
         private int selectedLedVersion;
         private float ledMonitorVolts;
         private string statusMessage;
+        private bool ledBoardEnabled;
+        private bool pdBoardEnabled;
 
         public OpticsViewModel(IOpticsModel opticsModel)
         {
@@ -48,8 +50,67 @@
             LedBoardVersions = OpticsDefault.LedBoardVersions;
             SelectedLedVersion = LedBoardVersions[0];
 
+            ledBoardEnabled = false;
+            pdBoardEnabled = false;
+            SetToDefaultControlSettings();
+
             Update();
             StartUpdateTask();
+        }
+
+        private void SetToDefaultControlSettings()
+        {
+            opticsModel.ResetControlSettingsCommand().Wait();
+        }
+
+        private async void SetLedBoardEnabledControl()
+        {
+            if (ledBoardEnabled)
+            {
+                await opticsModel.LedBoardEnableCommand();
+                return;
+            }
+
+            await opticsModel.LedBoardDisableCommand();
+        }
+
+        private async void SetPdBoardEnabledControl()
+        {
+            if (pdBoardEnabled)
+            {
+                await opticsModel.PdBoardEnableCommand();
+                return;
+            }
+
+            await opticsModel.PdBoardDisableCommand();
+        }
+
+        public bool LedBoardEnabled
+        {
+            get
+            {
+                return ledBoardEnabled;
+            }
+
+            set
+            {
+                ledBoardEnabled = value;
+                SetLedBoardEnabledControl();
+            }
+        }
+
+        public bool PdBoardEnabled
+        {
+            get
+            {
+                return pdBoardEnabled;
+            }
+
+            set
+            {
+                pdBoardEnabled = value;
+                SetPdBoardEnabledControl();
+            }
         }
 
         public RelayCommand UpdateCommand { get; set; }

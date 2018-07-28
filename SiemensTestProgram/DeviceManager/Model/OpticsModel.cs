@@ -111,5 +111,39 @@ namespace DeviceManager.Model
             return status;
         }
 
+        public Task<CommunicationData> LedBoardEnableCommand()
+        {
+            var requestArray = OpticsDefault.EnableLedBoardCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> LedBoardDisableCommand()
+        {
+            var requestArray = OpticsDefault.DisableLedBoardCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> PdBoardEnableCommand()
+        {
+            var requestArray = OpticsDefault.EnablePdBoardCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> PdBoardDisableCommand()
+        {
+            var requestArray = OpticsDefault.DisablePdBoardCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ResetControlSettingsCommand()
+        {
+            var requestArray = OpticsDefault.ResetControlSettingsCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
     }
 }
