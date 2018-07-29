@@ -2,6 +2,7 @@
 
 namespace DeviceManager.Model
 {
+    using DeviceManager.DeviceCommunication;
     using System.Threading.Tasks;
 
     public interface IFanModel
@@ -10,34 +11,34 @@ namespace DeviceManager.Model
         /// Gets the status of the fan.
         /// </summary>
         /// <returns> Task that returns fan status </returns>
-        bool GetFanStatus(ref byte[] response);
+        Task<CommunicationData> GetFanStatus();
 
         /// <summary>
         /// Sets pwm duty cycle.
         /// </summary>
-        bool SetFanPwmDutyCycle(int pwmChannel, int dutyCycle, ref byte[] response);
+        Task<CommunicationData> SetFanPwmDutyCycle(int pwmChannel, int dutyCycle);
 
 
         /// <summary>
         /// Sets pwm period.
         /// </summary>
-        bool SetFanPwmPeriod(int pwmChannel, float period, ref byte[] response);
+        Task<CommunicationData> SetFanPwmPeriod(int pwmChannel, float period);
 
         /// <summary>
         /// Gets pwm period.
         /// </summary>
-        bool GetFanPwmPeriod(int channel, ref byte[] response);
+        Task<CommunicationData> GetFanPwmPeriod(int channel);
 
         /// <summary>
         /// Gets pwm duty cycle.
         /// </summary>
-        bool GetFanPwmDutyCycle(int channel, ref byte[] response);
+        Task<CommunicationData> GetFanPwmDutyCycle(int channel);
 
 
         /// <summary>
         /// Gets sensor rpm.
         /// </summary>
         /// <returns> Value of sensor. </returns>
-        bool GetFanSensorRpm(int sensor, ref byte[] response);
+        Task<CommunicationData> GetFanSensorRpm(int sensor);
     }
 }

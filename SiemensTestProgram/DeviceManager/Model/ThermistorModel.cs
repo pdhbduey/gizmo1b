@@ -56,5 +56,12 @@ namespace DeviceManager.Model
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
+
+        public Task<CommunicationData> ReadType()
+        {
+            var requestArray = ThermistorDefaults.ReadTypeCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
     }
 }

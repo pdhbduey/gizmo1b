@@ -128,7 +128,7 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x00,
-                0x10,
+                0x01,
                 0x00
             };
         }
@@ -144,7 +144,7 @@ namespace DeviceManager
                 0x00,
                 0x00,
                 0x00,
-                0x20,
+                0x02,
                 0x00
             };
         }

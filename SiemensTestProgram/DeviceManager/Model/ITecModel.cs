@@ -25,42 +25,41 @@ namespace DeviceManager.Model
 
         Task<CommunicationData> ReadControlState();
 
-        bool ReadIsense(ref byte[] response);
+        Task<CommunicationData> ReadIsense();
 
-        bool ReadVsense(ref byte[] response);
+        Task<CommunicationData> ReadVsense();
 
-        bool ReadIref(ref byte[] response);
+        Task<CommunicationData> ReadIref();
 
-        bool ReadStatus(ref byte[] response);
+        Task<CommunicationData> ReadStatus();
 
-        bool ControlCommand(string request, ref byte[] response);
+        Task<CommunicationData> ControlCommand(string request);
 
-        bool SetWaveformCommand(string waveform, ref byte[] response);
+        Task<CommunicationData> SetWaveformCommand(string waveform);
 
-        bool SetWaveformCyclesCommand(int cycles, ref byte[] response);
+        Task<CommunicationData> SetWaveformCyclesCommand(int cycles);
 
-        bool SetSampleTimeCommand(int sampleTime, ref byte[] response);
+        Task<CommunicationData> SetSampleTimeCommand(int sampleTime);
 
-        bool SetPeriodCommand(int period, ref byte[] response);
+        Task<CommunicationData> SetPeriodCommand(int period);
 
-        bool SetDerivativeGainCommand(float derivateGain, ref byte[] response);
+        Task<CommunicationData> SetDerivativeGainCommand(float derivateGain);
 
-        bool SetIntegralGainCommand(float integralGain, ref byte[] response);
+        Task<CommunicationData> SetIntegralGainCommand(float integralGain);
 
-        bool SetProportionalGainCommand(float proportionalGain, ref byte[] response);
+        Task<CommunicationData> SetProportionalGainCommand(float proportionalGain);
 
-        bool SetWaveformIrefCommand(float irefGain, ref byte[] response);
+        Task<CommunicationData> SetWaveformIrefCommand(float irefGain);
 
         Task<CommunicationData> SetVoutCommand(float value);
 
-        Task<CommunicationData> SetSampleTimeCommand(int time);
-
         Task<CommunicationData> SetCustomWaveformIRefCommand(float iref);
 
-        bool SetIrefCommand(float irefGain, ref byte[] response);
+        Task<CommunicationData> SetIrefCommand(float irefGain);
 
-        bool ReadWaveformIndex(ref byte[] response);
+        Task<CommunicationData> ReadWaveformIndex();
 
-        bool Reset(ref byte[] response);
+        Task<CommunicationData> Reset();
+
     }
 }

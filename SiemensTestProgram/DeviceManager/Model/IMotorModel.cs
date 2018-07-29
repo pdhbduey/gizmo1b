@@ -7,39 +7,36 @@ namespace DeviceManager.Model
 {
     public interface IMotorModel
     {
-        bool Cycle(ref byte[] response);
+        Task<CommunicationData> Cycle();
 
-        bool Stop(ref byte[] response);
+        Task<CommunicationData> Stop();
 
         //Task<byte[]> SetDirection(string selectedDirection);
-        bool MotorControlMove(string selectedDirection, string selectedStepSize, string move, ref byte[] response);
+        Task<CommunicationData> MotorControlMove(string selectedDirection, string selectedStepSize, string move);
 
-        bool SetRegisterValue(byte[] selectedDirection, ref byte[] response);
+        Task<CommunicationData> SetRegisterValue(byte[] selectedDirection);
 
-        bool SetRegisterAddress(string address, ref byte[] response);
+        Task<CommunicationData> SetRegisterAddress(string address);
 
-        bool ReadRegisterValue(ref byte[] response);
+        Task<CommunicationData> ReadRegisterValue();
 
-        bool Home(ref byte[] response);
+        Task<CommunicationData> Home();
 
-        bool Initialize(ref byte[] response);
+        Task<CommunicationData> Initialize();
 
-        bool Energize(ref byte[] response);
+        Task<CommunicationData> Energize();
 
-        bool Reset(ref byte[] response);
+        Task<CommunicationData> Reset();
 
-        bool Limp(ref byte[] response);
+        Task<CommunicationData> Limp();
 
 
-        void SetRelativeMovePosition(int relativePosition, ref byte[] response);
+        Task<CommunicationData> SetRelativeMovePosition(int relativePosition);
 
-        void SetAbsoluteMovePosition(int absolutePosition, ref byte[] response);
+        Task<CommunicationData> SetAbsoluteMovePosition(int absolutePosition);
 
         Task<CommunicationData> GetMotorPosition();
+
         Task<CommunicationData> GetMotorStatus();
-
-        bool GetMotorPosition(ref byte[] response);
-
-        bool GetMotorStatus(ref byte[] response);
     }
 }

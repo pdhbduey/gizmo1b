@@ -20,8 +20,8 @@
             <!-- LED buttons -->
             <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
                 <StackPanel>
-                    <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding GreenLedStatus}" HorizontalAlignment="Left" Command="{Binding ToggleLedGreenCommand}"></ToggleButton>
-                    <ToggleButton Width="100" Height="25" Margin="2" Content="{Binding RedLedStatus}" HorizontalAlignment="Left" Command="{Binding ToggleLedRedCommand}"></ToggleButton>
+                    <ToggleButton IsChecked="{Binding GreenLedIsChecked, Mode=OneWay}" Width="100" Height="25" Margin="2" Content="{Binding GreenLedStatus}" HorizontalAlignment="Left" Command="{Binding ToggleLedGreenCommand}"></ToggleButton>
+                    <ToggleButton IsChecked="{Binding RedLedIsChecked, Mode=OneWay}" Width="100" Height="25" Margin="2" Content="{Binding RedLedStatus}" HorizontalAlignment="Left" Command="{Binding ToggleLedRedCommand}"></ToggleButton>
                 </StackPanel>
             </StackPanel>
 

@@ -59,5 +59,21 @@ namespace DeviceManager.Model
         Task<CommunicationData> ReadTemperatureThree();
 
         Task<CommunicationData> ReadTemperatureFour();
+
+        Task<CommunicationData> ReadTref();
+
+        Task<CommunicationData> ReadImax();
+
+        Task<CommunicationData> ReadCycles();
+
+        Task<CommunicationData> ReadControl();
+
+        Task<CommunicationData> ReadSelect();
+
+        Task<CommunicationData> ReadIntegralGain();
+
+        Task<CommunicationData> ReadProportionalGain();
+
+        Task<CommunicationData> ReadDerivativeGain();
     }
 }

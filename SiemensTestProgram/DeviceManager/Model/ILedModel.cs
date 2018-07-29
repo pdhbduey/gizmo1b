@@ -11,5 +11,7 @@ namespace DeviceManager.Model
     public interface ILedModel
     {
         Task<CommunicationData> SetLedCommand(string ledRequest);
+
+        Task<CommunicationData> GetLedCommand();
     }
 }

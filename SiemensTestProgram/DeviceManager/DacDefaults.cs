@@ -28,6 +28,22 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] ReadDacValueCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                DacValueAddress[0],
+                DacValueAddress[1],
+                DacValueAddress[2],
+                DacValueAddress[3],
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
         // Gets the array for reading DAC command.   
         public static byte[] ReadDacCommand()
         {

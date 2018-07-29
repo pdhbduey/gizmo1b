@@ -6,6 +6,7 @@ namespace DeviceManager.ViewModel
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
+    using Common;
     using Common.Bindings;
     using DeviceManager.Model;
 
@@ -29,7 +30,6 @@ namespace DeviceManager.ViewModel
             // Set default settings
             this.dacModel = dacModel;
             SendDacValueCommand = new RelayCommand(param => SendDacValue());
-            SliderVoltageValue = 250;
             dacStatus = string.Empty;
 
             // Check DAC status
@@ -49,11 +49,22 @@ namespace DeviceManager.ViewModel
 
         private void Update()
         {
-            var status = new byte[5];
+            var dacValue = dacModel.GetDacValueCommand().Result;
 
-            if (dacModel.ReadDacStatusCommand(ref status))
+            if (dacValue.succesfulResponse)
             {
-                ProcessStatus(status);
+                VoltageValue = Helper.GetFloatFromBigEndian(dacValue.response);
+            }
+            else
+            {
+                SliderVoltageValue = 250;
+            }
+
+            var status = dacModel.ReadDacStatusCommand().Result;
+
+            if (status.succesfulResponse)
+            {
+                ProcessStatus(status.response);
             }
             else
             {
@@ -133,10 +144,9 @@ namespace DeviceManager.ViewModel
         /// <summary>
         /// Sends the voltage value set.
         /// </summary>
-        private void SendDacValue()
+        private async void SendDacValue()
         {
-            var response = new byte[5];
-            dacModel.SetDacCommand(VoltageValue, ref response);
+            await dacModel.SetDacCommand(VoltageValue);
         }
 
         /// <summary>
@@ -167,13 +177,13 @@ namespace DeviceManager.ViewModel
 
                 try
                 {
-                    var status = new byte[5];
+                    var status = await dacModel.ReadDacStatusCommand();
 
-                    if (dacModel.ReadDacStatusCommand(ref status))
+                    if (status.succesfulResponse    )
                     {
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            ProcessStatus(status);
+                            ProcessStatus(status.response);
                         }));
                         
                     }

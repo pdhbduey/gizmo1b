@@ -19,50 +19,50 @@ namespace DeviceManager.Model
         /// Gets the status of the fan.
         /// </summary>
         /// <returns> Task that returns fan status </returns>
-        public bool GetFanStatus(ref byte[] response)
+        public Task<CommunicationData> GetFanStatus()
         {
             var requestArray = FanDefaults.GetStatusCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
 
         /// <summary>
         /// Gets pwm period.
         /// </summary>
-        public bool GetFanPwmPeriod(int channel, ref byte[] response)
+        public Task<CommunicationData> GetFanPwmPeriod(int channel)
         {
             var requestArray = FanDefaults.GetFanPeriodCommand(channel);
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
 
         /// <summary>
         /// Gets pwm duty cycle.
         /// </summary>
-        public bool GetFanPwmDutyCycle(int channel, ref byte[] response)
+        public Task<CommunicationData> GetFanPwmDutyCycle(int channel)
         {
             var requestArray = FanDefaults.GetFanDutyCycleCommand(channel);
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
 
         /// <summary>
         /// Sets pwm one duty cycle.
         /// </summary>
-        public bool SetFanPwmDutyCycle(int pwmChannel, int dutyCycle, ref byte[] response)
+        public Task<CommunicationData> SetFanPwmDutyCycle(int pwmChannel, int dutyCycle)
         {
             var requestArray = FanDefaults.SetFanDutyCycleCommand(pwmChannel, dutyCycle);
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
 
         /// <summary>
         /// Sets pwm period.
         /// </summary>
-        public bool SetFanPwmPeriod(int pwmChannel, float period, ref byte[] response)
+        public Task<CommunicationData> SetFanPwmPeriod(int pwmChannel, float period)
         {
             var requestArray = FanDefaults.SetFanPeriodCommand(pwmChannel, period);
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
 
@@ -71,10 +71,10 @@ namespace DeviceManager.Model
         /// Gets sensor rpm.
         /// </summary>
         /// <returns> Value of sensor. </returns>
-        public bool GetFanSensorRpm(int sensor, ref byte[] response)
+        public Task<CommunicationData> GetFanSensorRpm(int sensor)
         {
             var requestArray = FanDefaults.GetFanSensorRpmCommand(sensor);
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
     }

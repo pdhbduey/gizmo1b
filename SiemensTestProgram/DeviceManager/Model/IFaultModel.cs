@@ -7,11 +7,7 @@ namespace DeviceManager.Model
 {
     public interface IFaultModel
     {
-        bool Reset(ref byte[] response);
-
-        bool GetState(ref byte[] response);
-
-        bool GetNtcStatus(ref byte[] response);
+        Task<CommunicationData> Reset();
 
         Task<CommunicationData> GetState();
 

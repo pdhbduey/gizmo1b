@@ -28,5 +28,12 @@ namespace DeviceManager.Model
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
+
+        public Task<CommunicationData> GetLedCommand()
+        {
+            var requestArray = LedDefaults.GetLedReadCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
     }
 }
