@@ -105,19 +105,19 @@ namespace DeviceManager.Model
             int intSelectedTin;
             if (string.Equals(selectedTin, "T1"))
             {
-                intSelectedTin = 1;
+                intSelectedTin = 0;
             }
             else if (string.Equals(selectedTin, "T2"))
             {
-                intSelectedTin = 2;
+                intSelectedTin = 1;
             }
             else if (string.Equals(selectedTin, "T3"))
             {
-                intSelectedTin = 3;
+                intSelectedTin = 2;
             }
             else
             {
-                intSelectedTin = 4;
+                intSelectedTin = 3;
             }
 
             var requestArray = HeaterDefaults.SetTinSelect(intSelectedTin);
