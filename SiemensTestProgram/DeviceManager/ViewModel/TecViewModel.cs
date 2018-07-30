@@ -585,16 +585,15 @@ namespace DeviceManager.ViewModel
             return response.succesfulResponse;
         }
 
-        private void EnableToggle()
+        private async void EnableToggle()
         {
             var state = enableButtonState;
             EnableButtonState = enableButtonState == TecDefaults.EnableText ? TecDefaults.DisableText : TecDefaults.EnableText;
 
-            var response = new byte[5];
-            tecModel.ControlCommand(state, ref response);
+            await tecModel.ControlCommand(state);
         }
 
-        private void UpdatePeriod()
+        private async void UpdatePeriod()
         {
             if (tecPeriod < TecDefaults.PeriodMinimum)
             {
@@ -605,11 +604,10 @@ namespace DeviceManager.ViewModel
                 TecPeriod = TecDefaults.PeriodMaximum;
             }
 
-            var response = new byte[5];
-            tecModel.SetPeriodCommand(tecPeriod, ref response);
+            await tecModel.SetPeriodCommand(tecPeriod);
         }
 
-        private void UpdateProportionalGain()
+        private async void UpdateProportionalGain()
         {
             if (proportionalGain < TecDefaults.ProportionalGainMinimum)
             {
@@ -620,11 +618,10 @@ namespace DeviceManager.ViewModel
                 ProportionalGain = TecDefaults.ProportionalGainMaximum;
             }
 
-            var response = new byte[5];
-            tecModel.SetProportionalGainCommand(proportionalGain, ref response);
+            await tecModel.SetProportionalGainCommand(proportionalGain);
         }
 
-        private void UpdateIntegralGain()
+        private async void UpdateIntegralGain()
         {
             if (integralGain < TecDefaults.IntegralGainMinimum)
             {
@@ -635,11 +632,10 @@ namespace DeviceManager.ViewModel
                 IntegralGain = TecDefaults.IntegralGainMaximum;
             }
 
-            var response = new byte[5];
-            tecModel.SetIntegralGainCommand(integralGain, ref response);
+            await tecModel.SetIntegralGainCommand(integralGain);
         }
 
-        private void UpdateDerivativeGain()
+        private async void UpdateDerivativeGain()
         {
             if (derivativeGain < TecDefaults.DerivativeGainMinimum)
             {
@@ -650,17 +646,15 @@ namespace DeviceManager.ViewModel
                 DerivativeGain = TecDefaults.DerivativeGainMaximum;
             }
 
-            var response = new byte[5];
-            tecModel.SetDerivativeGainCommand(derivativeGain, ref response);
+            await tecModel.SetDerivativeGainCommand(derivativeGain);
         }
 
-        private void UpdateIrefForWaveform()
+        private async void UpdateIrefForWaveform()
         {
-            var response = new byte[5];
-            tecModel.SetWaveformIrefCommand(irefCustomValue, ref response);
+            await tecModel.SetWaveformIrefCommand(irefCustomValue);
         }
 
-        private void SetIref()
+        private async void SetIref()
         {
             if (irefValue < -15.0f)
             {
@@ -671,8 +665,7 @@ namespace DeviceManager.ViewModel
                 IrefValue = 15.0f;
             }
 
-            var response = new byte[5];
-            tecModel.SetIrefCommand(irefValue, ref response);
+            await tecModel.SetIrefCommand(irefValue);
         }
 
         private async void SetVout()
@@ -689,10 +682,9 @@ namespace DeviceManager.ViewModel
             await tecModel.SetVoutCommand(voutValue);
         }
 
-        private void UpdateWaveform()
+        private async void UpdateWaveform()
         {
-            var response = new byte[5];
-            tecModel.SetWaveformCommand(selectedWaveForm, ref response);
+            await tecModel.SetWaveformCommand(selectedWaveForm);
         }
 
         private void CaptureToggle()
@@ -700,64 +692,61 @@ namespace DeviceManager.ViewModel
             CaptureButtonState = captureButtonState == TecDefaults.StartCaptureText ? TecDefaults.StopCaptureText : TecDefaults.StartCaptureText;
         }
 
-        private void WaveformToggle()
+        private async void WaveformToggle()
         {
             var state = waveformButtonState;
             WaveformButtonState = waveformButtonState == TecDefaults.StartWaveformText ? TecDefaults.StopWaveformText : TecDefaults.StartWaveformText;
 
-            var response = new byte[5];
-            tecModel.ControlCommand(state, ref response);
+            await tecModel.ControlCommand(state);
         }
 
-        private void ClosedLoopToggle()
+        private async void ClosedLoopToggle()
         {
             var state = closedLoopButtonState;
             ClosedLoopButtonState = closedLoopButtonState == TecDefaults.EnableClosedLoopText ? TecDefaults.DisableClosedLoopText : TecDefaults.EnableClosedLoopText;
 
-            var response = new byte[5];
-            tecModel.ControlCommand(state, ref response);
+            await tecModel.ControlCommand(state);
         }
 
-        private void ResetTec()
+        private async void ResetTec()
         {
-            var response = new byte[5];
-            tecModel.Reset(ref response);
+            await tecModel.Reset();
         }
 
-        private void UpdateIref()
+        private async void UpdateIref()
         {
-            var data = new byte[5];
-            if (tecModel.ReadIref(ref data))
+            var data = await tecModel.ReadIref();
+            if (data.succesfulResponse)
             {
-                IRef = Helper.GetFloatFromBigEndian(data);
+                IRef = Helper.GetFloatFromBigEndian(data.response);
             }
         }
 
-        private void UpdateISense()
+        private async void UpdateISense()
         {
-            var data = new byte[5];
-            if (tecModel.ReadIsense(ref data))
+            var data = await tecModel.ReadIsense();
+            if (data.succesfulResponse)
             {
-                ISense = Helper.GetFloatFromBigEndian(data);
+                ISense = Helper.GetFloatFromBigEndian(data.response);
             }
         }
 
-        private void UpdateVSense()
+        private async void UpdateVSense()
         {
-            var data = new byte[5];
-            if (tecModel.ReadVsense(ref data))
+            var data = await tecModel.ReadVsense();
+            if (data.succesfulResponse)
             {
-                VSense = Helper.GetFloatFromBigEndian(data);
+                VSense = Helper.GetFloatFromBigEndian(data.response);
             }
             
         }
 
-        private void UpdateStatus()
+        private async void UpdateStatus()
         {
-            var status = new byte[5];
-            if (tecModel.ReadStatus(ref status))
+            var status = await tecModel.ReadStatus();
+            if (status.succesfulResponse)
             {
-                ProcessStatus(status);
+                ProcessStatus(status.response);
             }
             else
             {
@@ -776,7 +765,7 @@ namespace DeviceManager.ViewModel
             StatusMessage = GetErrorMessage(status[4]);
         }
 
-        private void SetWaveformCycles()
+        private async void SetWaveformCycles()
         {
             if (waveformCycles < TecDefaults.WaveformCyclesMinimum)
             {
@@ -787,11 +776,10 @@ namespace DeviceManager.ViewModel
                 WaveformCycles = TecDefaults.WaveformCyclesMaximum;
             }
 
-            var response = new byte[5];
-            tecModel.SetWaveformCyclesCommand(waveformCycles, ref response);
+            await tecModel.SetWaveformCyclesCommand(waveformCycles);
         }
 
-        private void SetSampleTime()
+        private async void SetSampleTime()
         {
             if (sampleTime < TecDefaults.SampleTimeMinimum)
             {
@@ -802,26 +790,18 @@ namespace DeviceManager.ViewModel
                 SampleTime = TecDefaults.SampleTimeMaximum;
             }
 
-            var response = new byte[5];
-            tecModel.SetSampleTimeCommand(sampleTime, ref response);
+            await tecModel.SetSampleTimeCommand(sampleTime);
         }
 
-        private void IncrementCounter()
+        private async void IncrementCounter()
         {
-            //Counter += 1;
-
-            var response = new byte[5];
-            tecModel.ControlCommand(TecDefaults.IncrementTecWaveform, ref response);
+            await tecModel.ControlCommand(TecDefaults.IncrementTecWaveform);
             ReadCustomWaveformIndex();
         }
 
-        private void Reset()
+        private async void Reset()
         {
-            //Counter = 0;
-
-            // Reset
-            var response = new byte[5];
-            tecModel.ControlCommand(TecDefaults.ResetTecWaveform, ref response);
+            await tecModel.ControlCommand(TecDefaults.ResetTecWaveform);
             ReadCustomWaveformIndex();
         }
 
@@ -842,45 +822,45 @@ namespace DeviceManager.ViewModel
             {
                 try
                 {
-                    var irefData = new byte[5];
-                    if (tecModel.ReadIref(ref irefData))
+                    var irefData = await tecModel.ReadIref();
+                    if (irefData.succesfulResponse)
                     {
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            IRef = Helper.GetFloatFromBigEndian(irefData);
+                            IRef = Helper.GetFloatFromBigEndian(irefData.response);
                         }));
 
                     }
                     Thread.Sleep(updateDelay);
 
-                    var isenseData = new byte[5];
-                    if (tecModel.ReadIsense(ref isenseData))
+                    var isenseData = await tecModel.ReadIsense();
+                    if (isenseData.succesfulResponse)
                     {
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            ISense = Helper.GetFloatFromBigEndian(isenseData);
-                        }));
-                        
-                    }
-                    Thread.Sleep(updateDelay);
-
-                    var vsenseData = new byte[5];
-                    if (tecModel.ReadVsense(ref vsenseData))
-                    {
-                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            VSense = Helper.GetFloatFromBigEndian(vsenseData);
+                            ISense = Helper.GetFloatFromBigEndian(isenseData.response);
                         }));
                         
                     }
                     Thread.Sleep(updateDelay);
 
-                    var status = new byte[5];
-                    if (tecModel.ReadStatus(ref status))
+                    var vsenseData = await tecModel.ReadVsense();
+                    if (vsenseData.succesfulResponse)
                     {
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            ProcessStatus(status);
+                            VSense = Helper.GetFloatFromBigEndian(vsenseData.response);
+                        }));
+                        
+                    }
+                    Thread.Sleep(updateDelay);
+
+                    var status = await tecModel.ReadStatus();
+                    if (status.succesfulResponse)
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            ProcessStatus(status.response);
                         }));
                         
                     }
@@ -1012,14 +992,13 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private void ReadCustomWaveformIndex()
+        private async void ReadCustomWaveformIndex()
         {
-            var index = new byte[5];
-            var indexByteArray = tecModel.ReadWaveformIndex(ref index);
+            var index = await tecModel.ReadWaveformIndex();
 
-            if (indexByteArray)
+            if (index.succesfulResponse)
             {
-                CustomIndex = Helper.GetIntFromBigEndian(index);
+                CustomIndex = Helper.GetIntFromBigEndian(index.response);
             }
         }
 

@@ -208,5 +208,61 @@ namespace DeviceManager.Model
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
+
+        public Task<CommunicationData> ReadTref()
+        {
+            var requestArray = HeaterDefaults.ReadTref();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadImax()
+        {
+            var requestArray = HeaterDefaults.ReadImax();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadCycles()
+        {
+            var requestArray = HeaterDefaults.ReadCycles();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadControl()
+        {
+            var requestArray = HeaterDefaults.ReadControl();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadSelect()
+        {
+            var requestArray = HeaterDefaults.ReadSelect();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadIntegralGain()
+        {
+            var requestArray = HeaterDefaults.ReadIntegralGain();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadProportionalGain()
+        {
+            var requestArray = HeaterDefaults.ReadProportionalGain();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadDerivativeGain()
+        {
+            var requestArray = HeaterDefaults.ReadDerivativeGain();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
     }
 }

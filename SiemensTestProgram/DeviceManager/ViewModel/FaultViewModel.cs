@@ -36,14 +36,10 @@ namespace DeviceManager.ViewModel
             ntcTwoColour = notSetColour;
 
             ResetCommand = new RelayCommand(param => Reset());
-            RefreshCommand = new RelayCommand(param => Update());
 
-            //GetNtc();
-            //GetState();
+            Update();
             StartUpdateTask();
         }
-
-        public RelayCommand RefreshCommand { get; set; }
 
         private void Update()
         {
@@ -265,26 +261,25 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private void Reset()
+        private async void Reset()
         {
-            var response = new byte[5];
-            faultModel.Reset(ref response);
+            await faultModel.Reset();
         }
 
-        private void GetNtc()
+        private async void GetNtc()
         {
-            var ntcState = new byte[5];
-            if (faultModel.GetNtcStatus(ref ntcState))
+            var ntcState = await faultModel.GetNtcStatus();
+            if (ntcState.succesfulResponse)
             {
                 ntcOneColour = notSetColour;
                 ntcTwoColour = notSetColour;
 
-                if (Helper.IsBitSet(ntcState[3], 0))
+                if (Helper.IsBitSet(ntcState.response[3], 0))
                 {
                     ntcOneColour = setColour;
                 }
 
-                if (Helper.IsBitSet(ntcState[3], 1))
+                if (Helper.IsBitSet(ntcState.response[3], 1))
                 {
                     ntcTwoColour = setColour;
                 }
@@ -294,10 +289,10 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private void GetState()
+        private async void GetState()
         {
-            var state = new byte[5];
-            if (faultModel.GetState(ref state))
+            var state = await faultModel.GetState();
+            if (state.succesfulResponse)
             {
                 overtempOneColour = notSetColour;
                 overtempTwoColour = notSetColour;
@@ -305,22 +300,22 @@ namespace DeviceManager.ViewModel
                 tecOcdNegColour = notSetColour;
 
 
-                if (Helper.IsBitSet(state[3], 0))
+                if (Helper.IsBitSet(state.response[3], 0))
                 {
                     tecOcdNegColour = setColour;
                 }
 
-                if (Helper.IsBitSet(state[3], 1))
+                if (Helper.IsBitSet(state.response[3], 1))
                 {
                     tecOcdPosColour = setColour;
                 }
 
-                if (Helper.IsBitSet(state[3], 2))
+                if (Helper.IsBitSet(state.response[3], 2))
                 {
                     overtempOneColour = setColour;
                 }
 
-                if (Helper.IsBitSet(state[3], 3))
+                if (Helper.IsBitSet(state.response[3], 3))
                 {
                     overtempTwoColour = setColour;
                 }

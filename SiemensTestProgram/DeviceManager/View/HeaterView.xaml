@@ -51,7 +51,7 @@
                     </StackPanel>
                     <StackPanel Margin="1" Orientation="Horizontal">
                         <Label Width="60" Margin="1"></Label>
-                        <ToggleButton Margin="1" Width="100" Height="25" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>
+                        <ToggleButton Margin="1" Width="100" Height="25" IsChecked="{Binding IsWaveformChecked, Mode=OneWay}" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>
                     </StackPanel>
                 </StackPanel>
 
@@ -99,11 +99,11 @@
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110"></Label>
-                    <ToggleButton Width="100" Height="25" Margin="1" Content="{Binding ClosedLoopState}" HorizontalAlignment="Left" Command="{Binding StartClosedLoopCommand}"></ToggleButton>
+                    <ToggleButton Width="100" Height="25" Margin="1" IsChecked="{Binding IsClosedLoopChecked, Mode=OneWay}" Content="{Binding ClosedLoopState}" HorizontalAlignment="Left" Command="{Binding StartClosedLoopCommand}"></ToggleButton>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
                     <Label Width="110"></Label>
-                    <ToggleButton Margin="1" Width="100" Height="25" Content="{Binding EnableState}" HorizontalAlignment="Left" Command="{Binding EnableCommand}"></ToggleButton>
+                    <ToggleButton Margin="1" Width="100" Height="25" IsChecked="{Binding IsEnabledChecked, Mode=OneWay}" Content="{Binding EnableState}" HorizontalAlignment="Left" Command="{Binding EnableCommand}"></ToggleButton>
                 </StackPanel>
             </StackPanel>
         </GroupBox>

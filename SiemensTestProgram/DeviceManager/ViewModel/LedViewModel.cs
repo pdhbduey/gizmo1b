@@ -2,6 +2,7 @@
 
 namespace DeviceManager.ViewModel
 {
+    using Common;
     using Common.Bindings;
     using DeviceManager.Model;
 
@@ -21,6 +22,8 @@ namespace DeviceManager.ViewModel
             ledStatus = string.Empty;
             redLedStatus = LedDefaults.redLedOn;
             greenLedStatus = LedDefaults.greenLedOn;
+
+            InitialUpdate();
 
             // Sets up the commands
             ToggleLedRedCommand = new RelayCommand(param => ToggleLedRed());
@@ -84,22 +87,61 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        public bool GreenLedIsChecked
+        {
+            get => greenLedStatus.Equals(LedDefaults.greenLedOff);
+        }
+
+        public bool RedLedIsChecked
+        {
+            get => redLedStatus.Equals(LedDefaults.redLedOff);
+        }
+
+        private void InitialUpdate()
+        {
+            var ledStateResponse = ledModel.GetLedCommand().Result;
+
+            if (ledStateResponse.succesfulResponse)
+            {
+                if (Helper.IsBitSet(ledStateResponse.response[4], 0))
+                {
+                    RedLedStatus = LedDefaults.redLedOff;
+                }
+                else
+                {
+                    RedLedStatus = LedDefaults.redLedOn;
+                }
+
+                if (Helper.IsBitSet(ledStateResponse.response[4], 2))
+                {
+                    GreenLedStatus = LedDefaults.greenLedOff;
+                }
+                else
+                {
+                    GreenLedStatus = LedDefaults.greenLedOn;
+                }
+            }
+        }
+
         /// <summary>
         /// Toggles the red LED.
         /// </summary>
         private async void ToggleLedRed()
         {
             var state = redLedStatus;
-            RedLedStatus = redLedStatus == LedDefaults.redLedOn ? LedDefaults.redLedOff : LedDefaults.redLedOn;
+            
             var status = await ledModel.SetLedCommand(state);
             if (status.succesfulResponse)
             {
+                RedLedStatus = redLedStatus == LedDefaults.redLedOn ? LedDefaults.redLedOff : LedDefaults.redLedOn;
                 ProcessStatus(status.response);
             }
             else
             {
                 LedStatus = "Communication Error";
             }
+
+            OnPropertyChanged(nameof(RedLedIsChecked));
         }
 
         /// <summary>
@@ -108,16 +150,19 @@ namespace DeviceManager.ViewModel
         private async void ToggleLedGreen()
         {
             var state = greenLedStatus;
-            GreenLedStatus = greenLedStatus == LedDefaults.greenLedOn ? LedDefaults.greenLedOff : LedDefaults.greenLedOn;
+            
             var status = await ledModel.SetLedCommand(state);
             if (status.succesfulResponse)
             {
+                GreenLedStatus = greenLedStatus == LedDefaults.greenLedOn ? LedDefaults.greenLedOff : LedDefaults.greenLedOn;
                 ProcessStatus(status.response);
             }
             else
             {
                 LedStatus = "Communication Error";
             }
+
+            OnPropertyChanged(nameof(GreenLedIsChecked));
         }
 
         /// <summary>

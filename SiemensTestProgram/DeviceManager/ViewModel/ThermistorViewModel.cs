@@ -31,7 +31,7 @@ namespace DeviceManager.ViewModel
             this.thermistorModel = thermistorModel;
 
             Types = ThermistorDefaults.Types;
-            SelectedType = Types[1];
+            
             InitialUpdate();
             StartUpdateTask();
         }
@@ -278,6 +278,23 @@ namespace DeviceManager.ViewModel
 
         private void InitialUpdate()
         {
+            var typeResponse = thermistorModel.ReadType().Result;
+            if (typeResponse.succesfulResponse)
+            {
+                if (Helper.IsBitSet(typeResponse.response[4], 0)) 
+                {
+                    SelectedType = Types[0];
+                }
+                else
+                {
+                    SelectedType = Types[1];
+                }
+            }
+            else
+            {
+                SelectedType = Types[1];
+            }
+
             var ainAData = thermistorModel.ReadAinA().Result;
             if (ainAData.succesfulResponse)
             {
@@ -322,9 +339,9 @@ namespace DeviceManager.ViewModel
             return response == null ? "Unknown" : response;
         }
 
-        private void SetType()
+        private async void SetType()
         {
-            thermistorModel.SetType(selectedType);
+            await thermistorModel.SetType(selectedType);
         }
     }
 }

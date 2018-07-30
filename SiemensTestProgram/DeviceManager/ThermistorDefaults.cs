@@ -89,6 +89,22 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] ReadTypeCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x08,
+                0x05,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+        
         public static byte[] GetStatusCommand()
         {
             return new byte[]

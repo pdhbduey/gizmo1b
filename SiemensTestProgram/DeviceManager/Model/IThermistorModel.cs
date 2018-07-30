@@ -18,5 +18,7 @@ namespace DeviceManager.Model
         Task<CommunicationData> ReadStatus();
 
         Task<CommunicationData> SetType(string type);
+
+        Task<CommunicationData> ReadType();
     }
 }

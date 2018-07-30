@@ -2,6 +2,7 @@
 
 namespace DeviceManager.Model
 {
+    using DeviceManager.DeviceCommunication;
     using System.Threading.Tasks;
 
     public interface IDacModel
@@ -11,12 +12,18 @@ namespace DeviceManager.Model
         /// </summary>
         /// <param name="voltage"> Voltage value. </param>
         /// <returns> Returns the value from DAC set request. </returns>
-        bool SetDacCommand(float voltage, ref byte[] response);
+        Task<CommunicationData> SetDacCommand(float voltage);
+
+        /// <summary>
+        /// Read DAC value.
+        /// </summary>
+        /// <returns> Returns the DAC value. </returns>
+        Task<CommunicationData> GetDacValueCommand();
 
         /// <summary>
         /// Read DAC status.
         /// </summary>
         /// <returns> Returns the DAC status. </returns>
-        bool ReadDacStatusCommand(ref byte[] response);
+        Task<CommunicationData> ReadDacStatusCommand();
     }
 }

@@ -411,38 +411,37 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private void InitialUpdate()
+        private async void InitialUpdate()
         {
-            var position = new byte[5];
-            if (motorModel.GetMotorPosition(ref position))
+            var position = await motorModel.GetMotorPosition();
+            if (position.succesfulResponse)
             {
-                MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
+                MotorPosition = Helper.GetIntFromBigEndian(position.response).ToString();
             }
 
-            var status = new byte[5];
-
-            if (motorModel.GetMotorStatus(ref status))
+            var status = await motorModel.GetMotorStatus();
+            if (status.succesfulResponse)
             {
-                ProcessMotorStatus(status);
-            }
-        }
-
-        private void RefreshPosition()
-        {
-            var position = new byte[5];
-            if (motorModel.GetMotorPosition(ref position))
-            {
-                MotorPosition = Helper.GetIntFromBigEndian(position).ToString();
+                ProcessMotorStatus(status.response);
             }
         }
 
-        private void RefreshMotorStatus()
+        private async void RefreshPosition()
         {
-            var status = new byte[5];
-
-            if (motorModel.GetMotorStatus(ref status))
+            var position = await motorModel.GetMotorPosition();
+            if (position.succesfulResponse)
             {
-                ProcessMotorStatus(status);
+                MotorPosition = Helper.GetIntFromBigEndian(position.response).ToString();
+            }
+        }
+
+        private async void RefreshMotorStatus()
+        {
+            var status = await motorModel.GetMotorStatus();
+
+            if (status.succesfulResponse)
+            {
+                ProcessMotorStatus(status.response);
             }
         }
 
@@ -584,110 +583,80 @@ namespace DeviceManager.ViewModel
             }
         }
 
-        private void Energize()
+        private async void Energize()
         {
-            var response = new byte[5];
-            motorModel.Energize(ref response);
+            await motorModel.Energize();
         }
 
-        private void SetRegister()
+        private async void SetRegister()
         {
-            var response = new byte[5];
-            motorModel.SetRegisterValue(registerValue, ref response);
+            await motorModel.SetRegisterValue(registerValue);
         }
 
-        private void MoveToRelativePosition()
+        private async void MoveToRelativePosition()
         {
-            var response = new byte[5];
-            motorModel.MotorControlMove(selectedDirection, selectedStepSize, "relative", ref response);
+            await motorModel.MotorControlMove(selectedDirection, selectedStepSize, "relative");
         }
 
-        private void MoveToAbsolutePosition()
+        private async void MoveToAbsolutePosition()
         {
-            var response = new byte[5];
-            motorModel.MotorControlMove(selectedDirection, selectedStepSize, "absolute", ref response);
+            await motorModel.MotorControlMove(selectedDirection, selectedStepSize, "absolute");
         }
 
-        private void SetRelativeMovePosition()
+        private async void SetRelativeMovePosition()
         {
-            var response = new byte[5];
-            motorModel.SetRelativeMovePosition(relativeMoveValue, ref response);
+            await motorModel.SetRelativeMovePosition(relativeMoveValue);
         }
 
-        private void SetAbsoluteMovePosition()
+        private async void SetAbsoluteMovePosition()
         {
-            var response = new byte[5];
-            motorModel.SetAbsoluteMovePosition(absoluteMoveValue, ref response);
+            await motorModel.SetAbsoluteMovePosition(absoluteMoveValue);
         }
 
-        private void SetSelectedRegisterAddress()
+        private async void SetSelectedRegisterAddress()
         {
-            var response = new byte[5];
-            motorModel.SetRegisterAddress(selectedRegisterAddress, ref response);
+            await motorModel.SetRegisterAddress(selectedRegisterAddress);
         }
 
-        //private async void SetConfiguration()
-        //{
-        //    await motorModel.SetDirection(selectedDirection);
-        //    await motorModel.SetStepMode(selectedStepSize);
-        //}
-
-        //private void SetStepMode()
-        //{
-        //    motorModel.SetStepMode(selectedStepSize).Wait();
-        //}
-
-        //private void SetDirectionMode()
-        //{
-        //    motorModel.SetDirection(selectedDirection).Wait();
-        //}
-
-        private void ReadRegister()
+        private async void ReadRegister()
         {
             // Read register address
-            var regValue = new byte[5];
-            if (motorModel.ReadRegisterValue(ref regValue))
+            var regValue = await motorModel.ReadRegisterValue();
+            if (regValue.succesfulResponse)
             {
-                RegisterReadValue = Helper.GetIntFromBigEndian(regValue).ToString();
+                RegisterReadValue = Helper.GetIntFromBigEndian(regValue.response).ToString();
             }
         }
 
-        private void Initialize()
+        private async void Initialize()
         {
-            var response = new byte[5];
-            motorModel.Initialize(ref response);
+            await motorModel.Initialize();
         }
 
-        private void Limp()
+        private async void Limp()
         {
-            var response = new byte[5];
-            motorModel.Limp(ref response);
+            await motorModel.Limp();
         }
 
-        private void Reset()
+        private async void Reset()
         {
-            var response = new byte[5];
-            motorModel.Reset(ref response);
+            await motorModel.Reset();
         }
 
-        private void Home()
+        private async void Home()
         {
             var response = new byte[5];
-            motorModel.Home(ref response);
-
-            //motorModel.GetMotorPosition();
+            await motorModel.Home();
         }
 
-        private void Cycle()
+        private async void Cycle()
         {
-            var response = new byte[5];
-            motorModel.Cycle(ref response);
+            await motorModel.Cycle();
         }
 
-        private void Stop()
+        private async void Stop()
         {
-            var response = new byte[5];
-            motorModel.Stop(ref response);
+            await motorModel.Stop();
         }
 
         private void StartUpdateTask()

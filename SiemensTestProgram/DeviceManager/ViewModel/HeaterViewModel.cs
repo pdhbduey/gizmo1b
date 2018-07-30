@@ -65,7 +65,7 @@ namespace DeviceManager.ViewModel
             CustomIndex = 0;
             CustomReadStatus = "No data read";
             WaveformCycles = TecDefaults.WaveformCyclesMinimum;
-            WaveformButtonState = TecDefaults.StartWaveformText;
+            waveformButtonState = TecDefaults.StartWaveformText;
 
             InitialUpdate();
             StartUpdateTask();
@@ -76,9 +76,12 @@ namespace DeviceManager.ViewModel
         private async void WaveformToggle()
         {
             var state = waveformButtonState;
-            WaveformButtonState = waveformButtonState == TecDefaults.StartWaveformText ? TecDefaults.StopWaveformText : TecDefaults.StartWaveformText;
-
-            await heaterModel.ControlCommand(state);
+            
+            var response = await heaterModel.ControlCommand(state);
+            if (response.succesfulResponse)
+            {
+                WaveformButtonState = waveformButtonState == TecDefaults.StartWaveformText ? TecDefaults.StopWaveformText : TecDefaults.StartWaveformText;
+            }
         }
 
         public string WaveformButtonState
@@ -92,6 +95,7 @@ namespace DeviceManager.ViewModel
             {
                 waveformButtonState = value;
                 OnPropertyChanged(nameof(WaveformButtonState));
+                OnPropertyChanged(nameof(IsWaveformChecked));
             }
         }
 
@@ -419,6 +423,7 @@ namespace DeviceManager.ViewModel
             {
                 closedLoopState = value;
                 OnPropertyChanged(nameof(ClosedLoopState));
+                OnPropertyChanged(nameof(IsClosedLoopChecked));
             }
         }
 
@@ -433,6 +438,7 @@ namespace DeviceManager.ViewModel
             {
                 enableState = value;
                 OnPropertyChanged(nameof(EnableState));
+                OnPropertyChanged(nameof(IsEnabledChecked));
             }
         }
 
@@ -479,82 +485,144 @@ namespace DeviceManager.ViewModel
             thread.Start();
         }
 
+        public bool IsEnabledChecked
+        {
+            get => enableState == TecDefaults.DisableText;
+        }
+
+        public bool IsClosedLoopChecked
+        {
+            get => closedLoopState == TecDefaults.DisableClosedLoopText;
+        }
+
+        public bool IsWaveformChecked
+        {
+            get => waveformButtonState == TecDefaults.StopWaveformText;
+        }
+
         private void InitialUpdate()
         {
+            var integralData = heaterModel.ReadIntegralGain().Result;
+            if (integralData.succesfulResponse)
+            {
+                IntegralGain = Helper.GetFloatFromBigEndian(integralData.response);
+            }
+
+            var derivativeData = heaterModel.ReadDerivativeGain().Result;
+            if (derivativeData.succesfulResponse)
+            {
+                DerivativeGain = Helper.GetFloatFromBigEndian(derivativeData.response);
+            }
+
+            var proportionalData = heaterModel.ReadProportionalGain().Result;
+            if (proportionalData.succesfulResponse)
+            {
+                ProportionalGain = Helper.GetFloatFromBigEndian(proportionalData.response);
+            }
+
+            var imaxData = heaterModel.ReadImax().Result;
+            if (imaxData.succesfulResponse)
+            {
+                IMax = Helper.GetFloatFromBigEndian(imaxData.response);
+            }
+
+            var trefData = heaterModel.ReadTref().Result;
+            if (trefData.succesfulResponse)
+            {
+                TRef = Helper.GetFloatFromBigEndian(trefData.response);
+            }
+
+            var cyclesData = heaterModel.ReadCycles().Result;
+            if (cyclesData.succesfulResponse)
+            {
+                WaveformCycles = Helper.GetIntFromBigEndian(cyclesData.response);
+            }
+
+            var selectData = heaterModel.ReadSelect().Result;
+            if (selectData.succesfulResponse)
+            {
+                if (HeaterDefaults.TinReadMapping.TryGetValue(selectData.response[4], out var selectedDataTin))
+                {
+                    SelectedTin = selectedDataTin;
+                }
+            }
+
+            var controlData = heaterModel.ReadControl().Result;
+            if (controlData.succesfulResponse)
+            {
+                if (Helper.IsBitSet(controlData.response[4], 1))
+                {
+                    EnableState = TecDefaults.DisableText;
+                }
+                else
+                {
+                    EnableState = TecDefaults.EnableText;
+                }
+
+                if (Helper.IsBitSet(controlData.response[4], 2))
+                {
+                    WaveformButtonState = TecDefaults.StopWaveformText;
+                }
+                else
+                {
+                    WaveformButtonState = TecDefaults.StartWaveformText;
+                }
+
+                if (Helper.IsBitSet(controlData.response[4], 5))
+                {
+                    ClosedLoopState = TecDefaults.DisableClosedLoopText;
+                }
+                else
+                {
+                    // stop closed loop
+                    ClosedLoopState = TecDefaults.EnableClosedLoopText;
+                }
+            }
+
             var vData = heaterModel.ReadVSenseCommand().Result;
             if (vData.succesfulResponse)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    VSense = Helper.GetFloatFromBigEndian(vData.response);
-                }));
-
+                VSense = Helper.GetFloatFromBigEndian(vData.response);
             }
 
             var isenseData = heaterModel.ReadISenseCommand().Result;
             if (isenseData.succesfulResponse)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    ISense = Helper.GetFloatFromBigEndian(isenseData.response);
-                }));
-
+                ISense = Helper.GetFloatFromBigEndian(isenseData.response);
             }
 
             var TemperatureOneData = heaterModel.ReadTemperatureOne().Result;
             if (TemperatureOneData.succesfulResponse)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    TemperatureOne = Helper.GetFloatFromBigEndian(TemperatureOneData.response);
-                }));
-
+                TemperatureOne = Helper.GetFloatFromBigEndian(TemperatureOneData.response);
             }
 
             var TemperatureTwoData = heaterModel.ReadTemperatureTwo().Result;
             if (TemperatureTwoData.succesfulResponse)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    TemperatureTwo = Helper.GetFloatFromBigEndian(TemperatureTwoData.response);
-                }));
-
+                TemperatureTwo = Helper.GetFloatFromBigEndian(TemperatureTwoData.response);
             }
 
             var TemperatureThreeData = heaterModel.ReadTemperatureThree().Result;
             if (TemperatureThreeData.succesfulResponse)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    TemperatureThree = Helper.GetFloatFromBigEndian(TemperatureThreeData.response);
-                }));
-
+                 TemperatureThree = Helper.GetFloatFromBigEndian(TemperatureThreeData.response);
             }
 
             var TemperatureFourData = heaterModel.ReadTemperatureFour().Result;
             if (TemperatureFourData.succesfulResponse)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    TemperatureFour = Helper.GetFloatFromBigEndian(TemperatureFourData.response);
-                }));
+                TemperatureFour = Helper.GetFloatFromBigEndian(TemperatureFourData.response);
             }
 
             var status = heaterModel.ReadStatusCommand().Result;
             if (status.succesfulResponse)
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    ProcessStatus(status.response);
-                }));
+                 ProcessStatus(status.response);
             }
             else
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    StatusMessage = "Communication Error";
-                }));
-
+                StatusMessage = "Communication Error";
             }
         }
 
@@ -662,7 +730,7 @@ namespace DeviceManager.ViewModel
         }
 
         string value;
-        if (HeaterDefaults.StatusValues.TryGetValue(status[3], out value))
+        if (HeaterDefaults.StatusValues.TryGetValue(status[4], out value))
         {
             StatusMessage = value;
         }
@@ -671,30 +739,46 @@ namespace DeviceManager.ViewModel
         private async void EnableToggle()
         {
             var state = enableState;
-            EnableState = enableState == TecDefaults.EnableText ? TecDefaults.DisableText : TecDefaults.EnableText;
+            
 
             if (string.Equals(state, TecDefaults.EnableText))
             {
-                await heaterModel.EnableCommand();
+                var setEnabled = await heaterModel.EnableCommand();
+                if (setEnabled.succesfulResponse)
+                {
+                    EnableState = TecDefaults.DisableText;
+                }
             }
             else
             {
-                await heaterModel.DisableCommand();
+                var setEnabled = await heaterModel.DisableCommand();
+                if (setEnabled.succesfulResponse)
+                {
+                    EnableState = TecDefaults.EnableText;
+                }
             }
         }
 
         private async void ClosedLoopToggle()
         {
             var state = closedLoopState;
-            ClosedLoopState = closedLoopState == TecDefaults.EnableClosedLoopText ? TecDefaults.DisableClosedLoopText : TecDefaults.EnableClosedLoopText;
+            
             
             if (string.Equals(state, TecDefaults.EnableClosedLoopText))
             {
-                await heaterModel.StartClosedLoopCommand();
+                var response = await heaterModel.StartClosedLoopCommand();
+                if (response.succesfulResponse)
+                {
+                    ClosedLoopState = TecDefaults.DisableClosedLoopText;
+                }
             }
             else
             {
-                await heaterModel.StopClosedLoopCommand();
+                var response = await heaterModel.StopClosedLoopCommand();
+                if (response.succesfulResponse)
+                {
+                    ClosedLoopState = TecDefaults.EnableClosedLoopText;
+                }
             }
         }
 

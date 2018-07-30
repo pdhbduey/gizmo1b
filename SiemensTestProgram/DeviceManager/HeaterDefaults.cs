@@ -38,6 +38,53 @@ namespace DeviceManager
             { 0x03, "T4" }
         };
 
+        public static byte[] ReadSelect()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0B,
+                0x04,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] ReadCycles()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0B,
+                0x0B,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] ReadControl()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0B,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x01
+            };
+        }
 
         public static byte[] SetDisableCommand()
         {

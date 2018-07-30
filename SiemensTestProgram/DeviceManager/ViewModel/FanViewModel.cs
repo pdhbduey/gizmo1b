@@ -40,13 +40,10 @@ namespace DeviceManager.ViewModel
             dutyCycleOne = FanDefaults.MinimumDutyCycle;
             dutyCycleTwo = FanDefaults.MinimumDutyCycle;
             statusMessage = "";
-            RefreshCommand = new RelayCommand(param => Update());
             // Update statuses
             InitialUpdate();
             StartUpdateTask();
         }
-
-        public RelayCommand RefreshCommand { get; set; }
 
         public int DutyCycleOne
         {
@@ -227,108 +224,56 @@ namespace DeviceManager.ViewModel
             thread.Start();
         }
 
-        private void Update()
-        {
-            // Update
-            var sensorOneValue = new byte[5];
-            if (fanModel.GetFanSensorRpm(1, ref sensorOneValue))
-            {
-                SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue);
-            }
-
-            //Thread.Sleep(delayBetweenRequests);
-
-            var sensorTwoValue = new byte[5];
-            if (fanModel.GetFanSensorRpm(2, ref sensorTwoValue))
-            {
-                SensorTwoRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
-            }
-
-            //Thread.Sleep(delayBetweenRequests);
-
-            var status = new byte[5];
-            if (fanModel.GetFanStatus(ref status))
-            {
-                ProcessStatus(status);
-            }
-            else
-            {
-                StatusMessage = "Communication Error";
-            }
-
-
-            //Thread.Sleep(updateDelay);
-        }
-
         /// <summary>
         /// Initial update for fan.
         /// </summary>
         private void InitialUpdate()
         {
-            //var initialDelay = 10;
-
-            // Read duty cycle/period
-            var cycleOneValue = new byte[5];
-            if (fanModel.GetFanPwmDutyCycle(1, ref cycleOneValue))
+            var cycleOneValue = fanModel.GetFanPwmDutyCycle(1).Result;
+            if (cycleOneValue.succesfulResponse)
             {
-                DutyCycleOne = Helper.GetIntFromBigEndian(cycleOneValue);
-            }
-            
-            //Thread.Sleep(initialDelay);
-
-            var cycleTwoValue = new byte[5];
-            if (fanModel.GetFanPwmDutyCycle(2, ref cycleTwoValue))
-            {
-                DutyCycleTwo = Helper.GetIntFromBigEndian(cycleTwoValue);
-            }
-            
-            //Thread.Sleep(initialDelay);
-
-            var periodOneValue = new byte[5];
-            if (fanModel.GetFanPwmPeriod(1, ref periodOneValue))
-            {
-                PeriodOne = Helper.GetFloatFromBigEndian(periodOneValue);
+                DutyCycleOne = Helper.GetIntFromBigEndian(cycleOneValue.response);
             }
 
-            //Thread.Sleep(initialDelay);
-
-            var periodTwoValue = new byte[5];
-            if (fanModel.GetFanPwmPeriod(2, ref periodTwoValue))
+            var cycleTwoValue = fanModel.GetFanPwmDutyCycle(2).Result;
+            if (cycleTwoValue.succesfulResponse)
             {
-                PeriodTwo = Helper.GetFloatFromBigEndian(periodTwoValue);
-            }
-            
-            //Thread.Sleep(initialDelay);
-
-            // Sensor updates
-            var sensorOneValue = new byte[5];
-            if (fanModel.GetFanSensorRpm(1, ref sensorOneValue))
-            {
-                SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue);
+                DutyCycleTwo = Helper.GetIntFromBigEndian(cycleTwoValue.response);
             }
 
-            //Thread.Sleep(initialDelay);
-
-            var sensorTwoValue = new byte[5];
-            if (fanModel.GetFanSensorRpm(2, ref sensorTwoValue))
+            var periodOneValue = fanModel.GetFanPwmPeriod(1).Result;
+            if (periodOneValue.succesfulResponse)
             {
-                SensorTwoRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
+                PeriodOne = Helper.GetFloatFromBigEndian(periodOneValue.response);
             }
 
-            //Thread.Sleep(initialDelay);
-
-            var status = new byte[5];
-            if (fanModel.GetFanStatus(ref status))
+            var periodTwoValue = fanModel.GetFanPwmPeriod(2).Result;
+            if (periodTwoValue.succesfulResponse)
             {
-                ProcessStatus(status);
+                PeriodTwo = Helper.GetFloatFromBigEndian(periodTwoValue.response);
+            }
+
+            var sensorOneValue = fanModel.GetFanSensorRpm(1).Result;
+            if (sensorOneValue.succesfulResponse)
+            {
+                SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue.response);
+            }
+
+            var sensorTwoValue = fanModel.GetFanSensorRpm(2).Result;
+            if (sensorTwoValue.succesfulResponse)
+            {
+                SensorTwoRpm = Helper.GetFloatFromBigEndian(sensorTwoValue.response);
+            }
+
+            var status = fanModel.GetFanStatus().Result;
+            if (status.succesfulResponse)
+            {
+                ProcessStatus(status.response);
             }
             else
             {
                 StatusMessage = "Communication Error";
             }
-
-
-            //Thread.Sleep(initialDelay);
         }
 
         /// <summary>
@@ -341,36 +286,36 @@ namespace DeviceManager.ViewModel
                 try
                 {
                     // Update
-                    var sensorOneValue = new byte[5];
-                    if (fanModel.GetFanSensorRpm(1, ref sensorOneValue))
+                    var sensorOneValue = await fanModel.GetFanSensorRpm(1);
+                    if (sensorOneValue.succesfulResponse)
                     {
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue);
+                            SensorOneRpm = Helper.GetFloatFromBigEndian(sensorOneValue.response);
                         }));
                         
                     }
 
                     Thread.Sleep(delayBetweenRequests);
 
-                    var sensorTwoValue = new byte[5];
-                    if (fanModel.GetFanSensorRpm(2, ref sensorTwoValue))
+                    var sensorTwoValue = await fanModel.GetFanSensorRpm(2);
+                    if (sensorTwoValue.succesfulResponse)
                     {
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            SensorTwoRpm = Helper.GetFloatFromBigEndian(sensorTwoValue);
+                            SensorTwoRpm = Helper.GetFloatFromBigEndian(sensorTwoValue.response);
                         }));
                         
                     }
                     
                     Thread.Sleep(delayBetweenRequests);
 
-                    var status = new byte[5];
-                    if (fanModel.GetFanStatus(ref status))
+                    var status = await fanModel.GetFanStatus();
+                    if (status.succesfulResponse)
                     {
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            ProcessStatus(status);
+                            ProcessStatus(status.response);
                         }));
                        
                     }
@@ -425,30 +370,29 @@ namespace DeviceManager.ViewModel
             return response == null ? "Unknown" : response;
         }
 
-        private void SetFanDutyCycle(int channel)
+        private async void SetFanDutyCycle(int channel)
         {
             var response = new byte[5];
             switch (channel)
             {
                 case 1:
-                    fanModel.SetFanPwmDutyCycle(channel, dutyCycleOne, ref response);
+                    await fanModel.SetFanPwmDutyCycle(channel, dutyCycleOne);
                     break;
                 case 2:
-                    fanModel.SetFanPwmDutyCycle(channel, dutyCycleTwo, ref response);
+                    await fanModel.SetFanPwmDutyCycle(channel, dutyCycleTwo);
                     break;
             }
         }
 
-        private void SetFanPeriod(int channel)
+        private async void SetFanPeriod(int channel)
         {
-            var response = new byte[5];
             switch (channel)
             {
                 case 1:
-                    fanModel.SetFanPwmPeriod(channel, periodTwo, ref response);
+                    await fanModel.SetFanPwmPeriod(channel, periodTwo);
                     break;
                 case 2:
-                    fanModel.SetFanPwmPeriod(channel, periodTwo, ref response);
+                    await fanModel.SetFanPwmPeriod(channel, periodTwo);
                     break;
             }
         }

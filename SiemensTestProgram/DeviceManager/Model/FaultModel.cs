@@ -14,24 +14,10 @@ namespace DeviceManager.Model
             this.communication = communication;
         }
 
-        public bool Reset(ref byte[] response)
+        public Task<CommunicationData> Reset()
         {
             var requestArray = FaultDefaults.ResetCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
-            return status;
-        }
-
-        public bool GetState(ref byte[] response)
-        {
-            var requestArray = FaultDefaults.ReadStateCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
-            return status;
-        }
-
-        public bool GetNtcStatus(ref byte[] response)
-        {
-            var requestArray = FaultDefaults.ReadNtcCommand();
-            var status = communication.ProcessCommunicationRequest(requestArray, ref response);
+            var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }
 
