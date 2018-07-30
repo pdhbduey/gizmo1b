@@ -67,6 +67,23 @@ namespace DeviceManager
             { Photodiodes[5], 0x30},
         };
 
+        
+        public static byte[] ReadControlCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
         public static byte[] SetLedControlCommand(string led)
         {
             var value = SelectLedMapping[led];
@@ -233,6 +250,38 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] ReadLedBoardVersionCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x06,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] ReadPdBoardVersionCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x07,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
         public static byte[] ReadLedTemperatureDuringIntegrationCommand()
         {
             return new byte[]
@@ -339,6 +388,22 @@ namespace DeviceManager
             };
         }
 
+        public static byte[] ReadIntegrationTime()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x02,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
         public static byte[] SetIntensity(int itensity)
         {
             var value = Helper.ConvertIntToByteArray(itensity);
@@ -353,6 +418,22 @@ namespace DeviceManager
                 value[1],
                 value[2],
                 value[3]
+            };
+        }
+
+        public static byte[] ReadIntensity()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x0C,
+                0x03,
+                0x00,
+                0x00,
+                0x00,
+                0x00
             };
         }
 

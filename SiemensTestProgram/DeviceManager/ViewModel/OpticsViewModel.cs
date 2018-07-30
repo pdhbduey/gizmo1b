@@ -38,29 +38,137 @@
             UpdateCommand = new RelayCommand(param => Update());
 
             // Initial Set
-            IntegrationTime = OpticsDefault.IntegrationTimeDefault;
-            Intensity = 0;
+            integrationTime = OpticsDefault.IntegrationTimeDefault;
+            intensity = 0;
             Leds = OpticsDefault.Leds;
-            SelectedLed = Leds[0];
+            selectedLed = Leds[0];
             Photodiodes = OpticsDefault.Photodiodes;
-            SelectedPhotodiode = Photodiodes[0];
+            selectedPhotodiode = Photodiodes[0];
 
             PdBoardVersions = OpticsDefault.PdBoardVersions;
-            SelectedPdVersion = PdBoardVersions[0];
+            selectedPdVersion = PdBoardVersions[0];
             LedBoardVersions = OpticsDefault.LedBoardVersions;
-            SelectedLedVersion = LedBoardVersions[0];
+            selectedLedVersion = LedBoardVersions[0];
 
             ledBoardEnabled = false;
             pdBoardEnabled = false;
-            SetToDefaultControlSettings();
+            DefaultControlSettings();
 
-            Update();
             StartUpdateTask();
         }
 
-        private void SetToDefaultControlSettings()
+        private void DefaultControlSettings()
         {
-            opticsModel.ResetControlSettingsCommand().Wait();
+            var control = opticsModel.ReadPhotodiodeControl().Result;
+            if (control.succesfulResponse)
+            {
+                if (Helper.IsBitSet(control.response[4], 6))
+                {
+                    LedBoardEnabled = true;
+                }
+                else
+                {
+                    LedBoardEnabled = false;
+                }
+
+                if (Helper.IsBitSet(control.response[3], 0))
+                {
+                    PdBoardEnabled = true;
+                }
+                else
+                {
+                    PdBoardEnabled = false;
+                }
+
+                GetLedSelected(control.response[4]);
+                GetPhotodiodeSelected(control.response[4]);
+            }
+
+            var intensityData = opticsModel.ReadIntensity().Result;
+            if (intensityData.succesfulResponse)
+            {
+                Intensity = Helper.GetIntFromBigEndian(intensityData.response);
+            }
+
+            var integrationData = opticsModel.ReadIntegrationTime().Result;
+            if (integrationData.succesfulResponse)
+            {
+                IntegrationTime = Helper.GetIntFromBigEndian(integrationData.response);
+            }
+
+            var pdBoardVersionData = opticsModel.ReadPdBoardVersion().Result;
+            if (pdBoardVersionData.succesfulResponse)
+            {
+                if (Helper.IsBitSet(pdBoardVersionData.response[4], 1))
+                {
+                    SelectedPdVersion = PdBoardVersions[1];
+                }
+            }
+
+            var ledBoardVersionData = opticsModel.ReadLedBoardVersion().Result;
+            if (ledBoardVersionData.succesfulResponse)
+            {
+                if (Helper.IsBitSet(ledBoardVersionData.response[4], 1))
+                {
+                    SelectedLedVersion = LedBoardVersions[1];
+                }
+            }
+        }
+
+        private void GetLedSelected(byte value)
+        {
+            if (Helper.IsBitSet(value, 2) && Helper.IsBitSet(value, 1))
+            {
+                SelectedLed = Leds[5];
+            }
+            else if (Helper.IsBitSet(value, 2) && Helper.IsBitSet(value, 0))
+            {
+                SelectedLed = Leds[4];
+            }
+            else if (Helper.IsBitSet(value, 2))
+            {
+                SelectedLed = Leds[3];
+            }
+            else if (Helper.IsBitSet(value, 1) && Helper.IsBitSet(value, 0))
+            {
+                SelectedLed = Leds[2];
+            }
+            else if (Helper.IsBitSet(value, 1))
+            {
+                SelectedLed = Leds[1];
+            }
+            else
+            {
+                SelectedLed = Leds[0];
+            }
+        }
+
+        private void GetPhotodiodeSelected(byte value)
+        {
+            if (Helper.IsBitSet(value, 5) && Helper.IsBitSet(value, 4))
+            {
+                SelectedPhotodiode = Photodiodes[5];
+            }
+            else if (Helper.IsBitSet(value, 5) && Helper.IsBitSet(value, 3))
+            {
+                SelectedPhotodiode = Photodiodes[4];
+            }
+            else if (Helper.IsBitSet(value, 5))
+            {
+                SelectedPhotodiode = Photodiodes[3];
+            }
+            else if (Helper.IsBitSet(value, 4) && Helper.IsBitSet(value, 3))
+            {
+                SelectedPhotodiode = Photodiodes[2];
+            }
+            else if (Helper.IsBitSet(value, 4))
+            {
+                SelectedPhotodiode = Photodiodes[1];
+            }
+            else
+            {
+                SelectedPhotodiode = Photodiodes[0];
+            }
         }
 
         private async void SetLedBoardEnabledControl()

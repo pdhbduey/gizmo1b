@@ -104,6 +104,20 @@ namespace DeviceManager.Model
             return status;
         }
 
+        public Task<CommunicationData> ReadLedBoardVersion()
+        {
+            var requestArray = OpticsDefault.ReadLedBoardVersionCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadPdBoardVersion()
+        {
+            var requestArray = OpticsDefault.ReadPdBoardVersionCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
         public Task<CommunicationData> ReadLedMonitorVolts()
         {
             var requestArray = OpticsDefault.ReadLedMonitorVolts();
@@ -142,6 +156,27 @@ namespace DeviceManager.Model
         public Task<CommunicationData> ResetControlSettingsCommand()
         {
             var requestArray = OpticsDefault.ResetControlSettingsCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadPhotodiodeControl()
+        {
+            var requestArray = OpticsDefault.ReadControlCommand();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadIntegrationTime()
+        {
+            var requestArray = OpticsDefault.ReadIntegrationTime();
+            var status = communication.ProcessCommunicationRequest(requestArray);
+            return status;
+        }
+
+        public Task<CommunicationData> ReadIntensity()
+        {
+            var requestArray = OpticsDefault.ReadIntensity();
             var status = communication.ProcessCommunicationRequest(requestArray);
             return status;
         }

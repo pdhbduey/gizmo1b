@@ -46,5 +46,15 @@ namespace DeviceManager.Model
         Task<CommunicationData> PdBoardDisableCommand();
 
         Task<CommunicationData> ResetControlSettingsCommand();
+
+        Task<CommunicationData> ReadPhotodiodeControl();
+
+        Task<CommunicationData> ReadIntegrationTime();
+
+        Task<CommunicationData> ReadIntensity();
+
+        Task<CommunicationData> ReadLedBoardVersion();
+
+        Task<CommunicationData> ReadPdBoardVersion();
     }
 }
