@@ -543,18 +543,21 @@ void LibTec::run()
         if (m_isHeaterClosedLoopEnabled && getTin(tin) == HEATER_OKAY) {
             heaterPidError -= tin;
         }
-        if (!m_isHeaterClosedLoopInitialized || !m_isHeaterClosedLoopEnabled) {
-            m_heaterPrevError = heaterPidError;
-            m_heaterAccError = 0;
-            if (!m_isHeaterClosedLoopInitialized) {
-                m_isHeaterClosedLoopInitialized = true;
+        {
+            LibMutex libMutex(s_mutex);
+            if (!m_isHeaterClosedLoopInitialized || !m_isHeaterEnabled) {
+                m_heaterPrevError = heaterPidError;
+                m_heaterAccError = 0;
+                if (!m_isHeaterClosedLoopInitialized) {
+                    m_isHeaterClosedLoopInitialized = true;
+                }
             }
-        }
-        if (m_pidHeaterDerivativeGain == 0) {
-            m_heaterPrevError = heaterPidError;
-        }
-        if (m_pidHeaterIntegralGain == 0) {
-            m_heaterAccError = 0;
+            if (m_pidHeaterDerivativeGain == 0 || !m_isHeaterClosedLoopEnabled) {
+                m_heaterPrevError = heaterPidError;
+            }
+            if (m_pidHeaterIntegralGain == 0 || !m_isHeaterClosedLoopEnabled) {
+                m_heaterAccError = 0;
+            }
         }
         float heaterControl = m_pidHeaterProportionalGain *  heaterPidError
                             + m_pidHeaterIntegralGain     *  m_heaterAccError
@@ -563,12 +566,12 @@ void LibTec::run()
                             =(heaterControl < -m_heaterImax ? -m_heaterImax :
                               heaterControl >  m_heaterImax ?  m_heaterImax :
                                                                heaterControl);
-        bool isSaturated    = heaterControlOut != heaterControl;
-        bool isIntAdding    = heaterPidError > 0 && heaterControl > 0
-                           || heaterPidError < 0 && heaterControl < 0;
-        bool clamp          = isSaturated && isIntAdding;
-        m_heaterAccError   +=(clamp ? 0 : heaterPidError);
-        m_heaterPrevError   = heaterPidError;
+        bool isHeaterSaturated =  heaterControlOut != heaterControl;
+        bool isHeaterIntAdding =  heaterPidError > 0 && heaterControl > 0
+                              ||  heaterPidError < 0 && heaterControl < 0;
+        bool isHeaterClamp     =  isHeaterSaturated && isHeaterIntAdding;
+        m_heaterAccError      += (isHeaterClamp ? 0 : heaterPidError);
+        m_heaterPrevError      =  heaterPidError;
         // Current PID regulator
         float iRef      = m_isHeaterEnabled ? heaterControl : getWaveformSample(tick);
         float pidError  = iRef;
@@ -577,18 +580,21 @@ void LibTec::run()
             pidError -= iSense;
         }
         pidError = filter(pidError);
-        if (!m_isClosedLoopInitialized || !m_isEnabled) {
-            m_prevError = pidError;
-            m_accError = 0;
-            if (!m_isClosedLoopInitialized) {
-                m_isClosedLoopInitialized = true;
+        {
+            LibMutex libMutex(s_mutex);
+            if (!m_isClosedLoopInitialized || !m_isEnabled) {
+                m_prevError = pidError;
+                m_accError = 0;
+                if (!m_isClosedLoopInitialized) {
+                    m_isClosedLoopInitialized = true;
+                }
             }
-        }
-        if (m_pidDerivativeGain == 0) {
-            m_prevError = pidError;
-        }
-        if (m_pidIntegralGain == 0) {
-            m_accError = 0;
+            if (m_pidDerivativeGain == 0 || !m_isClosedLoopEnabled) {
+                m_prevError = pidError;
+            }
+            if (m_pidIntegralGain == 0 || !m_isClosedLoopEnabled) {
+                m_accError = 0;
+            }
         }
         float control    = m_pidProportionalGain *  pidError
                          + m_pidIntegralGain     *  m_accError
@@ -597,12 +603,12 @@ void LibTec::run()
         float controlOut = (control < -m_controlLimit ? -m_controlLimit :
                             control >  m_controlLimit ?  m_controlLimit :
                                                          control);
-        isSaturated      = controlOut != control;
-        isIntAdding      = pidError > 0 && control > 0
-                        || pidError < 0 && control < 0;
-        clamp            = isSaturated && isIntAdding;
-        m_accError      +=(clamp ? 0 : pidError);
-        m_prevError      = pidError;
+        bool isSaturated =  controlOut != control;
+        bool isIntAdding =  pidError > 0 && control > 0
+                        ||  pidError < 0 && control < 0;
+        bool clamp       =  isSaturated && isIntAdding;
+        m_accError      += (clamp ? 0 : pidError);
+        m_prevError      =  pidError;
         if (m_isEnabled) {
             driveControl(controlOut);
         }
