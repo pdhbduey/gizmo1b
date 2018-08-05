@@ -16,9 +16,6 @@ namespace DeviceManager
         public const int SampleTimeMaximum = 9999;
         public const float VoutMinimum = 0.00f;
         public const float VoutMaximum = 21.00f;
-        //public const int IrefGainMinimum = 1;
-        //public const int IrefGainMaximum = 3;
-
         public const float ProportionalGainMinimum = 0.01F;
         public const float ProportionalGainMaximum = 100;
         public const int DerivativeGainMinimum = 0;

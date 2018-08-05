@@ -54,6 +54,7 @@ namespace DeviceManager.ViewModel
             if (dacValue.succesfulResponse)
             {
                 VoltageValue = Helper.GetFloatFromBigEndian(dacValue.response);
+                VoltageValueString = string.Format(voltageValue.ToString("0.##"));
             }
             else
             {
@@ -102,10 +103,32 @@ namespace DeviceManager.ViewModel
             {
                 sliderVoltageValue = value;
                 VoltageValue = (float)sliderVoltageValue / 100;
+                VoltageValueString = string.Format(voltageValue.ToString("0.##"));
                 OnPropertyChanged(nameof(SliderVoltageValue));
 
                 // Update DAC value when we scroll slider
                 SendDacValue();
+            }
+        }
+
+        private string voltageValueString;
+
+        public string VoltageValueString
+        {
+            get
+            {
+                return voltageValueString;
+            }
+
+            set
+            {
+                voltageValueString = value;
+                if (float.TryParse(value, out var parsedVoltage))
+                {
+                    VoltageValue = parsedVoltage;
+                }
+
+                OnPropertyChanged(nameof(VoltageValueString));
             }
         }
 
@@ -138,6 +161,7 @@ namespace DeviceManager.ViewModel
 
                 sliderVoltageValue = (int)(voltageValue * 100);
                 OnPropertyChanged(nameof(SliderVoltageValue));
+                
             }
         }
 

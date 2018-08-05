@@ -164,6 +164,69 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        private string integralGainText;
+        public string IntegralGainText
+        {
+            get
+            {
+                return integralGainText;
+            }
+
+            set
+            {
+                integralGainText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    IntegralGain = parsed;
+                }
+
+                OnPropertyChanged(nameof(IntegralGainText));
+            }
+        }
+
+        private string derivativeGainText;
+        public string DerivativeGainText
+        {
+            get
+            {
+                return derivativeGainText;
+            }
+
+            set
+            {
+                derivativeGainText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    derivativeGain = parsed;
+                }
+
+                OnPropertyChanged(nameof(DerivativeGainText));
+            }
+        }
+
+        private string proportionalGainText;
+        public string ProportionalGainText
+        {
+            get
+            {
+                return proportionalGainText;
+            }
+
+            set
+            {
+                proportionalGainText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    proportionalGain = parsed;
+                }
+
+                OnPropertyChanged(nameof(ProportionalGainText));
+            }
+        }
+
         public float IntegralGain
         {
             get
@@ -194,6 +257,27 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        private string imaxText;
+        public string ImaxText
+        {
+            get
+            {
+                return imaxText;
+            }
+
+            set
+            {
+                imaxText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    IMax = parsed;
+                }
+
+                OnPropertyChanged(nameof(ImaxText));
+            }
+        }
+
         public float IMax
         {
             get
@@ -206,6 +290,27 @@ namespace DeviceManager.ViewModel
 
                 OnPropertyChanged(nameof(IMax));
                 //UpdateIMax();
+            }
+        }
+
+        private string trefText;
+        public string TrefText
+        {
+            get
+            {
+                return trefText;
+            }
+
+            set
+            {
+                trefText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    TRef = parsed;
+                }
+
+                OnPropertyChanged(nameof(TrefText));
             }
         }
 
@@ -505,31 +610,31 @@ namespace DeviceManager.ViewModel
             var integralData = heaterModel.ReadIntegralGain().Result;
             if (integralData.succesfulResponse)
             {
-                IntegralGain = Helper.GetFloatFromBigEndian(integralData.response);
+                IntegralGainText = Helper.GetFloatFromBigEndian(integralData.response).ToString("0.##");
             }
 
             var derivativeData = heaterModel.ReadDerivativeGain().Result;
             if (derivativeData.succesfulResponse)
             {
-                DerivativeGain = Helper.GetFloatFromBigEndian(derivativeData.response);
+                DerivativeGainText = Helper.GetFloatFromBigEndian(derivativeData.response).ToString("0.##");
             }
 
             var proportionalData = heaterModel.ReadProportionalGain().Result;
             if (proportionalData.succesfulResponse)
             {
-                ProportionalGain = Helper.GetFloatFromBigEndian(proportionalData.response);
+                ProportionalGainText = Helper.GetFloatFromBigEndian(proportionalData.response).ToString("0.##");
             }
 
             var imaxData = heaterModel.ReadImax().Result;
             if (imaxData.succesfulResponse)
             {
-                IMax = Helper.GetFloatFromBigEndian(imaxData.response);
+                ImaxText = Helper.GetFloatFromBigEndian(imaxData.response).ToString("0.##");
             }
 
             var trefData = heaterModel.ReadTref().Result;
             if (trefData.succesfulResponse)
             {
-                TRef = Helper.GetFloatFromBigEndian(trefData.response);
+                TrefText = Helper.GetFloatFromBigEndian(trefData.response).ToString("0.##");
             }
 
             var cyclesData = heaterModel.ReadCycles().Result;
@@ -786,11 +891,11 @@ namespace DeviceManager.ViewModel
         {
             if (proportionalGain < HeaterDefaults.ProportionalGainMinimum)
             {
-                ProportionalGain = HeaterDefaults.ProportionalGainMinimum;
+                return;
             }
             else if (proportionalGain > HeaterDefaults.ProportionalGainMaximum)
             {
-                ProportionalGain = HeaterDefaults.ProportionalGainMaximum;
+                return;
             }
 
             await heaterModel.SetProportionalGainCommand(proportionalGain);
@@ -805,11 +910,11 @@ namespace DeviceManager.ViewModel
         {
             if (integralGain < HeaterDefaults.IntegralGainMinimum)
             {
-                IntegralGain = HeaterDefaults.IntegralGainMinimum;
+                return;
             }
             else if (integralGain > HeaterDefaults.IntegralGainMaximum)
             {
-                IntegralGain = HeaterDefaults.IntegralGainMaximum;
+                return;
             }
 
             await heaterModel.SetIntegralGainCommand(integralGain);
@@ -819,11 +924,11 @@ namespace DeviceManager.ViewModel
         {
             if (derivativeGain < HeaterDefaults.DerivativeGainMinimum)
             {
-                DerivativeGain = HeaterDefaults.DerivativeGainMinimum;
+                return;
             }
             else if (derivativeGain > HeaterDefaults.DerivativeGainMaximum)
             {
-                DerivativeGain = HeaterDefaults.DerivativeGainMaximum;
+                return;
             }
 
             await heaterModel.SetDerivativeGainCommand(derivativeGain);
@@ -833,11 +938,11 @@ namespace DeviceManager.ViewModel
         {
             if (tRef < HeaterDefaults.TRefMinimum)
             {
-                TRef = HeaterDefaults.TRefMinimum;
+                return;
             }
             else if (tRef > HeaterDefaults.TRefMaximum)
             {
-                TRef = HeaterDefaults.TRefMaximum;
+                return;
             }
 
             await heaterModel.SetTRefCommand(tRef);
@@ -847,11 +952,11 @@ namespace DeviceManager.ViewModel
         {
             if (iMax < HeaterDefaults.IMaxMinimum)
             {
-                IMax = HeaterDefaults.IMaxMinimum;
+                return;
             }
             else if (iMax > HeaterDefaults.IMaxMaximum)
             {
-                IMax = HeaterDefaults.IMaxMaximum;
+                return;
             }
 
             await heaterModel.SetIMaxCommand(iMax);

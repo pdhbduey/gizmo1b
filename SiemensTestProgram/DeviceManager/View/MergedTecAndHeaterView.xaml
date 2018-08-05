@@ -8,7 +8,15 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <ScrollViewer>
         <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
+            <ContentControl Grid.Row="0" Content="{Binding PassedHeaterView}"></ContentControl>
+            <ContentControl Grid.Row="1" Content="{Binding PassedTecView}"></ContentControl>
+            <ContentControl Grid.Row="2" Content="{Binding PassedFaultView}"></ContentControl>
         </Grid>
     </ScrollViewer>
 </UserControl>

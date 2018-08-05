@@ -21,15 +21,16 @@
                 "DAC",
                 "DIO",
                 "Fan",
-                "Fault",
-                "Heater",
+                //"Fault",
+                //"Heater",
                 "LED",
                 "Motor",
                 "Optics",
                 "Thermistor",
                 "Snapshot",
                 //"Trace",
-                "TEC"
+                //"TEC",
+                "TEC/Heater/Fault"
             };
 
             selectedTestView = TestViews[0];
@@ -123,6 +124,9 @@
                     break;
                 case "TEC":
                     Content = DeviceManager.Factory.Instance.GetTecView();
+                    break;
+                case "TEC/Heater/Fault":
+                    Content = DeviceManager.Factory.Instance.GetFaultHeaterTecView();
                     break;
                 default:
                     return;

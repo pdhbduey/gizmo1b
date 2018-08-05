@@ -20,7 +20,7 @@
         <!-- Waveform -->
         <GroupBox Grid.Row="0" Grid.Column="0">
             <GroupBox.Header>
-                <TextBlock Text="Waveform" FontWeight="Bold"/>
+                <TextBlock Text="TEC Waveform" FontWeight="Bold"/>
             </GroupBox.Header>
 
             <StackPanel Margin="1">
@@ -28,40 +28,44 @@
                     <Label Width="70" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Waveform:"></Label>
                     <ComboBox Height="25" Width="100" HorizontalAlignment="Left" ItemsSource="{Binding Waveforms}" SelectedItem="{Binding SelectedWaveForm}"></ComboBox>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label Width="70" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Period [ms]:"></Label>
+                <StackPanel Margin="1,10,1,1" Orientation="Horizontal">
+                    <Label Width="120" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="1" Content="Period [2-10000 ms]:"></Label>
                     <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=TecPeriod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetTecPeriodCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
                     </TextBox>
+                    <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetTecPeriodCommand}"/>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Height="25" Width="70" VerticalAlignment="Center" Margin="1" Content="iRef: "></Label>
-                    <TextBox Height="25" Width="100" Text="{Binding Path=IrefValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2}" HorizontalAlignment="Left">
+                    <Label Height="25" Width="120" VerticalAlignment="Center" Margin="1" Content="iRef [-15-15]: "></Label>
+                    <TextBox Height="25" Width="100" Text="{Binding Path=IrefValueText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SendIrefCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
                     </TextBox>
+                    <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SendIrefCommand}"/>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Height="25" Width="70" VerticalAlignment="Center" Margin="1" Content="VMax [V]: "></Label>
-                    <TextBox Height="25" Width="100" Text="{Binding Path=VoutValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2}" HorizontalAlignment="Left">
+                    <Label Height="25" Width="120" VerticalAlignment="Center" Margin="1" Content="VMax [0-21 V]: "></Label>
+                    <TextBox Height="25" Width="100" Text="{Binding Path=VoutValueText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetVoutCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
                     </TextBox>
+                    <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetVoutCommand}"/>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="70" VerticalAlignment="Center" Margin="1" Content="Cycles:"></Label>
+                    <Label Width="120" VerticalAlignment="Center" Margin="1" Content="Cycles:"></Label>
                     <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=WaveformCycles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetWaveformCyclesCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
                     </TextBox>
+                    <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetWaveformCyclesCommand}"/>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="70" VerticalAlignment="Center" Margin="1"/>
+                    <Label Width="120" VerticalAlignment="Center" Margin="1"/>
                     <ToggleButton IsChecked="{Binding WaveformButtonIsChecked, Mode=OneWay}" Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding WaveformButtonState}" Command="{Binding StartStopWaveformCommand}"></ToggleButton>
                 </StackPanel>
             </StackPanel>
@@ -70,40 +74,43 @@
         <!-- Gains -->
         <GroupBox Grid.Row="0" Grid.Column="1">
             <GroupBox.Header>
-                <TextBlock Text="Gains" FontWeight="Bold"/>
+                <TextBlock Text="TEC Gains" FontWeight="Bold"/>
             </GroupBox.Header>
 
             <StackPanel Margin="1">
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="110" Margin="1" Content="Integral Gain: "></Label>
-                    <TextBox Height="25" Width="100" Text="{Binding Path=IntegralGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                    <Label Width="165" Margin="1" Content="Integral Gain [0-100]: "></Label>
+                    <TextBox Height="25" Width="100" Text="{Binding Path=IntegralGainText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetIntegralGainCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
                     </TextBox>
+                    <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetIntegralGainCommand}"/>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="110" Margin="1" Content="Proportional Gain: "></Label>
-                    <TextBox Height="25" Width="100" Text="{Binding Path=ProportionalGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                    <Label Width="165" Margin="1" Content="Proportional Gain [0.01-100]: "></Label>
+                    <TextBox Height="25" Width="100" Text="{Binding Path=ProportionalGainText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetProportionalGainCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
                     </TextBox>
+                    <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetProportionalGainCommand}"/>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="110" Margin="1" Content="Derivative Gain: "></Label>
-                    <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=DerivativeGain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}">
+                    <Label Width="165" Margin="1" Content="Derivative Gain [0-100]: "></Label>
+                    <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=DerivativeGainText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.InputBindings>
                             <KeyBinding Command="{Binding SetDerivativeGainCommand}" Key="Enter"/>
                         </TextBox.InputBindings>
                     </TextBox>
+                    <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetDerivativeGainCommand}"/>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="110" VerticalAlignment="Center" Margin="1"/>
+                    <Label Width="165" VerticalAlignment="Center" Margin="1"/>
                     <ToggleButton IsChecked="{Binding ClosedLoopButtonIsChecked, Mode=OneWay}" Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding ClosedLoopButtonState}" Command="{Binding ClosedLoopToggleCommand}"></ToggleButton>
                 </StackPanel>
                 <StackPanel Margin="1" Orientation="Horizontal">
-                    <Label Width="110" VerticalAlignment="Center" Margin="1"/>
+                    <Label Width="165" VerticalAlignment="Center" Margin="1"/>
                     <ToggleButton IsChecked="{Binding EnableButtonIsChecked, Mode=OneWay}" Width="100" Height="25" HorizontalAlignment="Left" Content="{Binding EnableButtonState}" Command="{Binding EnableCommand}"></ToggleButton>
                 </StackPanel>
             </StackPanel>
@@ -112,7 +119,7 @@
         <!-- Custom waveform -->
         <GroupBox Grid.Row="1" Grid.Column="0">
             <GroupBox.Header>
-                <TextBlock Text="Custom Waveform" FontWeight="Bold"/>
+                <TextBlock Text="TEC Custom Waveform" FontWeight="Bold"/>
             </GroupBox.Header>
             <Grid>
                 <StackPanel>
@@ -125,7 +132,7 @@
         <!-- Status -->
         <GroupBox Grid.Row="1" Grid.Column="1">
             <GroupBox.Header>
-                <TextBlock Text="Status" FontWeight="Bold"/>
+                <TextBlock Text="TEC Status" FontWeight="Bold"/>
             </GroupBox.Header>
 
             <StackPanel Margin="1">

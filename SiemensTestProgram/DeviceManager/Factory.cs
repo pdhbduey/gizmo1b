@@ -54,6 +54,19 @@ namespace DeviceManager
             };
         }
 
+        public MergedTecAndHeaterView GetFaultHeaterTecView()
+        {
+            var heaterView = GetHeaterView();
+            var tecView = GetTecView();
+            var faultView = GetFaultView();
+
+
+            return new MergedTecAndHeaterView()
+            {
+                DataContext = new MergedTecAndHeaterViewModel(heaterView, tecView, faultView)
+            };
+        }
+
         /// <summary>
         ///  Sets the data context for DAC view.
         /// </summary>

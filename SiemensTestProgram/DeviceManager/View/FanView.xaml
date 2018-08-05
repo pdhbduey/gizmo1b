@@ -39,8 +39,9 @@
                     <Label Content="%"></Label>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
-                    <Label Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Period [µs]: "></Label>
+                    <Label Width="135" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Period [10-1000000 µs]: "></Label>
                     <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=PeriodOne}" KeyUp="EnterUpdate"></TextBox>
+                    <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetFanPeriodOne}"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
@@ -67,8 +68,9 @@
                     <Label Content="%"></Label>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="1">
-                    <Label Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Period [µs]: "></Label>
+                    <Label Width="135" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Period [10-1000000 µs]: "></Label>
                     <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=PeriodTwo}" KeyUp="EnterUpdate"></TextBox>
+                    <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetFanPeriodTwo}"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
