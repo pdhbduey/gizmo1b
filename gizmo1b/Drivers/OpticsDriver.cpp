@@ -32,6 +32,7 @@ OpticsDriver::OpticsDriver()
  */
 void OpticsDriver::SetLedIntensity(uint32_t nChanIdx, uint32_t nLedIntensity)
 {
+    // Note that LDAC is not used for v1 LED board
     uint16_t nBitPattern[2] = {0xFF00, 0x0000};
 
     nBitPattern[0] = (uint16_t)(nBitPattern[0] | (((uint16_t)kwrInputupdateN << 4) | nChanIdx));
@@ -386,7 +387,7 @@ void OpticsDriver::SetIntegratorState(pdIntegratorState state, uint32_t npdChanI
             pinState = 0;
         }
         gioSetBit(hetPORT1, m_dataPin, pinState);
-        gioSetBit(hetPORT1, m_clkPin, 1);
+        gioSetBit(hetPORT1, m_clkPin,  1);
         gioSetBit(hetPORT1, m_dataPin, 0);
     }
     gioSetBit(hetPORT1, m_clkPin, 0);
@@ -394,17 +395,13 @@ void OpticsDriver::SetIntegratorState(pdIntegratorState state, uint32_t npdChanI
 
 void OpticsDriver::SetBoardVersion(struct BoardVersion& boardVersion)
 {
-    uint32_t gpioDirectionConfig = 0;
-    uint32_t gpioOutputState     = 0;
-    m_boardVersion               = boardVersion;
+    m_boardVersion = boardVersion;
     if (m_boardVersion.m_isLedBoardEnabled) {
         switch (boardVersion.m_ledBoardVersion) {
         default:
         case LED_BOARD_V1:
-            gpioDirectionConfig |= (1<<LED_BOARD_V1_CS_PIN);
-            gpioDirectionConfig |= (1<<LED_BOARD_V1_LDAC_PIN);
-            gpioOutputState     |= (1<<LED_BOARD_V1_CS_PIN);
-            gpioOutputState     |= (1<<LED_BOARD_V1_LDAC_PIN);
+            gioSetBit(hetPORT1, LED_BOARD_V1_CS_PIN,   1);
+            gioSetBit(hetPORT1, LED_BOARD_V1_LDAC_PIN, 1);
             break;
         case LED_BOARD_V2:
             // TBD
@@ -417,45 +414,33 @@ void OpticsDriver::SetBoardVersion(struct BoardVersion& boardVersion)
         switch (boardVersion.m_photodiodeBoardVersion) {
         default:
         case PHOTODIODE_BOARD_V1:
-            gpioDirectionConfig |= (1<<PD_BOARD_V1_CNV_PIN);
-            gpioDirectionConfig |= (1<<PD_BOARD_V1_DATA_PIN);
-            gpioDirectionConfig |= (1<<PD_BOARD_V1_CLK_PIN);
-            gpioDirectionConfig |= (1<<PD_BOARD_V1_LATCH_PIN);
-            gpioOutputState     |= (1<<PD_BOARD_V1_CNV_PIN);
-            gpioOutputState     |= (0<<PD_BOARD_V1_DATA_PIN);
-            gpioOutputState     |= (0<<PD_BOARD_V1_CLK_PIN);
-            gpioOutputState     |= (1<<PD_BOARD_V1_LATCH_PIN); //Latch pin is high to start with
-            m_photodiodeVref     = 5;
-            m_dataPin            = PD_BOARD_V1_DATA_PIN;
-            m_clkPin             = PD_BOARD_V1_CLK_PIN;
-            m_latchPin           = PD_BOARD_V1_LATCH_PIN;
-            m_cnvPin             = PD_BOARD_V1_CNV_PIN;
+            m_photodiodeVref = 5;
+            m_dataPin        = PD_BOARD_V1_DATA_PIN;
+            m_clkPin         = PD_BOARD_V1_CLK_PIN;
+            m_latchPin       = PD_BOARD_V1_LATCH_PIN;
+            m_cnvPin         = PD_BOARD_V1_CNV_PIN;
+            gioSetBit(hetPORT1, m_cnvPin,   1);
+            gioSetBit(hetPORT1, m_dataPin,  0);
+            gioSetBit(hetPORT1, m_clkPin,   0);
+            gioSetBit(hetPORT1, m_latchPin, 1); //Latch pin is high to start with
             break;
         case PHOTODIODE_BOARD_V2:
-            gpioDirectionConfig |= (1<<PD_BOARD_V2_CNV_PIN);
-            gpioDirectionConfig |= (1<<PD_BOARD_V2_DATA_PIN);
-            gpioDirectionConfig |= (1<<PD_BOARD_V2_CLK_PIN);
-            gpioDirectionConfig |= (1<<PD_BOARD_V2_LATCH_PIN);
-            gpioDirectionConfig |= (1<<PD_BOARD_V2_TEMP_CTRL_A);
-            gpioDirectionConfig |= (1<<PD_BOARD_V2_TEMP_CTRL_B);
-            gpioOutputState     |= (1<<PD_BOARD_V2_CNV_PIN);
-            gpioOutputState     |= (0<<PD_BOARD_V2_DATA_PIN);
-            gpioOutputState     |= (0<<PD_BOARD_V2_CLK_PIN);
-            gpioOutputState     |= (1<<PD_BOARD_V2_LATCH_PIN); //Latch pin is high to start with
-            gpioOutputState     |= (0<<PD_BOARD_V2_TEMP_CTRL_A);
-            gpioOutputState     |= (0<<PD_BOARD_V2_TEMP_CTRL_B);
-            m_photodiodeVref     = 4.096;
-            m_dataPin            = PD_BOARD_V1_DATA_PIN;
-            m_clkPin             = PD_BOARD_V1_CLK_PIN;
-            m_latchPin           = PD_BOARD_V1_LATCH_PIN;
-            m_cnvPin             = PD_BOARD_V1_CNV_PIN;
-            m_tCtrlA             = PD_BOARD_V2_TEMP_CTRL_A;
-            m_tCtrlB             = PD_BOARD_V2_TEMP_CTRL_B;
+            m_photodiodeVref = 4.096;
+            m_dataPin        = PD_BOARD_V2_DATA_PIN;
+            m_clkPin         = PD_BOARD_V2_CLK_PIN;
+            m_latchPin       = PD_BOARD_V2_LATCH_PIN;
+            m_cnvPin         = PD_BOARD_V2_CNV_PIN;
+            m_tCtrlA         = PD_BOARD_V2_TEMP_CTRL_A;
+            m_tCtrlB         = PD_BOARD_V2_TEMP_CTRL_B;
+            gioSetBit(hetPORT1, m_cnvPin,   1);
+            gioSetBit(hetPORT1, m_dataPin,  0);
+            gioSetBit(hetPORT1, m_clkPin,   0);
+            gioSetBit(hetPORT1, m_latchPin, 1); //Latch pin is high to start with
+            gioSetBit(hetPORT1, m_tCtrlA,   0);
+            gioSetBit(hetPORT1, m_tCtrlB,   0);
             break;
         }
     }
-    gioSetDirection(hetPORT1, gpioDirectionConfig);
-    gioSetPort(hetPORT1, gpioOutputState);
 }
 
 void OpticsDriver::GetBoardVersion(struct BoardVersion& boardVersion)
