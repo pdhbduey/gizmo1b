@@ -11,7 +11,7 @@
     <Grid>
         <GroupBox>
             <GroupBox.Header>
-                <TextBlock Text="Status" FontWeight="Bold"/>
+                <TextBlock Text="Fault Status" FontWeight="Bold"/>
             </GroupBox.Header>
             <Grid>
                 <Grid.RowDefinitions>

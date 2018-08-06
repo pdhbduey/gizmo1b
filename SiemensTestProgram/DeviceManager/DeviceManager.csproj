@@ -121,6 +121,7 @@
     <Compile Include="ViewModel\FanViewModel.cs" />
     <Compile Include="ViewModel\FaultViewModel.cs" />
     <Compile Include="ViewModel\HeaterViewModel.cs" />
+    <Compile Include="ViewModel\MergedTecAndHeaterViewModel.cs" />
     <Compile Include="ViewModel\MotorViewModel.cs" />
     <Compile Include="ViewModel\LedViewModel.cs" />
     <Compile Include="ViewModel\OpticsViewModel.cs" />

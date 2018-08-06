@@ -26,12 +26,13 @@
                             <ComboBox IsEnabled="{Binding IsNotSaving}" Height="25" Width="70" HorizontalAlignment="Left" Margin="1" ItemsSource="{Binding Resolutions}" SelectedItem="{Binding SelectedResolution}"></ComboBox>
                         </StackPanel>
                         <StackPanel Margin="1" Orientation="Horizontal">
-                            <Label IsEnabled="{Binding IsNotSaving}" Width="105" Content="Samples: "></Label>
+                            <Label IsEnabled="{Binding IsNotSaving}" Width="105" Content="Samples [10-1000]: "></Label>
                             <TextBox IsEnabled="{Binding IsNotSaving}" Margin="1" Height="25" Width="70" Text="{Binding Path=NumberOfSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" MaxLength="4">
                                 <TextBox.InputBindings>
                                     <KeyBinding Command="{Binding SetNumberOfSamplesCommand}" Key="Enter"/>
                                 </TextBox.InputBindings>
                             </TextBox>
+                            <Button Content="Set" Margin="1,0,10,0" Height="25" Width="100" Command="{Binding SetNumberOfSamplesCommand}"/>
                         </StackPanel>
                         
 

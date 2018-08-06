@@ -254,6 +254,113 @@ namespace DeviceManager.ViewModel
             }
         }
 
+        private string integralGainText;
+        public string IntegralGainText
+        {
+            get
+            {
+                return integralGainText;
+            }
+
+            set
+            {
+                integralGainText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    IntegralGain = parsed;
+                }
+
+                OnPropertyChanged(nameof(IntegralGainText));
+            }
+        }
+
+        private string derivativeGainText;
+        public string DerivativeGainText
+        {
+            get
+            {
+                return derivativeGainText;
+            }
+
+            set
+            {
+                derivativeGainText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    derivativeGain = parsed;
+                }
+
+                OnPropertyChanged(nameof(DerivativeGainText));
+            }
+        }
+
+        private string proportionalGainText;
+        public string ProportionalGainText
+        {
+            get
+            {
+                return proportionalGainText;
+            }
+
+            set
+            {
+                proportionalGainText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    proportionalGain = parsed;
+                }
+
+                OnPropertyChanged(nameof(ProportionalGainText));
+            }
+        }
+
+        //
+        private string voutValueText;
+        public string VoutValueText
+        {
+            get
+            {
+                return voutValueText;
+            }
+
+            set
+            {
+                voutValueText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    voutValue = parsed;
+                }
+
+                OnPropertyChanged(nameof(VoutValueText));
+            }
+        }
+
+        private string irefValueText;
+        public string IrefValueText
+        {
+            get
+            {
+                return irefValueText;
+            }
+
+            set
+            {
+                irefValueText = value;
+
+                if (float.TryParse(value, out var parsed))
+                {
+                    IrefValue = parsed;
+                }
+
+                OnPropertyChanged(nameof(IrefValueText));
+            }
+        }
+
+
         public int WaveformCycles
         {
             get
@@ -597,11 +704,11 @@ namespace DeviceManager.ViewModel
         {
             if (tecPeriod < TecDefaults.PeriodMinimum)
             {
-                TecPeriod = TecDefaults.PeriodMinimum;
+                return;
             }
             else if (tecPeriod > TecDefaults.PeriodMaximum)
             {
-                TecPeriod = TecDefaults.PeriodMaximum;
+                return;
             }
 
             await tecModel.SetPeriodCommand(tecPeriod);
@@ -611,11 +718,11 @@ namespace DeviceManager.ViewModel
         {
             if (proportionalGain < TecDefaults.ProportionalGainMinimum)
             {
-                ProportionalGain = TecDefaults.ProportionalGainMinimum;
+                return;
             }
             else if (proportionalGain > TecDefaults.ProportionalGainMaximum)
             {
-                ProportionalGain = TecDefaults.ProportionalGainMaximum;
+                return;
             }
 
             await tecModel.SetProportionalGainCommand(proportionalGain);
@@ -625,11 +732,11 @@ namespace DeviceManager.ViewModel
         {
             if (integralGain < TecDefaults.IntegralGainMinimum)
             {
-                IntegralGain = TecDefaults.IntegralGainMinimum;
+                return;
             }
             else if (integralGain > TecDefaults.IntegralGainMaximum)
             {
-                IntegralGain = TecDefaults.IntegralGainMaximum;
+                return;
             }
 
             await tecModel.SetIntegralGainCommand(integralGain);
@@ -639,11 +746,11 @@ namespace DeviceManager.ViewModel
         {
             if (derivativeGain < TecDefaults.DerivativeGainMinimum)
             {
-                DerivativeGain = TecDefaults.DerivativeGainMinimum;
+                return;
             }
             else if (derivativeGain > TecDefaults.DerivativeGainMaximum)
             {
-                DerivativeGain = TecDefaults.DerivativeGainMaximum;
+                return;
             }
 
             await tecModel.SetDerivativeGainCommand(derivativeGain);
@@ -672,11 +779,11 @@ namespace DeviceManager.ViewModel
         {
             if (voutValue < TecDefaults.VoutMinimum)
             {
-                VoutValue = TecDefaults.VoutMinimum;
+                return;
             }
             else if (voutValue > TecDefaults.VoutMaximum)
             {
-                VoutValue = TecDefaults.VoutMaximum;
+                return;
             }
 
             await tecModel.SetVoutCommand(voutValue);
@@ -769,11 +876,11 @@ namespace DeviceManager.ViewModel
         {
             if (waveformCycles < TecDefaults.WaveformCyclesMinimum)
             {
-                WaveformCycles = TecDefaults.WaveformCyclesMinimum;
+                return;
             }
             else if (waveformCycles > TecDefaults.WaveformCyclesMaximum)
             {
-                WaveformCycles = TecDefaults.WaveformCyclesMaximum;
+                return;
             }
 
             await tecModel.SetWaveformCyclesCommand(waveformCycles);
@@ -783,11 +890,11 @@ namespace DeviceManager.ViewModel
         {
             if (sampleTime < TecDefaults.SampleTimeMinimum)
             {
-                SampleTime = TecDefaults.SampleTimeMinimum;
+                return;
             }
             else if (sampleTime > TecDefaults.SampleTimeMaximum)
             {
-                SampleTime = TecDefaults.SampleTimeMaximum;
+                return;
             }
 
             await tecModel.SetSampleTimeCommand(sampleTime);
@@ -931,13 +1038,13 @@ namespace DeviceManager.ViewModel
             var vmaxResponse = tecModel.ReadVmax().Result;
             if (vmaxResponse.succesfulResponse)
             {
-                VoutValue = Helper.GetFloatFromBigEndian(vmaxResponse.response);
+                VoutValueText = Helper.GetFloatFromBigEndian(vmaxResponse.response).ToString("0.##");
             }
 
             var irefSamplesResponse = tecModel.ReadIrefSamples().Result;
             if (irefSamplesResponse.succesfulResponse)
             {
-                IrefValue = Helper.GetFloatFromBigEndian(irefSamplesResponse.response);
+                IrefValueText = Helper.GetFloatFromBigEndian(irefSamplesResponse.response).ToString("0.##");
             }
 
             var readCyclesResponse = tecModel.ReadCycles().Result;
@@ -955,19 +1062,19 @@ namespace DeviceManager.ViewModel
             var integralGainResponse = tecModel.ReadIntegralGain().Result;
             if (integralGainResponse.succesfulResponse)
             {
-                IntegralGain = Helper.GetFloatFromBigEndian(integralGainResponse.response);
+                IntegralGainText = Helper.GetFloatFromBigEndian(integralGainResponse.response).ToString("0.##");
             }
 
             var derivativeGainResponse = tecModel.ReadDerivativeGain().Result;
             if (derivativeGainResponse.succesfulResponse)
             {
-                DerivativeGain = Helper.GetFloatFromBigEndian(derivativeGainResponse.response);
+                DerivativeGainText = Helper.GetFloatFromBigEndian(derivativeGainResponse.response).ToString("0.##");
             }
 
             var proportionalGainResponse = tecModel.ReadProportionalGain().Result;
             if (proportionalGainResponse.succesfulResponse)
             {
-                ProportionalGain = Helper.GetFloatFromBigEndian(proportionalGainResponse.response);
+                ProportionalGainText = Helper.GetFloatFromBigEndian(proportionalGainResponse.response).ToString("0.##");
             }
 
             var controlStateResponse = tecModel.ReadControlState().Result;

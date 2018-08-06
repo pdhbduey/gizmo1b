@@ -28,7 +28,7 @@
                         Value="{Binding SliderVoltageValue, Delay=15}"
                         >
                         </Slider>
-                        <TextBox Margin="1" Height="25" Text="{Binding Path=VoltageValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,StringFormat=N2}" HorizontalAlignment="Left" MaxLength="5" Width="40">
+                        <TextBox Margin="1" Height="25" Text="{Binding Path=VoltageValueString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" MaxLength="5" Width="40">
                             <TextBox.InputBindings>
                                 <KeyBinding Command="{Binding SendDacValueCommand}" Key="Enter"/>
                             </TextBox.InputBindings>

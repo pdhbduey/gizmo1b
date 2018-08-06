@@ -40,6 +40,9 @@ namespace DeviceManager.ViewModel
             dutyCycleOne = FanDefaults.MinimumDutyCycle;
             dutyCycleTwo = FanDefaults.MinimumDutyCycle;
             statusMessage = "";
+
+            SetFanPeriodOne = new RelayCommand(x => SetFanPeriod(1));
+            SetFanPeriodTwo = new RelayCommand(x => SetFanPeriod(2));
             // Update statuses
             InitialUpdate();
             StartUpdateTask();
@@ -98,6 +101,10 @@ namespace DeviceManager.ViewModel
                 SetFanDutyCycle(channel: 2);
             }
         }
+
+        public RelayCommand SetFanPeriodOne { get; set; }
+
+        public RelayCommand SetFanPeriodTwo { get; set; }
 
         public float PeriodOne
         {

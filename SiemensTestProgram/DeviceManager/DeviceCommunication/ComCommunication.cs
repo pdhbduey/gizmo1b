@@ -25,7 +25,7 @@ namespace DeviceManager.DeviceCommunication
         //private SemaphoreSlim readSemaphore;
 
         // Default configuration
-        private const int readTimeout = 100;
+        private const int readTimeout = 1000;
         private const int readBufferSize = 5;
         private string comPort;
         private int baudRate = 115200;
@@ -69,10 +69,10 @@ namespace DeviceManager.DeviceCommunication
                     // Write to serial port
                     receivedData = false;
                     serialPort.DiscardOutBuffer();
+                    serialPort.DiscardInBuffer();
                     serialPort.Write(request, 0, request.Length);
                     var timer = new Stopwatch();
                     timer.Start();
-
                     // Read from serial port
                     do
                     {
