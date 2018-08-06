@@ -21,97 +21,132 @@ public:
     enum AdcBwSelectBit {QUARTER_BW, FULL_BW};
     enum AdcReadBackBit {READ_BACK_EN, READ_BACK_DISABLE};
     enum AdcRefSelectionBits {
-            INT_REF2_5_AND_TEMP_SENS,   // REF = 2.5 V buffered output.
-            INT_REF4_096_AND_TEMP_SENS, // REF = 4.096 V buffered output.
-            EXT_REF_AND_TEMP_SENS,      // Internal buffer disabled
-            EXT_REF_AND_TEMP_SENS_BUFF, // Internal buffer and temperature sensor enabled.
-            EXT_REF = 6,                // Int ref, int buffer, and temp sensor disabled.
-            EXT_REF_BUFF                // Int buffer enabled. Int ref and temp sensor disabled.
-        };
+        INT_REF2_5_AND_TEMP_SENS,   // REF = 2.5 V buffered output.
+        INT_REF4_096_AND_TEMP_SENS, // REF = 4.096 V buffered output.
+        EXT_REF_AND_TEMP_SENS,      // Internal buffer disabled
+        EXT_REF_AND_TEMP_SENS_BUFF, // Internal buffer and temperature sensor enabled.
+        EXT_REF = 6,                // Int ref, int buffer, and temp sensor disabled.
+        EXT_REF_BUFF                // Int buffer enabled. Int ref and temp sensor disabled.
+    };
     enum AdcChSeqBits {
-            DISABLE_SEQ,
-            UPDATE_CFG,
-            SCAN_IN_CH_AND_TEMP,
-            SCAN_IN_CH
-        };
+        DISABLE_SEQ,
+        UPDATE_CFG,
+        SCAN_IN_CH_AND_TEMP,
+        SCAN_IN_CH
+    };
     enum AdcInChCfgBits {
-            BIPOLAR_DIFF_PAIRS  = 0, // INx referenced to VREF/2 ± 0.1 V.
-            BIPOLAR             = 2, // INx referenced to COM = VREF/2 ± 0.1 V.
-            TEMP_SENSOR         = 3, // Temperature sensor
-            UNIPOLAR_DIFF_PAIRS = 4, // INx referenced to GND ± 0.1 V.
-            UNIPOLAR_REF_TO_COM = 6, // INx referenced to COM = GND ± 0.1 V.
-            UNIPOLAR_REF_TO_GND = 7 // INx referenced to GND
-         };
+        BIPOLAR_DIFF_PAIRS  = 0, // INx referenced to VREF/2 ± 0.1 V.
+        BIPOLAR             = 2, // INx referenced to COM = VREF/2 ± 0.1 V.
+        TEMP_SENSOR         = 3, // Temperature sensor
+        UNIPOLAR_DIFF_PAIRS = 4, // INx referenced to GND ± 0.1 V.
+        UNIPOLAR_REF_TO_COM = 6, // INx referenced to COM = GND ± 0.1 V.
+        UNIPOLAR_REF_TO_GND = 7, // INx referenced to GND
+     };
     enum PDAdcChannels {
-            PDINPUTA1 = 0,
-            PDINPUTA2 = 1,
-            PDINPUTA3 = 2,
-            PDINPUTB1 = 3,
-            PDINPUTB2 = 4,
-            PDINPUTB3 = 5
-        };
+        PDINPUTA1 = 0,
+        PDINPUTA2 = 1,
+        PDINPUTA3 = 2,
+        PDINPUTB1 = 3,
+        PDINPUTB2 = 4,
+        PDINPUTB3 = 5
+    };
     enum AdcCtrlRegisterShifts {
-            READ_BACK_SHIFT   =  0,
-            SEQ_EN_SHIFT      =  1,
-            REF_SEL_SHIFT     =  3,
-            FULL_BW_SEL_SHIFT =  6,
-            IN_CH_SEL_SHIFT   =  7,
-            IN_CH_CFG_SHIFT   = 10,
-            CFG_SHIFT         = 13
-        };
+        READ_BACK_SHIFT   =  0,
+        SEQ_EN_SHIFT      =  1,
+        REF_SEL_SHIFT     =  3,
+        FULL_BW_SEL_SHIFT =  6,
+        IN_CH_SEL_SHIFT   =  7,
+        IN_CH_CFG_SHIFT   = 10,
+        CFG_SHIFT         = 13
+    };
     enum pdIntegratorState {
-        RESET_STATE = 0,
-        HOLD_STATE = 1,
+        RESET_STATE     = 0,
+        HOLD_STATE      = 1,
         INTEGRATE_STATE = 2
     };
     enum pdIntegratorSwitch {
         RESET_SW = 0,
-        HOLD_SW = 1
+        HOLD_SW  = 1
     };
     /*
-     * Use SPI3 and configure SPI3A_SOMI by setting SPI3_SOMI_SW to 0
-     *
-     * Configure following GPIOs
-     * v1 boards:
-     * ==========
-     * LED GPIO:    N2HET1[13] -> CS   (Output/High);
-     *              N2HET1[12] -> LDAC (Output/High)
-     * PD ADC GPIO: N2HET1[14] -> CNV  (Output/Low)
-     * PD SR GPIO:  N2HET1[24] -> DS   (Serial Data In);
-     *              N2HET1[26] -> SHCP (Shift Reg Clock Input)
-     *              N2HET1[28] -> STCP (Storage Reg Clock Input)
-     * v2 boards
-     * =========
-     * LED GPIO:    N2HET1[15] -> S0   (Output)
-     *              N2HET1[13] -> S1   (Output)
-     * NOTE:                      S2 is mapped to BB J13(10) GND
-     *              N2HET1[14] -> SYNC (Output/TBD)
-     * LED ADC GPIO:N2HET1[12] -> CNV  (Output/Low)
-     * PD ADC GPIO: N2HET1[26] -> CNV  (Output/Low)
-     * PD SR GPIO:  N2HET1[12] -> DS   (Serial Data In/DATA);
-     *              N2HET1[13] -> SHCP (Shift Reg Clock Input/CLK)
-     *              N2HET1[24] -> STCP (Storage Reg Clock Input/LATCH)
-     * PD T CTRL:   N2HET1[28] -> CT_A (Temperature Ctrl A)
-     *              N2HET1[30] -> CT_B (Temperature Ctrl B)
+     * =========================================================================
+     * MCU GPIO: MIBSPI3NCS[0] -> MCU_SPI3_SOMI_SW (0 - SPI3A_SOMI, 1 - SPI3B_SOMI)
+     * =========================================================================
+     * LED v1 board
+     * =========================================================================
+     * DAC SPI:  SPI3B_SIMO    -> EXT_DAC_SPI_SIMO
+     *           SPI3B_CLK     -> EXT_DAC_SPI_CLK
+     *           SPI3B_SOMI    -> EXT_DAC_SPI_SOMI
+     * DAC GPIO: N2HET1[13]    -> EXT_DAC_CS/LD     (Output/High);
+     *           N2HET1[12]    -> EXT_DAC_LDAC      (Output/High)
+     * =========================================================================
+     * PD v1 board
+     * =========================================================================
+     * ADC SPI:  SPI3A_SIMO -> EXT_ADC_SPI1_SIMO
+     *           SPI3A_CLK  -> EXT_ADC_SPI1_CLK
+     *           SPI3A_SOMI -> EXT_ADC_SPI1_SOMI
+     * ADC GPIO: N2HET1[14] -> EXT_ADC_CNV       (Output/Low)
+     * SR  GPIO: N2HET1[24] -> EXT_ADC_SHFT_DS   (Serial Data In);
+     *           N2HET1[26] -> EXT_ADC_SHFT_SHCP (Shift   Reg Clock Input/CLK)
+     *           N2HET1[28] -> EXT_ADC_SHFT_STCP (Storage Reg Clock Input/LATCH)
+     * =========================================================================
+     * LED v2 board
+     * =========================================================================
+     * DAC SPI:  SPI3B_SIMO -> LED_DAC_SDI
+     *           SPI3B_CLK  -> LED_DAC_SCLK
+     * GPIO:     N2HET1[15] -> LED_CTRL_S0   (Output)
+     *           N2HET1[13] -> LED_CTRL_S1   (Output)
+     *           J13[10]GND -> LED_CTRL_S2   (Output, always 0)
+     *           N2HET1[14] -> LED_DAC_SYNC  (Output/TBD)
+     * ADC SPI:  SPI3A_SIMO -> ADC_SPI1_SIMO
+     *           SPI3A_CLK  -> ADC_SPI1_CLK
+     *           SPI3A_SOMI -> ADC_SPI1_SOMI
+     * ADC GPIO: N2HET1[12] -> ADC_CNV       (Output/Low)
+     * =========================================================================
+     * PD v2 board
+     * =========================================================================
+     * ADC SPI:   SPI3A_SIMO -> EXT_ADC_SPI1_SIMO
+     *            SPI3A_CLK  -> EXT_ADC_SPI1_CLK
+     *            SPI3A_SOMI -> EXT_ADC_SPI1_SOMI
+     * ADC GPIO:  N2HET1[26] -> ADC_CNV           (Output/Low)
+     * SR  GPIO:  N2HET1[12] -> EXT_ADC_SHFT_DS   (Serial Data In/DATA);
+     *            N2HET1[13] -> EXT_ADC_SHFT_SHCP (Shift   Reg Clock Input/CLK)
+     *            N2HET1[24] -> EXT_ADC_SHFT_STCP (Storage Reg Clock Input/LATCH)
+     * TEMP CTRL: N2HET1[28] -> TEMP_SW_CTRL_A    (Temperature Ctrl A)
+     *            N2HET1[30] -> TEMP_SW_CTRL_B    (Temperature Ctrl B)
+     * =========================================================================
      */
-    enum OpticsPinMappings {
+    enum McuSpi3SomiSw {
         OPTICS_MCU_SPI3_SOMI_SW = PIN_CS0,
     };
-    enum PhotoDiodePinMappingBoardV1 {
+    enum McuSpi3SomiSwSelect {
+        OPTICS_MCU_SPI3A_SOMI = 0,
+        OPTICS_MCU_SPI3B_SOMI = 1,
+    };
+    enum LedPinMappingBoardV1 {
         LED_BOARD_V1_CS_PIN   = PIN_HET_13,
         LED_BOARD_V1_LDAC_PIN = PIN_HET_12,
+    };
+    enum PhotoDiodePinMappingBoardV1 {
         PD_BOARD_V1_DATA_PIN  = PIN_HET_24,
         PD_BOARD_V1_CLK_PIN   = PIN_HET_26,
         PD_BOARD_V1_LATCH_PIN = PIN_HET_28,
         PD_BOARD_V1_CNV_PIN   = PIN_HET_14,
     };
+    enum LedPinMappingBoardV2 {
+        LED_BOARD_V2_ADC_CNV      = PIN_HET_12,
+        LED_BOARD_V2_LED_CTRL_S0  = PIN_HET_15,
+        LED_BOARD_V1_LED_CTRL_S1  = PIN_HET_13,
+        // LED_BOARD_V2_LED_CTRL_S2 is not connected on BB!!!
+        LED_BOARD_V2_LED_DAC_SYNC = PIN_HET_14,
+    };
     enum PhotodiodePinMappingBoardV2 {
-        PD_BOARD_V2_DATA_PIN  = PIN_HET_12,
-        PD_BOARD_V2_CLK_PIN   = PIN_HET_13,
-        PD_BOARD_V2_LATCH_PIN = PIN_HET_24,
-        PD_BOARD_V2_CNV_PIN   = PIN_HET_26,
-        PD_BOARD_V2_T_CTRL_A  = PIN_HET_28,
-        PD_BOARD_V2_T_CTRL_B  = PIN_HET_30,
+        PD_BOARD_V2_DATA_PIN    = PIN_HET_12,
+        PD_BOARD_V2_CLK_PIN     = PIN_HET_13,
+        PD_BOARD_V2_LATCH_PIN   = PIN_HET_24,
+        PD_BOARD_V2_CNV_PIN     = PIN_HET_26,
+        PD_BOARD_V2_TEMP_CTRL_A = PIN_HET_28,
+        PD_BOARD_V2_TEMP_CTRL_B = PIN_HET_30,
     };
     enum LedBoardVersion {
         LED_BOARD_V1 = 1 << 0,
