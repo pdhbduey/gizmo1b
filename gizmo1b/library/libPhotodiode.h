@@ -69,6 +69,7 @@ public:
     void pdBoardDisable();
     uint32 getLedBoardEnabledStatus();
     uint32 getPhotodiodeBoardEnabledStatus();
+    float readLedMonitorPhotodiode();  // 0V-4.096V
 private:
     float convertPhotodiodeThermistorRawDataToResistance(uint16_t data);
     float convertLedThermistorRawDataToResistance(uint16_t data);

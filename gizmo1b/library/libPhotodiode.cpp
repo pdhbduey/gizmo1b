@@ -282,3 +282,14 @@ uint32 LibPhotodiode::getPhotodiodeBoardEnabledStatus()
     return m_opticsDriver.IsPhotodiodeBoardEnabled() ? PD_BOARD_ENABLED
                                                      : PD_BOARD_DISABLED;
 }
+
+float LibPhotodiode::readLedMonitorPhotodiode()
+{
+    LibMutex libMutex(s_mutex);
+    uint32_t nledChanIdx = m_ledMap[m_led];
+    struct OpticsDriver::Data data;
+    m_opticsDriver.GetLedDataRaw(nledChanIdx, &data);
+    float volts = data.m_ledMontorPhotodiodeResultRaw
+                * (m_opticsDriver.GetLedVref() / 65535);
+    return volts;
+}

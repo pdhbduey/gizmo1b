@@ -138,7 +138,7 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "dio get in 0..9|all\n\r";
     help += "dio get out 0..7|all\n\r";
     help += "dio set|clear 0..7\n\r";
-    help += "optics get led|pd|time|intensity|result|ledtemp|pdtemp\n\r";
+    help += "optics get led|pd|time|intensity|result|ledtemp|pdtemp|ledmonpd\n\r";
     help += "optics set led 1..6\n\r";
     help += "optics set pd 1..6\n\r";
     help += "optics set time 1,000..1,000,000(us)\n\r";
@@ -1899,6 +1899,15 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                 float pdTemp = *reinterpret_cast<float*>(&value);
                 char t[16];
                 sprintf(t, "%.1fdegC", pdTemp);
+                res = t;
+                isParsingError = false;
+            }
+            else if (tokens[ARGUMENT] == "ledmonpd") {
+                uint32 value;
+                result = regRead(BoardTest::PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS, value);
+                float ledMonPdValue = *reinterpret_cast<float*>(&value);
+                char t[16];
+                sprintf(t, "%.2fV", ledMonPdValue);
                 res = t;
                 isParsingError = false;
             }

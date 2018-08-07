@@ -111,6 +111,7 @@ BoardTestApp::BoardTestApp(const char* name) :
                                                                              = boardTestPhotodiode;
     m_boardTestMap[BoardTest::PHOTODIODE_LED_TEMPERATURE_DURING_INTEGRATION] = boardTestPhotodiode;
     m_boardTestMap[BoardTest::PHOTODIODE_PD_TEMPERATURE_DURING_INTEGRATION]  = boardTestPhotodiode;
+    m_boardTestMap[BoardTest::PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS]    = boardTestPhotodiode;
 }
 
 BoardTestApp::~BoardTestApp()
