@@ -11,6 +11,7 @@
 
 #define     kledDacGroup        (0)
 #define     kpdAdcGroup         (1)
+#define     kledDacAD5683RGroup (2)
 
 class OpticsDriver
 {
@@ -97,7 +98,7 @@ public:
      * GPIO:     N2HET1[15] -> LED_CTRL_S0   (Output)
      *           N2HET1[13] -> LED_CTRL_S1   (Output)
      *           J13[10]GND -> LED_CTRL_S2   (Output, always 0)
-     *           N2HET1[14] -> LED_DAC_SYNC  (Output/TBD)
+     *           N2HET1[14] -> LED_DAC_SYNC  (Output/Low)
      * ADC SPI:  SPI3A_SIMO -> ADC_SPI1_SIMO
      *           SPI3A_CLK  -> ADC_SPI1_CLK
      *           SPI3A_SOMI -> ADC_SPI1_SOMI
@@ -136,8 +137,8 @@ public:
     enum LedPinMappingBoardV2 {
         LED_BOARD_V2_ADC_CNV      = PIN_HET_12,
         LED_BOARD_V2_LED_CTRL_S0  = PIN_HET_15,
-        LED_BOARD_V1_LED_CTRL_S1  = PIN_HET_13,
-        // LED_BOARD_V2_LED_CTRL_S2 is not connected on BB!!!
+        LED_BOARD_V2_LED_CTRL_S1  = PIN_HET_13,
+      //LED_BOARD_V2_LED_CTRL_S2  = Not on BB
         LED_BOARD_V2_LED_DAC_SYNC = PIN_HET_14,
     };
     enum PhotodiodePinMappingBoardV2 {
@@ -156,9 +157,19 @@ public:
         PHOTODIODE_BOARD_V1 = 1 << 0,
         PHOTODIODE_BOARD_V2 = 1 << 1,
     };
+    enum DacAD5683R {
+        DAC_AD5683R_DO_NOTHING,
+        DAC_AD5683R_WRITE_INPUT_REGISTER,
+        DAC_AD5683R_UPDATE_DAC_REGISTER,
+        DAC_AD5683R_WRITE_DAC_AND_INPUT_REGISTER,
+        DAC_AD5683R_WRITE_CTRL_REGISTER,
+        DAC_AD5683R_READ_INPUT_REGISTER,
+    };
     struct Data {
         uint16_t m_photodiodeResultRaw;
         uint16_t m_photodiodeTemperatureRaw;
+        uint16_t m_ledMontorPhotodiodeResultRaw;
+        uint16_t m_ledTemperatureRaw;
     };
     struct BoardVersion {
         int m_photodiodeBoardVersion;
@@ -180,16 +191,20 @@ public:
     void PhotodiodeBoardDisable();
     bool IsLedBoardEnabled();
     bool IsPhotodiodeBoardEnabled();
+    void GetLedDataRaw(uint32_t nledChanIdx, struct Data *data);
+    float GetLedVref();
 private:
     void SetLedIntensity(uint32_t nChanIdx, uint32_t nLedIntensity);
-    void SetLedsOff(uint32_t nChanIdx);
+    void SetLedOff(uint32_t nChanIdx);
     void AdcConfig();
     void SetIntegratorState(pdIntegratorState state, uint32_t npdChanIdx);
     uint16_t GetAdc(uint32_t nChanIdx);
     void SetPhotodiodeTemperatureCtrl(uint32_t npdChanIdx);
+    void SetLedTemperatureCtrl(uint32_t nledChanIdx);
 private:
     struct BoardVersion m_boardVersion;
     float m_photodiodeVref;
+    float m_ledVref;
     uint32 m_dataPin;
     uint32 m_clkPin;
     uint32 m_latchPin;
