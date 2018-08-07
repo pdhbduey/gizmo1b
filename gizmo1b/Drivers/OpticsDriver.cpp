@@ -189,12 +189,16 @@ void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
     /* Hold for 1ms time before reading */
     delayInUs(1000);
     if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
+        bool useExternalRef = true;
+        if (m_boardVersion.m_photodiodeBoardVersion == PHOTODIODE_BOARD_V2) {
+            useExternalRef = false;
+        }
         /* Read photodiode result */
-        data->m_photodiodeResultRaw = GetAdc(adcPhotodiodeChannel);
+        data->m_photodiodeResultRaw = GetAdc(adcPhotodiodeChannel, useExternalRef);
         if (m_boardVersion.m_photodiodeBoardVersion == PHOTODIODE_BOARD_V2) {
             /* Read photodiode temperature */
             SetPhotodiodeTemperatureCtrl(npdChanIdx);
-            data->m_photodiodeTemperatureRaw = GetAdc(adcPhotodiodeTemperatureChannel);
+            data->m_photodiodeTemperatureRaw = GetAdc(adcPhotodiodeTemperatureChannel, useExternalRef);
         }
     }
     GetLedDataRaw(nledChanIdx, data);
@@ -250,7 +254,7 @@ void OpticsDriver::GetPhotoDiodeTemperatureRaw(uint32_t npdChanIdx,
         break;
     }
     SetPhotodiodeTemperatureCtrl(npdChanIdx);
-    data->m_photodiodeTemperatureRaw = GetAdc(adcTemperatureChannel);
+    data->m_photodiodeTemperatureRaw = GetAdc(adcTemperatureChannel, false);
 }
 
 void OpticsDriver::GetLedDataRaw(uint32_t nledChanIdx, struct Data *data)
@@ -262,13 +266,13 @@ void OpticsDriver::GetLedDataRaw(uint32_t nledChanIdx, struct Data *data)
         return;
     }
     /* Read LED monitor photodiode result */
-    data->m_ledMontorPhotodiodeResultRaw = GetAdc(6);
+    data->m_ledMontorPhotodiodeResultRaw = GetAdc(6, false);
     /* Read LED temperature */
     SetLedTemperatureCtrl(nledChanIdx);
-    data->m_ledTemperatureRaw = GetAdc(nledChanIdx);
+    data->m_ledTemperatureRaw = GetAdc(nledChanIdx, false);
 }
 
-void OpticsDriver::AdcConfig(void)
+void OpticsDriver::AdcConfig(bool useExternalRef)
 {
     uint16_t *adcConfigPointer = NULL;
     uint16_t adcConfig = 0x0000;
@@ -279,7 +283,12 @@ void OpticsDriver::AdcConfig(void)
     adcConfig |= UNIPOLAR_REF_TO_GND << IN_CH_CFG_SHIFT;
     adcConfig |= PDINPUTA1 << IN_CH_SEL_SHIFT;
     adcConfig |= FULL_BW << FULL_BW_SEL_SHIFT;
-    adcConfig |= EXT_REF << REF_SEL_SHIFT;
+    if (useExternalRef) {
+        adcConfig |= EXT_REF << REF_SEL_SHIFT;
+    }
+    else {
+        adcConfig |= INT_REF4_096_AND_TEMP_SENS << REF_SEL_SHIFT;
+    }
     adcConfig |= DISABLE_SEQ << SEQ_EN_SHIFT;
     adcConfig |= READ_BACK_DISABLE << READ_BACK_SHIFT;
     adcConfig <<= 2;
@@ -320,7 +329,7 @@ void OpticsDriver::AdcConfig(void)
  * Returns: uint16_t nAdcVal: ADC value
  * Description: Obtain value from ADC
  */
-uint16_t OpticsDriver::GetAdc(uint32_t nChanIdx)
+uint16_t OpticsDriver::GetAdc(uint32_t nChanIdx, bool useExternalRef)
 {
     uint16_t nAdcVal = 0;
     uint16_t *data = NULL;
@@ -335,7 +344,12 @@ uint16_t OpticsDriver::GetAdc(uint32_t nChanIdx)
     adcConfig |= UNIPOLAR_REF_TO_GND << IN_CH_CFG_SHIFT;
     adcConfig |= (uint16_t) nChanIdx << IN_CH_SEL_SHIFT;
     adcConfig |= FULL_BW << FULL_BW_SEL_SHIFT;
-    adcConfig |= EXT_REF << REF_SEL_SHIFT;
+    if (useExternalRef) {
+        adcConfig |= EXT_REF << REF_SEL_SHIFT;
+    }
+    else {
+        adcConfig |= INT_REF4_096_AND_TEMP_SENS << REF_SEL_SHIFT;
+    }
     adcConfig |= DISABLE_SEQ << SEQ_EN_SHIFT;
     adcConfig |= READ_BACK_DISABLE << READ_BACK_SHIFT;
     adcConfig <<= 2;
@@ -442,12 +456,11 @@ void OpticsDriver::SetBoardVersion(struct BoardVersion& boardVersion)
           //gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S2,  0); // not on BB
             gioSetBit(hetPORT1, m_cnvPin,                  1);
             gioSetBit(hetPORT1, LED_BOARD_V2_LED_DAC_SYNC, 1);
+            AdcConfig(false);
             break;
         }
     }
     if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
-        /* Configure ADC on Photo Diode board */
-        AdcConfig();
         switch (boardVersion.m_photodiodeBoardVersion) {
         default:
         case PHOTODIODE_BOARD_V1:
@@ -460,6 +473,7 @@ void OpticsDriver::SetBoardVersion(struct BoardVersion& boardVersion)
             gioSetBit(hetPORT1, m_dataPin,  0);
             gioSetBit(hetPORT1, m_clkPin,   0);
             gioSetBit(hetPORT1, m_latchPin, 1); //Latch pin is high to start with
+            AdcConfig(true);
             break;
         case PHOTODIODE_BOARD_V2:
             m_photodiodeVref = 4.096;
@@ -475,6 +489,7 @@ void OpticsDriver::SetBoardVersion(struct BoardVersion& boardVersion)
             gioSetBit(hetPORT1, m_latchPin, 1); //Latch pin is high to start with
             gioSetBit(hetPORT1, m_tCtrlA,   0);
             gioSetBit(hetPORT1, m_tCtrlB,   0);
+            AdcConfig(false);
             break;
         }
     }
