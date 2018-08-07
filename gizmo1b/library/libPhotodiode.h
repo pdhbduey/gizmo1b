@@ -70,7 +70,8 @@ public:
     uint32 getLedBoardEnabledStatus();
     uint32 getPhotodiodeBoardEnabledStatus();
 private:
-    float convertRawDataToResistance(uint16_t data);
+    float convertPhotodiodeThermistorRawDataToResistance(uint16_t data);
+    float convertLedThermistorRawDataToResistance(uint16_t data);
 private:
     OpticsDriver m_opticsDriver;
     static bool s_isInitialized;
@@ -84,6 +85,11 @@ private:
     uint32 m_photodiodeResultRaw;
     float m_photodiodeTemperatureDuringIntegration;
     LibThermistor m_photodiodeThermistor;
+    LibThermistor m_ledThermistor;
+    uint32 m_ledMontorPhotodiodeResult;
+    uint32 m_ledTemperatureDuringIntegration;
+    uint32 m_ledMontorPhotodiodeResultDuringIntegration;
+    uint32 m_ledTemperature;
 };
 
 #endif // _LIB_PHOTODIODE_H_

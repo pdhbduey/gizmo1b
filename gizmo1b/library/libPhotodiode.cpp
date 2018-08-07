@@ -7,6 +7,7 @@ bool LibPhotodiode::s_isInitialized;
 LibPhotodiode::LibPhotodiode() :
     m_integrationTimeInUs(10000),
     m_photodiodeThermistor(LibThermistor::NTCG163JF103FT1, LibThermistor::CELSIUS),
+    m_ledThermistor(LibThermistor::NTCG163JF103FT1, LibThermistor::CELSIUS),
     m_led(SELECT_LED_BLUE1),
     m_photodiode(SELECT_PHOTODIODE_D11_T1)
 {
@@ -118,10 +119,17 @@ float LibPhotodiode::readPhotodiode()
     struct OpticsDriver::Data data;
     m_opticsDriver.GetPhotoDiodeValue(nledChanIdx, npdChanIdx, nDuration_us,
                                                           nLedIntensity, &data);
-    m_photodiodeResultRaw = data.m_photodiodeResultRaw;
-    float rt = convertRawDataToResistance(data.m_photodiodeTemperatureRaw);
-    m_photodiodeTemperatureDuringIntegration = m_photodiodeThermistor.getTemperature(rt);
-    float photoDiodeReading = m_photodiodeResultRaw * (m_opticsDriver.GetPhotodiodeVref() / 65535);
+    float rt = convertPhotodiodeThermistorRawDataToResistance(data.m_photodiodeTemperatureRaw);
+    m_photodiodeTemperatureDuringIntegration =
+                                      m_photodiodeThermistor.getTemperature(rt);
+    rt = convertLedThermistorRawDataToResistance(data.m_ledTemperatureRaw);
+    m_ledTemperatureDuringIntegration = m_ledThermistor.getTemperature(rt);
+    m_ledMontorPhotodiodeResultDuringIntegration
+                                 =  data.m_ledMontorPhotodiodeResultRaw
+                                 * (m_opticsDriver.GetLedVref() / 65535);
+    m_photodiodeResultRaw        = data.m_photodiodeResultRaw;
+    float photoDiodeReading      = m_photodiodeResultRaw
+                                 * (m_opticsDriver.GetPhotodiodeVref() / 65535);
     return photoDiodeReading;
 }
 
@@ -182,7 +190,13 @@ int LibPhotodiode::setPhotodiodeBoardVersion(uint32 version)
 
 float LibPhotodiode::readLedTemperature()
 {
-    return 25;
+    LibMutex libMutex(s_mutex);
+    uint32_t nledChanIdx = m_ledMap[m_led];
+    struct OpticsDriver::Data data;
+    m_opticsDriver.GetLedDataRaw(nledChanIdx, &data);
+    float rt = convertLedThermistorRawDataToResistance(data.m_ledTemperatureRaw);
+    float temperature = m_ledThermistor.getTemperature(rt);
+    return temperature;
 }
 
 float LibPhotodiode::readPhotodiodeTemperature()
@@ -191,19 +205,19 @@ float LibPhotodiode::readPhotodiodeTemperature()
     uint32_t npdChanIdx = m_pdMap[m_photodiode];
     struct OpticsDriver::Data data;
     m_opticsDriver.GetPhotoDiodeTemperatureRaw(npdChanIdx, &data);
-    float rt = convertRawDataToResistance(data.m_photodiodeTemperatureRaw);
+    float rt = convertPhotodiodeThermistorRawDataToResistance(data.m_photodiodeTemperatureRaw);
     float temperature = m_photodiodeThermistor.getTemperature(rt);
     return temperature;
 }
 
 float LibPhotodiode::readLedMonitorPhotodiodeDuringIntegration()
 {
-    return 25;
+    return m_ledMontorPhotodiodeResultDuringIntegration;
 }
 
 float LibPhotodiode::readLedTemperatureDuringIntegration()
 {
-    return 25;
+    return m_ledTemperatureDuringIntegration;
 }
 
 float LibPhotodiode::readPhotodiodeTemperatureDuringIntegration()
@@ -213,13 +227,27 @@ float LibPhotodiode::readPhotodiodeTemperatureDuringIntegration()
 
 // TEMP_AINx = Vref * Rt/(10,700 + Rt)
 // Rt = 10,700 / (Vref / TEMP_AINx - 1)
-float LibPhotodiode::convertRawDataToResistance(uint16_t data)
+float LibPhotodiode::convertPhotodiodeThermistorRawDataToResistance(uint16_t data)
 {
-    float voltage = data  * (m_opticsDriver.GetPhotodiodeVref() / 65535);
-    if (voltage == 0 || voltage == m_opticsDriver.GetPhotodiodeVref()) {
+    float vref    = m_opticsDriver.GetPhotodiodeVref();
+    float voltage = data  * vref / 65535;
+    if (voltage == 0 || voltage == vref) {
         return 10000;
     }
-    float rt = 10700 / (m_opticsDriver.GetPhotodiodeVref() / voltage - 1);
+    float rt = 10700 / (vref / voltage - 1);
+    return rt;
+}
+
+// TEMP_AINx = Vref * Rt/(10,700 + Rt)
+// Rt = 10,700 / (Vref / TEMP_AINx - 1)
+float LibPhotodiode::convertLedThermistorRawDataToResistance(uint16_t data)
+{
+    float vref    = m_opticsDriver.GetLedVref();
+    float voltage = data  * vref / 65535;
+    if (voltage == 0 || voltage == vref) {
+        return 10000;
+    }
+    float rt = 10700 / (vref / voltage - 1);
     return rt;
 }
 

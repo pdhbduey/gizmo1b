@@ -32,17 +32,31 @@ OpticsDriver::OpticsDriver()
  */
 void OpticsDriver::SetLedIntensity(uint32_t nChanIdx, uint32_t nLedIntensity)
 {
-    // Note that LDAC is not used for v1 LED board
-    uint16_t nBitPattern[2] = {0xFF00, 0x0000};
-
-    nBitPattern[0] = (uint16_t)(nBitPattern[0] | (((uint16_t)kwrInputupdateN << 4) | nChanIdx));
-    nBitPattern[1] = (uint16_t)nLedIntensity;
-    gioSetBit(mibspiPORT3, OPTICS_MCU_SPI3_SOMI_SW, OPTICS_MCU_SPI3B_SOMI);
-    gioSetBit(hetPORT1, LED_BOARD_V1_CS_PIN, 0);
-    mibspiSetData(mibspiREG3, kledDacGroup, nBitPattern);
-    mibspiTransfer(mibspiREG3, kledDacGroup);
-    while(!(mibspiIsTransferComplete(mibspiREG3, kledDacGroup)));
-    gioSetBit(hetPORT1, LED_BOARD_V1_CS_PIN, 1);
+    if (m_boardVersion.m_ledBoardVersion == LED_BOARD_V1) {
+        // Note that LDAC is not used for v1 LED board
+        uint16_t nBitPattern[2] = {0xFF00, 0x0000};
+        nBitPattern[0] = (uint16_t)(nBitPattern[0] | (((uint16_t)kwrInputupdateN << 4) | nChanIdx));
+        nBitPattern[1] = (uint16_t)nLedIntensity;
+        gioSetBit(mibspiPORT3, OPTICS_MCU_SPI3_SOMI_SW, OPTICS_MCU_SPI3B_SOMI);
+        gioSetBit(hetPORT1, LED_BOARD_V1_CS_PIN, 0);
+        mibspiSetData(mibspiREG3, kledDacGroup, nBitPattern);
+        mibspiTransfer(mibspiREG3, kledDacGroup);
+        while(!(mibspiIsTransferComplete(mibspiREG3, kledDacGroup)));
+        gioSetBit(hetPORT1, LED_BOARD_V1_CS_PIN, 1);
+    }
+    else if (m_boardVersion.m_ledBoardVersion == LED_BOARD_V2) {
+        uint16_t nBitPattern[3];
+        nBitPattern[0] = DAC_AD5683R_WRITE_DAC_AND_INPUT_REGISTER << 4
+                       | nLedIntensity >> 12;
+        nBitPattern[1] = nLedIntensity >> 4;
+        nBitPattern[2] = nLedIntensity << 4;
+        gioSetBit(mibspiPORT3, OPTICS_MCU_SPI3_SOMI_SW, OPTICS_MCU_SPI3B_SOMI);
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_DAC_SYNC, 0);
+        mibspiSetData(mibspiREG3, kledDacAD5683RGroup, nBitPattern);
+        mibspiTransfer(mibspiREG3, kledDacAD5683RGroup);
+        while(!(mibspiIsTransferComplete(mibspiREG3, kledDacAD5683RGroup)));
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_DAC_SYNC, 1);
+    }
 }
 
 /**
@@ -51,7 +65,7 @@ void OpticsDriver::SetLedIntensity(uint32_t nChanIdx, uint32_t nLedIntensity)
  * Returns:
  * Description: Turns off LED by setting intensity to 0.
  */
-void OpticsDriver::SetLedsOff(uint32_t nChanIdx)
+void OpticsDriver::SetLedOff(uint32_t nChanIdx)
 {
     SetLedIntensity(nChanIdx, 0);
 }
@@ -101,8 +115,8 @@ void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
 {
     data->m_photodiodeResultRaw      = 0;
     data->m_photodiodeTemperatureRaw = 0;
-    uint32_t adcChannel;
-    uint32_t adcTemperatureChannel;
+    uint32_t adcPhotodiodeChannel;
+    uint32_t adcPhotodiodeTemperatureChannel;
     if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
         switch(npdChanIdx)
         {
@@ -110,33 +124,33 @@ void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
             // fall through
         case 1:
             npdChanIdx = 0x0001 << PDINPUTA1;
-            adcChannel = 0;
-            adcTemperatureChannel = 6;
+            adcPhotodiodeChannel = 0;
+            adcPhotodiodeTemperatureChannel = 6;
             break;
         case 2:
             npdChanIdx = 0x0001 << PDINPUTB1;
-            adcChannel = 3;
-            adcTemperatureChannel = 7;
+            adcPhotodiodeChannel = 3;
+            adcPhotodiodeTemperatureChannel = 7;
             break;
         case 3:
             npdChanIdx = 0x0001 << PDINPUTA2;
-            adcChannel = 1;
-            adcTemperatureChannel = 6;
+            adcPhotodiodeChannel = 1;
+            adcPhotodiodeTemperatureChannel = 6;
             break;
         case 4:
             npdChanIdx = 0x0001 << PDINPUTB2;
-            adcChannel = 4;
-            adcTemperatureChannel = 7;
+            adcPhotodiodeChannel = 4;
+            adcPhotodiodeTemperatureChannel = 7;
             break;
         case 5:
             npdChanIdx = 0x0001 << PDINPUTA3;
-            adcChannel = 2;
-            adcTemperatureChannel = 6;
+            adcPhotodiodeChannel = 2;
+            adcPhotodiodeTemperatureChannel = 6;
             break;
         case 6:
             npdChanIdx = 0x0001 << PDINPUTB3;
-            adcChannel = 5;
-            adcTemperatureChannel = 7;
+            adcPhotodiodeChannel = 5;
+            adcPhotodiodeTemperatureChannel = 7;
             break;
         }
         /* Reset Integrator first */
@@ -176,18 +190,19 @@ void OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx,
     delayInUs(1000);
     if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
         /* Read photodiode result */
-        data->m_photodiodeResultRaw = GetAdc(adcChannel);
+        data->m_photodiodeResultRaw = GetAdc(adcPhotodiodeChannel);
         if (m_boardVersion.m_photodiodeBoardVersion == PHOTODIODE_BOARD_V2) {
             /* Read photodiode temperature */
             SetPhotodiodeTemperatureCtrl(npdChanIdx);
-            data->m_photodiodeTemperatureRaw = GetAdc(adcTemperatureChannel);
+            data->m_photodiodeTemperatureRaw = GetAdc(adcPhotodiodeTemperatureChannel);
         }
     }
+    GetLedDataRaw(nledChanIdx, data);
     /* Hold for 1ms time before turning off LED */
     delayInUs(1000);
     if (m_boardVersion.m_isLedBoardEnabled) {
         /* Turn Off LED */
-        SetLedsOff(nledChanIdx);
+        SetLedOff(nledChanIdx);
     }
     /* Reset Integrator */
     if (m_boardVersion.m_isPhotodiodeBoardEnabled) {
@@ -236,6 +251,21 @@ void OpticsDriver::GetPhotoDiodeTemperatureRaw(uint32_t npdChanIdx,
     }
     SetPhotodiodeTemperatureCtrl(npdChanIdx);
     data->m_photodiodeTemperatureRaw = GetAdc(adcTemperatureChannel);
+}
+
+void OpticsDriver::GetLedDataRaw(uint32_t nledChanIdx, struct Data *data)
+{
+    data->m_ledMontorPhotodiodeResultRaw = 0;
+    data->m_ledTemperatureRaw            = 0;
+    if (!m_boardVersion.m_isLedBoardEnabled
+      || m_boardVersion.m_ledBoardVersion == LED_BOARD_V1) {
+        return;
+    }
+    /* Read LED monitor photodiode result */
+    data->m_ledMontorPhotodiodeResultRaw = GetAdc(6);
+    /* Read LED temperature */
+    SetLedTemperatureCtrl(nledChanIdx);
+    data->m_ledTemperatureRaw = GetAdc(nledChanIdx);
 }
 
 void OpticsDriver::AdcConfig(void)
@@ -400,11 +430,18 @@ void OpticsDriver::SetBoardVersion(struct BoardVersion& boardVersion)
         switch (boardVersion.m_ledBoardVersion) {
         default:
         case LED_BOARD_V1:
+            m_ledVref = 5;
             gioSetBit(hetPORT1, LED_BOARD_V1_CS_PIN,   1);
             gioSetBit(hetPORT1, LED_BOARD_V1_LDAC_PIN, 1);
             break;
         case LED_BOARD_V2:
-            // TBD
+            m_ledVref = 4.096;
+            m_cnvPin  = LED_BOARD_V2_ADC_CNV;
+            gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S0,  0);
+            gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S1,  0);
+          //gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S2,  0); // not on BB
+            gioSetBit(hetPORT1, m_cnvPin,                  1);
+            gioSetBit(hetPORT1, LED_BOARD_V2_LED_DAC_SYNC, 1);
             break;
         }
     }
@@ -477,6 +514,45 @@ void OpticsDriver::SetPhotodiodeTemperatureCtrl(uint32_t npdChanIdx)
     }
 }
 
+void OpticsDriver::SetLedTemperatureCtrl(uint32_t nledChanIdx)
+{
+    switch(nledChanIdx)
+    {
+    default:
+        // fall through
+    case 0:
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S0, 0);
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S1, 0);
+      //gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S2, 0); // not on BB
+        break;
+    case 1:
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S0, 1);
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S1, 0);
+      //gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S2, 0); // not on BB
+        break;
+    case 2:
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S0, 0);
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S1, 1);
+      //gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S2, 0); // not on BB
+        break;
+    case 3:
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S0, 1);
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S1, 1);
+      //gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S2, 0); // not on BB
+        break;
+    case 4:
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S0, 0);
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S1, 0);
+      //gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S2, 1); // not on BB
+        break;
+    case 5:
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S0, 1);
+        gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S1, 0);
+      //gioSetBit(hetPORT1, LED_BOARD_V2_LED_CTRL_S2, 1); // not on BB
+        break;
+    }
+}
+
 void OpticsDriver::LedBoardEnable()
 {
     struct BoardVersion boardVersion = m_boardVersion;
@@ -513,4 +589,9 @@ bool OpticsDriver::IsLedBoardEnabled()
 bool OpticsDriver::IsPhotodiodeBoardEnabled()
 {
     return m_boardVersion.m_isPhotodiodeBoardEnabled;
+}
+
+float OpticsDriver::GetLedVref()
+{
+    return m_ledVref;
 }
