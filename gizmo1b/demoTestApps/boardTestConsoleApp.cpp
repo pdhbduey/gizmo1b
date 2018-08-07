@@ -135,7 +135,8 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "fan set duty1|duty2 0..100\n\r";
     help += "fan set per1|per2 [10.0,1000000.0](us)\n\r";
     help += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
-    help += "dio get 0..9|all\n\r";
+    help += "dio get in 0..9|all\n\r";
+    help += "dio get out 0..7|all\n\r";
     help += "dio set|clear 0..7\n\r";
     help += "optics get led|pd|time|intensity|result|ledtemp|pdtemp\n\r";
     help += "optics set led 1..6\n\r";
@@ -1350,36 +1351,84 @@ bool BoardTestConsoleApp::parseDioCommand(std::vector<std::string>& tokens,
     bool isParsingError = true;
     if (tokens.size() > ACTION) {
         if (tokens[ACTION] == "get" && tokens.size() > ARGUMENT) {
-            uint32 pin;
-            std::map<int, int> pinsMap;
-            pinsMap[0] = BoardTestDio::DIN_0_STATE;
-            pinsMap[1] = BoardTestDio::DIN_1_STATE;
-            pinsMap[2] = BoardTestDio::DIN_2_STATE;
-            pinsMap[3] = BoardTestDio::DIN_3_STATE;
-            pinsMap[4] = BoardTestDio::DIN_4_STATE;
-            pinsMap[5] = BoardTestDio::DIN_5_STATE;
-            pinsMap[6] = BoardTestDio::DIN_6_STATE;
-            pinsMap[7] = BoardTestDio::DIN_7_STATE;
-            pinsMap[8] = BoardTestDio::DIN_8_STATE;
-            pinsMap[9] = BoardTestDio::DIN_9_STATE;
-            if (tokens[ARGUMENT] == "all") {
-                uint32 value;
-                result = regRead(BoardTest::DIO_IN, value);
-                for (std::map<int, int>::iterator it = pinsMap.begin();
-                                                    it != pinsMap.end(); it++) {
-                    char t[16];
-                    sprintf(t, "[%d]:%d ", it->first,
-                                            value & pinsMap[it->first] ? 1 : 0);
-                    res += t;
+            if (tokens[ARGUMENT] == "in" && tokens.size() > VALUE) {
+                uint32 pin;
+                std::map<int, int> pinsMap;
+                pinsMap[0] = BoardTestDio::DIN_0_STATE;
+                pinsMap[1] = BoardTestDio::DIN_1_STATE;
+                pinsMap[2] = BoardTestDio::DIN_2_STATE;
+                pinsMap[3] = BoardTestDio::DIN_3_STATE;
+                pinsMap[4] = BoardTestDio::DIN_4_STATE;
+                pinsMap[5] = BoardTestDio::DIN_5_STATE;
+                pinsMap[6] = BoardTestDio::DIN_6_STATE;
+                pinsMap[7] = BoardTestDio::DIN_7_STATE;
+                pinsMap[8] = BoardTestDio::DIN_8_STATE;
+                pinsMap[9] = BoardTestDio::DIN_9_STATE;
+                if (tokens[VALUE] == "all") {
+                    uint32 value;
+                    result = regRead(BoardTest::DIO_IN, value);
+                    for (std::map<int, int>::iterator it = pinsMap.begin();
+                                                        it != pinsMap.end(); it++) {
+                        char t[16];
+                        sprintf(t, "[%d]:%d ", it->first,
+                                                value & pinsMap[it->first] ? 1 : 0);
+                        res += t;
+                    }
+                    isParsingError = false;
                 }
-                isParsingError = false;
+                else if (sscanf(tokens[VALUE].c_str(), "%d", &pin) == 1
+                 && pinsMap.find(pin) != pinsMap.end()) {
+                    uint32 value;
+                    result = regRead(BoardTest::DIO_IN, value);
+                    res = value & pinsMap[pin] ? "set" : "clear";
+                    isParsingError = false;
+                }
             }
-            else if (sscanf(tokens[ARGUMENT].c_str(), "%d", &pin) == 1
-             && pinsMap.find(pin) != pinsMap.end()) {
-                uint32 value;
-                result = regRead(BoardTest::DIO_IN, value);
-                res = value & pinsMap[pin] ? "set" : "clear";
-                isParsingError = false;
+            else if (tokens[ARGUMENT] == "out" && tokens.size() > VALUE) {
+                uint32 pin;
+                std::map<int, int> pinsOnMap;
+                pinsOnMap[0] = BoardTestDio::DOUT_0_ON;
+                pinsOnMap[1] = BoardTestDio::DOUT_1_ON;
+                pinsOnMap[2] = BoardTestDio::DOUT_2_ON;
+                pinsOnMap[3] = BoardTestDio::DOUT_3_ON;
+                pinsOnMap[4] = BoardTestDio::DOUT_4_ON;
+                pinsOnMap[5] = BoardTestDio::DOUT_5_ON;
+                pinsOnMap[6] = BoardTestDio::DOUT_6_ON;
+                pinsOnMap[7] = BoardTestDio::DOUT_7_ON;
+                std::map<int, int> pinsOffMap;
+                pinsOffMap[0] = BoardTestDio::DOUT_0_OFF;
+                pinsOffMap[1] = BoardTestDio::DOUT_1_OFF;
+                pinsOffMap[2] = BoardTestDio::DOUT_2_OFF;
+                pinsOffMap[3] = BoardTestDio::DOUT_3_OFF;
+                pinsOffMap[4] = BoardTestDio::DOUT_4_OFF;
+                pinsOffMap[5] = BoardTestDio::DOUT_5_OFF;
+                pinsOffMap[6] = BoardTestDio::DOUT_6_OFF;
+                pinsOffMap[7] = BoardTestDio::DOUT_7_OFF;
+                if (tokens[VALUE] == "all") {
+                    uint32 value;
+                    result = regRead(BoardTest::DIO_OUT, value);
+                    for (std::map<int, int>::iterator it  = pinsOnMap.begin();
+                                                      it != pinsOnMap.end();
+                                                      it++) {
+                        char t[16];
+                        sprintf(t, "[%d]:%s ", it->first,
+                                          value & pinsOnMap[it->first]  ? "1"
+                                       : (value & pinsOffMap[it->first] ? "0"
+                                       :                                  "Z"));
+                        res += t;
+                    }
+                    isParsingError = false;
+                }
+                else if (sscanf(tokens[VALUE].c_str(), "%d", &pin) == 1
+                && pinsOnMap.find(pin)  != pinsOnMap.end()
+                && pinsOffMap.find(pin) != pinsOffMap.end()) {
+                    uint32 value;
+                    result = regRead(BoardTest::DIO_OUT, value);
+                    res = (value & pinsOnMap[pin]  ? "set"
+                        : (value & pinsOffMap[pin] ? "clear"
+                        :                            "undefined"));
+                    isParsingError = false;
+                }
             }
         }
         else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {

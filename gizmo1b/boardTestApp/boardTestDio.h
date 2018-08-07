@@ -1,13 +1,14 @@
 #ifndef _BOARD_TEST_GPIO_H_
 #define _BOARD_TEST_GPIO_H_
 
-#include "libDio.h"
+#include "libDioIn.h"
+#include "libDioOut.h"
 #include "boardTest.h"
 
 class BoardTestDio: public BoardTest
 {
 public:
-    enum InBits {
+    enum InPins {
         DIN_0_STATE = (uint32)((uint32)1U << 0U),
         DIN_1_STATE = (uint32)((uint32)1U << 1U),
         DIN_2_STATE = (uint32)((uint32)1U << 2U),
@@ -19,7 +20,7 @@ public:
         DIN_8_STATE = (uint32)((uint32)1U << 8U),
         DIN_9_STATE = (uint32)((uint32)1U << 9U),
     };
-    enum OutBits {
+    enum OutPins {
         DOUT_0_ON  = (uint32)((uint32)1U <<  0U),
         DOUT_0_OFF = (uint32)((uint32)1U <<  1U),
         DOUT_1_ON  = (uint32)((uint32)1U <<  2U),
@@ -42,7 +43,8 @@ public:
     virtual int get(uint32 address, uint32& value);
     virtual int set(uint32 address, uint32 value);
 private:
-    LibDio m_libDio;
+    LibDioIn m_libDioIn;
+    LibDioOut m_libDioOut;
 };
 
 #endif // _BOARD_TEST_GPIO_H_
