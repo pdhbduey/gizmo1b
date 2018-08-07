@@ -457,6 +457,21 @@ void OpticsDriver::SetBoardVersion(struct BoardVersion& boardVersion)
             gioSetBit(hetPORT1, m_cnvPin,                  1);
             gioSetBit(hetPORT1, LED_BOARD_V2_LED_DAC_SYNC, 1);
             AdcConfig(false);
+            {
+                // Configure DAC
+                uint16_t nBitPattern[3];
+                uint32 ctrlRegister = 1 << 15; // enable 2 × VREF output range
+                nBitPattern[0] = DAC_AD5683R_WRITE_CTRL_REGISTER << 4
+                               | ctrlRegister >> 16;
+                nBitPattern[1] = ctrlRegister >> 8;
+                nBitPattern[2] = ctrlRegister;
+                gioSetBit(mibspiPORT3, OPTICS_MCU_SPI3_SOMI_SW, OPTICS_MCU_SPI3B_SOMI);
+                gioSetBit(hetPORT1, LED_BOARD_V2_LED_DAC_SYNC, 0);
+                mibspiSetData(mibspiREG3, kledDacAD5683RGroup, nBitPattern);
+                mibspiTransfer(mibspiREG3, kledDacAD5683RGroup);
+                while(!(mibspiIsTransferComplete(mibspiREG3, kledDacAD5683RGroup)));
+                gioSetBit(hetPORT1, LED_BOARD_V2_LED_DAC_SYNC, 1);
+            }
             break;
         }
     }
