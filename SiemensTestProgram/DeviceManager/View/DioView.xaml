@@ -80,14 +80,14 @@
             </GroupBox.Header>
 
             <StackPanel>
-                <Button Width="100" Height="25" Margin="2" Content="{Binding DoutZeroStatus}" HorizontalAlignment="Left" Command="{Binding SetDioZeroCommand}"></Button>
-                <Button Width="100" Height="25" Margin="2" Content="{Binding DoutOneStatus}" HorizontalAlignment="Left" Command="{Binding SetDioOneCommand}"></Button>
-                <Button Width="100" Height="25" Margin="2" Content="{Binding DoutTwoStatus}" HorizontalAlignment="Left" Command="{Binding SetDioTwoCommand}"></Button>
-                <Button Width="100" Height="25" Margin="2" Content="{Binding DoutThreeStatus}" HorizontalAlignment="Left" Command="{Binding SetDioThreeCommand}"></Button>
-                <Button Width="100" Height="25" Margin="2" Content="{Binding DoutFourStatus}" HorizontalAlignment="Left" Command="{Binding SetDioFourCommand}"></Button>
-                <Button Width="100" Height="25" Margin="2" Content="{Binding DoutFiveStatus}" HorizontalAlignment="Left" Command="{Binding SetDioFiveCommand}"></Button>
-                <Button Width="100" Height="25" Margin="2" Content="{Binding DoutSixStatus}" HorizontalAlignment="Left" Command="{Binding SetDioSixCommand}"></Button>
-                <Button Width="100" Height="25" Margin="2" Content="{Binding DoutSevenStatus}" HorizontalAlignment="Left" Command="{Binding SetDioSevenCommand}"></Button>
+                <ToggleButton IsChecked="{Binding IsDoutZeroSet}" Width="100" Height="25" Margin="2" Content="{Binding DoutZeroStatus}" HorizontalAlignment="Left" Command="{Binding SetDioZeroCommand}"></ToggleButton>
+                <ToggleButton IsChecked="{Binding IsDoutOneSet}" Width="100" Height="25" Margin="2" Content="{Binding DoutOneStatus}" HorizontalAlignment="Left" Command="{Binding SetDioOneCommand}"></ToggleButton>
+                <ToggleButton IsChecked="{Binding IsDoutTwoSet}" Width="100" Height="25" Margin="2" Content="{Binding DoutTwoStatus}" HorizontalAlignment="Left" Command="{Binding SetDioTwoCommand}"></ToggleButton>
+                <ToggleButton IsChecked="{Binding IsDoutThreeSet}" Width="100" Height="25" Margin="2" Content="{Binding DoutThreeStatus}" HorizontalAlignment="Left" Command="{Binding SetDioThreeCommand}"></ToggleButton>
+                <ToggleButton IsChecked="{Binding IsDoutFourSet}" Width="100" Height="25" Margin="2" Content="{Binding DoutFourStatus}" HorizontalAlignment="Left" Command="{Binding SetDioFourCommand}"></ToggleButton>
+                <ToggleButton IsChecked="{Binding IsDoutFiveSet}" Width="100" Height="25" Margin="2" Content="{Binding DoutFiveStatus}" HorizontalAlignment="Left" Command="{Binding SetDioFiveCommand}"></ToggleButton>
+                <ToggleButton IsChecked="{Binding IsDoutSixSet}" Width="100" Height="25" Margin="2" Content="{Binding DoutSixStatus}" HorizontalAlignment="Left" Command="{Binding SetDioSixCommand}"></ToggleButton>
+                <ToggleButton IsChecked="{Binding IsDoutSevenSet}" Width="100" Height="25" Margin="2" Content="{Binding DoutSevenStatus}" HorizontalAlignment="Left" Command="{Binding SetDioSevenCommand}"></ToggleButton>
             </StackPanel>
         </GroupBox>
     </Grid>

@@ -13,6 +13,9 @@ namespace DeviceManager
         public const string notSetColour = "Gray";
         public const string setColour = "Green";
 
+        public const string SetDout = "Set Dout";
+        public const string ClearDout = "Clear Dout";
+
         public static byte[] ReadDioInCommand()
         {
             return new byte[]
@@ -22,6 +25,22 @@ namespace DeviceManager
                 0x00,
                 0x05,
                 0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            };
+        }
+
+        public static byte[] ReadDioOutCommand()
+        {
+            return new byte[]
+            {
+                DataHelper.REGISTER_READ,
+                0x00,
+                0x00,
+                0x05,
+                0x01,
                 0x00,
                 0x00,
                 0x00,
@@ -63,6 +82,19 @@ namespace DeviceManager
             var channelBit = channel - (channel / 8);
             var position = channelData.Length - 1 - (channel / 8);
             return Helper.IsBitSet(channelData[position], channelBit);
+        }
+
+        public static bool IsDoutSet(byte[] channelData, int channel)
+        {
+            var channelBit = channel * 2;
+
+            if (channelBit > 7)
+            {
+                channelBit = channelBit / 2;
+                return Helper.IsBitSet(channelData[3], channelBit);
+            }
+            
+            return Helper.IsBitSet(channelData[4], channelBit);
         }
     }
 }

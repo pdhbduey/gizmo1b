@@ -11,6 +11,8 @@ namespace DeviceManager.Model
     {
         Task<CommunicationData> ReadDin();
 
+        Task<CommunicationData> ReadDout();
+
         Task<CommunicationData> SetDout(int channel, bool set);
     }
 }
