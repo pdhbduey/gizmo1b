@@ -17,7 +17,8 @@ int BoardTestPhotodiode::get(uint32 address, uint32& value)
         value = m_libPhotodiode.getLed()
               | m_libPhotodiode.getPhotodiode()
               | m_libPhotodiode.getLedBoardEnabledStatus()
-              | m_libPhotodiode.getPhotodiodeBoardEnabledStatus();
+              | m_libPhotodiode.getPhotodiodeBoardEnabledStatus()
+              | m_libPhotodiode.getLedState();
         break;
     case PHOTODIODE_STATUS:
         value  = m_status;
@@ -73,6 +74,12 @@ int BoardTestPhotodiode::get(uint32 address, uint32& value)
             value = *reinterpret_cast<uint32*>(&temperature);
         }
         break;
+    case PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS:
+        {
+            float volts = m_libPhotodiode.readLedMonitorPhotodiode();
+            value = *reinterpret_cast<uint32*>(&volts);
+        }
+        break;
     }
     return OKAY;
 }
@@ -90,6 +97,7 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
     case PHOTODIODE_LED_MONITOR_PD_READING_DURING_INTEGRATION_IN_VOLTS:
     case PHOTODIODE_LED_TEMPERATURE_DURING_INTEGRATION:
     case PHOTODIODE_PD_TEMPERATURE_DURING_INTEGRATION:
+    case PHOTODIODE_LED_MONITOR_PD_READING_IN_VOLTS:
         return ERROR_RO;
     case PHOTODIODE_CONTROL:
         {
@@ -116,6 +124,12 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
             }
             else if (value & LibPhotodiode::PD_BOARD_DISABLED) {
                 m_libPhotodiode.pdBoardDisable();
+            }
+            if (value & LibPhotodiode::LED_TURN_ON) {
+                m_libPhotodiode.ledTurnOn();
+            }
+            else if (value & LibPhotodiode::LED_TURN_OFF) {
+                m_libPhotodiode.ledTurnOff();
             }
         }
         break;

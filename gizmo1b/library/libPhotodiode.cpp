@@ -9,7 +9,8 @@ LibPhotodiode::LibPhotodiode() :
     m_photodiodeThermistor(LibThermistor::NTCG163JF103FT1, LibThermistor::CELSIUS),
     m_ledThermistor(LibThermistor::NTCG163JF103FT1, LibThermistor::CELSIUS),
     m_led(SELECT_LED_BLUE1),
-    m_photodiode(SELECT_PHOTODIODE_D11_T1)
+    m_photodiode(SELECT_PHOTODIODE_D11_T1),
+    m_ledState(LED_TURN_OFF)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
@@ -281,4 +282,36 @@ uint32 LibPhotodiode::getPhotodiodeBoardEnabledStatus()
 {
     return m_opticsDriver.IsPhotodiodeBoardEnabled() ? PD_BOARD_ENABLED
                                                      : PD_BOARD_DISABLED;
+}
+
+float LibPhotodiode::readLedMonitorPhotodiode()
+{
+    LibMutex libMutex(s_mutex);
+    uint32_t nledChanIdx = m_ledMap[m_led];
+    struct OpticsDriver::Data data;
+    m_opticsDriver.GetLedDataRaw(nledChanIdx, &data);
+    float volts = data.m_ledMontorPhotodiodeResultRaw
+                * (m_opticsDriver.GetLedVref() / 65535);
+    return volts;
+}
+
+uint32 LibPhotodiode::getLedState()
+{
+    return m_ledState;
+}
+
+void LibPhotodiode::ledTurnOn()
+{
+    LibMutex libMutex(s_mutex);
+    m_ledState           = LED_TURN_ON;
+    uint32_t nledChanIdx = m_ledMap[m_led];
+    m_opticsDriver.SetLedIntensity(nledChanIdx, m_ledIntensity);
+}
+
+void LibPhotodiode::ledTurnOff()
+{
+    LibMutex libMutex(s_mutex);
+    m_ledState           = LED_TURN_OFF;
+    uint32_t nledChanIdx = m_ledMap[m_led];
+    m_opticsDriver.SetLedOff(nledChanIdx);
 }

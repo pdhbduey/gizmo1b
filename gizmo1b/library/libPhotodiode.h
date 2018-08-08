@@ -31,6 +31,9 @@ public:
         PD_BOARD_ENABLED   = 1 << 8,
         PD_BOARD_DISABLED  = 1 << 9,
         PD_BOARD_MASK      = 3 << 8,
+        LED_TURN_ON        = 1 << 10,
+        LED_TURN_OFF       = 1 << 11,
+        LED_STATE_MASK     = 3 << 10,
     };
     enum Status {
         OKAY,
@@ -69,6 +72,10 @@ public:
     void pdBoardDisable();
     uint32 getLedBoardEnabledStatus();
     uint32 getPhotodiodeBoardEnabledStatus();
+    float readLedMonitorPhotodiode();  // 0V-4.096V
+    uint32 getLedState();
+    void ledTurnOn();
+    void ledTurnOff();
 private:
     float convertPhotodiodeThermistorRawDataToResistance(uint16_t data);
     float convertLedThermistorRawDataToResistance(uint16_t data);
@@ -90,6 +97,7 @@ private:
     uint32 m_ledTemperatureDuringIntegration;
     uint32 m_ledMontorPhotodiodeResultDuringIntegration;
     uint32 m_ledTemperature;
+    uint32 m_ledState;
 };
 
 #endif // _LIB_PHOTODIODE_H_

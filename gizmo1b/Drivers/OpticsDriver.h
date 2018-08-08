@@ -193,12 +193,12 @@ public:
     bool IsPhotodiodeBoardEnabled();
     void GetLedDataRaw(uint32_t nledChanIdx, struct Data *data);
     float GetLedVref();
-private:
     void SetLedIntensity(uint32_t nChanIdx, uint32_t nLedIntensity);
     void SetLedOff(uint32_t nChanIdx);
-    void AdcConfig();
+private:
+    void AdcConfig(bool useExternalRef);
     void SetIntegratorState(pdIntegratorState state, uint32_t npdChanIdx);
-    uint16_t GetAdc(uint32_t nChanIdx);
+    uint16_t GetAdc(uint32_t nChanIdx, bool useExternalRef);
     void SetPhotodiodeTemperatureCtrl(uint32_t npdChanIdx);
     void SetLedTemperatureCtrl(uint32_t nledChanIdx);
 private:
