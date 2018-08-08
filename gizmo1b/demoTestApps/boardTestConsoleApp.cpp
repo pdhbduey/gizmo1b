@@ -148,6 +148,8 @@ void BoardTestConsoleApp::help(std::string& help)
     help += "optics set pdver v1|v2\n\r";
     help += "optics set ledstatus|pdstatus enabled|disabled\n\r";
     help += "optics get ledstatus|pdstatus\n\r";
+    help += "optics get ledstate\n\r";
+    help += "optics set ledstate on|off\n\r";
 }
 
 void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
@@ -1965,6 +1967,20 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                 }
                 isParsingError = false;
             }
+            else if (tokens[ARGUMENT] == "ledstate") {
+                uint32 control;
+                result = regRead(BoardTest::PHOTODIODE_CONTROL, control);
+                if (result == BoardTest::OKAY) {
+                    int ledState = control & LibPhotodiode::LED_STATE_MASK;
+                    std::map<int, std::string> ledStateMap;
+                    ledStateMap[LibPhotodiode::LED_TURN_ON]  = "on";
+                    ledStateMap[LibPhotodiode::LED_TURN_OFF] = "off";
+                    res = (ledStateMap.find(ledState) != ledStateMap.end()
+                        ?  ledStateMap[ledState]
+                        :  "unknown");
+                }
+                isParsingError = false;
+            }
         }
         else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
             if (tokens[ARGUMENT] == "led" && tokens.size() > VALUE) {
@@ -2061,6 +2077,16 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                 if (pdstatusMap.find(tokens[VALUE]) != pdstatusMap.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_CONTROL,
                                                     pdstatusMap[tokens[VALUE]]);
+                    isParsingError = false;
+                }
+            }
+            else if (tokens[ARGUMENT] == "ledstate" && tokens.size() > VALUE) {
+                std::map<std::string, int> ledStateMap;
+                ledStateMap["on"]  = LibPhotodiode::LED_TURN_ON;
+                ledStateMap["off"] = LibPhotodiode::LED_TURN_OFF;
+                if (ledStateMap.find(tokens[VALUE]) != ledStateMap.end()) {
+                    result = regWrite(BoardTest::PHOTODIODE_CONTROL,
+                                                    ledStateMap[tokens[VALUE]]);
                     isParsingError = false;
                 }
             }

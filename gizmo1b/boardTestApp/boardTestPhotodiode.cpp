@@ -17,7 +17,8 @@ int BoardTestPhotodiode::get(uint32 address, uint32& value)
         value = m_libPhotodiode.getLed()
               | m_libPhotodiode.getPhotodiode()
               | m_libPhotodiode.getLedBoardEnabledStatus()
-              | m_libPhotodiode.getPhotodiodeBoardEnabledStatus();
+              | m_libPhotodiode.getPhotodiodeBoardEnabledStatus()
+              | m_libPhotodiode.getLedState();
         break;
     case PHOTODIODE_STATUS:
         value  = m_status;
@@ -123,6 +124,12 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
             }
             else if (value & LibPhotodiode::PD_BOARD_DISABLED) {
                 m_libPhotodiode.pdBoardDisable();
+            }
+            if (value & LibPhotodiode::LED_TURN_ON) {
+                m_libPhotodiode.ledTurnOn();
+            }
+            else if (value & LibPhotodiode::LED_TURN_OFF) {
+                m_libPhotodiode.ledTurnOff();
             }
         }
         break;
