@@ -37,10 +37,8 @@ private:
     static SemaphoreHandle_t s_mibSpiMutex;
     gioPORT_t* m_port;
     mibspiBASE_t* m_mibSpiBase;
-    static SemaphoreHandle_t s_spi1SomiSwMutex;
     LibWrapGioPort::Port m_somiSw;
     static SemaphoreHandle_t s_sem;
-    uint32 m_group;
 };
 
 #endif // _LIB_WRAP_MIB_SPI1_H_

@@ -22,7 +22,7 @@ LibFault::~LibFault()
 void LibFault::reset()
 {
     m_drvErrClr.m_libWrapGioPort->setPin(m_drvErrClr.m_pin, true);
-    LibDelay::us(5); // >1us
+    LibDelay::waitForTimer(5); // >1us
     m_drvErrClr.m_libWrapGioPort->setPin(m_drvErrClr.m_pin, false);
 }
 

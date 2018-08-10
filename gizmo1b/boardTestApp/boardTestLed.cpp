@@ -57,7 +57,7 @@ void BoardTestLed::test()
         uint32 value;
         boardTestLed.get(LED_CONTROL, value);
         boardTestLed.set(LED_CONTROL, ~value);
-        LibDelay::us(500000);
+        LibDelay::waitForTimer(500000);
     }
     boardTestLed.set(LED_CONTROL, RED_OFF | GREEN_OFF);
 }

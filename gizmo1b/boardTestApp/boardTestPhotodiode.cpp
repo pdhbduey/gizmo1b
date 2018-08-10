@@ -107,8 +107,8 @@ int BoardTestPhotodiode::set(uint32 address, uint32 value)
                     break;
                 }
             }
-            if (value & LibPhotodiode::SELECT_PHOTODIODE_MASK) {
-                m_status = m_libPhotodiode.setPhotodiode(value & LibPhotodiode::SELECT_PHOTODIODE_MASK);
+            if (value & LibPdBoard::SELECT_PHOTODIODE_MASK) {
+                m_status = m_libPhotodiode.setPhotodiode(value & LibPdBoard::SELECT_PHOTODIODE_MASK);
                 if (m_status != LibPhotodiode::OKAY) {
                     break;
                 }

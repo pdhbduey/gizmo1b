@@ -1,10 +1,10 @@
+#include <LibMibSpi3GioPort.h>
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "mibspi.h"
 #include "gio.h"
 #include "libMutex.h"
 #include "libWrapMibSpi1.h"
-#include "libWrapMibSpi3.h"
 #include "mibspi.h"
 
 // 95:MIBSPI1CLK:MCU_SPI1_CLK
@@ -14,22 +14,21 @@
 SemaphoreHandle_t LibWrapMibSpi1::s_sem;
 SemaphoreHandle_t LibWrapMibSpi1::s_portMutex;
 SemaphoreHandle_t LibWrapMibSpi1::s_mibSpiMutex;
-SemaphoreHandle_t LibWrapMibSpi1::s_spi1SomiSwMutex;
 bool LibWrapMibSpi1::s_isInitialized;
 
 LibWrapMibSpi1::LibWrapMibSpi1() :
     m_port(mibspiPORT1),
     m_mibSpiBase(mibspiREG1),
-    m_somiSw(new LibWrapMibSpi3, PIN_ENA) // 54:MIBSPI3NENA:MCU_SPI1_SOMI_SW
+    m_somiSw(new LibMibSpi3GioPort, PIN_ENA) // 54:MIBSPI3NENA:MCU_SPI1_SOMI_SW
 {
     if (!s_isInitialized) {
         s_portMutex = xSemaphoreCreateMutex();
         s_mibSpiMutex = xSemaphoreCreateMutex();
-        s_spi1SomiSwMutex = xSemaphoreCreateMutex();
         s_sem = xSemaphoreCreateBinary();
         addNotification(this);
         s_isInitialized = true;
     }
+    somiSelect(LibWrapMibSpi1::SPI_A);
 }
 
 LibWrapMibSpi1::~LibWrapMibSpi1()
