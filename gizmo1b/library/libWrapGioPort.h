@@ -12,6 +12,7 @@ public:
     class Port {
     public:
         Port(LibWrapGioPort* libWrapGioPort, int pin);
+        ~Port();
         LibWrapGioPort* m_libWrapGioPort;
         int m_pin;
     };

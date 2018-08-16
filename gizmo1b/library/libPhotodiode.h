@@ -1,11 +1,11 @@
-#ifndef _LIB_PHOTODIODE_H_
-#define _LIB_PHOTODIODE_H_
+#pragma once
 
 #include <map>
-#include "FreeRTOS.h"
-#include "os_semphr.h"
-#include "OpticsDriver.h"
-#include "libThermistor.h"
+#include <FreeRTOS.h>
+#include <os_semphr.h>
+#include <LibPdBoardVersion2.h>
+#include <LibLedBoardVersion2.h>
+#include "LibThermistorCurves.h"
 
 class LibPhotodiode
 {
@@ -18,13 +18,6 @@ public:
         SELECT_LED_RED2,
         SELECT_LED_BLUE2,
         SELECT_LED_MASK = 7,
-        SELECT_PHOTODIODE_D11_T1 = 1 << 3,
-        SELECT_PHOTODIODE_D10_T1 = 2 << 3,
-        SELECT_PHOTODIODE_D11_T2 = 3 << 3,
-        SELECT_PHOTODIODE_D10_T2 = 4 << 3,
-        SELECT_PHOTODIODE_D11_T3 = 5 << 3,
-        SELECT_PHOTODIODE_D10_T3 = 6 << 3,
-        SELECT_PHOTODIODE_MASK   = 7 << 3,
         LED_BOARD_ENABLED  = 1 << 6,
         LED_BOARD_DISABLED = 1 << 7,
         LED_BOARD_MASK     = 3 << 6,
@@ -37,10 +30,8 @@ public:
     };
     enum Status {
         OKAY,
-        ERROR_INTEGRATION_TIME_OUT_OF_RANGE,
-        ERROR_SELECT_LED_OUT_OF_RANGE,
-        ERROR_SELECT_PHOTODIODE_OUT_OF_RANGE,
-        ERROR_LED_INTENSITY_OUT_OF_RANGE,
+        ERROR_SELECT_LED_OUT_OF_RANGE = 2,
+        ERROR_LED_INTENSITY_OUT_OF_RANGE = 4,
         ERROR_LED_BOARD_VERSION_INVALID,
         ERROR_PHOTODIODE_BOARD_VERSION_INVALID,
     };
@@ -48,9 +39,9 @@ public:
     LibPhotodiode();
     virtual ~LibPhotodiode();
     int setLed(int led);
-    int setPhotodiode(int photodiode);
+    int setPhotodiode(uint32 photodiode);
     int getLed();
-    int getPhotodiode();
+    uint32 getPhotodiode();
     uint32 getIntegrationTimeInUs(); // 1,000us-1,000,000us
     int setIntegrationTimeInUs(uint32 integrationTimeInUs);
     uint32 getLedIntensity(); // 0-40,000
@@ -78,26 +69,34 @@ public:
     void ledTurnOff();
 private:
     float convertPhotodiodeThermistorRawDataToResistance(uint16_t data);
-    float convertLedThermistorRawDataToResistance(uint16_t data);
+    //float convertLedThermistorRawDataToResistance(uint16_t data);
 private:
-    OpticsDriver m_opticsDriver;
+    //OpticsDriver m_opticsDriver;
     static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
-    int m_led;
-    int m_photodiode;
-    uint32 m_integrationTimeInUs;
+ //   uint32 m_integrationTimeInUs;
     uint32 m_ledIntensity;
-    std::map<int, int> m_ledMap;
-    std::map<int, int> m_pdMap;
-    uint32 m_photodiodeResultRaw;
+//    std::map<int, int> m_ledMap;
+//    std::map<int, int> m_pdMap;
+//    uint32 m_photodiodeResultRaw;
     float m_photodiodeTemperatureDuringIntegration;
-    LibThermistor m_photodiodeThermistor;
-    LibThermistor m_ledThermistor;
+    LibThermistorCurves m_photodiodeThermistorCurve;
+    LibThermistorCurves m_ledThermistorCurve;
     uint32 m_ledMontorPhotodiodeResult;
     uint32 m_ledTemperatureDuringIntegration;
     uint32 m_ledMontorPhotodiodeResultDuringIntegration;
     uint32 m_ledTemperature;
     uint32 m_ledState;
+    /////
+    /////
+    /////
+    LibPdBoard* m_libPdBoard;
+    LibLedBoard* m_libLedBoard;
+    uint32 m_led;
+    uint32 m_photodiode;
+    uint32 m_ledBoardVersion;
+    uint32 m_pdBoardVersion;
+    bool m_isLedBoardEnabled;
+    bool m_isPdBoardEnabled;
+    uint32 m_integrationTimeInUs;
 };
-
-#endif // _LIB_PHOTODIODE_H_

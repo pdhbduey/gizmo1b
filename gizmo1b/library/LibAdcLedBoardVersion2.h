@@ -1,21 +1,22 @@
-#ifndef _LIB_ADC_H_
-#define _LIB_ADC_H_
+#pragma once
 
-#include "FreeRTOS.h"
-#include "os_semphr.h"
-#include "libWrapMibSpi1.h"
-#include "libWrapGioPort.h"
+#include <FreeRTOS.h>
+#include <os_semphr.h>
+#include <libWrapGioPort.h>
+#include <LibMibSpi3.h>
 
-class LibAdc
+class LibAdcLedBoardVersion2
 {
 public:
-    enum Channel {
-        CHANNEL_0,
-        CHANNEL_1,
-        CHANNEL_2,
-        CHANNEL_3,
-        CHANNEL_4,
-        CHANNEL_5,
+    enum AdcChannel {
+        ADC_CHANNEL_0,
+        ADC_CHANNEL_1,
+        ADC_CHANNEL_2,
+        ADC_CHANNEL_3,
+        ADC_CHANNEL_4,
+        ADC_CHANNEL_5,
+        ADC_CHANNEL_6,
+        ADC_CHANNEL_7,
     };
     enum Status {
         OKAY,
@@ -23,10 +24,11 @@ public:
         ERROR_TIME_OUT,
     };
 public:
-    LibAdc();
-    virtual ~LibAdc();
-    int read(int channel, float& value);  // 0-5V
+    LibAdcLedBoardVersion2();
+    virtual ~LibAdcLedBoardVersion2();
+    int read(int channel, float& value);  // 0-Vref
     int read(int channel, uint32& value); // 0-65535
+    float getVref();
 private:
     enum CtrlRegisterShifts {
         CFG_SHIFT         = 13,
@@ -54,12 +56,11 @@ private:
         FULL_BW
     };
     enum RefSelectionBits {
-        INT_REF2_5_AND_TEMP_SENS,   // REF = 2.5 V buffered output.
-        INT_REF4_096_AND_TEMP_SENS, // REF = 4.096 V buffered output.
-        EXT_REF_AND_TEMP_SENS,      // Internal buffer disabled
-        EXT_REF_AND_TEMP_SENS_BUFF, // Internal buffer and temperature sensor enabled.
-        EXT_REF = 6,                // Int ref, int buffer, and temp sensor disabled.
-        EXT_REF_BUFF,               // Int buffer enabled. Int ref and temp sensor disabled.
+        INT_REF4_096_AND_TEMP_SENS = 1, // Internal reference and temperature sensor enabled. REF = 4.096 V buffered output.
+        EXT_REF_AND_TEMP_SENS,          // Use external reference. Temperature sensor enabled. Internal buffer disabled.
+        EXT_REF_AND_TEMP_SENS_BUFF,     // Use external reference. Internal buffer and temperature sensor enabled.
+        EXT_REF                    = 6, // Use external reference. Internal reference, internal buffer and temperature sensor disabled.
+        EXT_REF_BUFF,                   // Use external reference. Internal buffer enabled. Internal reference and temperature sensor disabled.
     };
     enum ChSeqBits {
         DISABLE_SEQ,
@@ -77,10 +78,9 @@ private:
     int convert();
     int get(uint16& data);
 private:
-    LibWrapMibSpi1 m_libWrapMibSpi1;
+    LibMibSpi3 m_libMibSpi3;
     LibWrapGioPort::Port m_adcCnv;
     static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
+    float m_refV;
 };
-
-#endif // _LIB_ADC_H_

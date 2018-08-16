@@ -1836,15 +1836,15 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                 uint32 control;
                 result = regRead(BoardTest::PHOTODIODE_CONTROL, control);
                 if (result == BoardTest::OKAY) {
-                    int pd = control & LibPhotodiode::SELECT_PHOTODIODE_MASK;
+                    int pd = control & LibPdBoard::SELECT_PHOTODIODE_MASK;
                     std::map<int, std::string> pdMap;
-                    pdMap[0]                                       = "none";
-                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D11_T1] = "1";
-                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D10_T1] = "2";
-                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D11_T2] = "3";
-                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D10_T2] = "4";
-                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D11_T3] = "5";
-                    pdMap[LibPhotodiode::SELECT_PHOTODIODE_D10_T3] = "6";
+                    pdMap[0]                                    = "none";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D11_T1] = "1";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D10_T1] = "2";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D11_T2] = "3";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D10_T2] = "4";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D11_T3] = "5";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D10_T3] = "6";
                     res = (pdMap.find(pd) != pdMap.end()
                         ?  pdMap[pd]
                         :  "unknown");
@@ -1915,8 +1915,8 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "ledver") {
                 std::map<int, std::string> ledVer;
-                ledVer[OpticsDriver::LED_BOARD_V1] = "v1";
-                ledVer[OpticsDriver::LED_BOARD_V2] = "v2";
+                ledVer[LibLedBoard::LED_BOARD_V1] = "v1";
+                ledVer[LibLedBoard::LED_BOARD_V2] = "v2";
                 uint32 ver;
                 result = regRead(BoardTest::PHOTODIODE_LED_BOARD_VERSION, ver);
                 char t[16];
@@ -1928,8 +1928,8 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "pdver") {
                 std::map<int, std::string> pdVer;
-                pdVer[OpticsDriver::PHOTODIODE_BOARD_V1] = "v1";
-                pdVer[OpticsDriver::PHOTODIODE_BOARD_V2] = "v2";
+                pdVer[LibPdBoard::PHOTODIODE_BOARD_V1] = "v1";
+                pdVer[LibPdBoard::PHOTODIODE_BOARD_V2] = "v2";
                 uint32 ver;
                 result = regRead(BoardTest::PHOTODIODE_PD_BOARD_VERSION, ver);
                 char t[16];
@@ -1999,12 +1999,12 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "pd" && tokens.size() > VALUE) {
                 std::map<std::string, int> pdMap;
-                pdMap["1"] = LibPhotodiode::SELECT_PHOTODIODE_D11_T1;
-                pdMap["2"] = LibPhotodiode::SELECT_PHOTODIODE_D10_T1;
-                pdMap["3"] = LibPhotodiode::SELECT_PHOTODIODE_D11_T2;
-                pdMap["4"] = LibPhotodiode::SELECT_PHOTODIODE_D10_T2;
-                pdMap["5"] = LibPhotodiode::SELECT_PHOTODIODE_D11_T3;
-                pdMap["6"] = LibPhotodiode::SELECT_PHOTODIODE_D10_T3;
+                pdMap["1"] = LibPdBoard::SELECT_PHOTODIODE_D11_T1;
+                pdMap["2"] = LibPdBoard::SELECT_PHOTODIODE_D10_T1;
+                pdMap["3"] = LibPdBoard::SELECT_PHOTODIODE_D11_T2;
+                pdMap["4"] = LibPdBoard::SELECT_PHOTODIODE_D10_T2;
+                pdMap["5"] = LibPdBoard::SELECT_PHOTODIODE_D11_T3;
+                pdMap["6"] = LibPdBoard::SELECT_PHOTODIODE_D10_T3;
                 if (pdMap.find(tokens[VALUE]) != pdMap.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_CONTROL,
                                                           pdMap[tokens[VALUE]]);
@@ -2042,8 +2042,8 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "ledver" && tokens.size() > VALUE) {
                 std::map<std::string, int> ledVer;
-                ledVer["v1"] = OpticsDriver::LED_BOARD_V1;
-                ledVer["v2"] = OpticsDriver::LED_BOARD_V2;
+                ledVer["v1"] = LibLedBoard::LED_BOARD_V1;
+                ledVer["v2"] = LibLedBoard::LED_BOARD_V2;
                 if (ledVer.find(tokens[VALUE]) != ledVer.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_LED_BOARD_VERSION,
                                                          ledVer[tokens[VALUE]]);
@@ -2052,8 +2052,8 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "pdver" && tokens.size() > VALUE) {
                 std::map<std::string, int> pdVer;
-                pdVer["v1"] = OpticsDriver::PHOTODIODE_BOARD_V1;
-                pdVer["v2"] = OpticsDriver::PHOTODIODE_BOARD_V2;
+                pdVer["v1"] = LibPdBoard::PHOTODIODE_BOARD_V1;
+                pdVer["v2"] = LibPdBoard::PHOTODIODE_BOARD_V2;
                 if (pdVer.find(tokens[VALUE]) != pdVer.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_PD_BOARD_VERSION,
                                                           pdVer[tokens[VALUE]]);

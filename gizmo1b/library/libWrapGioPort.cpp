@@ -22,6 +22,11 @@ LibWrapGioPort::Port::Port(LibWrapGioPort* libWrapGioPort, int pin) :
 {
 }
 
+LibWrapGioPort::Port::~Port()
+{
+    delete m_libWrapGioPort;
+}
+
 void LibWrapGioPort::setPin(uint32 pin, uint32 value)
 {
     LibMutex libMutex(getPortMutex());
