@@ -119,7 +119,7 @@ void LibMotor::reset()
 {
     LibMutex libMutex(s_mutex);
     m_pinMap[MOT_STBY_RST]->m_libWrapGioPort->setPin(m_pinMap[MOT_STBY_RST]->m_pin, false);
-    LibDelay::waitForTimer(10);
+    LibDelay::pmuMicrosecDelay(10);
     m_pinMap[MOT_STBY_RST]->m_libWrapGioPort->setPin(m_pinMap[MOT_STBY_RST]->m_pin, true);
 }
 
@@ -137,14 +137,14 @@ int LibMotor::write(uint16 command, uint16& data)
 {
     int result = OKAY;
     m_pinMap[MOT_CS]->m_libWrapGioPort->setPin(m_pinMap[MOT_CS]->m_pin, false);
-    LibDelay::waitForTimer(1);
+    LibDelay::pmuMicrosecDelay(1);
     m_libWrapMibSpi1.setData(LibWrapMibSpi1::L6470HTR_STEPPER_MOTOR_DRIVER, &command);
     m_libWrapMibSpi1.transfer(LibWrapMibSpi1::L6470HTR_STEPPER_MOTOR_DRIVER);
     if (!m_libWrapMibSpi1.waitForTransferComplete(LibWrapMibSpi1::L6470HTR_STEPPER_MOTOR_DRIVER, 1)) {
         result = ERROR_TIME_OUT;
     }
     m_pinMap[MOT_CS]->m_libWrapGioPort->setPin(m_pinMap[MOT_CS]->m_pin, true);
-    LibDelay::waitForTimer(1);
+    LibDelay::pmuMicrosecDelay(1);
     if (result == OKAY) {
         m_libWrapMibSpi1.getData(LibWrapMibSpi1::L6470HTR_STEPPER_MOTOR_DRIVER, &data);
     }

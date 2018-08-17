@@ -6,13 +6,12 @@
  *      https://github.com/GilRoss/AmpDetectFW
  */
 
-#include "OpticsDriver.h"
-#include "het.h"
+#include <OpticsDriver.h>
+#include <het.h>
+#include <libDelay.h>
 
-bool        OpticsDriver::_integrationEnd = false;
-uint32_t    OpticsDriver::_pdsr_latch_pin;
-uint32_t    OpticsDriver::_pd_pwm;
-#define delay_uS 10000
+#define delay_mS 10000
+#define delay_uS 10
 
 /**
  * Name: OpticsDriver
@@ -78,12 +77,7 @@ void OpticsDriver::SetLedsOff()
 uint32_t OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx, uint32_t nDuration_us, uint32_t nLedIntensity)
 {
     uint16_t adcValue = 0x0000;
-    hetSIGNAL_t signal;
     uint32_t adcChannel = 0;
-
-    signal.duty = 50;
-    signal.period = nDuration_us;
-    _integrationEnd = false;
 
     switch(npdChanIdx)
     {
@@ -119,40 +113,43 @@ uint32_t OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChan
     /* Reset Integrator first */
     SetIntegratorState(RESET_STATE, npdChanIdx);
     gioSetBit(hetPORT1, _pdsr_latch_pin, 1); //Enable Reset State
-    for(int i=0; i<delay_uS*5; i++); //Hold in reset state for 5 ms
+    for(int i=0; i<delay_uS*500; i++); //Hold in reset state for 500 us
 
     /* Turn On LED */
     SetLedIntensity(nledChanIdx, nLedIntensity);
-    for(int i=0; i<delay_uS*10; i++); //Hold for 10 ms time after turning on LED
-
-    /* Set Duration for Integration */
-    pwmSetSignal(hetRAM1, _pd_pwm, signal);
-    pwmEnableNotification(hetREG1, _pd_pwm, pwmEND_OF_PERIOD);
 
     SetIntegratorState(INTEGRATE_STATE, npdChanIdx);
-    /* Wait until interrupt occurs */
-    while (!_integrationEnd);
-    _integrationEnd = false;
+
+    //gioSetBit(hetPORT1, PIN_HET_14, 1);
+
+    taskENTER_CRITICAL();
+
     gioSetBit(hetPORT1, _pdsr_latch_pin, 1); //Enable Integration State (start integrating)
+
+    //gioSetBit(hetPORT1, PIN_HET_14, 0);
+
+    LibDelay::rtiReset();
 
     SetIntegratorState(HOLD_STATE, npdChanIdx); //Configure Hold state
 
-    /* Wait for integrationTimeExpired flag to be set */
-    while (!_integrationEnd);
-    pwmDisableNotification(hetREG1, _pd_pwm, pwmEND_OF_BOTH);
+    LibDelay::rtiMicrosecDelay(nDuration_us);
 
-    for(int i=0; i<delay_uS; i++); //1 ms delay
+    gioSetBit(hetPORT1, _pdsr_latch_pin, 1);
+
+    //gioSetBit(hetPORT1, PIN_HET_14, 1);
+
+    taskEXIT_CRITICAL();
+
     /* Turn Off LED */
     SetLedsOff();
 
-    for(int i=0; i<delay_uS; i++); //Hold for 1 ms time before reading
+    for(int i=0; i<delay_uS*500; i++); //Hold for 500 us time before reading
 
     adcValue = GetAdc(adcChannel);
 
-    //for(int i=0; i<delay_uS; i++);
-
     SetIntegratorState(RESET_STATE, npdChanIdx);
     gioSetBit(hetPORT1, _pdsr_latch_pin, 1); //Enable Reset State
+    for(int i=0; i<delay_uS*500; i++); //Hold in reset state for 500 us
 
     return (uint32_t)adcValue;
 }
@@ -275,6 +272,22 @@ uint16_t OpticsDriver::GetAdc(uint32_t nChanIdx)
  * Returns:
  * Description: Utilizes shift register to set integrator state
  */
+
+//Reset Mode
+//a.      Hold Switch goes Low
+//b.      Reset Switch goes Low
+//c.      Wait 500us
+//
+//(2)   Integrate Mode
+//a.      Hold Switch stays Low
+//b.      Reset Switch goes High
+//c.      Wait Integration Time
+//
+//(3)   Read ADC
+//a.      Hold Switch goes High
+//b.      Reset Switch goes High
+//c.      Wait 500us
+//d.      Read ADC
 void OpticsDriver::SetIntegratorState(pdIntegratorState state, uint32_t npdChanIdx)
 {
     uint8_t pinState = 0;
@@ -287,14 +300,13 @@ void OpticsDriver::SetIntegratorState(pdIntegratorState state, uint32_t npdChanI
     switch (state)
     {
         case RESET_STATE:
-            serialDataIn = 0xFF00;
+            serialDataIn = 0x0000; // MSB=Hold(L), LSB=Reset(L)
             break;
         case HOLD_STATE:
-            serialDataIn = 0xFFFF;
+            serialDataIn = 0xFFFF; // MSB=Hold(H), LSB=Reset(H)
             break;
         case INTEGRATE_STATE:
-            //serialDataIn = 0x0000 | (uint8_t) npdChanIdx;
-            serialDataIn = 0x00FF;
+            serialDataIn = 0x00FF; // MSB=Hold(L), LSB=Reset(H)
             break;
         default:
             break;
@@ -318,38 +330,4 @@ void OpticsDriver::SetIntegratorState(pdIntegratorState state, uint32_t npdChanI
         gioSetBit(hetPORT1, _pdsr_data_pin, 0);
     }
     gioSetBit(hetPORT1, _pdsr_clk_pin, 0);
-    //gioSetBit(hetPORT1, _pdsr_latch_pin, 1);
 }
-
-extern "C" void OpticsIntegrationDoneISR();
-void OpticsIntegrationDoneISR()
-{
-    OpticsDriver::OpticsIntegrationDoneISR();
-}
-
-void OpticsDriver::OpticsIntegrationDoneISR()
-{
-/*  enter user code between the USER CODE BEGIN and USER CODE END. */
-/* USER CODE BEGIN (35) */
-   /* Trigger Hold on Integrated Value */
-   gioSetBit(hetPORT1, _pdsr_latch_pin, 1);
-   /* Set flag pwmNotification */
-   _integrationEnd = true;
-
-/* USER CODE END */
-}
-
-extern "C" void pwmNotification(hetBASE_t * hetREG,uint32 pwm, uint32 notification)
-{
-/*  enter user code between the USER CODE BEGIN and USER CODE END. */
-/* USER CODE BEGIN (35) */
-    if(hetREG == hetREG1)
-    {
-        if ((pwm == OpticsDriver::_pd_pwm) && (notification == pwmEND_OF_PERIOD))
-        {
-            OpticsIntegrationDoneISR();
-        }
-    }
-/* USER CODE END */
-}
-

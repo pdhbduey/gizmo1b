@@ -68,19 +68,9 @@ public:
     void ledTurnOn();
     void ledTurnOff();
 private:
-    float convertPhotodiodeThermistorRawDataToResistance(uint16_t data);
-    //float convertLedThermistorRawDataToResistance(uint16_t data);
-private:
-    //OpticsDriver m_opticsDriver;
     static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;
- //   uint32 m_integrationTimeInUs;
     uint32 m_ledIntensity;
-//    std::map<int, int> m_ledMap;
-//    std::map<int, int> m_pdMap;
-//    uint32 m_photodiodeResultRaw;
-    float m_photodiodeTemperatureDuringIntegration;
-    LibThermistorCurves m_photodiodeThermistorCurve;
     LibThermistorCurves m_ledThermistorCurve;
     uint32 m_ledMontorPhotodiodeResult;
     uint32 m_ledTemperatureDuringIntegration;

@@ -31,7 +31,7 @@ LibAdc::LibAdc() :
         m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
         //gioSetBit(hetPORT1, PIN_HET_26, 1);
         // Allow enough time for internal reference to settle at turn-on
-        LibDelay::waitForTimer(10000);
+        LibDelay::pmuMicrosecDelay(10000);
         // Perform 2 conversions to set CFG register to a known state
         float value;
         read(CHANNEL_0, value);
@@ -81,7 +81,7 @@ int LibAdc::set(int channel)
     m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
     uint16 rbdata[2];
     m_libWrapMibSpi1.getData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, rbdata);
-    LibDelay::waitForTimer(4); // wait for conversion & acquisition to complete
+    LibDelay::pmuMicrosecDelay(4); // wait for conversion & acquisition to complete
     return result;
 }
 
@@ -98,7 +98,7 @@ int LibAdc::convert()
     m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
     uint16 rbdata[2];
     m_libWrapMibSpi1.getData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, rbdata);
-    LibDelay::waitForTimer(4); // wait for conversion & acquisition to complete
+    LibDelay::pmuMicrosecDelay(4); // wait for conversion & acquisition to complete
     return result;
 }
 
@@ -116,7 +116,7 @@ int LibAdc::get(uint16& data)
     uint16 rbdata[2];
     m_libWrapMibSpi1.getData(LibWrapMibSpi1::AD7689ACPZ_8CH_16BIT_ADC, rbdata);
     data = rbdata[0];
-    LibDelay::waitForTimer(4); // wait for conversion & acquisition to complete
+    LibDelay::pmuMicrosecDelay(4); // wait for conversion & acquisition to complete
     return result;
 }
 
