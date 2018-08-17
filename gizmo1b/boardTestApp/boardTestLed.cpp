@@ -1,5 +1,4 @@
 #include "boardTestLed.h"
-#include "libDelay.h"
 
 BoardTestLed::BoardTestLed()
 {
@@ -47,17 +46,4 @@ int BoardTestLed::set(uint32 address, uint32 value)
         break;
     }
     return OKAY;
-}
-
-void BoardTestLed::test()
-{
-    BoardTestLed boardTestLed;
-    boardTestLed.set(LED_CONTROL, RED_OFF | GREEN_ON);
-    for (int i = 0; i < 10; i++) {
-        uint32 value;
-        boardTestLed.get(LED_CONTROL, value);
-        boardTestLed.set(LED_CONTROL, ~value);
-        LibDelay::waitForTimer(500000);
-    }
-    boardTestLed.set(LED_CONTROL, RED_OFF | GREEN_OFF);
 }

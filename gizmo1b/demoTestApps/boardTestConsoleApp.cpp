@@ -1839,12 +1839,12 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                     int pd = control & LibPdBoard::SELECT_PHOTODIODE_MASK;
                     std::map<int, std::string> pdMap;
                     pdMap[0]                                    = "none";
-                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D11_T1] = "1";
-                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D10_T1] = "2";
-                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D11_T2] = "3";
-                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D10_T2] = "4";
-                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D11_T3] = "5";
-                    pdMap[LibPdBoard::SELECT_PHOTODIODE_D10_T3] = "6";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_1] = "1";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_2] = "2";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_3] = "3";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_4] = "4";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_5] = "5";
+                    pdMap[LibPdBoard::SELECT_PHOTODIODE_6] = "6";
                     res = (pdMap.find(pd) != pdMap.end()
                         ?  pdMap[pd]
                         :  "unknown");
@@ -1999,12 +1999,12 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
             }
             else if (tokens[ARGUMENT] == "pd" && tokens.size() > VALUE) {
                 std::map<std::string, int> pdMap;
-                pdMap["1"] = LibPdBoard::SELECT_PHOTODIODE_D11_T1;
-                pdMap["2"] = LibPdBoard::SELECT_PHOTODIODE_D10_T1;
-                pdMap["3"] = LibPdBoard::SELECT_PHOTODIODE_D11_T2;
-                pdMap["4"] = LibPdBoard::SELECT_PHOTODIODE_D10_T2;
-                pdMap["5"] = LibPdBoard::SELECT_PHOTODIODE_D11_T3;
-                pdMap["6"] = LibPdBoard::SELECT_PHOTODIODE_D10_T3;
+                pdMap["1"] = LibPdBoard::SELECT_PHOTODIODE_1;
+                pdMap["2"] = LibPdBoard::SELECT_PHOTODIODE_2;
+                pdMap["3"] = LibPdBoard::SELECT_PHOTODIODE_3;
+                pdMap["4"] = LibPdBoard::SELECT_PHOTODIODE_4;
+                pdMap["5"] = LibPdBoard::SELECT_PHOTODIODE_5;
+                pdMap["6"] = LibPdBoard::SELECT_PHOTODIODE_6;
                 if (pdMap.find(tokens[VALUE]) != pdMap.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_CONTROL,
                                                           pdMap[tokens[VALUE]]);

@@ -1,9 +1,9 @@
 #ifndef __OpticsDriver_H
 #define __OpticsDriver_H
 
-#include "gio.h"
-#include "mibspi.h"
-#include "het.h"
+#include <gio.h>
+#include <mibspi.h>
+#include <het.h>
 
 #define     kledDacGroup        (0)
 #define     kpdAdcGroup         (1)
@@ -97,22 +97,19 @@ public:
     void OpticsDriverInit();
     void AdcConfig();
     void SetIntegratorState(pdIntegratorState state, uint32_t npdChanIdx);
-    static void OpticsIntegrationDoneISR();
     uint16_t GetAdc(uint32_t nChanIdx);
 
 public:
     uint32_t            _pd_cs_pin;
     uint32_t            _pdsr_data_pin;
     uint32_t            _pdsr_clk_pin;
-    static uint32_t     _pdsr_latch_pin;
-    static uint32_t     _pd_pwm;
+    uint32_t            _pdsr_latch_pin;
     uint32_t            _somisw_pin;
     gioPORT_t*          _somisw_gioport;
     uint32_t            _pd_somisw;
   
 private:
     uint32_t            _nLedStateMsk;
-    static bool         _integrationEnd;
 };
 
 #endif // __OpticsDriver_H

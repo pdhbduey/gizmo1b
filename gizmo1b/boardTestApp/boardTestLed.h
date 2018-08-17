@@ -18,7 +18,6 @@ public:
     virtual ~BoardTestLed();
     virtual int get(uint32 address, uint32& value);
     virtual int set(uint32 address, uint32 value);
-    static void test();
 private:
     LibLed m_libLed;
 };

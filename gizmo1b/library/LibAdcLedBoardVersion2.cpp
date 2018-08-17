@@ -33,7 +33,7 @@ LibAdcLedBoardVersion2::LibAdcLedBoardVersion2() :
     // De-select ADC
     m_adcCnv.m_libWrapGioPort->setPin(m_adcCnv.m_pin, true);
     // Allow enough time for internal reference to settle at turn-on
-    LibDelay::waitForTimer(10000);
+    LibDelay::pmuMicrosecDelay(10000);
     // Perform 2 conversions to set CFG register to a known state
     uint32 value;
     read(ADC_CHANNEL_0, value);
@@ -89,7 +89,7 @@ int LibAdcLedBoardVersion2::set(int channel)
     mibspiTransfer(mibspiREG3, LibMibSpi3::AD7699BCPZ_8CH_16BIT_ADC);
     while(!(mibspiIsTransferComplete(mibspiREG3, LibMibSpi3::AD7699BCPZ_8CH_16BIT_ADC)));
     gioSetBit(hetPORT1, PIN_HET_12, 1);
-    LibDelay::waitForTimerInTheCriticalSection(4);
+    LibDelay::pmuMicrosecDelay(4);
     uint16 rbdata[2];
     mibspiGetData(mibspiREG3, LibMibSpi3::AD7699BCPZ_8CH_16BIT_ADC, rbdata);
     return result;
@@ -114,7 +114,7 @@ int LibAdcLedBoardVersion2::convert()
     mibspiTransfer(mibspiREG3, LibMibSpi3::AD7699BCPZ_8CH_16BIT_ADC);
     while(!(mibspiIsTransferComplete(mibspiREG3, LibMibSpi3::AD7699BCPZ_8CH_16BIT_ADC)));
     gioSetBit(hetPORT1, PIN_HET_12, 1);
-    LibDelay::waitForTimerInTheCriticalSection(4);
+    LibDelay::pmuMicrosecDelay(4);
     uint16 rbdata[2];
     mibspiGetData(mibspiREG3, LibMibSpi3::AD7699BCPZ_8CH_16BIT_ADC, rbdata);
     return result;
@@ -140,7 +140,7 @@ int LibAdcLedBoardVersion2::get(uint16& data)
     mibspiTransfer(mibspiREG3, LibMibSpi3::AD7699BCPZ_8CH_16BIT_ADC);
     while(!(mibspiIsTransferComplete(mibspiREG3, LibMibSpi3::AD7699BCPZ_8CH_16BIT_ADC)));
     gioSetBit(hetPORT1, PIN_HET_12, 1);
-    LibDelay::waitForTimerInTheCriticalSection(4);
+    LibDelay::pmuMicrosecDelay(4);
     uint16 rbdata[2];
     mibspiGetData(mibspiREG3, LibMibSpi3::AD7699BCPZ_8CH_16BIT_ADC, rbdata);
     data = rbdata[0];

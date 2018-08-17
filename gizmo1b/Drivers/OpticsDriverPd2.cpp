@@ -34,7 +34,6 @@ void OpticsDriverPd2::OpticsDriverInit(void)
     _pdsr_data_pin  = PIN_HET_12;
     _pdsr_clk_pin   = PIN_HET_13;
     _pdsr_latch_pin = PIN_HET_24;
-    _pd_pwm         = pwm2;
 
     gioSetBit(hetPORT1, _pd_cs_pin,      1);
     gioSetBit(hetPORT1, _pdsr_data_pin,  0);
@@ -43,7 +42,4 @@ void OpticsDriverPd2::OpticsDriverInit(void)
 
     /* Configure ADC on Photo Diode board */
     AdcConfig();
-
-    /* Disable PWM notification */
-    pwmDisableNotification(hetREG1, _pd_pwm, pwmEND_OF_BOTH);
 }

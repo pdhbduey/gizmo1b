@@ -6,13 +6,12 @@ bool LibPhotodiode::s_isInitialized;
 
 LibPhotodiode::LibPhotodiode() :
     m_integrationTimeInUs(10000),
-    m_photodiodeThermistorCurve(LibThermistorCurves::NTCG163JF103FT1, LibThermistorCurves::CELSIUS),
     m_ledThermistorCurve(LibThermistorCurves::NTCG163JF103FT1, LibThermistorCurves::CELSIUS),
     m_ledState(LED_TURN_OFF),
     m_libPdBoard(0),
     m_libLedBoard(0),
     m_led(LibLedBoard::SELECT_LED_BLUE1),
-    m_photodiode(LibPdBoard::SELECT_PHOTODIODE_D11_T1),
+    m_photodiode(LibPdBoard::SELECT_PHOTODIODE_1),
     m_ledBoardVersion(LibLedBoard::LED_BOARD_V1),
     m_pdBoardVersion(LibPdBoard::PHOTODIODE_BOARD_V1)
 {
@@ -46,12 +45,12 @@ int LibPhotodiode::setPhotodiode(uint32 photodiode)
     switch (photodiode) {
     default:
         return LibPdBoard::ERROR_SELECT_PHOTODIODE_OUT_OF_RANGE;
-    case LibPdBoard::SELECT_PHOTODIODE_D11_T1:
-    case LibPdBoard::SELECT_PHOTODIODE_D10_T1:
-    case LibPdBoard::SELECT_PHOTODIODE_D11_T2:
-    case LibPdBoard::SELECT_PHOTODIODE_D10_T2:
-    case LibPdBoard::SELECT_PHOTODIODE_D11_T3:
-    case LibPdBoard::SELECT_PHOTODIODE_D10_T3:
+    case LibPdBoard::SELECT_PHOTODIODE_1:
+    case LibPdBoard::SELECT_PHOTODIODE_2:
+    case LibPdBoard::SELECT_PHOTODIODE_3:
+    case LibPdBoard::SELECT_PHOTODIODE_4:
+    case LibPdBoard::SELECT_PHOTODIODE_5:
+    case LibPdBoard::SELECT_PHOTODIODE_6:
         m_photodiode = photodiode;
         break;
     }
@@ -104,28 +103,7 @@ int LibPhotodiode::setLedIntensity(uint32 ledIntensity)
 
 float LibPhotodiode::readPhotodiode()
 {
-//    LibMutex libMutex(s_mutex);
-//    uint32_t nledChanIdx   = m_ledMap[m_led];
-//    uint32_t npdChanIdx    = m_pdMap[m_photodiode];
-//    uint32_t nDuration_us  = m_integrationTimeInUs;
-//    uint32_t nLedIntensity = m_ledIntensity;
-//    struct OpticsDriver::Data data;
-//    m_opticsDriver.GetPhotoDiodeValue(nledChanIdx, npdChanIdx, nDuration_us,
-//                                                          nLedIntensity, &data);
-//    float rt = convertPhotodiodeThermistorRawDataToResistance(data.m_photodiodeTemperatureRaw);
-//    m_photodiodeTemperatureDuringIntegration =
-//                                      m_photodiodeThermistor.getTemperature(rt);
-//    rt = convertLedThermistorRawDataToResistance(data.m_ledTemperatureRaw);
-//    m_ledTemperatureDuringIntegration = m_ledThermistor.getTemperature(rt);
-//    m_ledMontorPhotodiodeResultDuringIntegration
-//                                 =  data.m_ledMontorPhotodiodeResultRaw
-//                                 * (m_opticsDriver.GetLedVref() / 65535);
-//    m_photodiodeResultRaw        = data.m_photodiodeResultRaw;
-//    float photoDiodeReading      = m_photodiodeResultRaw
-//                                 * (m_opticsDriver.GetPhotodiodeVref() / 65535);
-//    return photoDiodeReading;
     LibMutex libMutex(s_mutex);
-    m_photodiodeTemperatureDuringIntegration     = 0;
     m_ledTemperatureDuringIntegration            = 0;
     m_ledMontorPhotodiodeResultDuringIntegration = 0;
     float result = m_libPdBoard ? m_libPdBoard->readPhotodiodeResult() : 0;
@@ -231,13 +209,8 @@ float LibPhotodiode::readLedTemperature()
 float LibPhotodiode::readPhotodiodeTemperature()
 {
     LibMutex libMutex(s_mutex);
-//    uint32_t npdChanIdx = m_pdMap[m_photodiode];
-//    struct OpticsDriver::Data data;
-//    m_opticsDriver.GetPhotoDiodeTemperatureRaw(npdChanIdx, &data);
-//    float rt = convertPhotodiodeThermistorRawDataToResistance(data.m_photodiodeTemperatureRaw);
-//    float temperature = m_photodiodeThermistor.getTemperature(rt);
-//    return temperature;
-    return 0;
+    float temperature = m_libPdBoard ? m_libPdBoard->readPhotodiodeTemperature() : 0;
+    return temperature;
 }
 
 float LibPhotodiode::readLedMonitorPhotodiodeDuringIntegration()
@@ -252,34 +225,10 @@ float LibPhotodiode::readLedTemperatureDuringIntegration()
 
 float LibPhotodiode::readPhotodiodeTemperatureDuringIntegration()
 {
-    return m_photodiodeTemperatureDuringIntegration;
+    LibMutex libMutex(s_mutex);
+    float temperature = m_libPdBoard ? m_libPdBoard->readPhotodiodeTemperatureDuringIntegration() : 0;
+    return temperature;
 }
-
-// TEMP_AINx = Vref * Rt/(10,700 + Rt)
-// Rt = 10,700 / (Vref / TEMP_AINx - 1)
-float LibPhotodiode::convertPhotodiodeThermistorRawDataToResistance(uint16_t data)
-{
-    float vref    = 4.096;//m_opticsDriver.GetPhotodiodeVref();
-    float voltage = data  * vref / 65535;
-    if (voltage == 0 || voltage == vref) {
-        return 10000;
-    }
-    float rt = 10700 / (vref / voltage - 1);
-    return rt;
-}
-
-// TEMP_AINx = Vref * Rt/(10,700 + Rt)
-// Rt = 10,700 / (Vref / TEMP_AINx - 1)
-//float LibPhotodiode::convertLedThermistorRawDataToResistance(uint16_t data)
-//{
-//    float vref    = 4.096;//m_opticsDriver.GetLedVref();
-//    float voltage = data  * vref / 65535;
-//    if (voltage == 0 || voltage == vref) {
-//        return 10000;
-//    }
-//    float rt = 10700 / (vref / voltage - 1);
-//    return rt;
-//}
 
 // NOTE: I found that there is an issue with
 // FAN_PWM1 (pwm0) on HET1[0] creating noise
