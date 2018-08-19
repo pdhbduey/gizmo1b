@@ -19,7 +19,8 @@ private:
     virtual void run();
     void decodeMessage(std::vector<uint8>& message,
                                                   std::vector<uint8>& response);
-    void help(std::string& help);
+    bool parseHelpCommand(std::vector<std::string>& tokens,
+                                                 std::string& res, int& result);
     bool parseTecCommand(std::vector<std::string>& tokens,
                                                  std::string& res, int& result);
     bool parseHeaterCommand(std::vector<std::string>& tokens,

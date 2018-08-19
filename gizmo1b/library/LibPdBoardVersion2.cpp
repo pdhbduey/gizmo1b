@@ -22,9 +22,8 @@ LibPdBoardVersion2::LibPdBoardVersion2() :
     m_pdTempToAdcMap[SELECT_PHOTODIODE_5] = 6;
     m_pdTempToAdcMap[SELECT_PHOTODIODE_6] = 7;
 
-    LibWrapGioPort* libWrapHet1 = new LibWrapHet1;
-    m_tempSwCCtrlPinsMap[TEMP_SW_CTRL_A] = new LibWrapGioPort::Port(libWrapHet1, PIN_HET_28); // 107:HET1_28:DIG_OUT_B2
-    m_tempSwCCtrlPinsMap[TEMP_SW_CTRL_B] = new LibWrapGioPort::Port(libWrapHet1, PIN_HET_30); // 127:HET1_30:DIG_OUT_B3
+    m_tempSwCCtrlPinsMap[TEMP_SW_CTRL_A] = new LibWrapGioPort::Port(new LibWrapHet1, PIN_HET_28); // 107:HET1_28:DIG_OUT_B2
+    m_tempSwCCtrlPinsMap[TEMP_SW_CTRL_B] = new LibWrapGioPort::Port(new LibWrapHet1, PIN_HET_30); // 127:HET1_30:DIG_OUT_B3
 }
 
 LibPdBoardVersion2::~LibPdBoardVersion2()

@@ -1,5 +1,16 @@
-#include "libMutex.h"
-#include "libPhotodiode.h"
+#include <FreeRTOS.h>
+#include <os_task.h>
+#include <libMutex.h>
+#include <libPhotodiode.h>
+
+// NOTE: I found that there is an issue with
+// FAN_PWM1 (pwm0) on HET1[0] creating noise
+// breaking communication over MIBSPI3 with the PD2.0
+// board. It may be an issue with any communication
+// over MIBSPI3 so it's safer to disable both pwm0 and pwm1 before
+// any test related to MISPI3 is performed. The workaround
+// is to keep both pwm0 and pwm1 disabled until both PD and LED boards
+// are disabled
 
 SemaphoreHandle_t LibPhotodiode::s_mutex;
 bool LibPhotodiode::s_isInitialized;
@@ -144,6 +155,9 @@ int LibPhotodiode::setLedBoardVersion(uint32 version)
                     m_libLedBoard = 0;
                     break;
                 case LibLedBoard::LED_BOARD_V2:
+                    pwmStop(hetRAM1, pwm0);
+                    pwmStop(hetRAM1, pwm1);
+                    vTaskDelay(pdMS_TO_TICKS(100));
                     m_libLedBoard = new LibLedBoardVersion2;
                     break;
                 }
@@ -154,6 +168,10 @@ int LibPhotodiode::setLedBoardVersion(uint32 version)
             m_ledBoardVersion = version;
         }
         break;
+    }
+    if (!m_libLedBoard && !m_libPdBoard) {
+        pwmStart(hetRAM1, pwm0);
+        pwmStart(hetRAM1, pwm1);
     }
     return result;
 }
@@ -185,6 +203,9 @@ int LibPhotodiode::setPhotodiodeBoardVersion(uint32 version)
                     m_libPdBoard = 0;
                     break;
                 case LibPdBoard::PHOTODIODE_BOARD_V2:
+                    pwmStop(hetRAM1, pwm0);
+                    pwmStop(hetRAM1, pwm1);
+                    vTaskDelay(pdMS_TO_TICKS(100));
                     m_libPdBoard = new LibPdBoardVersion2;
                     break;
                 }
@@ -195,6 +216,10 @@ int LibPhotodiode::setPhotodiodeBoardVersion(uint32 version)
             m_pdBoardVersion = version;
         }
         break;
+    }
+    if (!m_libLedBoard && !m_libPdBoard) {
+        pwmStart(hetRAM1, pwm0);
+        pwmStart(hetRAM1, pwm1);
     }
     return result;
 }
@@ -230,15 +255,6 @@ float LibPhotodiode::readPhotodiodeTemperatureDuringIntegration()
     return temperature;
 }
 
-// NOTE: I found that there is an issue with
-// FAN_PWM1 (pwm0) on HET1[0] creating noise
-// breaking communication over MIBSPI3 with the PD2.0
-// board. It may be an issue with any communication
-// over MIBSPI3 so it's safer to disable both pwm0 and pwm1 before
-// any test related to MISPI3 is performed. The workaround
-// is to keep both pwm0 and pwm1 disabled until both PD and LED boards
-// are disabled
-
 void LibPhotodiode::ledBoardEnable()
 {
     LibMutex libMutex(s_mutex);
@@ -249,6 +265,7 @@ void LibPhotodiode::ledBoardEnable()
             case LibLedBoard::LED_BOARD_V2:
                 pwmStop(hetRAM1, pwm0);
                 pwmStop(hetRAM1, pwm1);
+                vTaskDelay(pdMS_TO_TICKS(100));
                 m_libLedBoard = new LibLedBoardVersion2;
                 break;
             }
@@ -268,11 +285,11 @@ void LibPhotodiode::ledBoardDisable()
             m_led = m_libLedBoard->getLed();
             delete m_libLedBoard;
             m_libLedBoard = 0;
-            if (!m_libPdBoard) {
-                pwmStart(hetRAM1, pwm0);
-                pwmStart(hetRAM1, pwm1);
-            }
         }
+    }
+    if (!m_libLedBoard && !m_libPdBoard) {
+        pwmStart(hetRAM1, pwm0);
+        pwmStart(hetRAM1, pwm1);
     }
 }
 
@@ -286,6 +303,7 @@ void LibPhotodiode::pdBoardEnable()
             case LibPdBoard::PHOTODIODE_BOARD_V2:
                 pwmStop(hetRAM1, pwm0);
                 pwmStop(hetRAM1, pwm1);
+                vTaskDelay(pdMS_TO_TICKS(100));
                 m_libPdBoard = new LibPdBoardVersion2;
                 break;
             }
@@ -305,11 +323,11 @@ void LibPhotodiode::pdBoardDisable()
             m_photodiode = m_libPdBoard->getPhotodiode();
             delete m_libPdBoard;
             m_libPdBoard = 0;
-            if (!m_libLedBoard) {
-                pwmStart(hetRAM1, pwm0);
-                pwmStart(hetRAM1, pwm1);
-            }
         }
+    }
+    if (!m_libLedBoard && !m_libPdBoard) {
+        pwmStart(hetRAM1, pwm0);
+        pwmStart(hetRAM1, pwm1);
     }
 }
 
