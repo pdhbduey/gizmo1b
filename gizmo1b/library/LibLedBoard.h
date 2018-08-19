@@ -6,7 +6,7 @@ class LibLedBoard
 {
 public:
     enum Control {
-        SELECT_LED_BLUE1,
+        SELECT_LED_BLUE1 = 1,
         SELECT_LED_GREEN,
         SELECT_LED_RED1,
         SELECT_LED_BROWN,
