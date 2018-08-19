@@ -66,92 +66,6 @@ void BoardTestConsoleApp::run()
     }
 }
 
-void BoardTestConsoleApp::help(std::string& help)
-{
-    help  = "ERROR: Unrecognized command\n\r";
-    help += "USAGE:\n\r";
-    help += "dac set [0,5](V)\n\r";
-    help += "dac get\n\r";
-    help += "adc get 0..5|all\n\r";
-    help += "led set green|red on|off\n\r";
-    help += "led get green|red\n\r";
-    help += "fault reset\n\r";
-    help += "fault get ntc|alarms\n\r";
-    help += "tec enable|disable\n\r";
-    help += "tec get enable\n\r";
-    help += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform|closedloop\n\r";
-    help += "tec set iref [-15,15](A)\n\r";
-    help += "tec set waveformtype sin|tr|sq|const|custom\n\r";
-    help += "tec set waveformperiod 2..10,000(ms)\n\r";
-    help += "tec set waveform start|stop\n\r";
-    help += "tec set closedloop enable|disable\n\r";
-    help += "tec set propgain [0.01,100]\n\r";
-    help += "tec get propgain\n\r";
-    help += "tec set intgain [0,100]\n\r";
-    help += "tec get intgain\n\r";
-    help += "tec set dergain [0,100]\n\r";
-    help += "tec get dergain\n\r";
-    help += "tec set voutmax [0,21](V)\n\r";
-    help += "tec get voutmax\n\r";
-    help += "tec set customindex reset\n\r";
-    help += "tec set customindex inc\n\r";
-    help += "tec set customtime 0..9,999(ms)\n\r";
-    help += "tec set customiref [-15,15](A)\n\r";
-    help += "tec set customcycles 0..4,294,967,296\n\r";
-    help += "tec get customindex|customtime|customiref|customcycles\n\r";
-    help += "heater enable|disable\n\r";
-    help += "heater get enable\n\r";
-    help += "heater get tref|imax|closedloop|tin\n\r";
-    help += "heater set tref [0,100](deg C)\n\r";
-    help += "heater set imax [0,15](A)\n\r";
-    help += "heater set tin 1..4\n\r";
-    help += "heater set closedloop enable|disable\n\r";
-    help += "heater set propgain [0.01,100]\n\r";
-    help += "heater get propgain\n\r";
-    help += "heater set intgain [0,100]\n\r";
-    help += "heater get intgain\n\r";
-    help += "heater set dergain [0,100]\n\r";
-    help += "heater get dergain\n\r";
-    help += "heater set customindex reset\n\r";
-    help += "heater set customindex inc\n\r";
-    help += "heater set customtime 0..10,000(s)\n\r";
-    help += "heater set customtref [0,100](deg C)\n\r";
-    help += "heater set customcycles 0..4,294,967,296\n\r";
-    help += "heater get customindex|customtime|customtref|customcycles|waveform\n\r";
-    help += "heater set waveform start|stop\n\r";
-    help += "thermistor get a|b|c|d|all\n\r";
-    help += "thermistor set type USP12837|SC30F103AN\n\r";
-    help += "thermistor get type\n\r";
-    help += "motor reset|initialize|limp|energize|stop\n\r";
-    help += "motor get regaddress|regvalue|step|abspos|relpos|pos|status\n\r";
-    help += "motor set regaddress|regvalue 0x<hex>\n\r";
-    help += "motor set step full|half|1/4|1/8|1/16|1/32|1/64|1/128\n\r";
-    help += "motor regread|regwrite\n\r";
-    help += "motor set abspos -2097152..2097151\n\r";
-    help += "motor set relpos 0..4194303\n\r";
-    help += "motor moveabs\n\r";
-    help += "motor moverel forward|reverse\n\r";
-    help += "motor cycle\n\r";
-    help += "fan set duty1|duty2 0..100\n\r";
-    help += "fan set per1|per2 [10.0,1000000.0](us)\n\r";
-    help += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
-    help += "dio get in 0..9|all\n\r";
-    help += "dio get out 0..7|all\n\r";
-    help += "dio set|clear 0..7\n\r";
-    help += "optics get led|pd|time|intensity|result|ledtemp|pdtemp|ledmonpd\n\r";
-    help += "optics set led 1..6\n\r";
-    help += "optics set pd 1..6\n\r";
-    help += "optics set time 1,000..1,000,000(us)\n\r";
-    help += "optics set intensity 0..40,000\n\r";
-    help += "optics get ledver|pdver\n\r";
-    help += "optics set ledver v1|v2\n\r";
-    help += "optics set pdver v1|v2\n\r";
-    help += "optics set ledstatus|pdstatus enabled|disabled\n\r";
-    help += "optics get ledstatus|pdstatus\n\r";
-    help += "optics get ledstate\n\r";
-    help += "optics set ledstate on|off\n\r";
-}
-
 void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
                                                    std::vector<uint8>& response)
 {
@@ -189,7 +103,10 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
             tokens.push_back(msg);
         }
         if (tokens.size() > COMPONENT) {
-            if (tokens[COMPONENT] == "tec") {
+            if (tokens[COMPONENT] == "help") {
+                isParsingError = parseHelpCommand(tokens, res, result);
+            }
+            else if (tokens[COMPONENT] == "tec") {
                 isParsingError = parseTecCommand(tokens, res, result);
             }
             else if (tokens[COMPONENT] == "heater") {
@@ -225,7 +142,8 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
         }
     }
     if (isParsingError) {
-        help(res);
+        res  = "ERROR: Unrecognized command\n\r";
+        res += "USAGE: Type help\n\r";
     }
     else {
         if (res.size()) {
@@ -245,6 +163,133 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
     for (int i = 0; i < res.size(); i++) {
         response.push_back(res[i]);
     }
+}
+
+bool BoardTestConsoleApp::parseHelpCommand(std::vector<std::string>& tokens,
+                                                  std::string& res, int& result)
+{
+    bool isParsingError = true;
+    if (tokens.size() > ACTION) {
+        if (tokens[ACTION] == "dac") {
+            res += "dac set [0,5](V)\n\r";
+            res += "dac get\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "adc") {
+            res += "adc get 0..5|all\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "led") {
+            res += "led set green|red on|off\n\r";
+            res += "led get green|red\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "fault") {
+            res += "fault reset\n\r";
+            res += "fault get ntc|alarms\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "tec") {
+            res += "tec enable|disable\n\r";
+            res += "tec get enable\n\r";
+            res += "tec get isense|vsense|iref|waveformtype|waveformperiod|waveform|closedloop\n\r";
+            res += "tec set iref [-15,15](A)\n\r";
+            res += "tec set waveformtype sin|tr|sq|const|custom\n\r";
+            res += "tec set waveformperiod 2..10,000(ms)\n\r";
+            res += "tec set waveform start|stop\n\r";
+            res += "tec set closedloop enable|disable\n\r";
+            res += "tec set propgain [0.01,100]\n\r";
+            res += "tec get propgain\n\r";
+            res += "tec set intgain [0,100]\n\r";
+            res += "tec get intgain\n\r";
+            res += "tec set dergain [0,100]\n\r";
+            res += "tec get dergain\n\r";
+            res += "tec set voutmax [0,21](V)\n\r";
+            res += "tec get voutmax\n\r";
+            res += "tec set customindex reset\n\r";
+            res += "tec set customindex inc\n\r";
+            res += "tec set customtime 0..9,999(ms)\n\r";
+            res += "tec set customiref [-15,15](A)\n\r";
+            res += "tec set customcycles 0..4,294,967,296\n\r";
+            res += "tec get customindex|customtime|customiref|customcycles\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "heater") {
+            res += "heater enable|disable\n\r";
+            res += "heater get enable\n\r";
+            res += "heater get tref|imax|closedloop|tin\n\r";
+            res += "heater set tref [0,100](deg C)\n\r";
+            res += "heater set imax [0,15](A)\n\r";
+            res += "heater set tin 1..4\n\r";
+            res += "heater set closedloop enable|disable\n\r";
+            res += "heater set propgain [0.01,100]\n\r";
+            res += "heater get propgain\n\r";
+            res += "heater set intgain [0,100]\n\r";
+            res += "heater get intgain\n\r";
+            res += "heater set dergain [0,100]\n\r";
+            res += "heater get dergain\n\r";
+            res += "heater set customindex reset\n\r";
+            res += "heater set customindex inc\n\r";
+            res += "heater set customtime 0..10,000(s)\n\r";
+            res += "heater set customtref [0,100](deg C)\n\r";
+            res += "heater set customcycles 0..4,294,967,296\n\r";
+            res += "heater get customindex|customtime|customtref|customcycles|waveform\n\r";
+            res += "heater set waveform start|stop\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "thermistor") {
+            res += "thermistor get a|b|c|d|all\n\r";
+            res += "thermistor set type USP12837|SC30F103AN\n\r";
+            res += "thermistor get type\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "motor") {
+            res += "motor reset|initialize|limp|energize|stop\n\r";
+            res += "motor get regaddress|regvalue|step|abspos|relpos|pos|status\n\r";
+            res += "motor set regaddress|regvalue 0x<hex>\n\r";
+            res += "motor set step full|half|1/4|1/8|1/16|1/32|1/64|1/128\n\r";
+            res += "motor regread|regwrite\n\r";
+            res += "motor set abspos -2097152..2097151\n\r";
+            res += "motor set relpos 0..4194303\n\r";
+            res += "motor moveabs\n\r";
+            res += "motor moverel forward|reverse\n\r";
+            res += "motor cycle\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "fan") {
+            res += "fan set duty1|duty2 0..100\n\r";
+            res += "fan set per1|per2 [10.0,1000000.0](us)\n\r";
+            res += "fan get duty1|duty2|per1|per2|sens1|sens2\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "dio") {
+            res += "dio get in 0..9|all\n\r";
+            res += "dio get out 0..7|all\n\r";
+            res += "dio set|clear 0..7\n\r";
+            isParsingError = false;
+        }
+        else if (tokens[ACTION] == "optics") {
+            res += "optics get led|pd|time|intensity|result|ledtemp|pdtemp|ledmonpd\n\r";
+            res += "optics set led 1..6\n\r";
+            res += "optics set pd 1..6\n\r";
+            res += "optics set time 1,000..1,000,000(us)\n\r";
+            res += "optics set intensity 0..40,000\n\r";
+            res += "optics get ledver|pdver\n\r";
+            res += "optics set ledver v1|v2\n\r";
+            res += "optics set pdver v1|v2\n\r";
+            res += "optics set ledstatus|pdstatus enabled|disabled\n\r";
+            res += "optics get ledstatus|pdstatus\n\r";
+            res += "optics get ledstate\n\r";
+            res += "optics set ledstate on|off\n\r";
+            isParsingError = false;
+        }
+    }
+    else {
+        res = "help dac|adc|led|fault|tec|heater|thermistor|motor|fan|dio|optics|";
+        result = BoardTest::OKAY;
+        isParsingError = false;
+    }
+    return isParsingError;
 }
 
 bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
