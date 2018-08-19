@@ -4,6 +4,7 @@ OpticsDriverPd1::OpticsDriverPd1(uint32_t nSiteIdx)
 {
     /* Initialize LED and PD Board Driver */
     OpticsDriverInit();
+    SetLedsOff();
 }
 
 /**

@@ -10,9 +10,6 @@
 #include <het.h>
 #include <libDelay.h>
 
-#define delay_mS 10000
-#define delay_uS 10
-
 /**
  * Name: OpticsDriver
  * Parameters:
@@ -23,35 +20,6 @@ OpticsDriver::OpticsDriver(uint32_t nSiteIdx)
 {
     /* Initialize LED and PD Board Driver */
     OpticsDriverInit();
-}
-
-/**
- * Name: SetLedState()
- * Parameters:
- * Returns:
- * Description:
- */
-void OpticsDriver::SetLedState(uint32_t nChanIdx, bool bStateOn)
-{
-}
-
-/**
- * Name: SetLedState2()
- * Parameters:
- * Returns:
- * Description:
- */
-void OpticsDriver::SetLedState2(uint32_t nChanIdx, uint32_t nIntensity, uint32_t nDuration_us)
-{
-
-    SetLedIntensity(nChanIdx, nIntensity);
-
-    //If the user wants to energize LED for a specified amount of time.
-    if (nDuration_us > 0)
-    {
-        for (int i = 0; i < (int)nDuration_us; i++);
-        SetLedIntensity(nChanIdx, 0);
-    }
 }
 
 /**
@@ -141,7 +109,7 @@ uint32_t OpticsDriver::GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChan
     taskEXIT_CRITICAL();
 
     /* Turn Off LED */
-    SetLedsOff();
+    SetLedIntensity(nledChanIdx, 0);
 
     for(int i=0; i<delay_uS*500; i++); //Hold for 500 us time before reading
 
@@ -180,36 +148,34 @@ void OpticsDriver::AdcConfig(void)
 
     uint16_t cfg[2] = { adcConfig, 0 };
 
-    gioSetBit(_somisw_gioport, _somisw_pin, _pd_somisw);
+    gioSetBit(_somisw_gioport, _somisw_pin, _adc_somisw);
 
     /* Send 2 dummy conversion to update config register on Photo Diode ADC */
     /* First dummy conversion */
-    mibspiSetData(mibspiREG3, kpdAdcGroup, cfg); //Set Config command
-    gioSetBit(hetPORT1, _pd_cs_pin, 0); //Start sending command
-    mibspiTransfer(mibspiREG3, kpdAdcGroup);
-    while(!(mibspiIsTransferComplete(mibspiREG3, kpdAdcGroup)));
-    gioSetBit(hetPORT1, _pd_cs_pin, 1);
+    mibspiSetData(mibspiREG3, _adc_group, cfg); //Set Config command
+    gioSetBit(hetPORT1, _adc_cs_pin, 0); //Start sending command
+    mibspiTransfer(mibspiREG3, _adc_group);
+    while(!(mibspiIsTransferComplete(mibspiREG3, _adc_group)));
+    gioSetBit(hetPORT1, _adc_cs_pin, 1);
     for(int i=0; i<1000; i++); //Wait for sometime for conv/acq to complete
 
     /* Wait for conversion to complete ~ 3.2 uS */
     cfg[0] = 0;
     /* Second dummy conversion */
-    mibspiSetData(mibspiREG3, kpdAdcGroup, cfg); //Set Config command
-    gioSetBit(hetPORT1, _pd_cs_pin, 0); //Start dummy conversion
-    mibspiTransfer(mibspiREG3, kpdAdcGroup);
-    while(!(mibspiIsTransferComplete(mibspiREG3, kpdAdcGroup)));
-    gioSetBit(hetPORT1, _pd_cs_pin, 1);
+    mibspiSetData(mibspiREG3, _adc_group, cfg); //Set Config command
+    gioSetBit(hetPORT1, _adc_cs_pin, 0); //Start dummy conversion
+    mibspiTransfer(mibspiREG3, _adc_group);
+    while(!(mibspiIsTransferComplete(mibspiREG3, _adc_group)));
+    gioSetBit(hetPORT1, _adc_cs_pin, 1);
     for(int i=0; i<1000; i++);
 
     /* Set Configuration Value */
-    mibspiSetData(mibspiREG3, kpdAdcGroup, cfg); //Set Config command
-    gioSetBit(hetPORT1, _pd_cs_pin, 0); //Start dummy conversion
-    mibspiTransfer(mibspiREG3, kpdAdcGroup);
-    while(!(mibspiIsTransferComplete(mibspiREG3, kpdAdcGroup)));
-    gioSetBit(hetPORT1, _pd_cs_pin, 1);
+    mibspiSetData(mibspiREG3, _adc_group, cfg); //Set Config command
+    gioSetBit(hetPORT1, _adc_cs_pin, 0); //Start dummy conversion
+    mibspiTransfer(mibspiREG3, _adc_group);
+    while(!(mibspiIsTransferComplete(mibspiREG3, _adc_group)));
+    gioSetBit(hetPORT1, _adc_cs_pin, 1);
     for(int i=0; i<1000; i++);
-
-    //gioSetBit(_somisw_gioport, _pd_cs_pin, 0);
 }
 
 /**
@@ -235,32 +201,32 @@ uint16_t OpticsDriver::GetAdc(uint32_t nChanIdx)
 
     uint16_t cfg[2] = { adcConfig, 0 };
 
-    gioSetBit(_somisw_gioport, _somisw_pin, _pd_somisw);
+    gioSetBit(_somisw_gioport, _somisw_pin, _adc_somisw);
 
-    mibspiSetData(mibspiREG3, kpdAdcGroup, cfg); //Set Config command
-    gioSetBit(hetPORT1, _pd_cs_pin, 0); //Start dummy conversion
-    mibspiTransfer(mibspiREG3, kpdAdcGroup);
-    while(!(mibspiIsTransferComplete(mibspiREG3, kpdAdcGroup)));
-    gioSetBit(hetPORT1, _pd_cs_pin, 1);
-    mibspiGetData(mibspiREG3, kpdAdcGroup, nAdcVal); //Get ADC Value
+    mibspiSetData(mibspiREG3, _adc_group, cfg); //Set Config command
+    gioSetBit(hetPORT1, _adc_cs_pin, 0); //Start dummy conversion
+    mibspiTransfer(mibspiREG3, _adc_group);
+    while(!(mibspiIsTransferComplete(mibspiREG3, _adc_group)));
+    gioSetBit(hetPORT1, _adc_cs_pin, 1);
+    mibspiGetData(mibspiREG3, _adc_group, nAdcVal); //Get ADC Value
     for(int i=0; i<1000; i++);
 
     cfg[0] = 0;
 
-    mibspiSetData(mibspiREG3, kpdAdcGroup, cfg); //Set Config command
-    gioSetBit(hetPORT1, _pd_cs_pin, 0); //Start dummy conversion
-    mibspiTransfer(mibspiREG3, kpdAdcGroup);
-    while(!(mibspiIsTransferComplete(mibspiREG3, kpdAdcGroup)));
-    gioSetBit(hetPORT1, _pd_cs_pin, 1);
-    mibspiGetData(mibspiREG3, kpdAdcGroup, nAdcVal); //Get ADC Value
+    mibspiSetData(mibspiREG3, _adc_group, cfg); //Set Config command
+    gioSetBit(hetPORT1, _adc_cs_pin, 0); //Start dummy conversion
+    mibspiTransfer(mibspiREG3, _adc_group);
+    while(!(mibspiIsTransferComplete(mibspiREG3, _adc_group)));
+    gioSetBit(hetPORT1, _adc_cs_pin, 1);
+    mibspiGetData(mibspiREG3, _adc_group, nAdcVal); //Get ADC Value
     for(int i=0; i<1000; i++);
 
-    mibspiSetData(mibspiREG3, kpdAdcGroup, cfg); //Set Config command
-    gioSetBit(hetPORT1, _pd_cs_pin, 0); //Start dummy conversion
-    mibspiTransfer(mibspiREG3, kpdAdcGroup);
-    while(!(mibspiIsTransferComplete(mibspiREG3, kpdAdcGroup)));
-    gioSetBit(hetPORT1, _pd_cs_pin, 1);
-    mibspiGetData(mibspiREG3, kpdAdcGroup, nAdcVal); //Get ADC Value
+    mibspiSetData(mibspiREG3, _adc_group, cfg); //Set Config command
+    gioSetBit(hetPORT1, _adc_cs_pin, 0); //Start dummy conversion
+    mibspiTransfer(mibspiREG3, _adc_group);
+    while(!(mibspiIsTransferComplete(mibspiREG3, _adc_group)));
+    gioSetBit(hetPORT1, _adc_cs_pin, 1);
+    mibspiGetData(mibspiREG3, _adc_group, nAdcVal); //Get ADC Value
     for(int i=0; i<1000; i++);
 
     return nAdcVal[0];

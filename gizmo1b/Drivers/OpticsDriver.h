@@ -9,6 +9,8 @@
 #define     kpdAdcGroup         (1)
 #define     maxLedIntensity     (40000)
 
+#define delay_mS 10000
+#define delay_uS 10
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,10 +89,7 @@ public:
         SPI_B
     };
 
-
     OpticsDriver(uint32_t nSiteIdx = 0);
-    void SetLedState(uint32_t nChanIdx, bool bStateOn = true);
-    void SetLedState2(uint32_t nChanIdx, uint32_t nIntensity, uint32_t nDuration_us);
     virtual void SetLedIntensity(uint32_t nChanIdx, uint32_t nLedIntensity) = 0;
     void SetLedsOff();
     uint32_t GetPhotoDiodeValue(uint32_t nledChanIdx, uint32_t npdChanIdx, uint32_t nDuration_us, uint32_t nLedIntensity);
@@ -99,17 +98,21 @@ public:
     void SetIntegratorState(pdIntegratorState state, uint32_t npdChanIdx);
     uint16_t GetAdc(uint32_t nChanIdx);
 
-public:
-    uint32_t            _pd_cs_pin;
-    uint32_t            _pdsr_data_pin;
-    uint32_t            _pdsr_clk_pin;
-    uint32_t            _pdsr_latch_pin;
-    uint32_t            _somisw_pin;
-    gioPORT_t*          _somisw_gioport;
-    uint32_t            _pd_somisw;
-  
-private:
-    uint32_t            _nLedStateMsk;
+protected:
+    uint32_t   _somisw_pin;
+    gioPORT_t* _somisw_gioport;
+
+    uint32_t   _adc_group;
+    uint32_t   _adc_cs_pin;
+    uint32_t   _adc_somisw;
+
+    uint32_t   _pdsr_data_pin;
+    uint32_t   _pdsr_clk_pin;
+    uint32_t   _pdsr_latch_pin;
+
+    uint32_t   _dac_group;
+    uint32_t   _dac_cs_pin;
+    uint32_t   _dac_somisw;
 };
 
 #endif // __OpticsDriver_H
