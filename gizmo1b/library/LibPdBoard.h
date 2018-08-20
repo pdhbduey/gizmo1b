@@ -6,18 +6,14 @@ class LibPdBoard
 {
 public:
     enum Control {
-        SELECT_PHOTODIODE_1 = 1 << 3,
-        SELECT_PHOTODIODE_2 = 2 << 3,
-        SELECT_PHOTODIODE_3 = 3 << 3,
-        SELECT_PHOTODIODE_4 = 4 << 3,
-        SELECT_PHOTODIODE_5 = 5 << 3,
-        SELECT_PHOTODIODE_6 = 6 << 3,
-        SELECT_PHOTODIODE_MASK   = 7 << 3,
-    };
-    enum Status {
-        OKAY,
-        ERROR_INTEGRATION_TIME_OUT_OF_RANGE  = 1,
-        ERROR_SELECT_PHOTODIODE_OUT_OF_RANGE = 3,
+        SELECT_PHOTODIODE_1    = 1 << 3,
+        SELECT_PHOTODIODE_2    = 2 << 3,
+        SELECT_PHOTODIODE_3    = 3 << 3,
+        SELECT_PHOTODIODE_4    = 4 << 3,
+        SELECT_PHOTODIODE_5    = 5 << 3,
+        SELECT_PHOTODIODE_6    = 6 << 3,
+
+        SELECT_PHOTODIODE_MASK = 7 << 3,
     };
     enum BoardVersion {
         PHOTODIODE_BOARD_V1   = 1 << 0,

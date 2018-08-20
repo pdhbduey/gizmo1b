@@ -2,25 +2,46 @@
 
 #include <map>
 #include <LibLedBoard.h>
-#include <LibThermistor.h>
-#include <LibAdcLedBoardVersion2.h>
+#include <OpticsDriverLed2.h>
+#include <LibThermistorCurves.h>
 
 class LibLedBoardVersion2 : public LibLedBoard
 {
 public:
     LibLedBoardVersion2();
     virtual ~LibLedBoardVersion2();
-    virtual int setLed(uint32 led);
+    virtual void setLed(uint32 led);
     virtual uint32 getLed();
-    virtual float readLedTemperature();
+    virtual float readLedTemperature();                  // degC
+    virtual float readLedTemperatureDuringIntegration(); // degC
     virtual uint32 getVersion();
+    virtual uint32 getLedIntensity(); // 0-40,000
+    virtual void setLedIntensity(uint32 ledIntensity);
+    virtual float readLedMonitorPhotodiode();                         // 0V-Vref
+    virtual float readLedMonitorPhotodiodeDuringIntegration();        // 0V-Vref
+    virtual float readPhotodiodeResult(uint32_t integrationTimeInUs); // 0V-Vref
+    virtual void turnLedOn();
+    virtual void turnLedOff();
 private:
-    float convertLedTemperatureRawDataToResistance(uint32_t data);
+    enum LedCtrlSwPins {
+        LED_CTRL_S0,
+        LED_CTRL_S1,
+        LED_CTRL_S2,
+    };
 private:
-    LibAdcLedBoardVersion2 m_libAdcLedBoardVersion2;
+    float convertRawToDeg(uint32_t data);
+private:
+    float m_refV;
+    OpticsDriverLed2 m_opticsDriverLed2;
     uint32 m_led;
-    std::map<int, int> m_ledToAdcMap;
-    uint32 m_ledTemperature;
-    LibThermistor m_ledThermistor;
+    std::map<int, int> m_ledTempToAdcMap;
+    float m_ledTemperatureDuringIntegration;
+    LibThermistorCurves m_ledThermistorCurve;
+    uint32 m_ledMonPdAdcChannel;
+    uint32 m_ledVisenseAdcChannel;
+    uint32 m_ledIntensity;
+    std::map<int, int> m_ledToDacMap;
+    float m_ledMonPdDuringIntegration;
+    std::map<int, LibWrapGioPort::Port*> m_ledCtrlSwPinsMap;
 };
 

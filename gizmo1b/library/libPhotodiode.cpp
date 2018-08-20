@@ -17,11 +17,10 @@ bool LibPhotodiode::s_isInitialized;
 
 LibPhotodiode::LibPhotodiode() :
     m_integrationTimeInUs(10000),
-    m_ledThermistorCurve(LibThermistorCurves::NTCG163JF103FT1, LibThermistorCurves::CELSIUS),
     m_ledState(LED_TURN_OFF),
     m_libPdBoard(0),
     m_libLedBoard(0),
-    m_led(LibLedBoard::SELECT_LED_BLUE1),
+    m_led(LibLedBoard::SELECT_LED_1),
     m_photodiode(LibPdBoard::SELECT_PHOTODIODE_1),
     m_ledBoardVersion(LibLedBoard::LED_BOARD_V1),
     m_pdBoardVersion(LibPdBoard::PHOTODIODE_BOARD_V1)
@@ -39,9 +38,22 @@ LibPhotodiode::~LibPhotodiode()
 int LibPhotodiode::setLed(int led)
 {
     LibMutex libMutex(s_mutex);
-    int result = m_libLedBoard ? m_libLedBoard->setLed(led) : OKAY;
-    m_led = led;
-    return result;
+    switch (led) {
+    default:
+        return ERROR_SELECT_LED_OUT_OF_RANGE;
+    case LibLedBoard::SELECT_LED_1:
+    case LibLedBoard::SELECT_LED_2:
+    case LibLedBoard::SELECT_LED_3:
+    case LibLedBoard::SELECT_LED_4:
+    case LibLedBoard::SELECT_LED_5:
+    case LibLedBoard::SELECT_LED_6:
+        m_led = led;
+        break;
+    }
+    if (m_libLedBoard) {
+        m_libLedBoard->setLed(led);
+    }
+    return OKAY;
 }
 
 int LibPhotodiode::getLed()
@@ -55,7 +67,7 @@ int LibPhotodiode::setPhotodiode(uint32 photodiode)
     LibMutex libMutex(s_mutex);
     switch (photodiode) {
     default:
-        return LibPdBoard::ERROR_SELECT_PHOTODIODE_OUT_OF_RANGE;
+        return ERROR_SELECT_PHOTODIODE_OUT_OF_RANGE;
     case LibPdBoard::SELECT_PHOTODIODE_1:
     case LibPdBoard::SELECT_PHOTODIODE_2:
     case LibPdBoard::SELECT_PHOTODIODE_3:
@@ -88,7 +100,7 @@ int LibPhotodiode::setIntegrationTimeInUs(uint32 integrationTimeInUs)
 {
     LibMutex libMutex(s_mutex);
     if (integrationTimeInUs < 1000 || integrationTimeInUs > 1000000) {
-        return LibPdBoard::ERROR_INTEGRATION_TIME_OUT_OF_RANGE;
+        return ERROR_INTEGRATION_TIME_OUT_OF_RANGE;
     }
     m_integrationTimeInUs = integrationTimeInUs;
     if (m_libPdBoard) {
@@ -99,7 +111,9 @@ int LibPhotodiode::setIntegrationTimeInUs(uint32 integrationTimeInUs)
 
 uint32 LibPhotodiode::getLedIntensity()
 {
-    return m_ledIntensity;
+    LibMutex libMutex(s_mutex);
+    return m_libLedBoard ? m_libLedBoard->getLedIntensity()
+                         : m_ledIntensity;
 }
 
 int LibPhotodiode::setLedIntensity(uint32 ledIntensity)
@@ -109,15 +123,18 @@ int LibPhotodiode::setLedIntensity(uint32 ledIntensity)
         return ERROR_LED_INTENSITY_OUT_OF_RANGE;
     }
     m_ledIntensity = ledIntensity;
+    if (m_libLedBoard) {
+        m_libLedBoard->setLedIntensity(ledIntensity);
+    }
     return OKAY;
 }
 
 float LibPhotodiode::readPhotodiode()
 {
     LibMutex libMutex(s_mutex);
-    m_ledTemperatureDuringIntegration            = 0;
-    m_ledMontorPhotodiodeResultDuringIntegration = 0;
-    float result = m_libPdBoard ? m_libPdBoard->readPhotodiodeResult() : 0;
+    float result = (m_libPdBoard  ?  m_libPdBoard->readPhotodiodeResult()
+                 : (m_libLedBoard ?  m_libLedBoard->readPhotodiodeResult(m_integrationTimeInUs)
+                 :  0));
     return result;
 }
 
@@ -147,7 +164,9 @@ int LibPhotodiode::setLedBoardVersion(uint32 version)
         if (m_ledBoardVersion != version) {
             if (m_isLedBoardEnabled) {
                 if (m_libLedBoard) {
-                    m_led = m_libLedBoard->getLed();
+                    m_led          = m_libLedBoard->getLed();
+                    m_ledIntensity = m_libLedBoard->getLedIntensity();
+                    m_libLedBoard->turnLedOff();
                     delete m_libLedBoard;
                 }
                 switch (version) {
@@ -163,6 +182,9 @@ int LibPhotodiode::setLedBoardVersion(uint32 version)
                 }
                 if (m_libLedBoard) {
                     m_libLedBoard->setLed(m_led);
+                    m_libLedBoard->setLedIntensity(m_ledIntensity);
+                    m_ledState == LED_TURN_OFF ? m_libLedBoard->turnLedOff()
+                                               : m_libLedBoard->turnLedOn();
                 }
             }
             m_ledBoardVersion = version;
@@ -195,7 +217,8 @@ int LibPhotodiode::setPhotodiodeBoardVersion(uint32 version)
         if (m_pdBoardVersion != version) {
             if (m_isPdBoardEnabled) {
                 if (m_libPdBoard) {
-                    m_photodiode = m_libPdBoard->getPhotodiode();
+                    m_photodiode          = m_libPdBoard->getPhotodiode();
+                    m_integrationTimeInUs = m_libPdBoard->getIntegrationTimeInUs();
                     delete m_libPdBoard;
                 }
                 switch (version) {
@@ -211,6 +234,7 @@ int LibPhotodiode::setPhotodiodeBoardVersion(uint32 version)
                 }
                 if (m_libPdBoard) {
                     m_libPdBoard->setPhotodiode(m_photodiode);
+                    m_libPdBoard->setIntegrationTimeInUs(m_integrationTimeInUs);
                 }
             }
             m_pdBoardVersion = version;
@@ -240,12 +264,23 @@ float LibPhotodiode::readPhotodiodeTemperature()
 
 float LibPhotodiode::readLedMonitorPhotodiodeDuringIntegration()
 {
-    return m_ledMontorPhotodiodeResultDuringIntegration;
+    LibMutex libMutex(s_mutex);
+    float result = m_libLedBoard ? m_libLedBoard->readLedMonitorPhotodiodeDuringIntegration() : 0;
+    return result;
+}
+
+float LibPhotodiode::readLedMonitorPhotodiode()
+{
+    LibMutex libMutex(s_mutex);
+    float result = m_libLedBoard ? m_libLedBoard->readLedMonitorPhotodiode() : 0;
+    return result;
 }
 
 float LibPhotodiode::readLedTemperatureDuringIntegration()
 {
-    return m_ledTemperatureDuringIntegration;
+    LibMutex libMutex(s_mutex);
+    float temperature = m_libLedBoard ? m_libLedBoard->readLedTemperatureDuringIntegration() : 0;
+    return temperature;
 }
 
 float LibPhotodiode::readPhotodiodeTemperatureDuringIntegration()
@@ -271,6 +306,9 @@ void LibPhotodiode::ledBoardEnable()
             }
             if (m_libLedBoard) {
                 m_libLedBoard->setLed(m_led);
+                m_libLedBoard->setLedIntensity(m_ledIntensity);
+                m_ledState == LED_TURN_OFF ? m_libLedBoard->turnLedOff()
+                                           : m_libLedBoard->turnLedOn();
             }
         }
     }
@@ -282,7 +320,9 @@ void LibPhotodiode::ledBoardDisable()
     if (m_isLedBoardEnabled) {
         m_isLedBoardEnabled = false;
         if (m_libLedBoard) {
-            m_led = m_libLedBoard->getLed();
+            m_led          = m_libLedBoard->getLed();
+            m_ledIntensity = m_libLedBoard->getLedIntensity();
+            m_libLedBoard->turnLedOff();
             delete m_libLedBoard;
             m_libLedBoard = 0;
         }
@@ -309,6 +349,7 @@ void LibPhotodiode::pdBoardEnable()
             }
             if (m_libPdBoard) {
                 m_libPdBoard->setPhotodiode(m_photodiode);
+                m_libPdBoard->setIntegrationTimeInUs(m_integrationTimeInUs);
             }
         }
     }
@@ -320,7 +361,8 @@ void LibPhotodiode::pdBoardDisable()
     if (m_isPdBoardEnabled) {
         m_isPdBoardEnabled = false;
         if (m_libPdBoard) {
-            m_photodiode = m_libPdBoard->getPhotodiode();
+            m_photodiode          = m_libPdBoard->getPhotodiode();
+            m_integrationTimeInUs = m_libPdBoard->getIntegrationTimeInUs();
             delete m_libPdBoard;
             m_libPdBoard = 0;
         }
@@ -341,18 +383,6 @@ uint32 LibPhotodiode::getPhotodiodeBoardEnabledStatus()
     return m_libPdBoard ? PD_BOARD_ENABLED : PD_BOARD_DISABLED;
 }
 
-float LibPhotodiode::readLedMonitorPhotodiode()
-{
-    LibMutex libMutex(s_mutex);
-//    uint32_t nledChanIdx = m_ledMap[m_led];
-//    struct OpticsDriver::Data data;
-//    m_opticsDriver.GetLedDataRaw(nledChanIdx, &data);
-//    float volts = data.m_ledMontorPhotodiodeResultRaw
-//                * (m_opticsDriver.GetLedVref() / 65535);
-//    return volts;
-    return 0;
-}
-
 uint32 LibPhotodiode::getLedState()
 {
     return m_ledState;
@@ -361,15 +391,17 @@ uint32 LibPhotodiode::getLedState()
 void LibPhotodiode::ledTurnOn()
 {
     LibMutex libMutex(s_mutex);
-    m_ledState           = LED_TURN_ON;
-//    uint32_t nledChanIdx = m_ledMap[m_led];
-//    m_opticsDriver.SetLedIntensity(nledChanIdx, m_ledIntensity);
+    m_ledState = LED_TURN_ON;
+    if (m_libLedBoard) {
+        m_libLedBoard->turnLedOn();
+    }
 }
 
 void LibPhotodiode::ledTurnOff()
 {
     LibMutex libMutex(s_mutex);
-    m_ledState           = LED_TURN_OFF;
-//    uint32_t nledChanIdx = m_ledMap[m_led];
-//    m_opticsDriver.SetLedOff(nledChanIdx);
+    m_ledState = LED_TURN_OFF;
+    if (m_libLedBoard) {
+        m_libLedBoard->turnLedOff();
+    }
 }

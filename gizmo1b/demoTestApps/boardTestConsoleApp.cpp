@@ -1862,15 +1862,15 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
                 uint32 control;
                 result = regRead(BoardTest::PHOTODIODE_CONTROL, control);
                 if (result == BoardTest::OKAY) {
-                    int led = control & LibPhotodiode::SELECT_LED_MASK;
+                    int led = control & LibLedBoard::SELECT_LED_MASK;
                     std::map<int, std::string> ledMap;
                     ledMap[0]                               = "none";
-                    ledMap[LibPhotodiode::SELECT_LED_BLUE1] = "1";
-                    ledMap[LibPhotodiode::SELECT_LED_GREEN] = "2";
-                    ledMap[LibPhotodiode::SELECT_LED_RED1]  = "3";
-                    ledMap[LibPhotodiode::SELECT_LED_BROWN] = "4";
-                    ledMap[LibPhotodiode::SELECT_LED_RED2]  = "5";
-                    ledMap[LibPhotodiode::SELECT_LED_BLUE2] = "6";
+                    ledMap[LibLedBoard::SELECT_LED_1] = "1";
+                    ledMap[LibLedBoard::SELECT_LED_2] = "2";
+                    ledMap[LibLedBoard::SELECT_LED_3] = "3";
+                    ledMap[LibLedBoard::SELECT_LED_4] = "4";
+                    ledMap[LibLedBoard::SELECT_LED_5] = "5";
+                    ledMap[LibLedBoard::SELECT_LED_6] = "6";
                     res = (ledMap.find(led) != ledMap.end()
                         ?  ledMap[led]
                         :  "unknown");
@@ -2030,12 +2030,12 @@ bool BoardTestConsoleApp::parseOpticsCommand(std::vector<std::string>& tokens,
         else if (tokens[ACTION] == "set" && tokens.size() > ARGUMENT) {
             if (tokens[ARGUMENT] == "led" && tokens.size() > VALUE) {
                 std::map<std::string, int> ledMap;
-                ledMap["1"] = LibPhotodiode::SELECT_LED_BLUE1;
-                ledMap["2"] = LibPhotodiode::SELECT_LED_GREEN;
-                ledMap["3"] = LibPhotodiode::SELECT_LED_RED1;
-                ledMap["4"] = LibPhotodiode::SELECT_LED_BROWN;
-                ledMap["5"] = LibPhotodiode::SELECT_LED_RED2;
-                ledMap["6"] = LibPhotodiode::SELECT_LED_BLUE2;
+                ledMap["1"] = LibLedBoard::SELECT_LED_1;
+                ledMap["2"] = LibLedBoard::SELECT_LED_2;
+                ledMap["3"] = LibLedBoard::SELECT_LED_3;
+                ledMap["4"] = LibLedBoard::SELECT_LED_4;
+                ledMap["5"] = LibLedBoard::SELECT_LED_5;
+                ledMap["6"] = LibLedBoard::SELECT_LED_6;
                 if (ledMap.find(tokens[VALUE]) != ledMap.end()) {
                     result = regWrite(BoardTest::PHOTODIODE_CONTROL,
                                                          ledMap[tokens[VALUE]]);
