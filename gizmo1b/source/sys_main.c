@@ -43,6 +43,13 @@
 
 
 /* USER CODE BEGIN (0) */
+#include <stdlib.h>
+#include <string.h>
+#include <FreeRTOS.h>
+#include <boardTestApp2Start.h>
+#include <BoardTestApp1Start.h>
+#include <BoardTestConsoleApp1Start.h>
+#include <BoardTestConsoleApp2Start.h>
 /* USER CODE END */
 
 /* Include Files */
@@ -50,13 +57,6 @@
 #include "sys_common.h"
 
 /* USER CODE BEGIN (1) */
-#include <stdlib.h>
-#include <string.h>
-#include "FreeRTOS.h"
-#include "boardTestAppStart.h"
-#include "unitTestAppStart.h"
-#include "boardTestConsoleAppStart.h"
-#include "boardTestFastPidAppStart.h"
 /* USER CODE END */
 
 /** @fn void main(void)
@@ -73,9 +73,10 @@
 int main(void)
 {
 /* USER CODE BEGIN (3) */
-    boardTestAppStart();
-    //boardTestConsoleAppStart();
-    //boardTestFastPidAppStart();
+    //boardTestApp1Start();
+    boardTestApp2Start();
+    //boardTestConsoleApp1Start();
+    //boardTestConsoleApp2Start();
 /* USER CODE END */
 
     return 0;
@@ -90,7 +91,7 @@ void* calloc(size_t _num, size_t _size)
     return p;
 }
 
- void* malloc(size_t size)
+void* malloc(size_t size)
 {
      void* p = pvPortMalloc(size);
      return p;

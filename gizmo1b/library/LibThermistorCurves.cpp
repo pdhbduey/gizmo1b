@@ -514,21 +514,10 @@ struct LibThermistorCurves::Conversion LibThermistorCurves::s_convTableNTCG163JF
     { .rt =   0,                       },
 };
 
-LibThermistorCurves::LibThermistorCurves() :
-    m_units(CELSIUS),
-    m_type(SC30F103AN),
-    m_mutex(xSemaphoreCreateMutex())
-{
-}
-
 LibThermistorCurves::LibThermistorCurves(int type, int units) :
     m_units(units),
     m_type(type),
     m_mutex(xSemaphoreCreateMutex())
-{
-}
-
-LibThermistorCurves::~LibThermistorCurves()
 {
 }
 

@@ -1,4 +1,3 @@
-
 #include <mibspi.h>
 #include <gio.h>
 #include <libMutex.h>

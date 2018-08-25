@@ -1,26 +1,33 @@
 #include <math.h>
 #include <mibspi.h>
-#include <libWrapMibSpi1.h>
-#include <libWrapMibSpi5.h>
-#include <LibMibSpi3GioPort.h>
-#include <libDelay.h>
 #include <libMutex.h>
 #include <libMotor.h>
+#include <LibDelay.h>
+#include <LibMibSpi1.h>
+#include <LibMibSpi1GioPort.h>
+#include <LibMibSpi3GioPort.h>
+#include <LibMibSpi5GioPort.h>
+
+// MCU setup: clock: 5Mhz,
+//            mode: polarity = 1, phase = 0,
+//            number of words: 1,
+//            word lenght: 8bits
 
 SemaphoreHandle_t LibMotor::s_mutex;
 bool LibMotor::s_isInitialized;
 
 LibMotor::LibMotor()
 {
-    LibWrapGioPort* libWrapMibSpi1    = &m_libWrapMibSpi1;
+    LibWrapGioPort* libMibSpi1GioPort = new LibMibSpi1GioPort;
     LibWrapGioPort* libMibSpi3GioPort = new LibMibSpi3GioPort;
-    LibWrapGioPort* libWrapMibSpi5    = new LibWrapMibSpi5;
-    m_pinMap[MOT_CS]        = new LibWrapGioPort::Port(libWrapMibSpi1,    PIN_CS2); //  40:MIBSPI1NCS[2]:MOT_CS
-    m_pinMap[MOT_FLAG]      = new LibWrapGioPort::Port(libWrapMibSpi1,    PIN_CS1); // 130:MIBSPI1NCS[1]:MOT_FLAG
+    LibWrapGioPort* libMibSpi5GioPort = new LibMibSpi5GioPort;
+    m_pinMap[MOT_CS]        = new LibWrapGioPort::Port(libMibSpi1GioPort, PIN_CS2); //  40:MIBSPI1NCS[2]:MOT_CS
+    m_pinMap[MOT_FLAG]      = new LibWrapGioPort::Port(libMibSpi1GioPort, PIN_CS1); // 130:MIBSPI1NCS[1]:MOT_FLAG
     m_pinMap[MOT_STCK]      = new LibWrapGioPort::Port(libMibSpi3GioPort, PIN_CS3); //   3:MIBSPI3NCS[3]:MOT_STCK
     m_pinMap[MOT_SYNC]      = new LibWrapGioPort::Port(libMibSpi3GioPort, PIN_CS2); //   4:MIBSPI3NCS[2]:MOT_SYNC
     m_pinMap[MOT_STBY_RST]  = new LibWrapGioPort::Port(libMibSpi3GioPort, PIN_CS1); //  37:MIBSPI3NCS[1]:MOT_STBY/RST
-    m_pinMap[MOT_SENSOR_IN] = new LibWrapGioPort::Port(libWrapMibSpi5,    PIN_CLK); // 100:MIBSPI5CLK:MOT_SENSOR_IN
+    m_pinMap[MOT_SENSOR_IN] = new LibWrapGioPort::Port(libMibSpi5GioPort, PIN_CLK); // 100:MIBSPI5CLK:MOT_SENSOR_IN
+    m_pinMap[MOT_SOMI_SW]   = new LibWrapGioPort::Port(libMibSpi3GioPort, PIN_ENA); //  54:MIBSPI3NENA:MCU_SPI1_SOMI_SW
     m_addrToNoBytesMap[ABS_POS]    = 3;
     m_addrToNoBytesMap[EL_POS]     = 2;
     m_addrToNoBytesMap[MARK]       = 3;
@@ -52,10 +59,7 @@ LibMotor::LibMotor()
     }
     reset();
     limp();
-}
-
-LibMotor::~LibMotor()
-{
+    setMicroSteps(STEP_MICRO_1_128TH);
 }
 
 bool LibMotor::isValidReg(uint16 address)
@@ -69,8 +73,8 @@ int LibMotor::readReg(uint16 address, uint32& value)
         return ERROR_INVALID_REG;
     }
     LibMutex libMutex(s_mutex);
-    LibWrapMibSpi::Lock lock(m_libWrapMibSpi1);
-    m_libWrapMibSpi1.somiSelect(LibWrapMibSpi1::SPI_B);
+    LibMibSpi::Lock lock(m_libWrapMibSpi1);
+    m_pinMap[MOT_SOMI_SW]->m_libWrapGioPort->setPin(m_pinMap[MOT_SOMI_SW]->m_pin, LibMibSpi1::SPI_B);
     uint16 data;
     int result = write(GET_PARAM | address, data);
     if (result == OKAY) {
@@ -97,8 +101,8 @@ int LibMotor::writeReg(uint16 address, uint32 value)
         return ERROR_INVALID_REG;
     }
     LibMutex libMutex(s_mutex);
-    LibWrapMibSpi::Lock lock(m_libWrapMibSpi1);
-    m_libWrapMibSpi1.somiSelect(LibWrapMibSpi1::SPI_B);
+    LibMibSpi::Lock lock(m_libWrapMibSpi1);
+    m_pinMap[MOT_SOMI_SW]->m_libWrapGioPort->setPin(m_pinMap[MOT_SOMI_SW]->m_pin, LibMibSpi1::SPI_B);
     uint16 data;
     int result = write(SET_PARAM | address, data);
     if (result == OKAY) {
@@ -138,15 +142,15 @@ int LibMotor::write(uint16 command, uint16& data)
     int result = OKAY;
     m_pinMap[MOT_CS]->m_libWrapGioPort->setPin(m_pinMap[MOT_CS]->m_pin, false);
     LibDelay::pmuMicrosecDelay(1);
-    m_libWrapMibSpi1.setData(LibWrapMibSpi1::L6470HTR_STEPPER_MOTOR_DRIVER, &command);
-    m_libWrapMibSpi1.transfer(LibWrapMibSpi1::L6470HTR_STEPPER_MOTOR_DRIVER);
-    if (!m_libWrapMibSpi1.waitForTransferComplete(LibWrapMibSpi1::L6470HTR_STEPPER_MOTOR_DRIVER, 1)) {
+    m_libWrapMibSpi1.setData(LibMibSpi1::L6470_STEPPER_MOTOR_DRIVER, &command);
+    m_libWrapMibSpi1.transfer(LibMibSpi1::L6470_STEPPER_MOTOR_DRIVER);
+    if (!m_libWrapMibSpi1.waitForTransferComplete(LibMibSpi1::L6470_STEPPER_MOTOR_DRIVER, 1)) {
         result = ERROR_TIME_OUT;
     }
     m_pinMap[MOT_CS]->m_libWrapGioPort->setPin(m_pinMap[MOT_CS]->m_pin, true);
     LibDelay::pmuMicrosecDelay(1);
     if (result == OKAY) {
-        m_libWrapMibSpi1.getData(LibWrapMibSpi1::L6470HTR_STEPPER_MOTOR_DRIVER, &data);
+        m_libWrapMibSpi1.getData(LibMibSpi1::L6470_STEPPER_MOTOR_DRIVER, &data);
     }
     return result;
 }
@@ -154,8 +158,8 @@ int LibMotor::write(uint16 command, uint16& data)
 int LibMotor::limp()
 {
     LibMutex libMutex(s_mutex);
-    LibWrapMibSpi::Lock lock(m_libWrapMibSpi1);
-    m_libWrapMibSpi1.somiSelect(LibWrapMibSpi1::SPI_B);
+    LibMibSpi::Lock lock(m_libWrapMibSpi1);
+    m_pinMap[MOT_SOMI_SW]->m_libWrapGioPort->setPin(m_pinMap[MOT_SOMI_SW]->m_pin, LibMibSpi1::SPI_B);
     uint16 command = HARD_HIZ;
     uint16 data;
     int result = write(command, data);
@@ -165,8 +169,8 @@ int LibMotor::limp()
 int LibMotor::energize()
 {
     LibMutex libMutex(s_mutex);
-    LibWrapMibSpi::Lock lock(m_libWrapMibSpi1);
-    m_libWrapMibSpi1.somiSelect(LibWrapMibSpi1::SPI_B);
+    LibMibSpi::Lock lock(m_libWrapMibSpi1);
+    m_pinMap[MOT_SOMI_SW]->m_libWrapGioPort->setPin(m_pinMap[MOT_SOMI_SW]->m_pin, LibMibSpi1::SPI_B);
     uint16 command = HARD_STOP;
     uint16 data;
     int result = write(command, data);
@@ -209,8 +213,8 @@ bool LibMotor::isValidSteps(uint32 steps)
 int LibMotor::move(int command, uint32 steps)
 {
     LibMutex libMutex(s_mutex);
-    LibWrapMibSpi::Lock lock(m_libWrapMibSpi1);
-    m_libWrapMibSpi1.somiSelect(LibWrapMibSpi1::SPI_B);
+    LibMibSpi::Lock lock(m_libWrapMibSpi1);
+    m_pinMap[MOT_SOMI_SW]->m_libWrapGioPort->setPin(m_pinMap[MOT_SOMI_SW]->m_pin, LibMibSpi1::SPI_B);
     uint16 data;
     int result = write(command, data);
     if (result == OKAY) {

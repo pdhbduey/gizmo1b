@@ -5,7 +5,8 @@
 #include "FreeRTOS.h"
 #include "os_semphr.h"
 #include "libWrapGioPort.h"
-#include "libWrapMibSpi1.h"
+#include "LibMibSpi1.h"
+#include <LibMibSpi1GioPort.h>
 
 class LibMotor
 {
@@ -81,7 +82,6 @@ public:
     };
 public:
     LibMotor();
-    virtual ~LibMotor();
     void reset();
     int limp();
     int energize();
@@ -90,8 +90,8 @@ public:
     int getMicroSteps(int& microSteps);
     int readReg(uint16 address, uint32& value);
     int writeReg(uint16 address, uint32 value);
-    int moveToPosition(sint32 position); // -2097152..2097151
-    int moveRelative(int direction, uint32 steps);      // 0..4194303
+    int moveToPosition(sint32 position);           // -2097152..2097151
+    int moveRelative(int direction, uint32 steps); // 0..4194303
     int getStatus(uint32& status);
     int getPosition(sint32& position);
 private:
@@ -102,6 +102,7 @@ private:
         MOT_SYNC,
         MOT_STBY_RST,
         MOT_SENSOR_IN,
+        MOT_SOMI_SW,
     };
     enum Commands {
         NOP       = 0,
@@ -151,7 +152,7 @@ private:
     bool isValidSteps(uint32 steps);
     int move(int command, uint32 steps);
 private:
-    LibWrapMibSpi1 m_libWrapMibSpi1;
+	LibMibSpi1 m_libWrapMibSpi1;
     std::map<int, LibWrapGioPort::Port*> m_pinMap;
     static bool s_isInitialized;
     static SemaphoreHandle_t s_mutex;

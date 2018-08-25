@@ -7,7 +7,6 @@ bool LibWrapGioPort::s_isInitialized;
 LibWrapGioPort::LibWrapGioPort()
 {
     if (!s_isInitialized) {
-        gioInit();
         s_isInitialized = true;
     }
 }
