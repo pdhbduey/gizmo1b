@@ -24,7 +24,8 @@ bool BoardTestConsoleApp2::parseCommand(std::vector<std::string>& tokens,
 {
     bool isParsingError = true;
     if (tokens[COMPONENT] == "help") {
-        isParsingError = parseHelpCommand(tokens, res, result);
+        parseHelpCommand(tokens, res);
+        isParsingError = false;
     }
     else if (tokens[COMPONENT] == "fault") {
         isParsingError = parseFaultCommand(tokens, res, result);
@@ -44,28 +45,27 @@ bool BoardTestConsoleApp2::parseCommand(std::vector<std::string>& tokens,
     else if (tokens[COMPONENT] == "adciv") {
         isParsingError = parseAdcIVCommand(tokens, res, result);
     }
+    else if (tokens[COMPONENT] == "tec") {
+        isParsingError = parseTecCommand(tokens, res, result);
+    }
     return isParsingError;
 }
 
-bool BoardTestConsoleApp2::parseHelpCommand(std::vector<std::string>& tokens,
-                                                  std::string& res, int& result)
+void BoardTestConsoleApp2::parseHelpCommand(std::vector<std::string>& tokens,
+                                                               std::string& res)
 {
-    bool isParsingError = true;
     if (tokens.size() > ACTION
          && (dacHelp       (tokens, res)
          ||  adcHelp       (tokens, res)
          ||  adcIVHelp     (tokens, res)
          ||  ledHelp       (tokens, res)
          ||  faultHelp     (tokens, res)
+         ||  tecHelp       (tokens, res)
          ||  thermistorHelp(tokens, res))) {
-        isParsingError = false;
     }
     else {
-        res = "help dac|adc|adciv|led|fault|thermistor";
-        result = BoardTest::OKAY;
-        isParsingError = false;
+        res = "help dac|adc|adciv|led|fault|thermistor|tec";
     }
-    return isParsingError;
 }
 
 bool BoardTestConsoleApp2::adcIVHelp(std::vector<std::string>& tokens,

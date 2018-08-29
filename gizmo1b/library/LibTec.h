@@ -185,8 +185,8 @@ private:
     float getHeaterTref();
 protected:
     int m_adcChannelsMap[2];
-private:
-    LibWrapGioPort::Port m_tecEnable;
+protected:
+    LibWrapGioPort::Port* m_tecEnable;
     LibAdc& m_libAdc;
     LibDac& m_libDac;
     LibThermistor& m_libThermistor;
