@@ -25,9 +25,7 @@ public:
         float temp[2];
     };
 public:
-    LibThermistorCurves();
     LibThermistorCurves(int type, int units);
-    virtual ~LibThermistorCurves();
     float getTemperature(float rt);
     int setType(int type);
     int getType();

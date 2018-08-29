@@ -1,5 +1,4 @@
 #include "sci.h"
-#include "boardTestFastPidApp.h"
 #include "libSci.h"
 
 bool LibSci::s_isInitialized;
@@ -8,7 +7,6 @@ std::map<sciBASE_t*, LibSci*>* LibSci::s_notificationMap;
 LibSci::LibSci()
 {
     if (!s_isInitialized) {
-        sciInit();
         s_notificationMap = &m_notificationMap;
         s_isInitialized = true;
     }
@@ -150,10 +148,6 @@ void LibSci::notification(uint32 flags)
 
 extern "C" void sciNotification(sciBASE_t* sci, uint32 flags)
 {
-    if (BoardTestFastPidApp::s_isBoardTestFastPidApp) {
-        BoardTestFastPidApp::sciNotification(sci, flags);
-        return;
-    }
     if (LibSci::s_notificationMap->find(sci) != LibSci::s_notificationMap->end()
    && (*LibSci::s_notificationMap)[sci]) {
         (*LibSci::s_notificationMap)[sci]->notification(flags);

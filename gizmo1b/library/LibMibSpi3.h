@@ -3,9 +3,9 @@
 #include <FreeRTOS.h>
 #include <os_semphr.h>
 #include <reg_mibspi.h>
-#include <libWrapMibSpi.h>
+#include <LibMibSpi.h>
 
-class LibMibSpi3 : public LibWrapMibSpi
+class LibMibSpi3 : public LibMibSpi
 {
 public:
     enum SomiSelect {
@@ -13,11 +13,9 @@ public:
         SPI_B,
     };
     enum Group {
-        AD7699BCPZ_8CH_16BIT_ADC = GROUP_1,
+        AD7699_16BIT_ADC = GROUP_1,
     };
     LibMibSpi3();
-    virtual ~LibMibSpi3();
-    void somiSelect(int somi);
 private:
     virtual mibspiBASE_t* getMibSpiBase();
     virtual SemaphoreHandle_t& getMibSpiMutex();
@@ -27,5 +25,4 @@ private:
     static SemaphoreHandle_t s_mibSpiMutex;
     mibspiBASE_t* m_mibSpiBase;
     static SemaphoreHandle_t s_sem;
-    LibWrapGioPort::Port m_somiSw;
 };

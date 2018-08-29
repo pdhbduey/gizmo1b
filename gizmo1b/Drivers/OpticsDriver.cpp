@@ -8,7 +8,7 @@
 
 #include <OpticsDriver.h>
 #include <het.h>
-#include <libDelay.h>
+#include <LibDelay.h>
 
 /**
  * Name: OpticsDriver

@@ -1,5 +1,4 @@
-#ifndef _LIB_FAULT_H_
-#define _LIB_FAULT_H_
+#pragma once
 
 #include <map>
 #include "libWrapGioPort.h"
@@ -27,15 +26,11 @@ public:
         ERROR_NOT_IMPLEMENTED,
     };
 public:
-    LibFault();
-    virtual ~LibFault();
     void reset();
     int getFault(int fault, bool& isFault);
     int getNtcPresent(int ntc, bool& isNtcPresent);
-private:
+protected:
     std::map<int, LibWrapGioPort::Port*> m_faultMap;
     std::map<int, LibWrapGioPort::Port*> m_ntcMap;
-    LibWrapGioPort::Port m_drvErrClr;
+    LibWrapGioPort::Port* m_drvErrClr;
 };
-
-#endif // _LIB_FAULT_H_

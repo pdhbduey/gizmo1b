@@ -7,7 +7,6 @@ bool LibWrapHet::s_isInitialized;
 LibWrapHet::LibWrapHet()
 {
     if (!s_isInitialized) {
-        hetInit();
         s_isInitialized = true;
     }
 }
