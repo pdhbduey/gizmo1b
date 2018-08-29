@@ -73,8 +73,8 @@
 int main(void)
 {
 /* USER CODE BEGIN (3) */
-    //boardTestApp1Start();
-    boardTestApp2Start();
+    boardTestApp1Start();
+    //boardTestApp2Start();
     //boardTestConsoleApp1Start();
     //boardTestConsoleApp2Start();
 /* USER CODE END */

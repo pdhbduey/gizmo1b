@@ -17,7 +17,7 @@ public:
     BoardTestConsoleApp(BoardTestApp* boardTestApp);
     void msgLoop();
     virtual bool parseCommand(std::vector<std::string>& tokens, std::string& res, int& result);
-    virtual bool parseHelpCommand(std::vector<std::string>& tokens, std::string& res, int& result);
+    virtual void parseHelpCommand(std::vector<std::string>& tokens, std::string& res);
     virtual bool dacHelp(std::vector<std::string>& tokens, std::string& res);
     virtual bool adcHelp(std::vector<std::string>& tokens, std::string& res);
     virtual bool ledHelp(std::vector<std::string>& tokens, std::string& res);

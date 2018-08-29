@@ -24,7 +24,6 @@ void LibTec::Sample::clear()
 
 LibTec::LibTec(LibDac* libDac, LibAdc* libAdc, LibThermistor* libThermistor, const char* name) :
     LibTask(name, configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 1),
-    m_tecEnable(new LibMibSpi5GioPort, PIN_SIMO), // 99:MIBSPI5SIMO[0]:TEC_EN
     m_waveformPeriod(1000),
     m_pidProportionalGain(1),
     m_snapshotNumSamples(10),
@@ -37,7 +36,6 @@ LibTec::LibTec(LibDac* libDac, LibAdc* libAdc, LibThermistor* libThermistor, con
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
-        m_tecEnable.m_libWrapGioPort->setPin(m_tecEnable.m_pin, false);
         s_snapshotVsense = new float[1000];
         s_snapshotIsense = new float[1000];
         s_snapshotIref   = new float[1000];
@@ -80,7 +78,7 @@ LibTec::LibTec(LibDac* libDac, LibAdc* libAdc, LibThermistor* libThermistor, con
 void LibTec::enable(bool en)
 {
     LibMutex libMutex(s_mutex);
-    m_tecEnable.m_libWrapGioPort->setPin(m_tecEnable.m_pin, en);
+    m_tecEnable->m_libWrapGioPort->setPin(m_tecEnable->m_pin, en);
     m_isEnabled = en;
 }
 

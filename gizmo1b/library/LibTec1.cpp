@@ -1,10 +1,14 @@
 #include <LibTec1.h>
+#include <LibMibSpi5GioPort.h>
+#include <mibspi.h>
 
 LibTec1::LibTec1(LibDac* libDac, LibAdc* libAdc, LibThermistor* libThermistor, const char* name) :
     LibTec(libDac,libAdc, libThermistor, name)
 {
     m_adcChannelsMap[ISENSE] = LibAdc::CHANNEL_1;
     m_adcChannelsMap[VSENSE] = LibAdc::CHANNEL_0;
+    m_tecEnable = new LibWrapGioPort::Port(new LibMibSpi5GioPort, PIN_SIMO); // 99:MIBSPI5SIMO[0]:TEC_EN
+    enable(false);
 }
 
 // TEC_ISENSE = (ISENSE * 0.008ohm * 20V/V + 2.5V) * 6.04K/9.05K

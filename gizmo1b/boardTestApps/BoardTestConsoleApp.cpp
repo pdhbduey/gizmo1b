@@ -80,7 +80,7 @@ void BoardTestConsoleApp::decodeMessage(std::vector<uint8>& message,
     status.push_back("ERROR_ADDR");
     status.push_back("ERROR_RO");
     status.push_back("ERROR_WO");
-    int result;
+    int result = BoardTest::OKAY;
     if (msg.size() == 0) {
         msg = m_prevMsg;
     }
@@ -131,7 +131,8 @@ bool BoardTestConsoleApp::parseCommand(std::vector<std::string>& tokens,
 {
     bool isParsingError = true;
     if (tokens[COMPONENT] == "help") {
-        isParsingError = parseHelpCommand(tokens, res, result);
+        parseHelpCommand(tokens, res);
+        isParsingError = false;
     }
     else if (tokens[COMPONENT] == "tec") {
         isParsingError = parseTecCommand(tokens, res, result);
@@ -169,10 +170,9 @@ bool BoardTestConsoleApp::parseCommand(std::vector<std::string>& tokens,
     return isParsingError;
 }
 
-bool BoardTestConsoleApp::parseHelpCommand(std::vector<std::string>& tokens,
-                                                  std::string& res, int& result)
+void BoardTestConsoleApp::parseHelpCommand(std::vector<std::string>& tokens,
+                                                               std::string& res)
 {
-    bool isParsingError = true;
     if (tokens.size() > ACTION
          && (dacHelp       (tokens, res)
          ||  adcHelp       (tokens, res)
@@ -185,14 +185,10 @@ bool BoardTestConsoleApp::parseHelpCommand(std::vector<std::string>& tokens,
          ||  fanHelp       (tokens, res)
          ||  dioHelp       (tokens, res)
          ||  opticsHelp    (tokens, res))) {
-        isParsingError = false;
     }
     else {
         res = "help dac|adc|led|fault|tec|heater|thermistor|motor|fan|dio|optics";
-        result = BoardTest::OKAY;
-        isParsingError = false;
     }
-    return isParsingError;
 }
 
 bool BoardTestConsoleApp::dacHelp(std::vector<std::string>& tokens,
