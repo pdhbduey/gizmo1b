@@ -1,7 +1,7 @@
 #include <LibADS8330.h>
 
 // MCU setup: clock: 20Mhz,
-//            mode: polarity = 0, phase = 0,
+//            mode: polarity = 1, phase = 1,
 //            number of words: 1,
 //            word lenght: 16bits
 
@@ -30,6 +30,7 @@ void LibADS8330::initialize()
         | DISABLE_POWER_DOWN
         | NORMAL_OPERATION, data);
     write(READ_CFG_REGISTER, data);
+    write(SEL_AN_IN_CHANNEL_0, data);
 }
 
 int LibADS8330::read(int channel, uint32& value)

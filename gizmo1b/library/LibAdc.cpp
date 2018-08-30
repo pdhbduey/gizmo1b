@@ -29,7 +29,7 @@ int LibAdc::read(int channel, float& value)
     uint32 data;
     int result = read(channel, data);
     if (result == OKAY) {
-        value = data * (m_vref / 65535);
+        value = data * (m_vref / 65536);
     }
     return result;
 }

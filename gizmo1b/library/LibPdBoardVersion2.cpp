@@ -67,7 +67,7 @@ float LibPdBoardVersion2::readPhotodiodeResult()
     uint32_t nLedIntensity = 0;
     m_photodiodeResultRaw = m_opticsDriverPd2.GetPhotoDiodeValue(nledChanIdx,
                                        npdChanIdx, nDuration_us, nLedIntensity);
-    float result = m_photodiodeResultRaw * (m_refV / 65535);
+    float result = m_photodiodeResultRaw * (m_refV / 65536);
     m_photodiodeTemperatureDuringIntegration = readPhotodiodeTemperature();
     return result;
 }
@@ -107,7 +107,7 @@ float LibPdBoardVersion2::readPhotodiodeTemperatureDuringIntegration()
 
 float LibPdBoardVersion2::convertRawToDeg(uint16_t data)
 {
-    float voltage = data  * m_refV / 65535;
+    float voltage = data  * m_refV / 65536;
     if (voltage == 0 || voltage == m_refV) {
         return 10000;
     }
