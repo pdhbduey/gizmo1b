@@ -16,24 +16,20 @@ LibADS8330::LibADS8330(float vref = 5.0) :
 
 void LibADS8330::initialize()
 {
+    uint16 data;
     m_pinMap[CS]->m_libWrapGioPort->setPin(m_pinMap[CS]->m_pin, true);
     m_pinMap[CONVST]->m_libWrapGioPort->setPin(m_pinMap[CONVST]->m_pin, true);
-    uint16 data;
-    write(RESET_CFG_REGISTER, data);
-    uint16 cfg = WRITE_CFG_REGISTER
-               | MANUAL_CHANNEL_SELECT
-               | CCLK_INTERNAL_25MHz
-               | MANUAL_TRIGGER_SOC
-               | D8_DONT_CARE
-               | EOC_ACTIVE_LOW
-               | PIN_EOC_IS_EOC
-               | PIN_EOC_IS_EOC_OUT
-               | POWER_DOWN_DISABLED
-               | TAG_BIT_DISABLED
-               | NORMAL_OPERATION;
-    write(cfg, data);
+    write(WRITE_CFG_REGISTER
+        | SYSTEM_RESET, data);
+    write(WRITE_CFG_REGISTER
+        | INTERNAL_CCLK
+        | MANUAL_TRIGGER
+        | EOC_ACTIVE_LOW
+        | PIN_EOC
+        | EOC_OUT
+        | DISABLE_POWER_DOWN
+        | NORMAL_OPERATION, data);
     write(READ_CFG_REGISTER, data);
-    // assert( (cfg & ~(0b1111 << 12)) == (data & ~(0b1111 << 12)) );
 }
 
 int LibADS8330::read(int channel, uint32& value)
@@ -47,17 +43,17 @@ int LibADS8330::read(int channel, uint32& value)
         m_pinMap[SOMI_SW]->m_libWrapGioPort->setPin(m_pinMap[SOMI_SW]->m_pin, m_somiSelect);
     }
     // Select channel
-    uint16 cfg = m_channelMap[channel];
     uint16 data;
-    result = write(cfg, data);
+    result = write(m_channelMap[channel], data);
     if (result != OKAY) {
         return result;
     }
     // Start conversion
     m_pinMap[CONVST]->m_libWrapGioPort->setPin(m_pinMap[CONVST]->m_pin, false);
     m_pinMap[CONVST]->m_libWrapGioPort->setPin(m_pinMap[CONVST]->m_pin, true);
-    // Wait until EOC goes high indicating end of conversion
+    // Wait until EOC
     while (m_pinMap[EOC]->m_libWrapGioPort->getPin(m_pinMap[EOC]->m_pin) == false);
+    // Read result
     result = write(READ_DATA, data);
     if (result != OKAY) {
         return result;
@@ -75,7 +71,7 @@ int LibADS8330::write(uint16 txBuffer, uint16& data)
     if (!m_libWrapMibSpi->waitForTransferComplete(m_mibSpiGroup, 1)) {
         result = ERROR_TIME_OUT;
     }
-    m_pinMap[CS]->m_libWrapGioPort->setPin(m_pinMap[CS]->m_pin, true);
     m_libWrapMibSpi->getData(m_mibSpiGroup, &data);
+    m_pinMap[CS]->m_libWrapGioPort->setPin(m_pinMap[CS]->m_pin, true);
     return result;
 }
