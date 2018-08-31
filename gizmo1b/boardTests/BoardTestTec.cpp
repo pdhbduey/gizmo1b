@@ -148,10 +148,10 @@ int BoardTestTec::get(uint32 address, uint32& value)
     case TEC_WAVEFORM_CYCLES:
         value = m_customeWaveformCycles;
         break;
-    case TEC_VOUT_MAX:
+    case TEC_OUTPUT_LIMITER:
         {
-            float voutLimit = m_libTec.getVoutMax();
-            value = *reinterpret_cast<uint32*>(&voutLimit);
+            float voutLimiter = m_libTec.getOutputLimiter();
+            value = *reinterpret_cast<uint32*>(&voutLimiter);
         }
         break;
     case SNAPSHOT_STATUS:
@@ -369,10 +369,10 @@ int BoardTestTec::set(uint32 address, uint32 value)
     case TEC_WAVEFORM_CYCLES:
         m_customeWaveformCycles = value;
         break;
-    case TEC_VOUT_MAX:
+    case TEC_OUTPUT_LIMITER:
         {
-            float voutLimit = *reinterpret_cast<float*>(&value);
-            m_status = m_libTec.setVoutMax(voutLimit);
+            float voutLimiter = *reinterpret_cast<float*>(&value);
+            m_status = m_libTec.setOutputLimiter(voutLimiter);
         }
         break;
     case SNAPSHOT_CONTROL:

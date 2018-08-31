@@ -252,8 +252,8 @@ bool BoardTestConsoleApp::tecHelp(std::vector<std::string>& tokens,
         res += "tec get intgain\n\r";
         res += "tec set dergain [0,100]\n\r";
         res += "tec get dergain\n\r";
-        res += "tec set voutmax [0,21](V)\n\r";
-        res += "tec get voutmax\n\r";
+        res += "tec set outputlimit [0.0,0.9]\n\r";
+        res += "tec get outputlimit\n\r";
         res += "tec set customindex reset\n\r";
         res += "tec set customindex inc\n\r";
         res += "tec set customtime 0..9,999(ms)\n\r";
@@ -388,7 +388,7 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
     tecStatus.push_back("ERROR_DERIVATIVE_GAIN_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_CUSTOM_WAVEFORM_TIME_NOT_RISING");
     tecStatus.push_back("ERROR_CUSTOM_WAVEFORM_NON_ZERO_START_TIME");
-    tecStatus.push_back("ERROR_VOUT_MAX_OUT_OF_RANGE");
+    tecStatus.push_back("ERROR_OUTPUT_LIMIT_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_SNAPSHOT_RESOLUTION_OUT_OF_RANGE");
     tecStatus.push_back("ERROR_SNAPSHOT_NUMBER_OF_SAMPLES_OUT_OF_RANGE");
@@ -512,13 +512,13 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                 }
                 isParsingError = false;
             }
-            else if (tokens[ARGUMENT] == "voutmax") {
+            else if (tokens[ARGUMENT] == "outputlimit") {
                 uint32 value;
-                result = m_boardTestApp.regRead(BoardTest::TEC_VOUT_MAX, value);
+                result = m_boardTestApp.regRead(BoardTest::TEC_OUTPUT_LIMITER, value);
                 if (result == BoardTest::OKAY) {
                     float f = *reinterpret_cast<float*>(&value);
                     char t[16];
-                    sprintf(t, "%.2fV", f);
+                    sprintf(t, "%.2f", f);
                     res = t;
                 }
                 isParsingError = false;
@@ -699,11 +699,11 @@ bool BoardTestConsoleApp::parseTecCommand(std::vector<std::string>& tokens,
                    isParsingError = false;
                 }
             }
-            else if (tokens[ARGUMENT] == "voutmax" && tokens.size() > VALUE) {
-                float voutMax;
-                if (sscanf(tokens[VALUE].c_str(), "%f", &voutMax) == 1) {
-                   uint32 value = *reinterpret_cast<uint32*>(&voutMax);
-                   result = m_boardTestApp.regWrite(BoardTest::TEC_VOUT_MAX, value);
+            else if (tokens[ARGUMENT] == "outputlimit" && tokens.size() > VALUE) {
+                float voutLimiter;
+                if (sscanf(tokens[VALUE].c_str(), "%f", &voutLimiter) == 1) {
+                   uint32 value = *reinterpret_cast<uint32*>(&voutLimiter);
+                   result = m_boardTestApp.regWrite(BoardTest::TEC_OUTPUT_LIMITER, value);
                    if (result == BoardTest::OKAY) {
                        result = m_boardTestApp.regRead(BoardTest::TEC_STATUS, value);
                        if (value != LibTec::OKAY) {
