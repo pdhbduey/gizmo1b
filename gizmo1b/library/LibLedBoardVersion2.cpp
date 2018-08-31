@@ -84,7 +84,7 @@ float LibLedBoardVersion2::readLedMonitorPhotodiode()
 {
     uint32_t nChanIdx = m_ledMonPdAdcChannel;
     float raw = m_opticsDriverLed2.GetAdc(nChanIdx);
-    float result = raw * (m_refV / 65535);
+    float result = raw * (m_refV / 65536);
     return result;
 }
 
@@ -111,7 +111,7 @@ float LibLedBoardVersion2::readLedTemperatureDuringIntegration()
 
 float LibLedBoardVersion2::convertRawToDeg(uint32 data)
 {
-    float voltage = data  * m_refV / 65535;
+    float voltage = data  * m_refV / 65536;
     if (voltage == 0 || voltage == m_refV) {
         return 10000;
     }

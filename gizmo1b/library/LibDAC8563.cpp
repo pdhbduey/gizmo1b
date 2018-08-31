@@ -46,7 +46,7 @@ int LibDAC8563::set(float value)
         return ERROR_SET_VALUE_OUT_OF_RANGE;
     }
     uint16 txBuffer[3];
-    uint16 dacValue = value * (65535 / m_refV);
+    uint16 dacValue = value * (65536 / m_refV);
     // Write to DAC-A input register and update DAC-A
     txBuffer[0] = CMD_WR_ONE_REG_AND_UPDATE_ONE_DAC << CMD_SHIFT
                 | ADDR_DAC_A << ADDR_SHIFT;
@@ -74,7 +74,7 @@ int LibDAC8563::set(uint32 value)
     txBuffer[2] = dacValue;
     int result = writeDac(txBuffer);
     if (result == OKAY) {
-        m_value = (value * m_refV) / 65535;
+        m_value = (value * m_refV) / 65536;
     }
     return result;
 }

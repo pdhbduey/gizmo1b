@@ -43,7 +43,7 @@ int LibAD5683::set(float value)
         return ERROR_SET_VALUE_OUT_OF_RANGE;
     }
     uint16 txBuffer[3];
-    uint16 dacValue = value * (65535 / m_refV);
+    uint16 dacValue = value * (65536 / m_refV);
     uint32 ctrl = DAC_AD5683R_WRITE_DAC_AND_INPUT_REGISTER << 20
                 | dacValue << 4;
     txBuffer[0] = ctrl >> 16;
@@ -71,7 +71,7 @@ int LibAD5683::set(uint32 value)
     txBuffer[2] = ctrl;
     int result = writeDac(txBuffer);
     if (result == OKAY) {
-        m_value = (value * m_refV) / 65535;
+        m_value = (value * m_refV) / 65536;
     }
     return result;
 }
