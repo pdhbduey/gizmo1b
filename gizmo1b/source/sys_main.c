@@ -73,10 +73,17 @@
 int main(void)
 {
 /* USER CODE BEGIN (3) */
+#if defined BB_GUI_APP
     boardTestApp1Start();
-    //boardTestApp2Start();
-    //boardTestConsoleApp1Start();
-    //boardTestConsoleApp2Start();
+#elif defined TB_GUI_APP
+    boardTestApp2Start();
+#elif defined BB_TERMINAL_APP
+    boardTestConsoleApp1Start();
+#elif defined TB_TERMINAL_APP
+    boardTestConsoleApp2Start();
+#else
+#error Must define one of: BB_GUI_APP, TB_GUI_APP, BB_TERMINAL_APP, TB_TERMINAL_APP
+#endif
 /* USER CODE END */
 
     return 0;

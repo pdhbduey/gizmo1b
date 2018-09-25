@@ -34,7 +34,7 @@ public:
        ERROR_DERIVATIVE_GAIN_OUT_OF_RANGE,
        ERROR_CUSTOM_WAVEFORM_TIME_NOT_RISING,
        ERROR_CUSTOM_WAVEFORM_NON_ZERO_START_TIME,
-       ERROR_VOUT_MAX_OUT_OF_RANGE,
+       ERROR_OUTPUT_LIMIT_OUT_OF_RANGE,
        ERROR_SNAPSHOT_SAMPLE_OUT_OF_RANGE,
        ERROR_SNAPSHOT_RESOLUTION_OUT_OF_RANGE,
        ERROR_SNAPSHOT_NUMBER_OF_SAMPLES_OUT_OF_RANGE,
@@ -114,8 +114,8 @@ public:
     int setDerivativeGain(float gain); // 0-100
     float getDerivativeGain();
     bool isClosedLoopEnabled();
-    float getVoutMax(); // 0V-21V
-    int setVoutMax(float voutLimit);
+    float getOutputLimiter(); // 0-0.9
+    int setOutputLimiter(float outputLimiter);
     void startSnaphot();
     void stopSnapshot();
     int setSnapshotNumberOfSamples(int nsamples);
@@ -206,8 +206,7 @@ protected:
     float m_pidDerivativeGain;
     bool m_isClosedLoopEnabled;
     bool m_isEnabled;
-    float m_voutLimit;
-    float m_controlLimit;
+    float m_outputLimiter;
     std::queue<float> m_filterQueue;
     std::vector<float> m_filterTaps;
     std::vector<struct Sample> m_customWaveform;

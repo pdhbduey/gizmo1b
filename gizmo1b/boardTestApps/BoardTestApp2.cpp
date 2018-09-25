@@ -34,7 +34,7 @@ void BoardTestApp2::setupTests()
     // Create tests
     BoardTest*      boardTestLed        = new BoardTestLed(libLed);
     BoardTest*      boardTestAdc        = new BoardTestAdc(libAdcTempSensor);
-    BoardTest*      boardTestDac        = new BoardTestDac(libCurrentDac);
+    BoardTest*      boardTestDac        = new BoardTestDac(libCurrentDac, libTec);
     BoardTest*      boardTestThermistor = new BoardTestThermistor(libThermistor, libThermistorOnBoard);
     BoardTest*      boardTestFault      = new BoardTestFault(libFault);
     BoardTest*      boardTestTec        = new BoardTestTec(libTec, libLed);
@@ -81,7 +81,7 @@ void BoardTestApp2::setupTests()
     m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_TIME]      = boardTestTec;
     m_boardTestMap[BoardTest::TEC_WAVEFORM_SAMPLE_IREF]      = boardTestTec;
     m_boardTestMap[BoardTest::TEC_WAVEFORM_CYCLES]           = boardTestTec;
-    m_boardTestMap[BoardTest::TEC_VOUT_MAX]                  = boardTestTec;
+    m_boardTestMap[BoardTest::TEC_OUTPUT_LIMITER]            = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_CONTROL]              = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_STATUS]               = boardTestTec;
     m_boardTestMap[BoardTest::SNAPSHOT_RESOLUTION]           = boardTestTec;

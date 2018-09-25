@@ -25,14 +25,15 @@ void LibTec::Sample::clear()
 LibTec::LibTec(LibDac* libDac, LibAdc* libAdc, LibThermistor* libThermistor, const char* name) :
     LibTask(name, configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 1),
     m_waveformPeriod(1000),
-    m_pidProportionalGain(1),
+    m_pidProportionalGain(0.1),
     m_snapshotNumSamples(10),
     m_snapshotRes(SNAPSHOT_RES_10),
     m_traceCircularBuffer(1000),
     m_pidHeaterProportionalGain(1),
     m_libDac(*libDac),
     m_libAdc(*libAdc),
-    m_libThermistor(*libThermistor)
+    m_libThermistor(*libThermistor),
+    m_outputLimiter(0.1)
 {
     if (!s_isInitialized) {
         s_mutex = xSemaphoreCreateMutex();
@@ -72,7 +73,6 @@ LibTec::LibTec(LibDac* libDac, LibAdc* libAdc, LibThermistor* libThermistor, con
     for (int i = 0; i < m_filterTaps.size(); i++) {
         m_filterQueue.push(0);
     }
-    setVoutMax(21);
 }
 
 void LibTec::enable(bool en)
@@ -454,20 +454,19 @@ bool LibTec::isClosedLoopEnabled()
     return m_isClosedLoopEnabled;
 }
 
-float LibTec::getVoutMax()
-{
-    return m_voutLimit;
-}
-
-int LibTec::setVoutMax(float voutLimit)
+int LibTec::setOutputLimiter(float outputLimiter)
 {
     LibMutex libMutex(s_mutex);
-    if (voutLimit < 0 || voutLimit > 21) {
-        return ERROR_VOUT_MAX_OUT_OF_RANGE;
+    if (outputLimiter < 0 || outputLimiter > 0.9) {
+        return ERROR_OUTPUT_LIMIT_OUT_OF_RANGE;
     }
-    m_voutLimit    = voutLimit;
-    m_controlLimit = voutLimit / 25 * 2.5;
+    m_outputLimiter  = outputLimiter;
     return OKAY;
+}
+
+float LibTec::getOutputLimiter()
+{
+    return m_outputLimiter;
 }
 
 float LibTec::filter(float value)
@@ -594,10 +593,9 @@ void LibTec::run()
         float control    = m_pidProportionalGain *  pidError
                          + m_pidIntegralGain     *  m_accError
                          + m_pidDerivativeGain   * (pidError - m_prevError);
-        control         *= 0.1; // scale a bit so that the gains are not small
-        float controlOut = (control < -m_controlLimit ? -m_controlLimit :
-                            control >  m_controlLimit ?  m_controlLimit :
-                                                         control);
+        float controlOut = (control < -m_outputLimiter * 2.5 ? -m_outputLimiter * 2.5 :
+                            control >  m_outputLimiter * 2.5 ?  m_outputLimiter * 2.5 :
+                                                              control);
         bool isSaturated =  controlOut != control;
         bool isIntAdding =  pidError > 0 && control > 0
                         ||  pidError < 0 && control < 0;
@@ -609,9 +607,9 @@ void LibTec::run()
         }
         if (m_isSnapshotRunning) {
             if (m_snapshotSample < m_snapshotNumSamples) {
-                int res[3] = { [SNAPSHOT_RES_10  ] = 100,
-                               [SNAPSHOT_RES_100 ] =  10,
-                               [SNAPSHOT_RES_1000] =   1, };
+                int res[3] = { [ SNAPSHOT_RES_10   ] = 100,
+                               [ SNAPSHOT_RES_100  ] =  10,
+                               [ SNAPSHOT_RES_1000 ] =   1, };
                 if (m_snapshotResCount >= res[m_snapshotRes]) {
                     m_snapshotResCount = 0;
                 }

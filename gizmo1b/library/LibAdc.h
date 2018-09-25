@@ -25,6 +25,6 @@ public:
     int read(int channel, float& value);              // 0-Vref
     virtual int read(int channel, uint32& value) = 0; // 0-65535
     bool isChannelCorrect(int channel);
-private:
+protected:
     float m_vref;
 };
