@@ -2,16 +2,15 @@
 
 namespace DeviceManager.ViewModel
 {
+    using System;
+    using System.Threading;
+    using System.Windows;
+
     using Common;
     using Common.Bindings;
     using Model;
-    using System;
-    using System.Drawing;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Windows;
 
-    public class FaultViewModel : BindableBase
+    public class FaultViewModel : BindableBase, IDisposable
     {
         private string notSetColour = "Gray";
         private string setColour = "Green";

@@ -1,14 +1,17 @@
-﻿namespace DeviceManager.ViewModel
+﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
+
+namespace DeviceManager.ViewModel
 {
     using Common;
     using Common.Bindings;
     using DeviceManager.Model;
+
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Windows;
 
-    public class OpticsViewModel : BindableBase
+    public class OpticsViewModel : BindableBase, IDisposable
     {
         private IOpticsModel opticsModel;
         private string selectedLed;

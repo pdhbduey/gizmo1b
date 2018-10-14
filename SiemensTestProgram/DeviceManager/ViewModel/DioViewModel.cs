@@ -4,12 +4,12 @@ namespace DeviceManager.ViewModel
 {
     using Common.Bindings;
     using DeviceManager.Model;
+
     using System;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
 
-    public class DioViewModel : BindableBase
+    public class DioViewModel : BindableBase, IDisposable
     {
         private IDioModel dioModel;
 

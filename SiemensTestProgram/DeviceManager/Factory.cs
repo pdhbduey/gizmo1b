@@ -13,8 +13,10 @@ namespace DeviceManager
         private IComCommunication serialCommunication;
 
         // Singletons
-        private SnapshotView snapshotView;
+        //private SnapshotView snapshotView;
         private SnapshotViewModel snapshotViewModel;
+        //private CommunicationConfigurationView comConfiguration;
+        private CommunicationConfigurationViewModel comConfiguration;
 
         /// <summary>
         /// Creates Device Manager Factory.
@@ -46,37 +48,42 @@ namespace DeviceManager
         ///  Sets the data context for DAC view.
         /// </summary>
         /// <returns> DAC view </returns>
-        public DacView GetDacView()
+        public DacViewModel GetDacViewModel()
         {
-           return new DacView()
-            {
-                DataContext = new DacViewModel(GetDacModel())
-            };
+            var vm = new DacViewModel(GetDacModel());
+            return vm;
+            //new DacView()
+            //{
+            //    DataContext = vm
+            //};
         }
 
-        public MergedTecAndHeaterView GetFaultHeaterTecView()
+        public MergedTecAndHeaterViewModel GetFaultHeaterTecViewModel()
         {
+            
             var heaterView = GetHeaterView();
             var tecView = GetTecView();
             var faultView = GetFaultView();
-
-
-            return new MergedTecAndHeaterView()
-            {
-                DataContext = new MergedTecAndHeaterViewModel(heaterView, tecView, faultView)
-            };
+            var vm = new MergedTecAndHeaterViewModel(heaterView, tecView, faultView);
+            return vm;
+            //return new MergedTecAndHeaterView()
+            //{
+            //    DataContext = new MergedTecAndHeaterViewModel(heaterView, tecView, faultView)
+            //};
         }
 
         /// <summary>
-        ///  Sets the data context for DAC view.
+        ///  Sets the data context for Trace view.
         /// </summary>
-        /// <returns> DAC view </returns>
-        public TraceView GetTraceView()
+        /// <returns> Trace view model</returns>
+        public TraceViewModel GetTraceViewModel()
         {
-            return new TraceView()
-            {
-                DataContext = new TraceViewModel(GetTraceModel())
-            };
+            var vm = new TraceViewModel(GetTraceModel());
+            return vm;
+            //return new TraceView()
+            //{
+            //    DataContext = new TraceViewModel(GetTraceModel())
+            //};
         }
 
         public ITraceModel GetTraceModel()
@@ -88,30 +95,32 @@ namespace DeviceManager
         ///  Sets the data context for led view.
         /// </summary>
         /// <returns> LED view </returns>
-        public LedView GetLedView()
+        public LedViewModel GetLedViewModel()
         {
-            return new LedView()
-            {
-                DataContext = new LedViewModel(GetLedModel())
-            };
+            var vm = new LedViewModel(GetLedModel());
+            return vm;
+            //return new LedView()
+            //{
+            //    DataContext = new LedViewModel(GetLedModel())
+            //};
         }
 
         /// <summary>
         ///  Sets the data context for snapshot view.
         /// </summary>
         /// <returns> Snapshot view </returns>
-        public SnapshotView GetSnapshotView()
+        public SnapshotViewModel GetSnapshotViewModel()
         {
             if (snapshotViewModel == null)
             {
                 snapshotViewModel = new SnapshotViewModel(GetSnapshotModel());
-                snapshotView = new SnapshotView()
-                {
-                    DataContext = snapshotViewModel
-                };
+                //snapshotView = new SnapshotView()
+                //{
+                //    DataContext = snapshotViewModel
+                //};
             }
 
-            return snapshotView;
+            return snapshotViewModel;
         }
 
         /// <summary>
@@ -121,21 +130,23 @@ namespace DeviceManager
         public TecView GetTecView()
         {
             return new TecView()
-                {
-                    DataContext = new TecViewModel(GetTecModel())
-                };
+            {
+                DataContext = new TecViewModel(GetTecModel())
+            };
         }
 
         /// <summary>
         ///  Sets the data context for thermistor view.
         /// </summary>
         /// <returns> Thermistor view </returns>
-        public ThermistorView GetThermistorView()
+        public ThermistorViewModel GetThermistorViewModel()
         {
-            return new ThermistorView()
-                {
-                    DataContext = new ThermistorViewModel(GetThermistorModel())
-                };
+            var vm = new ThermistorViewModel(GetThermistorModel());
+            return vm;
+            //return new ThermistorView()
+            //    {
+            //        DataContext = new ThermistorViewModel(GetThermistorModel())
+            //    };
 
         }
 
@@ -143,29 +154,31 @@ namespace DeviceManager
         ///  Sets the data context for ADC view.
         /// </summary>
         /// <returns> ADC view </returns>
-        public AdcView GetAdcView()
+        public AdcViewModel GetAdcViewModel()
         {
-            return new AdcView()
-                {
-                    DataContext = new AdcViewModel(GetAdcModel())
-                };
+            var vm = new AdcViewModel(GetAdcModel());
+            return vm;
+            //return new AdcView()
+            //    {
+            //        DataContext = new AdcViewModel(GetAdcModel())
+            //    };
             
         }
-
-        private CommunicationConfigurationView comConfiguration;
 
         /// <summary>
         ///  Sets the data context for com configuration view.
         /// </summary>
         /// <returns> Communication configuration view. </returns>
-        public CommunicationConfigurationView GetCommunicationConfigurationView()
+        public CommunicationConfigurationViewModel GetCommunicationConfigurationViewModel()
         {
+            //todo: differently???
             if (comConfiguration == null)
             {
-                comConfiguration = new CommunicationConfigurationView()
-                {
-                    DataContext = new CommunicationConfigurationViewModel(GetCommunicationConfigurationModel())
-                };
+                comConfiguration = new CommunicationConfigurationViewModel(GetCommunicationConfigurationModel());
+                //comConfiguration = new CommunicationConfigurationView()
+                //{
+                //    DataContext = new CommunicationConfigurationViewModel(GetCommunicationConfigurationModel())
+                //};
             }
 
             return comConfiguration;
@@ -175,36 +188,42 @@ namespace DeviceManager
         ///  Sets the data context for fan view.
         /// </summary>
         /// <returns> Fan view. </returns>
-        public FanView GetFanView()
+        public FanViewModel GetFanViewModel()
         {
-            return new FanView()
-            {
-                DataContext = new FanViewModel(GetFanModel())
-            };
+            var vm = new FanViewModel(GetFanModel());
+            return vm;
+            //return new FanView()
+            //{
+            //    DataContext = new FanViewModel(GetFanModel())
+            //};
         }
 
         /// <summary>
         ///  Sets the data context for dio view.
         /// </summary>
         /// <returns> Dio view. </returns>
-        public DioView GetDioView()
+        public DioViewModel GetDioViewModel()
         {
-            return new DioView()
-            {
-                DataContext = new DioViewModel(GetDioModel())
-            };
+            var vm = new DioViewModel(GetDioModel());
+            return vm;
+            //return new DioView()
+            //{
+            //    DataContext = new DioViewModel(GetDioModel())
+            //};
         }
 
         /// <summary>
         ///  Sets the data context for motor view.
         /// </summary>
         /// <returns> Motor view. </returns>
-        public MotorView GetMotorView()
+        public MotorViewModel GetMotorViewModel()
         {
-           return new MotorView()
-            {
-                DataContext = new MotorViewModel(GetMotorModel())
-            };
+            var vm = new MotorViewModel(GetMotorModel());
+            return vm;
+            //return new MotorView()
+            //{
+            //    DataContext = new MotorViewModel(GetMotorModel())
+            //};
             
         }
 
@@ -212,12 +231,14 @@ namespace DeviceManager
         ///  Sets the data context for Optics view.
         /// </summary>
         /// <returns> Optics view. </returns>
-        public OpticsView GetOpticsView()
+        public OpticsViewModel GetOpticsViewModel()
         {
-            return new OpticsView()
-            {
-                DataContext = new OpticsViewModel(GetOpticsModel())
-            };
+            var vm = new OpticsViewModel(GetOpticsModel());
+            return vm;
+            //return new OpticsView()
+            //{
+            //    DataContext = new OpticsViewModel(GetOpticsModel())
+            //};
 
         }
 

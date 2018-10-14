@@ -2,16 +2,17 @@
 
 namespace DeviceManager.ViewModel
 {
-    using Common;
-    using Common.Bindings;
-    using Model;
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
 
-    public class TecViewModel : BindableBase
+    using Common;
+    using Common.Bindings;
+    using Model;
+
+    public class TecViewModel : BindableBase, IDisposable
     {
         private Task updateTask;
         private ITecModel tecModel;

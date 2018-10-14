@@ -1,19 +1,19 @@
-﻿using Common;
-using Common.Bindings;
-using DeviceManager.DeviceCommunication;
-using DeviceManager.Model;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
 namespace DeviceManager.ViewModel
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Windows;
+
+    using Common;
+    using Common.Bindings;
+    using DeviceManager.DeviceCommunication;
+    using DeviceManager.Model;
+
     public class SnapshotViewModel : BindableBase
     {
         private ISnapshotModel snapshotModel;

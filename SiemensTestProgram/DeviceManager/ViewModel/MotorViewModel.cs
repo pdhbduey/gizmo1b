@@ -5,13 +5,13 @@ namespace DeviceManager.ViewModel
     using Common;
     using Common.Bindings;
     using DeviceManager.Model;
+
     using System;
     using System.Collections.Generic;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
 
-    public class MotorViewModel : BindableBase
+    public class MotorViewModel : BindableBase, IDisposable
     {
         private IMotorModel motorModel;
         private string selectedStepSize;

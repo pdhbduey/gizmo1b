@@ -6,6 +6,7 @@ namespace DeviceManager.ViewModel
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
+
     using Common;
     using Common.Bindings;
     using Model;
@@ -13,7 +14,7 @@ namespace DeviceManager.ViewModel
     /// <summary>
     /// This is the view model for the fan.
     /// </summary>
-    public class FanViewModel : BindableBase
+    public class FanViewModel : BindableBase, IDisposable
     {
         // Fan variables
         private IFanModel fanModel;

@@ -1,11 +1,16 @@
-﻿namespace SiemensTestProgram
+﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
+
+
+namespace SiemensTestProgram
 {
     using System.Collections.ObjectModel;
     using System.Threading;
-    using System.Windows;
 
     using Common.Bindings;
 
+    /// <summary>
+    /// This class is responsible for mapping viewmodels so correctly selected menu is shown.
+    /// </summary>
     public class MainViewModel : BindableBase
     {
         private object content;
@@ -13,7 +18,6 @@
 
         public MainViewModel()
         {
-            // Default settings
             TestViews = new ObservableCollection<string>()
             {
                 "COM Port",
@@ -21,16 +25,13 @@
                 "DAC",
                 "DIO",
                 "Fan",
-                //"Fault",
-                //"Heater",
                 "LED",
                 "Motor",
                 "Optics",
-                "Thermistor",
                 "Snapshot",
-                //"Trace",
-                //"TEC",
+                "Thermistor",
                 "TEC/Heater/Fault"
+                //"Trace",
             };
 
             selectedTestView = TestViews[0];
@@ -84,49 +85,40 @@
             switch (selectedTestView)
             {
                 case "COM Port":
-                    Content = DeviceManager.Factory.Instance.GetCommunicationConfigurationView();
+                    Content = DeviceManager.Factory.Instance.GetCommunicationConfigurationViewModel();
                     break;
                 case "LED":
-                    Content = DeviceManager.Factory.Instance.GetLedView();
+                    Content = DeviceManager.Factory.Instance.GetLedViewModel();
                     break;
                 case "DAC":
-                    Content = DeviceManager.Factory.Instance.GetDacView();
+                    Content = DeviceManager.Factory.Instance.GetDacViewModel();
                     break;
                 case "DIO":
-                    Content = DeviceManager.Factory.Instance.GetDioView();
+                    Content = DeviceManager.Factory.Instance.GetDioViewModel();
                     break;
                 case "ADC":
-                    Content = DeviceManager.Factory.Instance.GetAdcView();
+                    Content = DeviceManager.Factory.Instance.GetAdcViewModel();
                     break;
                 case "Motor":
-                    Content = DeviceManager.Factory.Instance.GetMotorView();
+                    Content = DeviceManager.Factory.Instance.GetMotorViewModel();
                     break;
                 case "Optics":
-                    Content = DeviceManager.Factory.Instance.GetOpticsView();
+                    Content = DeviceManager.Factory.Instance.GetOpticsViewModel();
                     break;
                 case "Fan":
-                    Content = DeviceManager.Factory.Instance.GetFanView();
-                    break;
-                case "Fault":
-                    Content = DeviceManager.Factory.Instance.GetFaultView();
-                    break;
-                case "Heater":
-                    Content = DeviceManager.Factory.Instance.GetHeaterView();
+                    Content = DeviceManager.Factory.Instance.GetFanViewModel();
                     break;
                 case "Snapshot":
-                    Content = DeviceManager.Factory.Instance.GetSnapshotView();
+                    Content = DeviceManager.Factory.Instance.GetSnapshotViewModel();
                     break;
                 case "Trace":
-                    Content = DeviceManager.Factory.Instance.GetTraceView();
+                    Content = DeviceManager.Factory.Instance.GetTraceViewModel();
                     break;
                 case "Thermistor":
-                    Content = DeviceManager.Factory.Instance.GetThermistorView();
-                    break;
-                case "TEC":
-                    Content = DeviceManager.Factory.Instance.GetTecView();
+                    Content = DeviceManager.Factory.Instance.GetThermistorViewModel();
                     break;
                 case "TEC/Heater/Fault":
-                    Content = DeviceManager.Factory.Instance.GetFaultHeaterTecView();
+                    Content = DeviceManager.Factory.Instance.GetFaultHeaterTecViewModel();
                     break;
                 default:
                     return;

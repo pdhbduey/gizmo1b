@@ -3,15 +3,14 @@
 namespace DeviceManager.ViewModel
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
+
     using Common;
     using Common.Bindings;
     using Model;
 
-    public class AdcViewModel : BindableBase
+    public class AdcViewModel : BindableBase, IDisposable
     {
         private IAdcModel adcModel;
         //private SynchronizationContext AdcUiThread;

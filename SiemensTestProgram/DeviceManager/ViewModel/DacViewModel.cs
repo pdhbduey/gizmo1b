@@ -6,6 +6,7 @@ namespace DeviceManager.ViewModel
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
+
     using Common;
     using Common.Bindings;
     using DeviceManager.Model;
@@ -13,7 +14,7 @@ namespace DeviceManager.ViewModel
     /// <summary>
     /// This class is responsible for updating DAC.
     /// </summary>
-    public class DacViewModel : BindableBase
+    public class DacViewModel : BindableBase, IDisposable
     {
         private IDacModel dacModel;
         private float voltageValue;

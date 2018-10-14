@@ -1,18 +1,17 @@
-﻿using Common;
-using Common.Bindings;
-using DeviceManager.Model;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
 namespace DeviceManager.ViewModel
 {
-    public class HeaterViewModel : BindableBase
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+    using System.Windows;
+
+    using Common;
+    using Common.Bindings;
+    using DeviceManager.Model;
+
+    public class HeaterViewModel : BindableBase, IDisposable
     {
         IHeaterModel heaterModel;
 

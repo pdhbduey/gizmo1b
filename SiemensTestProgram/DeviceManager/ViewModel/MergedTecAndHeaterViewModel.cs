@@ -1,11 +1,14 @@
-﻿
+﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
 namespace DeviceManager.ViewModel
 {
+    using System;
+
     using DeviceManager.View;
 
-    public class MergedTecAndHeaterViewModel
+    public class MergedTecAndHeaterViewModel : IDisposable
     {
+        // todo: make IDiposable and call dispose for child vm's
         public MergedTecAndHeaterViewModel(HeaterView heaterView, TecView tecView, FaultView faultView)
         {
             PassedHeaterView = heaterView;

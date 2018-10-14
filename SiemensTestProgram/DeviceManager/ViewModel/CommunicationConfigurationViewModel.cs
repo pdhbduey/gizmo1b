@@ -1,12 +1,13 @@
 ﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
-using Common.Bindings;
-using DeviceManager.DeviceCommunication;
-using DeviceManager.Model;
-using System.Collections.Generic;
-
 namespace DeviceManager.ViewModel
 {
+    using System.Collections.Generic;
+
+    using Common.Bindings;
+    using DeviceManager.DeviceCommunication;
+    using DeviceManager.Model;
+
     public class CommunicationConfigurationViewModel : BindableBase
     { 
         public string selectedComPort;

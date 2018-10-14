@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:DeviceManager.View;assembly=DeviceManager"
-        xmlns:viewmodels="clr-namespace:DeviceManager.ViewModel;assembly=DeviceManager"
+        xmlns:view="clr-namespace:DeviceManager.View;assembly=DeviceManager"
+        xmlns:vm="clr-namespace:DeviceManager.ViewModel;assembly=DeviceManager"
         xmlns:local="clr-namespace:SiemensTestProgram"
         mc:Ignorable="d"
         Title="Gizmo1B"
@@ -13,6 +13,53 @@
 
         Background="GhostWhite">
 
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:DacViewModel}">
+            <view:DacView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:MergedTecAndHeaterViewModel}">
+            <view:MergedTecAndHeaterView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TraceViewModel}">
+            <view:TraceView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:LedViewModel}">
+            <view:LedView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SnapshotViewModel}">
+            <view:SnapshotView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TecViewModel}">
+            <view:TecView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ThermistorViewModel}">
+            <view:ThermistorView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AdcViewModel}">
+            <view:AdcView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DioViewModel}">
+            <view:DioView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:FanViewModel}">
+            <view:FanView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:FaultViewModel}">
+            <view:FaultView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:HeaterViewModel}">
+            <view:HeaterView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:MotorViewModel}">
+            <view:MotorView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:OpticsViewModel}">
+            <view:OpticsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CommunicationConfigurationViewModel}">
+            <view:CommunicationConfigurationView />
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>

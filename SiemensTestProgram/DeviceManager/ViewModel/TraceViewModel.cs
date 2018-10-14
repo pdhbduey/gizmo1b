@@ -1,19 +1,17 @@
-﻿using Common;
-using Common.Bindings;
-using DeviceManager.DeviceCommunication;
-using DeviceManager.Model;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls.DataVisualization.Charting;
+﻿// <--------------------------------------------- Gizmo1B Test Program --------------------------------------------->
 
 namespace DeviceManager.ViewModel
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Windows;
+
+    using Common;
+    using Common.Bindings;
+    using DeviceManager.Model;
+
     public class TraceViewModel : BindableBase
     {
         private ITraceModel traceModel;

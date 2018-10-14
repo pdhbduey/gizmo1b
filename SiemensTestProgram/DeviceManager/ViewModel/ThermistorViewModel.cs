@@ -5,8 +5,8 @@ namespace DeviceManager.ViewModel
     using System;
     using System.Collections.Generic;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
+
     using Common;
     using Common.Bindings;
     using DeviceManager.Model;
@@ -14,7 +14,7 @@ namespace DeviceManager.ViewModel
     /// <summary>
     /// This class is responsible for updating Thermistor.
     /// </summary>
-    public class ThermistorViewModel : BindableBase
+    public class ThermistorViewModel : BindableBase, IDisposable
     {
         private IThermistorModel thermistorModel;
 
