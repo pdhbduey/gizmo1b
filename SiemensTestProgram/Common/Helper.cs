@@ -73,6 +73,13 @@ namespace Common
             return BitConverter.ToInt32(bytes, 0);
         }
 
+        public static uint GetUnsignedIntFromBigEndian(byte[] bytes)
+        {
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes); // We have to reverse
+            return BitConverter.ToUInt32(bytes, 0);
+        }
+
         public static int GetIntFromLittleEndian(byte[] bytes)
         {
             if (!BitConverter.IsLittleEndian)

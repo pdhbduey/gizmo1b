@@ -13,9 +13,7 @@ namespace DeviceManager
         private IComCommunication serialCommunication;
 
         // Singletons
-        //private SnapshotView snapshotView;
         private SnapshotViewModel snapshotViewModel;
-        //private CommunicationConfigurationView comConfiguration;
         private CommunicationConfigurationViewModel comConfiguration;
 
         /// <summary>

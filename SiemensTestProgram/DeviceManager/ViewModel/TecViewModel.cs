@@ -14,7 +14,6 @@ namespace DeviceManager.ViewModel
 
     public class TecViewModel : BindableBase, IDisposable
     {
-        private Task updateTask;
         private ITecModel tecModel;
         private int progressMaximum;
         private string selectedWaveForm;
@@ -43,6 +42,10 @@ namespace DeviceManager.ViewModel
         private float derivativeGain;
         private string statusMessage;
         private string customReadStatus;
+
+        private Task updateTask;
+        private CancellationTokenSource cts;
+        private CancellationToken token;
         private const int updateDelay = 300;
 
         public TecViewModel(ITecModel tecModel)
@@ -915,13 +918,13 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            var thread = new Thread(() =>
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            updateTask = Task.Factory.StartNew(() =>
             {
                 UpdateAllStatuses();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }, token);
         }
 
         private async void UpdateAllStatuses()
@@ -930,6 +933,11 @@ namespace DeviceManager.ViewModel
             {
                 try
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
                     var irefData = await tecModel.ReadIref();
                     if (irefData.succesfulResponse)
                     {
@@ -1122,5 +1130,41 @@ namespace DeviceManager.ViewModel
 
             return response == null ? "Unknown" : response;
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    cts.Cancel();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                updateTask = null;
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~DacViewModel() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

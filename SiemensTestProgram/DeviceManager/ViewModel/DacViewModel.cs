@@ -179,13 +179,10 @@ namespace DeviceManager.ViewModel
         /// </summary>
         private void StartUpdateTask()
         {
-            var thread = new Thread(() =>
+            var task = Task.Factory.StartNew(() =>
             {
                 CheckDacStatus();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }, token);
         }
 
         /// <summary>
@@ -204,7 +201,7 @@ namespace DeviceManager.ViewModel
                 {
                     var status = await dacModel.ReadDacStatusCommand();
 
-                    if (status.succesfulResponse    )
+                    if (status.succesfulResponse)
                     {
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
@@ -257,5 +254,32 @@ namespace DeviceManager.ViewModel
 
             return response == null ? "Unknown Response" : response;
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    cts.Cancel();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                updateTask = null;
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

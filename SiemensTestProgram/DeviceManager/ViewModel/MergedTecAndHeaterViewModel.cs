@@ -21,5 +21,36 @@ namespace DeviceManager.ViewModel
         public object PassedTecView { get; set; }
 
         public object PassedFaultView { get; set; }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    var heaterViewModel = PassedHeaterView as HeaterViewModel;
+                    var tecViewModel = PassedTecView as TecViewModel;
+                    var faultViewModel = PassedFaultView as FaultViewModel;
+
+                    heaterViewModel.Dispose();
+                    tecViewModel.Dispose();
+                    faultViewModel.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

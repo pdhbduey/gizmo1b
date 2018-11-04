@@ -5,11 +5,12 @@ namespace DeviceManager.ViewModel
     using Common;
     using Common.Bindings;
     using DeviceManager.Model;
+    using System;
 
     /// <summary>
     /// This class is responsible for updating LED.
     /// </summary>
-    public class LedViewModel : BindableBase
+    public class LedViewModel : BindableBase, IDisposable
     {
         private ILedModel ledModel;
         private string ledStatus;
@@ -191,6 +192,11 @@ namespace DeviceManager.ViewModel
             LedDefaults.LedStatus.TryGetValue(value, out response);
 
             return response == null ? "Unknown Response" : response;
+        }
+
+        public void Dispose()
+        {
+            // do nothing
         }
     }
 }

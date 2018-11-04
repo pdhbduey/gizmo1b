@@ -14,7 +14,7 @@ namespace DeviceManager.ViewModel
     using DeviceManager.DeviceCommunication;
     using DeviceManager.Model;
 
-    public class SnapshotViewModel : BindableBase
+    public class SnapshotViewModel : BindableBase, IDisposable
     {
         private ISnapshotModel snapshotModel;
         private int selectedResolution;
@@ -834,6 +834,11 @@ namespace DeviceManager.ViewModel
             }
 
             await snapshotModel.SetNumberOfSamples(numberOfSamples);
+        }
+
+        public void Dispose()
+        {
+            // do nothing
         }
     }
 }

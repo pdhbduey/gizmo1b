@@ -28,6 +28,8 @@ namespace DeviceManager.ViewModel
 
         // Update task variables
         private Task updateTask;
+        private CancellationTokenSource cts;
+        private CancellationToken token;
         private int updateDelay = 750;
         private int delayBetweenRequests = 300;
 
@@ -44,6 +46,7 @@ namespace DeviceManager.ViewModel
 
             SetFanPeriodOne = new RelayCommand(x => SetFanPeriod(1));
             SetFanPeriodTwo = new RelayCommand(x => SetFanPeriod(2));
+            
             // Update statuses
             InitialUpdate();
             StartUpdateTask();
@@ -223,13 +226,13 @@ namespace DeviceManager.ViewModel
         /// </summary>
         private void StartUpdateTask()
         {
-            var thread = new Thread(() =>
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            updateTask = Task.Factory.StartNew(() =>
             {
                 UpdateAllStatuses();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }, token);
         }
 
         /// <summary>
@@ -293,6 +296,11 @@ namespace DeviceManager.ViewModel
             {
                 try
                 {
+                    if (token.IsCancellationRequested == true)
+                    {
+                        break;
+                    }
+
                     // Update
                     var sensorOneValue = await fanModel.GetFanSensorRpm(1);
                     if (sensorOneValue.succesfulResponse)
@@ -404,5 +412,32 @@ namespace DeviceManager.ViewModel
                     break;
             }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    cts.Cancel();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                updateTask = null;
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

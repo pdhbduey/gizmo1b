@@ -3,6 +3,8 @@
 
 namespace SiemensTestProgram
 {
+    using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Threading;
 
@@ -82,6 +84,14 @@ namespace SiemensTestProgram
         /// </summary>
         private void SetContent()
         {
+            var disposable = Content as IDisposable;
+
+            if (disposable != null)
+            {
+                disposable.Dispose();
+                Content = null;
+            }
+
             switch (selectedTestView)
             {
                 case "COM Port":

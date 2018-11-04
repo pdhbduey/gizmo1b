@@ -5,6 +5,7 @@ namespace DeviceManager.ViewModel
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using Common;
@@ -33,8 +34,12 @@ namespace DeviceManager.ViewModel
         private string customReadStatus;
         private int customIndex;
         private int waveformCycles;
-        private const int updateDelay = 300;
         private string waveformButtonState;
+
+        private Task updateTask;
+        private CancellationTokenSource cts;
+        private CancellationToken token;
+        private const int updateDelay = 300;
 
         public HeaterViewModel(IHeaterModel heaterModel)
         {
@@ -580,13 +585,13 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            var thread = new Thread(() =>
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            updateTask = Task.Factory.StartNew(() =>
             {
                 UpdateAllStatuses();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }, token);
         }
 
         public bool IsEnabledChecked
@@ -1039,5 +1044,32 @@ namespace DeviceManager.ViewModel
                 CustomIndex = Helper.GetIntFromBigEndian(customIndexData.response);
             }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    cts.Cancel();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                updateTask = null;
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

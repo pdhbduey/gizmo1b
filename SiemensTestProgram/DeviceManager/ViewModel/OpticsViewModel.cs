@@ -9,6 +9,7 @@ namespace DeviceManager.ViewModel
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     public class OpticsViewModel : BindableBase, IDisposable
@@ -18,19 +19,23 @@ namespace DeviceManager.ViewModel
         private string selectedPhotodiode;
         private int integrationTime;
         private int intensity;
-        private const int updateDelay = 300;
         private float photodiodeVolts;
         private float pdTemperature;
         private float ledTemperature;
         private float pdTemperatureDuringIntegration;
         private float ledTemperatureDuringIntegration;
-        private int photodiodeRaw;
+        private uint photodiodeRaw;
         private int selectedPdVersion;
         private int selectedLedVersion;
         private float ledMonitorVolts;
         private string statusMessage;
         private bool ledBoardEnabled;
         private bool pdBoardEnabled;
+
+        private Task updateTask;
+        private CancellationTokenSource cts;
+        private CancellationToken token;
+        private const int updateDelay = 300;
 
         public OpticsViewModel(IOpticsModel opticsModel)
         {
@@ -237,7 +242,7 @@ namespace DeviceManager.ViewModel
             var photodiodeRawRead = opticsModel.ReadPhotodiodeRawCommand().Result;
             if (photodiodeRawRead.succesfulResponse)
             {
-                PhotodiodeRaw = Helper.GetIntFromBigEndian(photodiodeRawRead.response);
+                PhotodiodeRaw = Helper.GetUnsignedIntFromBigEndian(photodiodeRawRead.response);
             }
 
             var readLedMonitor = opticsModel.ReadLedMonitorVolts().Result;
@@ -279,19 +284,24 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            var thread = new Thread(() =>
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            updateTask = Task.Factory.StartNew(() =>
             {
                 UpdateAllStatuses();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }, token);
         }
 
         private async void UpdateAllStatuses()
         {
             while (true)
             {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 var pdTemperatureRead = await opticsModel.ReadPdTemperatureCommand();
                 if (pdTemperatureRead.succesfulResponse)
                 {
@@ -498,7 +508,7 @@ namespace DeviceManager.ViewModel
 
 
 
-        private int PhotodiodeRaw
+        private uint PhotodiodeRaw
         {
             get
             {
@@ -660,6 +670,40 @@ namespace DeviceManager.ViewModel
             await opticsModel.SetPhotodiodeCommand(selectedPhotodiode);
         }
 
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    cts.Cancel();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                updateTask = null;
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~DacViewModel() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

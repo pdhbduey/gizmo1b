@@ -2,13 +2,14 @@
 
 namespace DeviceManager.ViewModel
 {
+    using System;
     using System.Collections.Generic;
 
     using Common.Bindings;
     using DeviceManager.DeviceCommunication;
     using DeviceManager.Model;
 
-    public class CommunicationConfigurationViewModel : BindableBase
+    public class CommunicationConfigurationViewModel : BindableBase, IDisposable
     { 
         public string selectedComPort;
         public int selectedBaudRate;
@@ -195,6 +196,11 @@ namespace DeviceManager.ViewModel
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(PnpDeviceId));
             OnPropertyChanged(nameof(Description));
+        }
+
+        public void Dispose()
+        {
+            // do nothing
         }
     }
 }

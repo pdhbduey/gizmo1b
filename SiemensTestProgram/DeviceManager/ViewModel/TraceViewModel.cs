@@ -12,7 +12,7 @@ namespace DeviceManager.ViewModel
     using Common.Bindings;
     using DeviceManager.Model;
 
-    public class TraceViewModel : BindableBase
+    public class TraceViewModel : BindableBase, IDisposable
     {
         private ITraceModel traceModel;
         private int selectedResolution;
@@ -472,6 +472,11 @@ namespace DeviceManager.ViewModel
         public BulkObservableCollection<DataPoint> TemperatureThreeCollection { get; set; }
 
         public BulkObservableCollection<DataPoint> TemperatureFourCollection { get; set; }
+
+        public void Dispose()
+        {
+            // do nothing
+        }
 
     }
 }

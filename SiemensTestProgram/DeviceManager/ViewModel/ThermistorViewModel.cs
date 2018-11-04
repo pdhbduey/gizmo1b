@@ -5,6 +5,7 @@ namespace DeviceManager.ViewModel
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using Common;
@@ -24,6 +25,10 @@ namespace DeviceManager.ViewModel
         private float ainD;
         private string statusMessage;
         private string selectedType;
+
+        private Task updateTask;
+        private CancellationTokenSource cts;
+        private CancellationToken token;
         private const int updateDelay = 300;
 
         public ThermistorViewModel(IThermistorModel thermistorModel)
@@ -188,19 +193,24 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            var thread = new Thread(() =>
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            updateTask = Task.Factory.StartNew(() =>
             {
                 UpdateAllStatuses();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }, token);
         }
 
         private async void UpdateAllStatuses()
         {
             while (true)
             {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 var ainAData = await thermistorModel.ReadAinA();
                 if (ainAData.succesfulResponse)
                 {
@@ -343,5 +353,41 @@ namespace DeviceManager.ViewModel
         {
             await thermistorModel.SetType(selectedType);
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    cts.Cancel();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                updateTask = null;
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~DacViewModel() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

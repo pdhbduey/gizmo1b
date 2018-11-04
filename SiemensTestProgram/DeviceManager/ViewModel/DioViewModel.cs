@@ -7,6 +7,7 @@ namespace DeviceManager.ViewModel
 
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     public class DioViewModel : BindableBase, IDisposable
@@ -33,6 +34,9 @@ namespace DeviceManager.ViewModel
         private string doutSixStatus;
         private string doutSevenStatus;
 
+        private Task updateTask;
+        CancellationTokenSource cts;
+        CancellationToken token;
         private const int updateDelay = 300;
 
         public DioViewModel(IDioModel dioModel)
@@ -78,19 +82,24 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            var thread = new Thread(() =>
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            updateTask = Task.Factory.StartNew(() =>
             {
                 UpdateAllStatuses();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }, token);
         }
 
         private async void UpdateAllStatuses()
         {
             while (true)
             {
+                if (token.IsCancellationRequested == true)
+                {
+                    break;
+                }
+
                 var din = await dioModel.ReadDin();
                 if (din.succesfulResponse)
                 {
@@ -455,8 +464,6 @@ namespace DeviceManager.ViewModel
             }
         }
 
-       
-
         private async void updateDinStatus(int channel, bool isSet)
         {
             switch (channel)
@@ -633,5 +640,32 @@ namespace DeviceManager.ViewModel
                     break;
             }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    cts.Cancel();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                updateTask = null;
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

@@ -4,6 +4,7 @@ namespace DeviceManager.ViewModel
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using Common;
@@ -23,8 +24,10 @@ namespace DeviceManager.ViewModel
         private float channelFiveValue;
         private string statusMessage;
 
-
-        private int updateDelay = 300;
+        private Task updateTask;
+        private CancellationTokenSource cts;
+        private CancellationToken token;
+        private const int updateDelay = 300;
 
         public AdcViewModel(IAdcModel adcModel)
         {
@@ -185,13 +188,13 @@ namespace DeviceManager.ViewModel
 
         private void StartUpdateTask()
         {
-            var thread = new Thread(() =>
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            updateTask = Task.Factory.StartNew(() =>
             {
                 UpdateAllStatuses();
-            });
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            }, token);
         }
 
         private void HandleResults(int channel)
@@ -240,7 +243,11 @@ namespace DeviceManager.ViewModel
         {
             while (true)
             {
-                
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 var commandZeroSuccesful = await adcModel.ControlAdcChannel(0);
                 if (commandZeroSuccesful.succesfulResponse)
                 {
@@ -266,6 +273,10 @@ namespace DeviceManager.ViewModel
                 Thread.Sleep(updateDelay);
 
                 //// Channel One
+                if (token.IsCancellationRequested == true)
+                {
+                    break;
+                }
                 var commandOneSuccesful = await adcModel.ControlAdcChannel(1);
                 if (commandOneSuccesful.succesfulResponse)
                 {
@@ -291,6 +302,10 @@ namespace DeviceManager.ViewModel
                 Thread.Sleep(updateDelay);
 
                 // Channel Two
+                if (token.IsCancellationRequested == true)
+                {
+                    break;
+                }
                 var commandTwoSuccesful = await adcModel.ControlAdcChannel(2);
                 if (commandTwoSuccesful.succesfulResponse)
                 {
@@ -316,6 +331,10 @@ namespace DeviceManager.ViewModel
                 Thread.Sleep(updateDelay);
 
                 // Channel Three
+                if (token.IsCancellationRequested == true)
+                {
+                    break;
+                }
                 var commandThreeSuccesful = await adcModel.ControlAdcChannel(3);
                 if (commandThreeSuccesful.succesfulResponse)
                 {
@@ -343,6 +362,10 @@ namespace DeviceManager.ViewModel
                 Thread.Sleep(updateDelay);
 
                 // Channel Four
+                if (token.IsCancellationRequested == true)
+                {
+                    break;
+                }
                 var commandFourSuccesful = await adcModel.ControlAdcChannel(4);
                 if (commandFourSuccesful.succesfulResponse)
                 {
@@ -370,6 +393,10 @@ namespace DeviceManager.ViewModel
                 Thread.Sleep(updateDelay);
 
                 // Channel Five
+                if (token.IsCancellationRequested == true)
+                {
+                    break;
+                }
                 var commandFiveSuccesful = await adcModel.ControlAdcChannel(5);
                 if (commandFiveSuccesful.succesfulResponse)
                 {
@@ -423,5 +450,32 @@ namespace DeviceManager.ViewModel
 
             return response == null ? "Unknown" : $"Channel {channelNumber} {response}";
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    cts.Cancel();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                updateTask = null;
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
