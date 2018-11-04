@@ -75,7 +75,7 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(DutyCycleOne));
-                SetFanDutyCycle(channel: 1);
+                // SetFanDutyCycle(channel: 1);
             }
         }
 
@@ -102,7 +102,7 @@ namespace DeviceManager.ViewModel
                 }
 
                 OnPropertyChanged(nameof(DutyCycleTwo));
-                SetFanDutyCycle(channel: 2);
+                // SetFanDutyCycle(channel: 2);
             }
         }
 
@@ -386,7 +386,7 @@ namespace DeviceManager.ViewModel
             return response == null ? "Unknown" : response;
         }
 
-        private async void SetFanDutyCycle(int channel)
+        public async void SetFanDutyCycle(int channel)
         {
             var response = new byte[5];
             switch (channel)

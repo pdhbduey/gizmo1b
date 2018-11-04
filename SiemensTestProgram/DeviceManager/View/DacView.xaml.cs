@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DeviceManager.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,15 @@ namespace DeviceManager.View
         public DacView()
         {
             InitializeComponent();
+        }
+
+        private void DacSliderSetCommand(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            var dacViewModel = DataContext as DacViewModel;
+            if (dacViewModel != null)
+            {
+                dacViewModel.SendDacValueCommand.Execute(null);
+            }
         }
     }
 }

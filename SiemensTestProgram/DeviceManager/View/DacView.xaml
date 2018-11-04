@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:DeviceManager.View"
         mc:Ignorable="d"
         Background="GhostWhite">
@@ -18,6 +19,9 @@
                 </Grid.RowDefinitions>
                 
                 <StackPanel Grid.Row="0" Margin="10">
+                    
+                        
+                    
                     <StackPanel Orientation="Horizontal">
                         <Slider
                         Width="250" 
@@ -25,9 +29,10 @@
                         HorizontalAlignment="Left" 
                         Minimum="0" 
                         Maximum="500" 
-                        Value="{Binding SliderVoltageValue, Delay=15}"
-                        >
-                        </Slider>
+                        Value="{Binding SliderVoltageValue}"
+                        Thumb.DragCompleted="DacSliderSetCommand"
+                        />
+
                         <TextBox Margin="1" Height="25" Text="{Binding Path=VoltageValueString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" MaxLength="5" Width="40">
                             <TextBox.InputBindings>
                                 <KeyBinding Command="{Binding SendDacValueCommand}" Key="Enter"/>

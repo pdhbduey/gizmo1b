@@ -108,7 +108,7 @@ namespace DeviceManager.ViewModel
                 OnPropertyChanged(nameof(SliderVoltageValue));
 
                 // Update DAC value when we scroll slider
-                SendDacValue();
+                // SendDacValue();
             }
         }
 

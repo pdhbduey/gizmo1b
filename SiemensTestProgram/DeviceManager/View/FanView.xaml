@@ -33,7 +33,8 @@
                     VerticalAlignment="Center"
                     Minimum="0" 
                     Maximum="100" 
-                    Value="{Binding DutyCycleOne, Delay=15}">
+                    Value="{Binding DutyCycleOne}"
+                    Thumb.DragCompleted="FanOneCycleSetCommand">
                     </Slider>
                     <Label Margin="5,0,0,0" Content="{Binding DutyCycleOne}"></Label>
                     <Label Content="%"></Label>
@@ -62,7 +63,8 @@
                     VerticalAlignment="Center"
                     Minimum="0" 
                     Maximum="100" 
-                    Value="{Binding DutyCycleTwo, Delay=15}">
+                    Value="{Binding DutyCycleTwo}"
+                    Thumb.DragCompleted="FanTwoCycleSetCommand">
                     </Slider>
                     <Label VerticalAlignment="Center" Margin="5,0,0,0" Content="{Binding DutyCycleTwo}"></Label>
                     <Label Content="%"></Label>

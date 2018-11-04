@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DeviceManager.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,24 @@ namespace DeviceManager.View
 
                 BindingExpression binding = BindingOperations.GetBindingExpression(textBox, property);
                 if (binding != null) { binding.UpdateSource(); }
+            }
+        }
+
+        private void FanOneCycleSetCommand(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            var fanViewModel = DataContext as FanViewModel;
+            if (fanViewModel != null)
+            {
+                fanViewModel.SetFanDutyCycle(1);
+            }
+        }
+
+        private void FanTwoCycleSetCommand(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            var fanViewModel = DataContext as FanViewModel;
+            if (fanViewModel != null)
+            {
+                fanViewModel.SetFanDutyCycle(2);
             }
         }
     }
