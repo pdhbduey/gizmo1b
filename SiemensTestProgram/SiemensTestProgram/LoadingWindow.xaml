@@ -1,0 +1,12 @@
+﻿<Window x:Class="SiemensTestProgram.LoadingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SiemensTestProgram"
+        mc:Ignorable="d"
+        Title="Loading Window" MinHeight="150" MinWidth="300" MaxHeight="150" MaxWidth="300">
+    <Grid>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading Data..."></Label>
+    </Grid>
+</Window>

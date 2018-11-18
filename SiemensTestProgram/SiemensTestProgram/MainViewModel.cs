@@ -7,7 +7,8 @@ namespace SiemensTestProgram
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Threading;
-
+    using System.Windows;
+    using System.Windows.Threading;
     using Common.Bindings;
 
     /// <summary>
@@ -17,6 +18,7 @@ namespace SiemensTestProgram
     {
         private object content;
         private string selectedTestView;
+        private LoadingWindow loadingDisplay;
 
         public MainViewModel()
         {
@@ -92,6 +94,16 @@ namespace SiemensTestProgram
                 Content = null;
             }
 
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                loadingDisplay = new LoadingWindow();
+                loadingDisplay.Topmost = true;
+                loadingDisplay.Show();
+                
+            }));
+
+            Thread.Sleep(100);
+
             switch (selectedTestView)
             {
                 case "COM Port":
@@ -134,8 +146,12 @@ namespace SiemensTestProgram
                     return;
             }
 
-            Thread.Sleep(500);
-            System.GC.Collect();
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                loadingDisplay.Close();
+
+            }));
+            
         }
     }
 }
