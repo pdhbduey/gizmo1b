@@ -364,7 +364,7 @@ namespace DeviceManager.ViewModel
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
-                    cts.Cancel();
+                    cts?.Cancel();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.

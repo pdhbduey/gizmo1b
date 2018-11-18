@@ -36,9 +36,9 @@ namespace DeviceManager.ViewModel
                     var tecViewModel = PassedTecView as TecViewModel;
                     var faultViewModel = PassedFaultView as FaultViewModel;
 
-                    heaterViewModel.Dispose();
-                    tecViewModel.Dispose();
-                    faultViewModel.Dispose();
+                    heaterViewModel?.Dispose();
+                    tecViewModel?.Dispose();
+                    faultViewModel?.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
