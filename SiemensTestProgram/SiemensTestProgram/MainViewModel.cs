@@ -7,6 +7,7 @@ namespace SiemensTestProgram
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Threading;
     using Common.Bindings;
@@ -18,7 +19,8 @@ namespace SiemensTestProgram
     {
         private object content;
         private string selectedTestView;
-        private LoadingWindow loadingDisplay;
+        private static Action EmptyDelegate = delegate () { };
+        private LoadingWindow loadingDisplay = new LoadingWindow() { Topmost = true };
 
         public MainViewModel()
         {
@@ -81,6 +83,7 @@ namespace SiemensTestProgram
             }
         }
 
+        
         /// <summary>
         /// Changes content of view in the main interface
         /// </summary>
@@ -94,15 +97,7 @@ namespace SiemensTestProgram
                 Content = null;
             }
 
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                loadingDisplay = new LoadingWindow();
-                loadingDisplay.Topmost = true;
-                loadingDisplay.Show();
-                
-            }));
-
-            Thread.Sleep(100);
+            ShowLoadingWindow();
 
             switch (selectedTestView)
             {
@@ -146,12 +141,18 @@ namespace SiemensTestProgram
                     return;
             }
 
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                loadingDisplay.Close();
+            loadingDisplay.Hide();
+        }
 
-            }));
-            
+        private void ShowLoadingWindow()
+        {
+            var size = new Size(300, 300);
+            loadingDisplay.Measure(size);
+            loadingDisplay.Arrange(new Rect(size));
+            loadingDisplay.UpdateLayout();
+            loadingDisplay.Show();
+            loadingDisplay.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+            Thread.Sleep(100);
         }
     }
 }

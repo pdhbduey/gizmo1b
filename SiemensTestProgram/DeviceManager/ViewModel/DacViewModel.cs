@@ -179,6 +179,9 @@ namespace DeviceManager.ViewModel
         /// </summary>
         private void StartUpdateTask()
         {
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
             var task = Task.Factory.StartNew(() =>
             {
                 CheckDacStatus();

@@ -7,6 +7,6 @@
         mc:Ignorable="d"
         Title="Loading Window" MinHeight="150" MinWidth="300" MaxHeight="150" MaxWidth="300">
     <Grid>
-        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading Data..."></Label>
+        <Label Name="LoadingText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading Data..."></Label>
     </Grid>
 </Window>

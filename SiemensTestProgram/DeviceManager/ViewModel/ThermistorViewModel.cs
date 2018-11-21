@@ -14,7 +14,7 @@ namespace DeviceManager.ViewModel
 
     /// <summary>
     /// This class is responsible for updating Thermistor.
-    /// </summary>
+    /// </summary>C:\Users\Nikola Ostojic\gizmo1b\SiemensTestProgram\DeviceManager\ViewModel\ThermistorViewModel.cs
     public class ThermistorViewModel : BindableBase, IDisposable
     {
         private IThermistorModel thermistorModel;
