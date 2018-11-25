@@ -18,6 +18,7 @@ namespace DeviceManager.ViewModel
     {
         private IDacModel dacModel;
         private float voltageValue;
+        private float dacReadValue;
         private int sliderVoltageValue;
         private string dacStatus;
 
@@ -62,6 +63,8 @@ namespace DeviceManager.ViewModel
                 SliderVoltageValue = 250;
             }
 
+            GetDacReadString();
+
             var status = dacModel.ReadDacStatusCommand().Result;
 
             if (status.succesfulResponse)
@@ -71,6 +74,16 @@ namespace DeviceManager.ViewModel
             else
             {
                 DacStatus = "Communication Error";
+            }
+        }
+
+        private void GetDacReadString()
+        {
+            var dacValue = dacModel.GetDacValueCommand().Result;
+
+            if (dacValue.succesfulResponse)
+            {
+                DacReadValue = Helper.GetFloatFromBigEndian(dacValue.response);
             }
         }
 
@@ -88,6 +101,29 @@ namespace DeviceManager.ViewModel
             {
                 dacStatus = value;
                 OnPropertyChanged(nameof(DacStatus));
+            }
+        }
+
+        public string DacReadString
+        {
+            get
+            {
+                return $"Dac Value: {string.Format(dacReadValue.ToString("0.##"))}";
+            }
+        }
+
+        public float DacReadValue
+        {
+            get
+            {
+                return dacReadValue;
+            }
+
+            set
+            {
+                dacReadValue = value;
+                OnPropertyChanged(nameof(DacReadValue));
+                OnPropertyChanged(nameof(DacReadString));
             }
         }
 
@@ -172,6 +208,7 @@ namespace DeviceManager.ViewModel
         private async void SendDacValue()
         {
             await dacModel.SetDacCommand(VoltageValue);
+            GetDacReadString();
         }
 
         /// <summary>
