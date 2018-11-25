@@ -110,7 +110,7 @@ namespace DeviceManager.ViewModel
             {
                 if (Helper.IsBitSet(pdBoardVersionData.response[4], 1))
                 {
-                    SelectedPdVersion = PdBoardVersions[1];
+                    selectedPdVersion = PdBoardVersions[1];
                 }
             }
 
@@ -119,7 +119,7 @@ namespace DeviceManager.ViewModel
             {
                 if (Helper.IsBitSet(ledBoardVersionData.response[4], 1))
                 {
-                    SelectedLedVersion = LedBoardVersions[1];
+                    selectedLedVersion = LedBoardVersions[1];
                 }
             }
         }

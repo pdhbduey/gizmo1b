@@ -462,7 +462,98 @@ namespace DeviceManager.ViewModel
                 updateDinStatus(6, sixSet);
                 updateDinStatus(7, sevenSet);
             }
+
+            var dout = dioModel.ReadDout().Result;
+            if (dout.succesfulResponse)
+            {
+                DoutSet(dout.response);
+            }
         }
+
+        private void DoutSet(byte[] doutData)
+        {
+            var dioZeroStatus = !DioDefaults.IsDoutSet(doutData, 0);
+            var dioOneStatus = !DioDefaults.IsDoutSet(doutData, 1);
+            var dioTwoStatus = !DioDefaults.IsDoutSet(doutData, 2);
+            var dioThreeStatus = !DioDefaults.IsDoutSet(doutData, 3);
+            var dioFourStatus = !DioDefaults.IsDoutSet(doutData, 4);
+            var dioFiveStatus = !DioDefaults.IsDoutSet(doutData, 5);
+            var dioSixStatus = !DioDefaults.IsDoutSet(doutData, 6);
+            var dioSevenStatus = !DioDefaults.IsDoutSet(doutData, 7);
+
+            if (dioZeroStatus)
+            {
+                DoutZeroStatus = $"{DioDefaults.SetDout} 0";
+            }
+            else
+            {
+                DoutZeroStatus = $"{DioDefaults.ClearDout} 0";
+            }
+
+            if (dioOneStatus)
+            {
+                DoutOneStatus = $"{DioDefaults.SetDout} 1";
+            }
+            else
+            {
+                DoutOneStatus = $"{DioDefaults.ClearDout} 1";
+            }
+
+            if (dioTwoStatus)
+            {
+                DoutTwoStatus = $"{DioDefaults.SetDout} 2";
+            }
+            else
+            {
+                DoutTwoStatus = $"{DioDefaults.ClearDout} 2";
+            }
+
+            if (dioThreeStatus)
+            {
+                DoutThreeStatus = $"{DioDefaults.SetDout} 3";
+            }
+            else
+            {
+                DoutThreeStatus = $"{DioDefaults.ClearDout} 3";
+            }
+
+            if (dioFourStatus)
+            {
+                DoutFourStatus = $"{DioDefaults.SetDout} 4";
+            }
+            else
+            {
+                DoutFourStatus = $"{DioDefaults.ClearDout} 4";
+            }
+
+            if (dioFiveStatus)
+            {
+                DoutFiveStatus = $"{DioDefaults.SetDout} 5";
+            }
+            else
+            {
+                DoutFiveStatus = $"{DioDefaults.ClearDout} 5";
+            }
+
+            if (dioSixStatus)
+            {
+                DoutSixStatus = $"{DioDefaults.SetDout} 6";
+            }
+            else
+            {
+                DoutSixStatus = $"{DioDefaults.ClearDout} 6";
+            }
+
+            if (dioSevenStatus)
+            {
+                DoutSevenStatus = $"{DioDefaults.SetDout} 7";
+            }
+            else
+            {
+                DoutSevenStatus = $"{DioDefaults.ClearDout} 7";
+            }
+        }
+
 
         private async void updateDinStatus(int channel, bool isSet)
         {

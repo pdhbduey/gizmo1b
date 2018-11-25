@@ -9,6 +9,8 @@ namespace DeviceManager.Model
 {
     public interface IDioModel
     {
+        Task<CommunicationData> ReadDout();
+
         Task<CommunicationData> ReadDin();
 
         Task<CommunicationData> SetDout(int channel, bool set);
