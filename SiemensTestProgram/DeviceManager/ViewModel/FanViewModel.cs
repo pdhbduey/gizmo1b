@@ -46,11 +46,14 @@ namespace DeviceManager.ViewModel
 
             SetFanPeriodOne = new RelayCommand(x => SetFanPeriod(1));
             SetFanPeriodTwo = new RelayCommand(x => SetFanPeriod(2));
-            
+            RefreshCommand = new RelayCommand(param => InitialUpdate());
+
             // Update statuses
             InitialUpdate();
             StartUpdateTask();
         }
+
+        public RelayCommand RefreshCommand { get; set; }
 
         public int DutyCycleOne
         {

@@ -20,7 +20,7 @@
                 <Label Margin="1" Content="{Binding AinCText}"></Label>
                 <Label Margin="1" Content="{Binding AinDText}"></Label>
                 <Label Margin="1" Content="{Binding StatusMessage}"></Label>
-                
+                <Button HorizontalAlignment="Left" Height="25" Width="90" Margin="1" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
             </StackPanel>
         </GroupBox>
     </Grid>

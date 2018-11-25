@@ -86,6 +86,7 @@
                 <Label Content="{Binding StatusMessage}"></Label>
                 <Label Content="{Binding SensorOneRpmText}"></Label>
                 <Label Content="{Binding SensorTwoRpmText}"></Label>
+                <Button Margin="1"  Width="75" Height="25" HorizontalAlignment="Left" Command="{Binding RefreshCommand}" Content="Refresh"></Button>
             </StackPanel>
         </GroupBox>
     </Grid>

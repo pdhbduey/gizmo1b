@@ -21,6 +21,7 @@
                 <Label Content="{Binding ChannelFourValueText}"></Label>
                 <Label Content="{Binding ChannelFiveValueText}"></Label>
                 <Label Content="{Binding StatusMessage}"></Label>
+                <Button Margin="1" Width="90" Height="25" HorizontalAlignment="Left" Content="Refresh" Command="{Binding RefreshCommand}"/>
             </StackPanel>
         </GroupBox>
     </Grid>

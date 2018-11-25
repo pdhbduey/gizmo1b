@@ -11,6 +11,7 @@ namespace SiemensTestProgram
     using System.Windows;
     using System.Windows.Threading;
     using Common.Bindings;
+    using DeviceManager.ViewModel;
 
     /// <summary>
     /// This class is responsible for mapping viewmodels so correctly selected menu is shown.
@@ -93,11 +94,15 @@ namespace SiemensTestProgram
 
             if (disposable != null)
             {
-                disposable.Dispose();
-                Content = null;
+                if (!(disposable is CommunicationConfigurationViewModel))
+                {
+                    disposable.Dispose();
+                    Content = null;
+                }
             }
 
             ShowLoadingWindow();
+            Thread.Sleep(100);
 
             switch (selectedTestView)
             {

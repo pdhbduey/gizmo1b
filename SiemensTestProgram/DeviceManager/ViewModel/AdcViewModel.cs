@@ -35,7 +35,7 @@ namespace DeviceManager.ViewModel
             InitialUpdate(10);
 
             StartUpdateTask();
-            //RefreshCommand = new RelayCommand(param => InitialUpdate(10));
+            RefreshCommand = new RelayCommand(param => InitialUpdate(10));
         }
 
         public RelayCommand RefreshCommand { get; set; }

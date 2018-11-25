@@ -56,6 +56,7 @@ namespace DeviceManager.ViewModel
             ResetCustomWaveformCommand = new RelayCommand(param => Reset());
             SetWaveformCyclesCommand = new RelayCommand(param => SetWaveformCycles());
             StartStopWaveformCommand = new RelayCommand(param => WaveformToggle());
+            RefreshCommand = new RelayCommand(param => InitialUpdate());
 
             Tins = HeaterDefaults.Tins;
             selectedTin = Tins[0];
@@ -74,6 +75,8 @@ namespace DeviceManager.ViewModel
             InitialUpdate();
             StartUpdateTask();
         }
+
+        public RelayCommand RefreshCommand { get; set; }
 
         public RelayCommand StartStopWaveformCommand { get; set; }
 
@@ -739,6 +742,11 @@ namespace DeviceManager.ViewModel
         {
             while (true)
             {
+                if (token.IsCancellationRequested == true)
+                {
+                    break;
+                }
+
                 var vData = await heaterModel.ReadVSenseCommand();
                 if (vData.succesfulResponse)
                 {

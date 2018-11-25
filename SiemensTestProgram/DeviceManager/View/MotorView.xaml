@@ -23,10 +23,11 @@
             <GroupBox.Header>
                 <TextBlock Text="State" FontWeight="Bold"/>
             </GroupBox.Header>
-            <StackPanel VerticalAlignment="Center">
+            <StackPanel>
                 <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Reset" Command="{Binding ResetCommand}"></Button>
                 <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Limp" Command="{Binding LimpCommand}"></Button>
                 <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Initialize" Command="{Binding InitializeCommand}"></Button>
+                <Button Margin="1" Width="100" Height="25" HorizontalAlignment="Left" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
             </StackPanel>
         </GroupBox>
 

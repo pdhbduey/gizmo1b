@@ -36,10 +36,14 @@ namespace DeviceManager.ViewModel
             this.thermistorModel = thermistorModel;
 
             Types = ThermistorDefaults.Types;
-            
+
+            RefreshCommand = new RelayCommand(param => InitialUpdate());
+
             InitialUpdate();
             StartUpdateTask();
         }
+
+        public RelayCommand RefreshCommand { get; set; }
 
         public List<string> Types { get; set; }
 

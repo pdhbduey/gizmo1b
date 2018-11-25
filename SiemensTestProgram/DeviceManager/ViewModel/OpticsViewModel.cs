@@ -45,6 +45,7 @@ namespace DeviceManager.ViewModel
             SetIntensityCommand = new RelayCommand(param => UpdateIntensity());
             UpdateCommand = new RelayCommand(param => Update());
 
+
             // Initial Set
             integrationTime = OpticsDefault.IntegrationTimeDefault;
             intensity = 0;

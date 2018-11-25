@@ -40,10 +40,13 @@ namespace DeviceManager.ViewModel
             ntcTwoColour = notSetColour;
 
             ResetCommand = new RelayCommand(param => Reset());
+            RefreshCommand = new RelayCommand(param => Update());
 
             Update();
             StartUpdateTask();
         }
+
+        public RelayCommand RefreshCommand { get; set; }
 
         private void Update()
         {

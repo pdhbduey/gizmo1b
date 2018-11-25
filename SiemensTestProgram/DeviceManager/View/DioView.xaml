@@ -69,6 +69,10 @@
                         <Ellipse Fill="{Binding DinNineColour}" Width="10" Height="10" />
                         <Label Content="DIN9"></Label>
                     </StackPanel>
+
+                    <StackPanel>
+                        <Label />
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
@@ -88,6 +92,7 @@
                 <Button Width="100" Height="25" Margin="2" Content="{Binding DoutFiveStatus}" HorizontalAlignment="Left" Command="{Binding SetDioFiveCommand}"></Button>
                 <Button Width="100" Height="25" Margin="2" Content="{Binding DoutSixStatus}" HorizontalAlignment="Left" Command="{Binding SetDioSixCommand}"></Button>
                 <Button Width="100" Height="25" Margin="2" Content="{Binding DoutSevenStatus}" HorizontalAlignment="Left" Command="{Binding SetDioSevenCommand}"></Button>
+                <Button Width="100" Height="25" Margin="2" HorizontalAlignment="Left" Content="Refresh" Command="{Binding RefreshCommand}"></Button>
             </StackPanel>
         </GroupBox>
     </Grid>

@@ -125,6 +125,10 @@
                     <Label Width="50" VerticalAlignment="Center" HorizontalAlignment="Right" Content="Select:"></Label>
                     <ComboBox Margin="1" Height="25" Width="110" HorizontalAlignment="Left" ItemsSource="{Binding Tins}" SelectedItem="{Binding SelectedTin}"></ComboBox>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="50" VerticalAlignment="Center" HorizontalAlignment="Right"></Label>
+                    <Button Margin="1" Height="25" Width="110" HorizontalAlignment="Left" Command="{Binding RefreshCommand}" Content="Refresh"></Button>
+                </StackPanel>
                 
             </StackPanel>
         </GroupBox>
