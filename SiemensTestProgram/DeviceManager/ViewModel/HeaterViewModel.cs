@@ -16,6 +16,13 @@ namespace DeviceManager.ViewModel
     {
         IHeaterModel heaterModel;
 
+        private float trefReadback;
+        private float iMaxReadback;
+        private int cyclesReadback;
+        private float proportionalReadback;
+        private float integralReadback;
+        private float derivativeReadback;
+
         private float proportionalGain;
         private float integralGain;
         private float derivativeGain;
@@ -120,6 +127,13 @@ namespace DeviceManager.ViewModel
             }
 
             await heaterModel.SetWaveformCyclesCommand(waveformCycles);
+
+            var cyclesData = heaterModel.ReadCycles().Result;
+            if (cyclesData.succesfulResponse)
+            {
+                cyclesReadback = Helper.GetIntFromBigEndian(cyclesData.response);
+                OnPropertyChanged(nameof(CyclesReadback));
+            }
         }
 
         public int WaveformCycles
@@ -168,6 +182,54 @@ namespace DeviceManager.ViewModel
 
                 OnPropertyChanged(nameof(ProportionalGain));
                 //UpdateProportionalGain();
+            }
+        }
+
+        public string TRefReadback
+        {
+            get
+            {
+                return $"TRef: {trefReadback.ToString("0.##")}";
+            }
+        }
+
+        public string IMaxReadback
+        {
+            get
+            {
+                return $"IMax: {iMaxReadback.ToString("0.##")}";
+            }
+        }
+
+        public string CyclesReadback
+        {
+            get
+            {
+                return $"Cycles: {cyclesReadback}";
+            }
+        }
+
+        public string ProportionalReadback
+        {
+            get
+            {
+                return $"Proportional Gain: {proportionalReadback.ToString("0.##")}";
+            }
+        }
+
+        public string IntegralReadback
+        {
+            get
+            {
+                return $"Integral Gain: {integralReadback.ToString("0.##")}"; ;
+            }
+        }
+
+        public string DerivativeReadback
+        {
+            get
+            {
+                return $"Derivative Gain: {derivativeReadback.ToString("0.##")}"; ;
             }
         }
 
@@ -911,6 +973,13 @@ namespace DeviceManager.ViewModel
             }
 
             await heaterModel.SetProportionalGainCommand(proportionalGain);
+
+            var data = heaterModel.ReadProportionalGain().Result;
+            if (data.succesfulResponse)
+            {
+                proportionalReadback = Helper.GetFloatFromBigEndian(data.response);
+                OnPropertyChanged(nameof(ProportionalReadback));
+            }
         }
 
         private async void UpdateTin()
@@ -930,6 +999,13 @@ namespace DeviceManager.ViewModel
             }
 
             await heaterModel.SetIntegralGainCommand(integralGain);
+
+            var integralData = heaterModel.ReadIntegralGain().Result;
+            if (integralData.succesfulResponse)
+            {
+                integralReadback = Helper.GetFloatFromBigEndian(integralData.response);
+                OnPropertyChanged(nameof(IntegralReadback));
+            }
         }
 
         private async void UpdateDerivativeGain()
@@ -944,6 +1020,13 @@ namespace DeviceManager.ViewModel
             }
 
             await heaterModel.SetDerivativeGainCommand(derivativeGain);
+
+            var data = heaterModel.ReadDerivativeGain().Result;
+            if (data.succesfulResponse)
+            {
+                derivativeReadback = Helper.GetFloatFromBigEndian(data.response);
+                OnPropertyChanged(nameof(DerivativeReadback));
+            }
         }
 
         private async void UpdateTRef()
@@ -958,6 +1041,13 @@ namespace DeviceManager.ViewModel
             }
 
             await heaterModel.SetTRefCommand(tRef);
+
+            var trefData = heaterModel.ReadTref().Result;
+            if (trefData.succesfulResponse)
+            {
+                trefReadback = Helper.GetFloatFromBigEndian(trefData.response);
+                OnPropertyChanged(nameof(TRefReadback));
+            }
         }
 
         private async void UpdateIMax()
@@ -972,6 +1062,13 @@ namespace DeviceManager.ViewModel
             }
 
             await heaterModel.SetIMaxCommand(iMax);
+
+            var imaxData = heaterModel.ReadImax().Result;
+            if (imaxData.succesfulResponse)
+            {
+                iMaxReadback = Helper.GetFloatFromBigEndian(imaxData.response);
+                OnPropertyChanged(nameof(IMaxReadback));
+            }
         }
 
         private void GetCustomWaveformData()

@@ -44,6 +44,8 @@
                     <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=PeriodOne}" KeyUp="EnterUpdate"></TextBox>
                     <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetFanPeriodOne}"/>
                 </StackPanel>
+                <Label Margin="1" Content="{Binding DutycycleReadback1}"></Label>
+                <Label Margin="1" Content="{Binding PeriodReadback1}"></Label>
             </StackPanel>
         </GroupBox>
 
@@ -74,6 +76,8 @@
                     <TextBox Height="25" Width="100" HorizontalAlignment="Left" Text="{Binding Path=PeriodTwo}" KeyUp="EnterUpdate"></TextBox>
                     <Button Content="Set" Margin="1,0,0,0" Height="25" Width="100" Command="{Binding SetFanPeriodTwo}"/>
                 </StackPanel>
+                <Label Margin="1" Content="{Binding DutycycleReadback2}"></Label>
+                <Label Margin="1" Content="{Binding PeriodReadback2}"></Label>
             </StackPanel>
         </GroupBox>
 

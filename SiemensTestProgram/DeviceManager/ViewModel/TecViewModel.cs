@@ -43,6 +43,14 @@ namespace DeviceManager.ViewModel
         private string statusMessage;
         private string customReadStatus;
 
+        private float irefReadback;
+        private float vMaxReadback;
+        private int cyclesReadback;
+        private int periodReadback;
+        private float proportionalReadback;
+        private float integralReadback;
+        private float derivativeReadback;
+
         private Task updateTask;
         private CancellationTokenSource cts;
         private CancellationToken token;
@@ -130,6 +138,62 @@ namespace DeviceManager.ViewModel
         public RelayCommand IncrementCommand { get; set; }
 
         public List<string> Waveforms { get; set; }
+
+        public string IRefReadback
+        {
+            get
+            {
+                return $"IRef: {irefReadback.ToString("0.##")}";
+            }
+        }
+
+        public string VMaxReadback
+        {
+            get
+            {
+                return $"VMax: {vMaxReadback.ToString("0.##")}";
+            }
+        }
+
+        public string PeriodReadback
+        {
+            get
+            {
+                return $"Period: {periodReadback}";
+            }
+        }
+
+        public string CyclesReadback
+        {
+            get
+            {
+                return $"Cycles: {cyclesReadback}";
+            }
+        }
+
+        public string ProportionalReadback
+        {
+            get
+            {
+                return $"Proportional Gain: {proportionalReadback.ToString("0.##")}";
+            }
+        }
+
+        public string IntegralReadback
+        {
+            get
+            {
+                return $"Integral Gain: {integralReadback.ToString("0.##")}"; ;
+            }
+        }
+
+        public string DerivativeReadback
+        {
+            get
+            {
+                return $"Derivative Gain: {derivativeReadback.ToString("0.##")}"; ;
+            }
+        }
 
         public string EnableButtonState
         {
@@ -716,6 +780,13 @@ namespace DeviceManager.ViewModel
             }
 
             await tecModel.SetPeriodCommand(tecPeriod);
+
+            var readPeriodResponse = tecModel.ReadPeriod().Result;
+            if (readPeriodResponse.succesfulResponse)
+            {
+                periodReadback = Helper.GetIntFromBigEndian(readPeriodResponse.response);
+                OnPropertyChanged(nameof(PeriodReadback));
+            }
         }
 
         private async void UpdateProportionalGain()
@@ -730,6 +801,13 @@ namespace DeviceManager.ViewModel
             }
 
             await tecModel.SetProportionalGainCommand(proportionalGain);
+
+            var data = tecModel.ReadProportionalGain().Result;
+            if (data.succesfulResponse)
+            {
+                proportionalReadback = Helper.GetFloatFromBigEndian(data.response);
+                OnPropertyChanged(nameof(ProportionalReadback));
+            }
         }
 
         private async void UpdateIntegralGain()
@@ -744,6 +822,13 @@ namespace DeviceManager.ViewModel
             }
 
             await tecModel.SetIntegralGainCommand(integralGain);
+
+            var data = tecModel.ReadIntegralGain().Result;
+            if (data.succesfulResponse)
+            {
+                integralReadback = Helper.GetFloatFromBigEndian(data.response);
+                OnPropertyChanged(nameof(IntegralReadback));
+            }
         }
 
         private async void UpdateDerivativeGain()
@@ -758,11 +843,20 @@ namespace DeviceManager.ViewModel
             }
 
             await tecModel.SetDerivativeGainCommand(derivativeGain);
+
+            var data = tecModel.ReadDerivativeGain().Result;
+            if (data.succesfulResponse)
+            {
+                derivativeReadback = Helper.GetFloatFromBigEndian(data.response);
+                OnPropertyChanged(nameof(DerivativeReadback));
+            }
         }
 
         private async void UpdateIrefForWaveform()
         {
             await tecModel.SetWaveformIrefCommand(irefCustomValue);
+
+            
         }
 
         private async void SetIref()
@@ -777,6 +871,13 @@ namespace DeviceManager.ViewModel
             }
 
             await tecModel.SetIrefCommand(irefValue);
+
+            var data = tecModel.ReadIref().Result;
+            if (data.succesfulResponse)
+            {
+                irefReadback = Helper.GetFloatFromBigEndian(data.response);
+                OnPropertyChanged(nameof(IRefReadback));
+            }
         }
 
         private async void SetVout()
@@ -791,6 +892,13 @@ namespace DeviceManager.ViewModel
             }
 
             await tecModel.SetVoutCommand(voutValue);
+
+            var data = tecModel.ReadVmax().Result;
+            if (data.succesfulResponse)
+            {
+                vMaxReadback = Helper.GetFloatFromBigEndian(data.response);
+                OnPropertyChanged(nameof(VMaxReadback));
+            }
         }
 
         private async void UpdateWaveform()
@@ -888,6 +996,13 @@ namespace DeviceManager.ViewModel
             }
 
             await tecModel.SetWaveformCyclesCommand(waveformCycles);
+
+            var readCyclesResponse = tecModel.ReadCycles().Result;
+            if (readCyclesResponse.succesfulResponse)
+            {
+                cyclesReadback = Helper.GetIntFromBigEndian(readCyclesResponse.response);
+                OnPropertyChanged(nameof(CyclesReadback));
+            }
         }
 
         private async void SetSampleTime()

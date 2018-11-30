@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -144,5 +145,20 @@
             </StackPanel>
         </GroupBox>
 
+        <GroupBox Grid.Row="2" Grid.ColumnSpan="2">
+            <GroupBox.Header>
+                <TextBlock Text="TEC Readback" FontWeight="Bold"/>
+            </GroupBox.Header>
+
+            <StackPanel>
+                <Label Margin="1" Content="{Binding PeriodReadback}"></Label>
+                <Label Margin="1" Content="{Binding IRefReadback}"></Label>
+                <Label Margin="1" Content="{Binding VMaxReadback}"></Label>
+                <Label Margin="1" Content="{Binding CyclesReadback}"></Label>
+                <Label Margin="1" Content="{Binding IntegralReadback}"></Label>
+                <Label Margin="1" Content="{Binding ProportionalReadback}"></Label>
+                <Label Margin="1" Content="{Binding DerivativeReadback}"></Label>
+            </StackPanel>
+        </GroupBox>
     </Grid>
 </UserControl>

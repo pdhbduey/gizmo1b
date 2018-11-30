@@ -10,6 +10,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -147,6 +148,22 @@
                 <Label Margin="1" Content="{Binding TemperatureTwoText}"></Label>
                 <Label Margin="1" Content="{Binding TemperatureThreeText}"></Label>
                 <Label Margin="1" Content="{Binding TemperatureFourText}"></Label>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Status -->
+        <GroupBox Grid.Row="2" Grid.ColumnSpan="2">
+            <GroupBox.Header>
+                <TextBlock Text="Heater Readback" FontWeight="Bold"/>
+            </GroupBox.Header>
+
+            <StackPanel>
+                <Label Margin="1" Content="{Binding TRefReadback}"></Label>
+                <Label Margin="1" Content="{Binding IMaxReadback}"></Label>
+                <Label Margin="1" Content="{Binding CyclesReadback}"></Label>
+                <Label Margin="1" Content="{Binding IntegralReadback}"></Label>
+                <Label Margin="1" Content="{Binding ProportionalReadback}"></Label>
+                <Label Margin="1" Content="{Binding DerivativeReadback}"></Label>
             </StackPanel>
         </GroupBox>
     </Grid>

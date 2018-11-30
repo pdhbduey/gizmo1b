@@ -25,6 +25,10 @@ namespace DeviceManager.ViewModel
         public float sensorOneRpm;
         public float sensorTwoRpm;
         private string statusMessage;
+        private int dutycycleReadback1;
+        private int dutycycleReadback2;
+        private float periodReadback1;
+        private float periodReadback2;
 
         // Update task variables
         private Task updateTask;
@@ -54,6 +58,38 @@ namespace DeviceManager.ViewModel
         }
 
         public RelayCommand RefreshCommand { get; set; }
+
+        public string PeriodReadback1
+        {
+            get
+            {
+                return $"Period: {periodReadback1.ToString("0.##")}";
+            }
+        }
+
+        public string PeriodReadback2
+        {
+            get
+            {
+                return $"Period: {periodReadback2.ToString("0.##")}";
+            }
+        }
+
+        public string DutycycleReadback1
+        {
+            get
+            {
+                return $"Duty Cycle: {dutycycleReadback1}";
+            }
+        }
+
+        public string DutycycleReadback2
+        {
+            get
+            {
+                return $"Duty Cycle: {dutycycleReadback2}";
+            }
+        }
 
         public int DutyCycleOne
         {
@@ -391,14 +427,25 @@ namespace DeviceManager.ViewModel
 
         public async void SetFanDutyCycle(int channel)
         {
-            var response = new byte[5];
             switch (channel)
             {
                 case 1:
                     await fanModel.SetFanPwmDutyCycle(channel, dutyCycleOne);
+                    var cycleOneValue = fanModel.GetFanPwmDutyCycle(1).Result;
+                    if (cycleOneValue.succesfulResponse)
+                    {
+                        dutycycleReadback1 = Helper.GetIntFromBigEndian(cycleOneValue.response);
+                        OnPropertyChanged(nameof(DutycycleReadback1));
+                    }
                     break;
                 case 2:
                     await fanModel.SetFanPwmDutyCycle(channel, dutyCycleTwo);
+                    var cycleTwoValue = fanModel.GetFanPwmDutyCycle(2).Result;
+                    if (cycleTwoValue.succesfulResponse)
+                    {
+                        dutycycleReadback2 = Helper.GetIntFromBigEndian(cycleTwoValue.response);
+                        OnPropertyChanged(nameof(DutycycleReadback2));
+                    }
                     break;
             }
         }
@@ -409,9 +456,22 @@ namespace DeviceManager.ViewModel
             {
                 case 1:
                     await fanModel.SetFanPwmPeriod(channel, periodTwo);
+                    var periodOneValue = fanModel.GetFanPwmPeriod(1).Result;
+                    if (periodOneValue.succesfulResponse)
+                    {
+                        periodReadback1 = Helper.GetFloatFromBigEndian(periodOneValue.response);
+                        OnPropertyChanged(nameof(PeriodReadback1));
+                    }
+
                     break;
                 case 2:
                     await fanModel.SetFanPwmPeriod(channel, periodTwo);
+                    var periodTwoValue = fanModel.GetFanPwmPeriod(2).Result;
+                    if (periodTwoValue.succesfulResponse)
+                    {
+                        periodReadback2 = Helper.GetFloatFromBigEndian(periodTwoValue.response);
+                        OnPropertyChanged(nameof(PeriodReadback2));
+                    }
                     break;
             }
         }
